@@ -7,7 +7,7 @@ module Magic
 
     COST = "{0}"
 
-    def initialize(name: NAME, type_line: "", game: Game.new, controller: Player.new, zone: CardZone.new, cost: nil, tapped: false)
+    def initialize(name: NAME, type_line: "", game: Game.new, controller: Player.new, zone: CardZone.new(self), cost: nil, tapped: false)
       @name = name
       @type_line = type_line
       @game = game
@@ -71,6 +71,9 @@ module Magic
 
     def skip_stack?
       false
+    end
+
+    def entered_the_battlefield!
     end
 
     private

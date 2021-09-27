@@ -1,9 +1,9 @@
 module Magic
   class CardZone
-    attr_reader :battlefield_entry_effects
+    attr_reader :card
 
-    def initialize(battlefield_entry_effects: [])
-      @battlefield_entry_effects = battlefield_entry_effects
+    def initialize(card)
+      @card = card
     end
 
     include AASM
@@ -20,11 +20,11 @@ module Magic
       end
 
       event :cast do
-        transitions from: :hand, to: :battlefield, after: :run_battlefield_entry_effects
+        transitions from: :hand, to: :stack
       end
 
       event :battlefield do
-        transitions to: :battlefield
+        transitions to: :battlefield, after: -> { card.entered_the_battlefield! }
       end
 
       event :graveyard do
@@ -34,10 +34,6 @@ module Magic
       event :move_to_graveyard do
         transitions from: :battlefield, to: :graveyard
       end
-    end
-
-    def run_battlefield_entry_effects
-      battlefield_entry_effects.each(&:call)
     end
   end
 end

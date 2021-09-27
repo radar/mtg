@@ -5,7 +5,7 @@ module Magic
     def_delegator :@stack, :first
 
     def initialize(stack: [])
-      @stack = []
+      @stack = stack
     end
 
     def add(item)

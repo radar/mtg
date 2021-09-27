@@ -9,7 +9,7 @@ module Magic
         )
       end
 
-      def add_to_battlefield!
+      def entered_the_battlefield!
         controller.gain_life(3)
         super
       end
