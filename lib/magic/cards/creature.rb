@@ -8,10 +8,6 @@ module Magic
         @toughness = toughness
         super(**args)
       end
-
-      def creature?
-        true
-      end
     end
   end
 end

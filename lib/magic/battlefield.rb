@@ -7,7 +7,6 @@ module Magic
     end
 
     def <<(card)
-      card.cast!
       @cards << card
     end
 

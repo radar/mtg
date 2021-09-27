@@ -2,17 +2,15 @@ module Magic
   module Cards
     class GolgariGuildgate < Card
       def initialize(**args)
-        zone = CardZone.new(
-          battlefield_entry_effects: [
-            -> { self.tapped = true },
-          ]
-        )
-
         super(
           name: "Golgari Guildgate",
-          zone: zone,
           **args
         )
+      end
+
+      def add_to_battlefield!
+        self.tapped = true
+        super
       end
 
       def tap!

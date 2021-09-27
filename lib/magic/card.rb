@@ -1,14 +1,16 @@
 module Magic
   class Card
-    attr_reader :name, :zone, :cost
+    attr_reader :game, :name, :zone, :cost, :type_line
     attr_accessor :tapped
 
     attr_accessor :controller
 
     COST = "{0}"
 
-    def initialize(name: NAME, controller: Player.new, zone: CardZone.new, cost: nil, tapped: false)
+    def initialize(name: NAME, type_line: "", game: Game.new, controller: Player.new, zone: CardZone.new, cost: nil, tapped: false)
       @name = name
+      @type_line = type_line
+      @game = game
       @controller = controller
       @zone = zone
       @cost = cost
@@ -16,7 +18,11 @@ module Magic
     end
 
     def creature?
-      false
+      type_line.include?("Creature")
+    end
+
+    def artifact?
+      type_line.include?("Artifact")
     end
 
     def draw!
@@ -24,8 +30,20 @@ module Magic
     end
 
     def cast!
+      if skip_stack?
+        add_to_battlefield!
+      else
+        game.stack.add(self)
+      end
+    end
+
+    def add_to_battlefield!
+      game.battlefield << self
       move_zone!(:battlefield)
-      resolve!
+    end
+
+    def destroy!
+      move_zone!(:graveyard)
     end
 
     def tap!
@@ -47,6 +65,10 @@ module Magic
     def resolve!
     end
 
+    def skip_stack?
+      false
+    end
+
     private
 
     def move_zone!(target_zone)
@@ -54,7 +76,9 @@ module Magic
       when :hand
         zone.draw!
       when :battlefield
-        zone.cast!
+        zone.battlefield!
+      when :graveyard
+        zone.graveyard!
       else
         raise "invalid zone #{target_zone}"
       end

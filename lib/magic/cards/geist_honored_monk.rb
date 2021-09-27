@@ -2,7 +2,7 @@ module Magic
   module Cards
     class GeistHonoredMonk < Creature
       def initialize(**args)
-        super(name: "Geist Honored Monk", **args)
+        super(name: "Geist Honored Monk", type_line: "Creature -- Human Monk", **args)
       end
 
       def power

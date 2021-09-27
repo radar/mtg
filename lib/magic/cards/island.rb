@@ -1,9 +1,10 @@
 module Magic
   module Cards
-    class Island < Card
+    class Island < BasicLand
       def initialize(**args)
         super(name: "Island", **args)
       end
+
 
       def tap!
         controller.add_mana(blue: 1)

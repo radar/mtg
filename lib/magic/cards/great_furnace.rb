@@ -1,16 +1,16 @@
 module Magic
   module Cards
-    class ChargeThrough < Instant
+    class GreatFurnace < Land
       def initialize(**args)
         super(
-          name: "Charge Through",
-          cost: { green: 1 },
+          name: "Great Furnace",
+          type_line: "Artifact Land",
           **args
         )
       end
 
-      def resolve!
-        controller.draw!
+      def tap!
+        controller.add_mana(red: 1)
         super
       end
     end

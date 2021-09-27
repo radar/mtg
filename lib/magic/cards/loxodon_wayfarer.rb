@@ -6,7 +6,7 @@ module Magic
       TOUGHNESS = 5
 
       def initialize(**args)
-        super(name: "Loxodon Wayfarer", **args)
+        super(name: "Loxodon Wayfarer", type_line: "Creature -- Elephant Monk", **args)
       end
     end
   end

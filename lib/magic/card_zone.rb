@@ -23,6 +23,14 @@ module Magic
         transitions from: :hand, to: :battlefield, after: :run_battlefield_entry_effects
       end
 
+      event :battlefield do
+        transitions to: :battlefield
+      end
+
+      event :graveyard do
+        transitions to: :graveyard
+      end
+
       event :move_to_graveyard do
         transitions from: :battlefield, to: :graveyard
       end

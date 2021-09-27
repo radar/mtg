@@ -29,10 +29,6 @@ module Magic
       @players = players
     end
 
-    def add_to_battlefield(card)
-      battlefield << card
-    end
-
     def add_effect(effect)
       if effect.use_stack?
         @stack << effect
@@ -46,10 +42,10 @@ module Magic
       end
     end
 
-    def resolve_effect(type, *args)
+    def resolve_effect(type, **args)
       effect = @effects.first
       if effect.is_a?(type)
-        effect.resolve(*args)
+        effect.resolve(**args)
         @effects.shift
       else
         raise "Invalid type specified. Top effect is a #{effect.class}, but you specified #{type}"
