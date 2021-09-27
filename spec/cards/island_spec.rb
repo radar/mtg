@@ -7,5 +7,6 @@ RSpec.describe Magic::Cards::Island do
   it "taps for a single blue mana" do
     card.tap!
     expect(p1.mana_pool[:blue]).to eq(1)
+    expect(card).to be_tapped
   end
 end

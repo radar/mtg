@@ -1,15 +1,18 @@
 module Magic
   class Card
     attr_reader :name, :zone, :cost
+    attr_accessor :tapped
+
     attr_accessor :controller
 
     COST = "{0}"
 
-    def initialize(name: NAME, controller: Player.new, zone: CardZone.new, cost: nil)
+    def initialize(name: NAME, controller: Player.new, zone: CardZone.new, cost: nil, tapped: false)
       @name = name
       @controller = controller
       @zone = zone
       @cost = cost
+      @tapped = tapped
     end
 
     def creature?
@@ -23,6 +26,18 @@ module Magic
     def cast!
       move_zone!(:battlefield)
       resolve!
+    end
+
+    def tap!
+      @tapped = true
+    end
+
+    def untap!
+      @tapped = false
+    end
+
+    def tapped?
+      @tapped
     end
 
     def resolve!

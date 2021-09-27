@@ -7,5 +7,6 @@ RSpec.describe Magic::Cards::Mountain do
   it "taps for a single red mana" do
     card.tap!
     expect(p1.mana_pool[:red]).to eq(1)
+    expect(card).to be_tapped
   end
 end
