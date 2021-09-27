@@ -1,9 +1,9 @@
 module Magic
   module Cards
-    class EssenceWarden < Creature
-      NAME = "Essence Warden"
-      COST = { green: 1 }
-      TYPE_LINE = "Creature -- Elf Shaman"
+    class HealerOfThePride < Creature
+      NAME = "Healer of the Pride"
+      COST = { any: 3, white: 1 }
+      TYPE_LINE = "Creature -- Cat Cleric"
 
       def notify(event)
         case event
@@ -14,7 +14,7 @@ module Magic
               source: self,
               controller: controller,
               card: card,
-              life: 1
+              life: 2
             )
           )
         end
