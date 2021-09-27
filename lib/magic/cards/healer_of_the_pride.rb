@@ -10,9 +10,8 @@ module Magic
         when Events::EnterTheBattlefield
           card = event.card
           game.add_effect(
-            Effects::CreatureEntersControllerGainsLife.new(
+            Effects::AnotherCreatureEntersUnderYourControlYouGainLife.new(
               source: self,
-              controller: controller,
               card: card,
               life: 2
             )

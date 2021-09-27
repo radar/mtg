@@ -9,8 +9,6 @@ module Magic
         case event
         when Events::EnterTheBattlefield
           card = event.card
-          return if card == self
-
           game.add_effect(
             Effects::AnotherCreatureEntersYouGainLife.new(
               source: self,

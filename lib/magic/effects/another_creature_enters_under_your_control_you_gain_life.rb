@@ -1,6 +1,6 @@
 module Magic
   module Effects
-    class AnotherCreatureEntersYouGainLife
+    class AnotherCreatureEntersUnderYourControlYouGainLife
       attr_reader :source, :card, :life
       def initialize(source:, card:, life:)
         @source = source
@@ -18,6 +18,7 @@ module Magic
 
       def resolve
         return if card == source
+        return unless card.controller == source.controller
         return unless card.creature?
 
         source.controller.gain_life(life)
