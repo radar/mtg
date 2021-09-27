@@ -11,7 +11,7 @@ RSpec.describe Magic::Cards::RampantGrowth do
     card.cast!
     game.stack.resolve!
     expect(game.effects.count).to eq(1)
-    game.resolve_effect(Magic::Effects::SearchLibrary, p1_forest)
+    game.resolve_effect(Magic::Effects::SearchLibrary, target: p1_forest)
     expect(game.effects.count).to eq(0)
     expect(p1_forest.zone).to be_battlefield
     expect(p1_forest).to be_tapped

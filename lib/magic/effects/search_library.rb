@@ -21,8 +21,8 @@ module Magic
         library.cards.select(condition)
       end
 
-      def resolve(card)
-        resolve_action.call(card)
+      def resolve(target:)
+        resolve_action.call(target)
       end
     end
   end
