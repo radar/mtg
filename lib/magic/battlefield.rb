@@ -3,7 +3,7 @@ module Magic
     attr_reader :cards
 
     def initialize(cards: [])
-      @cards = cards
+      @cards = CardList.new(cards)
     end
 
     def <<(card)
@@ -11,10 +11,12 @@ module Magic
       @cards << card
     end
 
+    def untap(&block)
+      block.call(cards).each(&:untap!)
+    end
+
     def creatures_controlled_by(player)
-      @cards.select do |card|
-        card.controller == player && card.creature?
-      end
+      @cards.controlled_by(player).select(&:creature?)
     end
   end
 end

@@ -40,6 +40,10 @@ module Magic
       @tapped
     end
 
+    def untapped?
+      !tapped?
+    end
+
     def resolve!
     end
 
