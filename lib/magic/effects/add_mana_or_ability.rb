@@ -12,8 +12,16 @@ module Magic
         @green = green
       end
 
-      def choose(color)
-        player.add_mana(color)
+      def use_stack?
+        false
+      end
+
+      def requires_choices?
+        true
+      end
+
+      def resolve(mana)
+        player.add_mana(mana)
       end
     end
   end

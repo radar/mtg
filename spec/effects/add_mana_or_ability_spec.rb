@@ -6,7 +6,7 @@ RSpec.describe Magic::Effects::AddManaOrAbility do
 
   context "choose" do
     it "chooses the black mana" do
-      subject.choose(:black)
+      subject.resolve(black: 1)
       expect(player.mana_pool[:black]).to eq(1)
     end
   end

@@ -31,8 +31,7 @@ RSpec.describe Magic::Player do
 
     context "when the player has enough mana" do
       it "is castable" do
-        player.add_mana(:white, 1)
-        player.add_mana(:red, 2)
+        player.add_mana(white: 1, red: 2)
         expect(player.can_cast?(card)).to eq(true)
       end
     end

@@ -20,16 +20,40 @@ module Magic
       end
     end
 
-    attr_reader :battlefield, :stack, :players
+    attr_reader :battlefield, :stack, :players, :effects
 
-    def initialize(battlefield: Battlefield.new, stack: Stack.new, players: [])
+    def initialize(battlefield: Battlefield.new, stack: Stack.new, effects: [], players: [])
       @battlefield = battlefield
       @stack = stack
+      @effects = effects
       @players = players
     end
 
     def add_to_battlefield(card)
       battlefield << card
+    end
+
+    def add_effect(effect)
+      if effect.use_stack?
+        @stack << effect
+      else
+        if effect.requires_choices?
+          @effects << effect
+          # wait for a choice to be made
+        else
+          effect.resolve
+        end
+      end
+    end
+
+    def resolve_effect(type, *args)
+      effect = @effects.first
+      if effect.is_a?(type)
+        effect.resolve(*args)
+        @effects.shift
+      else
+        raise "Invalid type specified. Top effect is a #{effect.class}, but you specified #{type}"
+      end
     end
 
     def active_player

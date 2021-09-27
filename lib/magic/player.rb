@@ -1,16 +1,23 @@
 module Magic
   class Player
-    attr_reader :game, :library, :mana_pool, :hand
+    attr_reader :game, :library, :mana_pool, :hand, :life
 
-    def initialize(game: Game.new, library: Library.new([]), hand: [], mana_pool: Hash.new(0))
+    def initialize(game: Game.new, library: Library.new([]), hand: [], mana_pool: Hash.new(0), life: 20)
       @game = game
       @library = library
       @hand = hand
       @mana_pool = mana_pool
+      @life = life
     end
 
-    def add_mana(color, count = 1)
-      @mana_pool[color] += count
+    def gain_life(life)
+      @life += life
+    end
+
+    def add_mana(mana)
+      mana.each do |color, count|
+        @mana_pool[color] += count
+      end
     end
 
     def draw!

@@ -6,7 +6,7 @@ module Magic
       end
 
       def tap!
-        controller.add_mana(:blue)
+        controller.add_mana(blue: 1)
         super
       end
     end

@@ -16,9 +16,9 @@ RSpec.describe Magic::Cards::GolgariGuildgate do
     card.cast!
     card.untap!
     card.tap!
-    expect(mana_ability).to be_a(Magic::Effects::AddManaOrAbility)
-    expect(mana_ability.black).to eq(1)
-    expect(mana_ability.green).to eq(1)
-    mana_ability.choose
+    expect(game.effects.count).to eq(1)
+    game.resolve_effect(Magic::Effects::AddManaOrAbility, black: 1)
+    expect(game.effects).to be_empty
+    expect(p1.mana_pool[:black]).to eq(1)
   end
 end
