@@ -10,6 +10,10 @@ module Magic
       @cards << card
     end
 
+    def notify!(event)
+      @cards.each { |card| card.notify(event) }
+    end
+
     def untap(&block)
       block.call(cards).each(&:untap!)
     end

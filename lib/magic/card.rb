@@ -44,6 +44,9 @@ module Magic
     def add_to_battlefield!
       game.battlefield << self
       move_zone!(:battlefield)
+      game.notify!(
+        Events::EnterTheBattlefield.new(self)
+      )
     end
 
     def destroy!
@@ -66,6 +69,10 @@ module Magic
       !tapped?
     end
 
+    def controller?(other_controller)
+      controller == other_controller
+    end
+
     def resolve!
     end
 
@@ -74,6 +81,9 @@ module Magic
     end
 
     def entered_the_battlefield!
+    end
+
+    def notify(event)
     end
 
     private

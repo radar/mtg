@@ -27,6 +27,10 @@ module Magic
       end
     end
 
+    def notify!(event)
+      battlefield.notify!(event)
+    end
+
     def resolve_effect(type, **args)
       effect = @effects.first
       if effect.is_a?(type)
