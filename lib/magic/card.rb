@@ -25,6 +25,10 @@ module Magic
       type_line.include?("Artifact")
     end
 
+    def enchantment?
+      type_line.include?("Enchantment")
+    end
+
     def draw!
       move_zone!(:hand)
     end
