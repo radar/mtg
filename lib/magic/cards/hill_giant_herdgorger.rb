@@ -1,13 +1,9 @@
 module Magic
   module Cards
     class HillGiantHerdgorger < Creature
-      def initialize(**args)
-        super(
-          name: "Hill Giant Herdgorger",
-          cost: { green: 2, any: 4 },
-          **args
-        )
-      end
+      NAME = "Hill Giant Herdgorger"
+      TYPE_LINE = "Creature -- Giant"
+      COST = { green: 2, any: 4 }
 
       def entered_the_battlefield!
         controller.gain_life(3)

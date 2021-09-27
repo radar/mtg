@@ -7,13 +7,13 @@ module Magic
 
     COST = "{0}"
 
-    def initialize(name: NAME, type_line: "", game: Game.new, controller: Player.new, zone: CardZone.new(self), cost: nil, tapped: false)
-      @name = name
-      @type_line = type_line
+    def initialize(game: Game.new, controller: Player.new, zone: CardZone.new(self), cost: self.class::COST, tapped: false)
+      @name = self.class::NAME
+      @type_line = self.class::TYPE_LINE
       @game = game
       @controller = controller
       @zone = zone
-      @cost = cost
+      @cost = self.class::COST
       @tapped = tapped
     end
 

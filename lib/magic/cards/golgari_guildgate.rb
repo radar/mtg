@@ -1,12 +1,8 @@
 module Magic
   module Cards
     class GolgariGuildgate < Card
-      def initialize(**args)
-        super(
-          name: "Golgari Guildgate",
-          **args
-        )
-      end
+      NAME = "Golgari Guildgate"
+      TYPE_LINE = "Land -- Gate"
 
       def add_to_battlefield!
         self.tapped = true

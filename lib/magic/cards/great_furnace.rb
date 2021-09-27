@@ -1,13 +1,8 @@
 module Magic
   module Cards
     class GreatFurnace < Land
-      def initialize(**args)
-        super(
-          name: "Great Furnace",
-          type_line: "Artifact Land",
-          **args
-        )
-      end
+      NAME = "Great Furnace"
+      TYPE_LINE = "Artifact Land"
 
       def tap!
         controller.add_mana(red: 1)

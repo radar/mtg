@@ -1,9 +1,8 @@
 module Magic
   module Cards
     class Forest < Card
-      def initialize(**args)
-        super(name: "Forest", **args)
-      end
+      NAME = "Forest"
+      TYPE_LINE = "Basic Land -- Forest"
 
       def tap!
         controller.add_mana(:green)

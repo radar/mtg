@@ -1,12 +1,9 @@
 module Magic
   module Cards
     class PathOfPeace < Sorcery
-      def initialize(**args)
-        super(
-          name: "Path of Peace",
-          **args
-        )
-      end
+      NAME = "Path of Peace"
+      COST = { any: 3, white: 1 }
+
 
       def resolve!
         game.add_effect(

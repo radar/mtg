@@ -1,13 +1,8 @@
 module Magic
   module Cards
     class ChargeThrough < Instant
-      def initialize(**args)
-        super(
-          name: "Charge Through",
-          cost: { green: 1 },
-          **args
-        )
-      end
+      NAME = "Charge Through"
+      COST = { green: 1 }
 
       def resolve!
         controller.draw!

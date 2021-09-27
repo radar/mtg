@@ -1,12 +1,8 @@
 module Magic
   module Cards
-    class NaturesClaim < Sorcery
-      def initialize(**args)
-        super(
-          name: "Path of Peace",
-          **args
-        )
-      end
+    class NaturesClaim < Instant
+      NAME = "Nature's Claim"
+      COST = { green: 1 }
 
       def resolve!
         game.add_effect(

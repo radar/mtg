@@ -1,9 +1,8 @@
 module Magic
   module Cards
     class GeistHonoredMonk < Creature
-      def initialize(**args)
-        super(name: "Geist Honored Monk", type_line: "Creature -- Human Monk", **args)
-      end
+      NAME = "Geist Honored Monk"
+      TYPE_LINE = "Creature -- Human Monk"
 
       def power
         other_controlled_creatures_count

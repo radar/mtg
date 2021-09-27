@@ -1,12 +1,8 @@
 module Magic
   module Cards
     class Shatter < Instant
-      def initialize(**args)
-        super(
-          name: "Shatter",
-          **args
-        )
-      end
+      NAME = "Shatter"
+      COST = { any: 1, red: 1 }
 
       def resolve!
         game.add_effect(

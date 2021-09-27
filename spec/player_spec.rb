@@ -37,7 +37,7 @@ RSpec.describe Magic::Player do
   end
 
   context "can_cast?" do
-    let(:card) { Magic::Card.new(name: "Loxodon Wayfarer", cost: { any: 2, white: 1 }, controller: player) }
+    let(:card) { Magic::Cards::LoxodonWayfarer.new(controller: player) }
     subject(:player) { described_class.new }
 
     context "when the player has enough mana" do
