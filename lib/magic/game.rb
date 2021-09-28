@@ -26,6 +26,13 @@ module Magic
       end
     end
 
+    def add_player(**args)
+      Magic::Player.new(**args).tap do |player|
+        @players << player
+        player.join_game(self)
+      end
+    end
+
     def next_step
       step.next
     end

@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::ProfaneMemento do
-  let(:p1) { Magic::Player.new }
-  let(:p2) { Magic::Player.new }
+  let(:game) { Magic::Game.new }
+  let(:p1) { game.add_player }
+  let(:p2) { game.add_player }
   subject { Card("Profane Memento", controller: p1) }
 
   context "receive notification" do

@@ -4,7 +4,7 @@ RSpec.describe Magic::Player do
   let(:game) { Magic::Game.new }
   context "draw" do
     let(:island) { Magic::Cards::Island.new(game: game) }
-    subject(:player) { described_class.new(game: game, library: [island]) }
+    subject(:player) { game.add_player(library: [island]) }
 
     it "draws a card" do
       player.draw!

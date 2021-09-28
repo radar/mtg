@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::GeistHonoredMonk do
   let(:game) { Magic::Game.new }
-  let(:p1) { Magic::Player.new(game: game) }
+  let(:p1) { game.add_player }
   let(:geist) { described_class.new(controller: p1) }
   let(:loxodon) { Magic::Cards::LoxodonWayfarer.new(controller: p1) }
 

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::GolgariGuildgate do
   let(:game) { Magic::Game.new }
-  let(:p1) { Magic::Player.new(game: game) }
+  let(:p1) { game.add_player }
   let(:card) { described_class.new(game: game, controller: p1) }
 
   it "enters the battlefield tapped" do

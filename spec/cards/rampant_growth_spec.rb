@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::RampantGrowth do
   let(:game) { Magic::Game.new }
   let(:p1_forest) { Magic::Cards::Forest.new(game: game) }
-  let(:p1) { Magic::Player.new(game: game, library: [p1_forest]) }
+  let(:p1) { game.add_player(library: [p1_forest]) }
   let(:card) { described_class.new(game: game, controller: p1) }
 
   it "search for land effect" do

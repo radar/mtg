@@ -2,15 +2,15 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::HillGiantHerdgorger do
   let(:game) { Magic::Game.new }
-  let(:p1) { Magic::Player.new(game: game) }
+  let(:p1) { game.add_player }
   let(:card) { described_class.new(game: game, controller: p1) }
 
   context "ETB Event" do
     let(:event) do
       Magic::Events::ZoneChange.new(
         card,
-        from: :hand,
-        to: :battlefield
+        from: p1.hand,
+        to: game.battlefield,
       )
     end
 

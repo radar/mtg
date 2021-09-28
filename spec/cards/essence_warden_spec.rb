@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::EssenceWarden do
   let(:game) { Magic::Game.new }
-  let(:p1) { Magic::Player.new(game: game) }
+  let(:p1) { game.add_player }
 
   let(:card) { described_class.new(game: game, controller: p1) }
 
@@ -22,7 +22,7 @@ RSpec.describe Magic::Cards::EssenceWarden do
   end
 
   context "when another creature controlled by a different controller enters the battlefield" do
-    let(:p2) { Magic::Player.new(game: game) }
+    let(:p2) { game.add_player }
     let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(game: game, controller: p2) }
     let(:event) do
       Magic::Events::ZoneChange.new(
@@ -38,7 +38,7 @@ RSpec.describe Magic::Cards::EssenceWarden do
   end
 
   context "when a creature controlled by this controller moves to the graveyard" do
-    let(:p2) { Magic::Player.new(game: game) }
+    let(:p2) { game.add_player }
     let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(game: game, controller: p2) }
     let(:event) do
       Magic::Events::ZoneChange.new(

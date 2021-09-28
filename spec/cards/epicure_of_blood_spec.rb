@@ -1,15 +1,10 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::EpicureOfBlood do
-  let(:p1) { Magic::Player.new }
-  let(:p2) { Magic::Player.new }
   let(:game) { Magic::Game.new }
+  let(:p1) { game.add_player }
+  let(:p2) { game.add_player }
   subject { Card("Epicure Of Blood", controller: p1, game: game) }
-
-  before do
-    game.add_player(p1)
-    game.add_player(p2)
-  end
 
   context "receive notification" do
     let(:event) do
@@ -35,15 +30,21 @@ RSpec.describe Magic::Cards::EpicureOfBlood do
       game.battlefield.add(subject)
     end
 
+    def hill_giant_etb
+      hill_giant_herdgorger.cast!
+      game.stack.resolve!
+    end
+
     it "deals damage to other player" do
       expect do
-        hill_giant_herdgorger.cast!
-        game.stack.resolve!
+        hill_giant_etb
       end.to(change { p2.life }.by(-1))
     end
 
     it "does not deal damage to controller" do
-      expect { subject.receive_notification(event) }.not_to(change { p1.life })
+      # Hill Giant Herdgorger ETBs and grants controller +3 life
+      # If Epicure of Blood incorrectly targetted P1, this life gain would only be 2.
+      expect { hill_giant_etb }.to(change { p1.life }.by(3))
     end
   end
 end

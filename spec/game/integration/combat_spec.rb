@@ -3,14 +3,12 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat" do
   subject(:game) { Magic::Game.new }
 
-  let(:p1) { Magic::Player.new }
-  let(:p2) { Magic::Player.new }
+  let(:p1) { game.add_player }
+  let(:p2) { game.add_player }
   let(:loxodon_wayfarer) { Card("Loxodon Wayfarer") }
   let(:vastwood_gorger) { Card("Vastwood Gorger") }
 
   before do
-    game.add_player(p1)
-    game.add_player(p2)
     game.battlefield.add(loxodon_wayfarer)
     game.battlefield.add(vastwood_gorger)
   end

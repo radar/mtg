@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::PathOfPeace do
-  let(:p1) { Magic::Player.new(game: game) }
-  let(:p2) { Magic::Player.new(game: game) }
+  let(:p1) { game.add_player }
+  let(:p2) { game.add_player }
   let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(controller: p2) }
 
   let(:battlefield) { Magic::Battlefield.new(cards: [loxodon_wayfarer])}
