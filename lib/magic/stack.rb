@@ -4,23 +4,51 @@ module Magic
 
     def_delegator :@stack, :first
 
-    def initialize(stack: [])
+    attr_reader :effects
+
+    def initialize(stack: [], effects: [])
       @stack = stack
+      @effects = effects
     end
 
     def add(item)
       @stack.unshift(item)
     end
 
-    def resolve!
-
-      @stack.each do |item|
-        if item.is_a?(Card)
-          item.add_to_battlefield!
-          item.resolve!
-        end
+    def add_effect(effect)
+      if effect.requires_choices?
+        @effects << effect
+        # wait for a choice to be made
+      else
+        effect.resolve
       end
-      @stack.clear
+    end
+
+    def pending_effects?
+      @effects.any?
+    end
+
+    def resolve_effect(type, **args)
+      effect = @effects.first
+      if effect.is_a?(type)
+        effect.resolve(**args)
+        @effects.shift
+      else
+        raise "Invalid type specified. Top effect is a #{effect.class}, but you specified #{type}"
+      end
+    end
+
+    def resolve!
+      return if @stack.empty?
+
+      item = @stack.shift
+      unless item.countered?
+        item.resolve!
+        item.resolution_effects.each { |effect| add_effect(effect) }
+      end
+
+      return if effects.any? { |effect| effect.requires_choices? }
+      resolve!
     end
   end
 end

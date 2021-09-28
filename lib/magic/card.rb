@@ -1,6 +1,6 @@
 module Magic
   class Card
-    attr_reader :game, :name, :zone, :cost, :type_line
+    attr_reader :game, :name, :zone, :cost, :type_line, :countered
     attr_accessor :tapped
 
     attr_accessor :controller
@@ -8,6 +8,7 @@ module Magic
     COST = "{0}"
 
     def initialize(game: Game.new, controller: Player.new, zone: CardZone.new(self), cost: self.class::COST, tapped: false)
+      @countered = false
       @name = self.class::NAME
       @type_line = self.class::TYPE_LINE
       @game = game
@@ -69,11 +70,25 @@ module Magic
       !tapped?
     end
 
+    def countered?
+      countered
+    end
+
     def controller?(other_controller)
       controller == other_controller
     end
 
     def resolve!
+      add_to_battlefield!
+    end
+
+    def counter!
+      @countered = true
+      move_zone!(:graveyard)
+    end
+
+    def resolution_effects
+      []
     end
 
     def skip_stack?

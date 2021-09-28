@@ -4,13 +4,12 @@ module Magic
       NAME = "Annul"
       COST = { blue: 1 }
 
-      def resolve!
-        game.add_effect(
+      def resolution_effects
+        [
           Effects::Destroy.new(
             valid_targets: -> (c) { c.enchantment? || c.artifact? }
           )
-        )
-        super
+        ]
       end
     end
   end

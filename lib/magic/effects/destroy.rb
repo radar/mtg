@@ -1,7 +1,7 @@
 module Magic
   module Effects
     class Destroy
-      def initialize(valid_targets:)
+      def initialize(valid_targets: -> { })
         @valid_targets = valid_targets
       end
 
