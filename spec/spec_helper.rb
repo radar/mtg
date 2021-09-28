@@ -1,7 +1,12 @@
 # frozen_string_literal: true
 require "pry"
 require "magic"
-require_relative "support/game_dsl"
+
+module CardHelper
+  def Card(name)
+    Magic::Cards.const_get(name.gsub(" ", "")).new
+  end
+end
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -14,5 +19,5 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 
-  config.include GameDSL
+  config.include CardHelper
 end

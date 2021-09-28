@@ -1,9 +1,10 @@
 module Magic
   class Player
-    attr_reader :game, :library, :mana_pool, :floating_mana, :hand, :life
+    attr_reader :name, :game, :library, :mana_pool, :floating_mana, :hand, :life
     class UnfloatableMana < StandardError; end
 
     def initialize(
+      name: "",
       game: Game.new,
       library: Library.new([]),
       hand: [],
@@ -11,6 +12,7 @@ module Magic
       floating_mana: Hash.new(0),
       life: 20
     )
+      @name = name
       @game = game
       @library = library
       @hand = hand

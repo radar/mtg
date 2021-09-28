@@ -3,23 +3,6 @@ module Magic
     class CombatPhase
       include AASM
 
-      aasm do
-        state :beginning_of_combat, initial: true
-        state :declare_attackers
-        state :declare_blockers
-        state :first_strike
-        state :combat_damage
-        state :end_of_combat
-
-        event :next_step do
-          transitions from: :beginning_of_combat, to: :declare_attackers
-          transitions from: :declare_attackers, to: :declare_blockers
-          transitions from: :declare_blockers, to: :first_strike
-          transitions from: :first_strike, to: :combat_damage, after: :deal_combat_damage
-          transitions from: :combat_damage, to: :end_of_combat
-        end
-      end
-
       class Attack
         attr_reader :attacker, :target, :blockers
 
@@ -49,11 +32,9 @@ module Magic
         end
       end
 
-      attr_reader :active_player, :opponents, :attacks
+      attr_reader :attacks
 
-      def initialize(active_player:, opponents: [])
-        @active_player = active_player
-        @opponents = opponents
+      def initialize
         @attacks = []
       end
 
@@ -86,6 +67,10 @@ module Magic
 
         dead_attackers + dead_blockers
       end
+
+
+      private
+
     end
   end
 end
