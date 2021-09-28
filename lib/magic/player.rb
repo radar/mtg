@@ -23,6 +23,10 @@ module Magic
       @life += life
     end
 
+    def take_damage(damage)
+      @life -= damage
+    end
+
     def add_mana(mana)
       mana.each do |color, count|
         @mana_pool[color] += count
@@ -41,7 +45,7 @@ module Magic
     end
 
     def draw!
-      card = @library.draw
+      card = library.draw
       card.draw!
       card.controller = self
       hand << card

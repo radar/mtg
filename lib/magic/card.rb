@@ -1,13 +1,14 @@
 module Magic
   class Card
-    attr_reader :game, :name, :zone, :cost, :type_line, :countered
+    attr_reader :game, :name, :zone, :cost, :type_line, :countered, :keywords
     attr_accessor :tapped
 
     attr_accessor :controller
 
     COST = "{0}"
+    KEYWORDS = []
 
-    def initialize(game: Game.new, controller: Player.new, zone: CardZone.new(self), cost: self.class::COST, tapped: false)
+    def initialize(game: Game.new, controller: Player.new, zone: CardZone.new(self), cost: self.class::COST, tapped: false, keywords: [])
       @countered = false
       @name = self.class::NAME
       @type_line = self.class::TYPE_LINE
@@ -16,6 +17,7 @@ module Magic
       @zone = zone
       @cost = self.class::COST
       @tapped = tapped
+      @keywords = self.class::KEYWORDS
     end
 
     def creature?
@@ -28,6 +30,10 @@ module Magic
 
     def enchantment?
       type_line.include?("Enchantment")
+    end
+
+    def flying?
+      keywords.include?(Keywords::FLYING)
     end
 
     def draw!
@@ -99,6 +105,10 @@ module Magic
     end
 
     def notify(event)
+    end
+
+    def take_damage(damage_dealt)
+      @damage += damage_dealt
     end
 
     private

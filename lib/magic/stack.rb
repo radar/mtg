@@ -43,6 +43,7 @@ module Magic
 
       item = @stack.shift
       unless item.countered?
+        puts "Resolving #{item.name}"
         item.resolve!
         item.resolution_effects.each { |effect| add_effect(effect) }
       end
