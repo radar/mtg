@@ -114,13 +114,14 @@ module Magic
     private
 
     def move_zone!(new_zone)
-      zone.remove(self)
+      old_zone = zone
+      old_zone.remove(self)
       new_zone.add(self)
 
       game.notify!(
         Events::ZoneChange.new(
           self,
-          from: zone,
+          from: old_zone,
           to: new_zone
         )
       )
