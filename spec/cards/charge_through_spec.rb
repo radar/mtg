@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::ChargeThrough do
   let(:game) { Magic::Game.new }
-  let(:p1) { Magic::Player.new(game: game) }
+  let(:p1) { game.add_player }
   let(:charge_through) { described_class.new(game: game, controller: p1) }
 
   before do

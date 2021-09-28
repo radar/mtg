@@ -8,7 +8,7 @@ module Magic
       def receive_notification(event)
         case event
         when Events::ZoneChange
-          return if event.to != :battlefield
+          return if !event.to.battlefield?
           return if event.card != self
 
           controller.gain_life(3)

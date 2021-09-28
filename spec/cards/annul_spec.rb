@@ -2,8 +2,8 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::Annul do
   let(:game) { Magic::Game.new }
-  let(:p1) { Magic::Player.new(game: game) }
-  let(:p2) { Magic::Player.new(game: game) }
+  let(:p1) { game.add_player }
+  let(:p2) { game.add_player }
   let(:sol_ring) { Magic::Cards::SolRing.new(game: game, controller: p2)}
   subject(:annul) { described_class.new(game: game, controller: p1) }
 

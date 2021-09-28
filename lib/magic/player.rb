@@ -1,11 +1,11 @@
 module Magic
   class Player
     attr_reader :name, :game, :library, :graveyard, :mana_pool, :floating_mana, :hand, :life
+
     class UnfloatableMana < StandardError; end
 
     def initialize(
       name: "",
-      game: Game.new,
       graveyard: Graveyard.new(player: self, cards: []),
       library: [],
       hand: Hand.new([]),
@@ -14,7 +14,6 @@ module Magic
       life: 20
     )
       @name = name
-      @game = game
       @library = Library.new(library)
       @graveyard = graveyard
       @hand = hand
@@ -25,6 +24,13 @@ module Magic
 
     def gain_life(life)
       @life += life
+
+      game.notify!(
+        Events::LifeGain.new(
+          player: self,
+          life: life,
+        )
+      )
     end
 
     def take_damage(damage)
@@ -69,6 +75,10 @@ module Magic
       all_above_zero = floating_mana.all? { |_, count| count >= 0 }
 
       any_mana_payable && all_above_zero
+    end
+
+    def join_game(game)
+      @game = game
     end
   end
 end

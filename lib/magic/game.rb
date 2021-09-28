@@ -19,8 +19,11 @@ module Magic
       @combat = nil
     end
 
-    def add_player(player)
-      @players << player
+    def add_player
+      Magic::Player.new.tap do |player|
+        @players << player
+        player.join_game(self)
+      end
     end
 
     def next_step
