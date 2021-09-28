@@ -3,12 +3,14 @@ module Magic
     include AASM
     extend Forwardable
 
-    attr_reader :battlefield, :stack, :players, :step, :attacks
+    attr_reader :logger, :battlefield, :stack, :players, :step, :attacks
 
     def_delegators :@stack, :effects, :add_effect, :resolve_effect
     def_delegators :@combat, :declare_attacker, :declare_blocker, :deal_combat_damage, :fatalities
 
     def initialize(battlefield: Battlefield.new, stack: Stack.new, effects: [], players: [], step: Step.new(game: self))
+      @logger = Logger.new(STDOUT)
+      @logger.formatter = -> (_, _, _, msg) { "#{msg}\n" }
       @step = step
       @battlefield = battlefield
       @stack = stack
@@ -25,8 +27,11 @@ module Magic
       step.next
     end
 
-    def notify!(event)
-      battlefield.notify!(event)
+    def notify!(*events)
+      events.each do |event|
+        logger.debug "EVENT: #{event.inspect}"
+        battlefield.receive_event(event)
+      end
     end
 
     def active_player

@@ -6,6 +6,10 @@ module Magic
       @cards = cards
     end
 
+    def remove(card)
+      @cards -= [card]
+    end
+
     def draw
       @cards.shift
     end

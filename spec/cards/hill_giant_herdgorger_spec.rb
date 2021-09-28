@@ -5,11 +5,17 @@ RSpec.describe Magic::Cards::HillGiantHerdgorger do
   let(:p1) { Magic::Player.new(game: game) }
   let(:card) { described_class.new(game: game, controller: p1) }
 
-  it "adds 3 life to player's life total" do
-    starting_life = p1.life
-    card.draw!
-    card.cast!
-    game.stack.resolve!
-    expect(p1.life).to eq(starting_life + 3)
+  context "ETB Event" do
+    let(:event) do
+      Magic::Events::ZoneChange.new(
+        card,
+        from: :hand,
+        to: :battlefield
+      )
+    end
+
+    it "adds a life to controller's life total" do
+      expect { card.receive_notification(event) }.to change { p1.life }.by(3)
+    end
   end
 end

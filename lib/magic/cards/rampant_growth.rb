@@ -9,7 +9,7 @@ module Magic
           Effects::SearchLibrary.new(
             library: controller.library,
             condition: -> (c) { c.basic_land? },
-            resolve_action: -> (c) { c.add_to_battlefield!; c.tapped = true }
+            resolve_action: -> (c) { c.resolve!; c.tapped = true }
           )
         )
         super

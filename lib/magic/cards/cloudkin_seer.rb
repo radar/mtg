@@ -8,10 +8,12 @@ module Magic
       TOUGHNESS = 1
       KEYWORDS = [Keywords::FLYING]
 
-      def notify(event)
+      def receive_notification(event)
         case event
-        when Events::EnterTheBattlefield
-          return unless event.card == self
+        when Events::ZoneChange
+          return if event.card != self
+          return if !event.to.battlefield?
+
           game.add_effect(
             Effects::DrawCards.new(player: controller)
           )

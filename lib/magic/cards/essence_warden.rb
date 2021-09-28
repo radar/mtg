@@ -5,10 +5,12 @@ module Magic
       COST = { green: 1 }
       TYPE_LINE = "Creature -- Elf Shaman"
 
-      def notify(event)
+      def receive_notification(event)
         case event
-        when Events::EnterTheBattlefield
+        when Events::ZoneChange
           card = event.card
+          return if event.to != :battlefield
+
           game.add_effect(
             Effects::AnotherCreatureEntersYouGainLife.new(
               source: self,

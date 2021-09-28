@@ -6,13 +6,17 @@ RSpec.describe Magic::Cards::HealerOfThePride do
   let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(game: game, controller: p1) }
   let(:card) { described_class.new(game: game, controller: p1) }
 
-  it "adds a life to player's life total" do
-    starting_life = p1.life
-    card.draw!
-    card.cast!
-    game.stack.resolve!
-    loxodon_wayfarer.cast!
-    game.stack.resolve!
-    expect(p1.life).to eq(starting_life + 2)
+  context "when another creature controlled by this player enters the battlefield" do
+    let(:event) do
+      Magic::Events::ZoneChange.new(
+        loxodon_wayfarer,
+        from: :hand,
+        to: :battlefield
+      )
+    end
+
+    it "adds a life to player's life total" do
+      expect { card.receive_notification(event) }.to change { p1.life }.by(2)
+    end
   end
 end

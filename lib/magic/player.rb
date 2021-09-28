@@ -1,20 +1,22 @@
 module Magic
   class Player
-    attr_reader :name, :game, :library, :mana_pool, :floating_mana, :hand, :life
+    attr_reader :name, :game, :library, :graveyard, :mana_pool, :floating_mana, :hand, :life
     class UnfloatableMana < StandardError; end
 
     def initialize(
       name: "",
       game: Game.new,
-      library: Library.new([]),
-      hand: [],
+      graveyard: Graveyard.new(player: self, cards: []),
+      library: [],
+      hand: Hand.new([]),
       mana_pool: Hash.new(0),
       floating_mana: Hash.new(0),
       life: 20
     )
       @name = name
       @game = game
-      @library = library
+      @library = Library.new(library)
+      @graveyard = graveyard
       @hand = hand
       @mana_pool = mana_pool
       @floating_mana = floating_mana
@@ -50,12 +52,12 @@ module Magic
       card = library.draw
       card.draw!
       card.controller = self
-      hand << card
+      hand.add(card)
     end
 
     def cast!(card)
       card.cast!
-      @hand -= [card]
+      @hand.remove(card)
     end
 
     def can_cast?(card)

@@ -11,8 +11,8 @@ RSpec.describe Magic::Game, "combat" do
   before do
     game.add_player(p1)
     game.add_player(p2)
-    game.battlefield << loxodon_wayfarer
-    game.battlefield << vastwood_gorger
+    game.battlefield.add(loxodon_wayfarer)
+    game.battlefield.add(vastwood_gorger)
   end
 
   context "when in combat" do
@@ -47,6 +47,8 @@ RSpec.describe Magic::Game, "combat" do
     end
 
     it "p2 blocks with a vastwood gorger" do
+      expect(subject.battlefield.cards).to include(loxodon_wayfarer)
+      expect(subject.battlefield.cards).to include(vastwood_gorger)
       p2_starting_life = p2.life
 
       expect(subject.step).to be_beginning_of_combat
@@ -72,8 +74,11 @@ RSpec.describe Magic::Game, "combat" do
 
       subject.next_step
       expect(subject.step).to be_combat_damage
-
       expect(loxodon_wayfarer.zone).to be_graveyard
+      expect(subject.battlefield.cards).not_to include(loxodon_wayfarer)
+
+      expect(vastwood_gorger.zone).to be_battlefield
+      expect(subject.battlefield.cards).to include(vastwood_gorger)
 
       expect(p2.life).to eq(p2_starting_life)
     end

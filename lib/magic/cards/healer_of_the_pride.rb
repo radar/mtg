@@ -5,17 +5,13 @@ module Magic
       COST = { any: 3, white: 1 }
       TYPE_LINE = "Creature -- Cat Cleric"
 
-      def notify(event)
+      def receive_notification(event)
         case event
-        when Events::EnterTheBattlefield
-          card = event.card
-          game.add_effect(
-            Effects::AnotherCreatureEntersUnderYourControlYouGainLife.new(
-              source: self,
-              card: card,
-              life: 2
-            )
-          )
+        when Events::ZoneChange
+          return if event.to != :battlefield
+          return unless event.card.controller?(controller)
+
+          controller.gain_life(2)
         end
       end
     end

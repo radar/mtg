@@ -4,6 +4,10 @@ module Magic
       NAME = "Forest"
       TYPE_LINE = "Basic Land -- Forest"
 
+      def skip_stack?
+        true
+      end
+
       def tap!
         controller.add_mana(:green)
         super

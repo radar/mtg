@@ -4,20 +4,19 @@ RSpec.describe Magic::Player do
   let(:game) { Magic::Game.new }
   context "draw" do
     let(:island) { Magic::Cards::Island.new(game: game) }
-    let(:library) { Magic::Library.new([island]) }
-    subject(:player) { described_class.new(game: game, library: library) }
+    subject(:player) { described_class.new(game: game, library: [island]) }
 
     it "draws a card" do
       player.draw!
       expect(player.hand).to include(island)
-      expect(library.cards).to be_empty
+      expect(player.library.cards).to be_empty
     end
   end
 
   context "cast!" do
     context "with an island" do
       let(:island) { Magic::Cards::Island.new }
-      subject(:player) { described_class.new(library: Magic::Library.new([island])) }
+      subject(:player) { described_class.new(library: [island]) }
 
       it "plays the island" do
         player.draw!

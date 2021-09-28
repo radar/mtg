@@ -4,9 +4,14 @@ module Magic
       NAME = "Golgari Guildgate"
       TYPE_LINE = "Land -- Gate"
 
-      def add_to_battlefield!
-        self.tapped = true
-        super
+      def receive_notification(event)
+        case event
+        when Events::ZoneChange
+          return if event.card != self
+          return if !event.to.battlefield?
+
+          self.tapped = true
+        end
       end
 
       def tap!

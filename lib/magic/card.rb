@@ -1,23 +1,27 @@
 module Magic
   class Card
-    attr_reader :game, :name, :zone, :cost, :type_line, :countered, :keywords
+    attr_reader :game, :name, :cost, :type_line, :countered, :keywords
     attr_accessor :tapped
 
-    attr_accessor :controller
+    attr_accessor :controller, :zone
 
     COST = "{0}"
     KEYWORDS = []
 
-    def initialize(game: Game.new, controller: Player.new, zone: CardZone.new(self), cost: self.class::COST, tapped: false, keywords: [])
+    def initialize(game: Game.new, controller: Player.new, tapped: false, keywords: [])
       @countered = false
       @name = self.class::NAME
       @type_line = self.class::TYPE_LINE
       @game = game
       @controller = controller
-      @zone = zone
+      @zone = controller.library
       @cost = self.class::COST
       @tapped = tapped
       @keywords = self.class::KEYWORDS
+    end
+
+    def inspect
+      "#<Card name:#{name} controller:#{controller.name}>"
     end
 
     def creature?
@@ -37,27 +41,15 @@ module Magic
     end
 
     def draw!
-      move_zone!(:hand)
+      move_zone!(controller.hand)
     end
 
     def cast!
       if skip_stack?
-        add_to_battlefield!
+        move_zone!(game.battlefield)
       else
         game.stack.add(self)
       end
-    end
-
-    def add_to_battlefield!
-      game.battlefield << self
-      move_zone!(:battlefield)
-      game.notify!(
-        Events::EnterTheBattlefield.new(self)
-      )
-    end
-
-    def destroy!
-      move_zone!(:graveyard)
     end
 
     def tap!
@@ -85,12 +77,16 @@ module Magic
     end
 
     def resolve!
-      add_to_battlefield!
+      move_zone!(game.battlefield)
     end
 
     def counter!
       @countered = true
-      move_zone!(:graveyard)
+      move_zone!(controller.graveyard)
+    end
+
+    def destroy!
+      move_zone!(controller.graveyard)
     end
 
     def resolution_effects
@@ -104,7 +100,11 @@ module Magic
     def entered_the_battlefield!
     end
 
-    def notify(event)
+    def notify!(event)
+      game.notify!(event)
+    end
+
+    def receive_notification(notification)
     end
 
     def take_damage(damage_dealt)
@@ -113,17 +113,17 @@ module Magic
 
     private
 
-    def move_zone!(target_zone)
-      case target_zone
-      when :hand
-        zone.draw!
-      when :battlefield
-        zone.battlefield!
-      when :graveyard
-        zone.graveyard!
-      else
-        raise "invalid zone #{target_zone}"
-      end
+    def move_zone!(new_zone)
+      zone.remove(self)
+      new_zone.add(self)
+
+      game.notify!(
+        Events::ZoneChange.new(
+          self,
+          from: zone,
+          to: new_zone
+        )
+      )
     end
   end
 end
