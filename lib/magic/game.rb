@@ -46,6 +46,11 @@ module Magic
       @combat = CombatPhase.new
     end
 
+    def deal_damage_to_opponents(player, damage)
+      opponents = players - [player]
+      opponents.each { |opponent| opponent.take_damage(damage) }
+    end
+
     def untap_active_player_permanents
       battlefield.untap { |cards| cards.controlled_by(active_player) }
     end

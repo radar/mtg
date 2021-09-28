@@ -3,8 +3,8 @@ require "pry"
 require "magic"
 
 module CardHelper
-  def Card(name)
-    Magic::Cards.const_get(name.gsub(" ", "")).new
+  def Card(name, **args)
+    Magic::Cards.const_get(name.gsub(" ", "")).new(**args)
   end
 end
 
