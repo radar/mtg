@@ -8,7 +8,7 @@ module Magic
     COST = "{0}"
     KEYWORDS = []
 
-    def initialize(game: Game.new, controller: Player.new, tapped: false, keywords: [])
+    def initialize(game: Game.new, controller: Player.new, tapped: false, keywords: [], card_event: CardState.new(self))
       @countered = false
       @name = self.class::NAME
       @type_line = self.class::TYPE_LINE
@@ -109,7 +109,11 @@ module Magic
       game.notify!(event)
     end
 
-    def receive_notification(notification)
+    def receive_notification(event)
+      case event
+      when Events::ZoneChange
+        died! if event.card == self && event.death?
+      end
     end
 
     private
