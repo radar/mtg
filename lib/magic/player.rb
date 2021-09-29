@@ -6,15 +6,15 @@ module Magic
 
     def initialize(
       name: "",
-      graveyard: Graveyard.new(player: self, cards: []),
+      graveyard: Zones::Graveyard.new(cards: []),
       library: [],
-      hand: Hand.new([]),
+      hand: Zones::Hand.new(cards: []),
       mana_pool: Hash.new(0),
       floating_mana: Hash.new(0),
       life: 20
     )
       @name = name
-      @library = Library.new(library)
+      @library = Zones::Library.new(cards: library)
       @graveyard = graveyard
       @hand = hand
       @mana_pool = mana_pool

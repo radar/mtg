@@ -113,7 +113,14 @@ module Magic
       case event
       when Events::ZoneChange
         died! if event.card == self && event.death?
+        entered_the_battlefield! if event.card == self && event.to.battlefield?
       end
+    end
+
+    def died!
+    end
+
+    def entered_the_battlefield!
     end
 
     private
