@@ -14,11 +14,17 @@ module Magic
       end
 
       def alive?
-        (toughness - damage) > 0
+        (toughness - damage).positive?
       end
 
       def dead?
         !alive?
+      end
+
+      def take_damage(damage_dealt)
+        @damage += damage_dealt
+
+        destroy! if dead?
       end
     end
   end

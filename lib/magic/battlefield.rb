@@ -38,8 +38,12 @@ module Magic
       block.call(cards).each(&:untap!)
     end
 
+    def creatures
+      @cards.creatures
+    end
+
     def creatures_controlled_by(player)
-      @cards.controlled_by(player).select(&:creature?)
+      @cards.creatures.controlled_by(player)
     end
   end
 end

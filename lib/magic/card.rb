@@ -112,10 +112,6 @@ module Magic
     def receive_notification(notification)
     end
 
-    def take_damage(damage_dealt)
-      @damage += damage_dealt
-    end
-
     private
 
     def move_zone!(new_zone)
