@@ -1,6 +1,6 @@
 module Magic
   class Player
-    attr_reader :name, :game, :library, :graveyard, :mana_pool, :floating_mana, :hand, :life
+    attr_reader :name, :game, :library, :graveyard, :exile, :mana_pool, :floating_mana, :hand, :life
 
     class UnfloatableMana < StandardError; end
 
@@ -16,6 +16,7 @@ module Magic
       @name = name
       @library = Zones::Library.new(cards: library)
       @graveyard = graveyard
+      @exile = Zones::Exile.new
       @hand = hand
       @mana_pool = mana_pool
       @floating_mana = floating_mana

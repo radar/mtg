@@ -97,6 +97,10 @@ module Magic
       move_zone!(controller.graveyard)
     end
 
+    def exile!
+      move_zone!(controller.exile)
+    end
+
     def resolution_effects
       []
     end

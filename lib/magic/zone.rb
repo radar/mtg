@@ -34,5 +34,9 @@ module Magic
     def battlefield?
       false
     end
+
+    def exile?
+      false
+    end
   end
 end
