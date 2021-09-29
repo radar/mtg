@@ -5,7 +5,7 @@ module Magic
 
     attr_reader :logger, :battlefield, :stack, :players, :step, :attacks
 
-    def_delegators :@stack, :effects, :add_effect, :resolve_effect
+    def_delegators :@stack, :effects, :add_effect, :resolve_effect, :next_effect
     def_delegators :@combat, :declare_attacker, :declare_blocker, :deal_combat_damage, :fatalities
 
     def initialize(battlefield: Battlefield.new, stack: Stack.new, effects: [], players: [], step: Step.new(game: self))

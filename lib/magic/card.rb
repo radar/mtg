@@ -24,24 +24,32 @@ module Magic
       "#<Card name:#{name} controller:#{controller.name}>"
     end
 
+    def type?(type)
+      type_line.split(" ").include?(type)
+    end
+
+    def basic_land?
+      type?("Basic") && type?("Land")
+    end
+
     def creature?
-      type_line.include?("Creature")
+      type?("Creature")
     end
 
     def artifact?
-      type_line.include?("Artifact")
+      type?("Artifact")
     end
 
     def enchantment?
-      type_line.include?("Enchantment")
+      type?("Enchantment")
     end
 
     def flying?
       keywords.include?(Keywords::FLYING)
     end
 
-    def draw!
-      move_zone!(controller.hand)
+    def move_to_hand!(target_controller)
+      move_zone!(target_controller.hand)
     end
 
     def cast!

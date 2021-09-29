@@ -7,7 +7,7 @@ module Magic
       def resolve!
         game.add_effect(
           Effects::Destroy.new(
-            valid_targets: -> (c) { c.artifact? }
+            choices: game.battlefield.cards.select(&:artifact?),
           )
         )
         super

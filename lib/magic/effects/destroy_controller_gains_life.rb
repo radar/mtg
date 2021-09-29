@@ -1,9 +1,9 @@
 module Magic
   module Effects
     class DestroyControllerGainsLife
-      attr_reader :valid_targets
-      def initialize(valid_targets:)
-        @valid_targets = valid_targets
+      attr_reader :choices
+      def initialize(choices:)
+        @choices = choices
       end
 
       def use_stack?
@@ -14,11 +14,13 @@ module Magic
         true
       end
 
+      def single_choice?
+        choices.count == 1
+      end
+
       def resolve(target:)
-        if valid_targets.call(target)
-          target.destroy!
-          target.controller.gain_life(4)
-        end
+        target.destroy!
+        target.controller.gain_life(4)
       end
     end
   end

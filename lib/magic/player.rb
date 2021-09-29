@@ -56,7 +56,7 @@ module Magic
 
     def draw!
       card = library.draw
-      card.draw!
+      card.move_to_hand!(self)
       card.controller = self
       hand.add(card)
     end

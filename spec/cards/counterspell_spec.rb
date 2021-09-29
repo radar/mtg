@@ -14,7 +14,9 @@ RSpec.describe Magic::Cards::Counterspell do
       annul.cast!
       counterspell.cast!
       game.stack.resolve!
-      game.resolve_effect(Magic::Effects::CounterSpell, target: annul)
+      counterspell = game.next_effect
+      expect(counterspell).to be_a(Magic::Effects::CounterSpell)
+      game.resolve_effect(counterspell, target: annul)
       expect(annul).to be_countered
       expect(game.stack.pending_effects?).to eq(false)
       game.stack.resolve!

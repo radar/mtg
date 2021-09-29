@@ -20,6 +20,10 @@ module Magic
         true
       end
 
+      def single_choice?
+        false
+      end
+
       def resolve(mana)
         player.add_mana(mana)
       end

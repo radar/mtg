@@ -15,7 +15,12 @@ module Magic
       @stack.unshift(item)
     end
 
+    def select(...)
+      @stack.select(...)
+    end
+
     def add_effect(effect)
+      puts "New effect added: #{effect}, requires_choices: #{effect.requires_choices?}"
       if effect.requires_choices?
         @effects << effect
         # wait for a choice to be made
@@ -28,18 +33,28 @@ module Magic
       @effects.any?
     end
 
-    def resolve_effect(type, **args)
-      effect = @effects.first
-      if effect.is_a?(type)
-        effect.resolve(**args)
-        @effects.shift
+    def next_effect
+      @effects.first
+    end
+
+    def resolve_effect(effect, **args)
+      if effect.single_choice?
+        effect.resolve(target: effect.choices.first)
       else
-        raise "Invalid type specified. Top effect is a #{effect.class}, but you specified #{type}"
+        effect.resolve(**args)
       end
+
+      @effects.shift
     end
 
     def resolve!
+      resolve_stack!
+      resolve_effects!
+    end
+
+    def resolve_stack!
       return if @stack.empty?
+      return if pending_effects?
 
       item = @stack.shift
       unless item.countered?
@@ -48,8 +63,16 @@ module Magic
         item.resolution_effects.each { |effect| add_effect(effect) }
       end
 
-      return if effects.any? { |effect| effect.requires_choices? }
-      resolve!
+      resolve_effects!
+
+      resolve_stack!
+    end
+
+    def resolve_effects!
+      single_choice_effects = effects.select { |effect| effect.single_choice? }
+      single_choice_effects.each do |effect|
+        resolve_effect(effect)
+      end
     end
   end
 end

@@ -1,8 +1,10 @@
 module Magic
   module Effects
     class Destroy
-      def initialize(valid_targets: -> { })
-        @valid_targets = valid_targets
+      attr_reader :choices
+
+      def initialize(choices:)
+        @choices = choices
       end
 
       def use_stack?
@@ -11,6 +13,10 @@ module Magic
 
       def requires_choices?
         true
+      end
+
+      def single_choice?
+        choices.count == 1
       end
 
       def resolve(target:)

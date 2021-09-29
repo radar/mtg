@@ -4,7 +4,12 @@ module Magic
       @cards = cards
     end
 
+    def hand?
+      true
+    end
+
     def add(card)
+      card.zone = self
       @cards << card
     end
 

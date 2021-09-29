@@ -5,10 +5,6 @@ RSpec.describe Magic::Cards::ChargeThrough do
   let(:p1) { game.add_player }
   let(:charge_through) { described_class.new(game: game, controller: p1) }
 
-  before do
-    charge_through.draw!
-  end
-
   context "cast effect" do
     it "makes the player draw a card" do
       expect(p1).to receive(:draw!)

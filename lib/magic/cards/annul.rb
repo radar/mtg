@@ -6,7 +6,8 @@ module Magic
 
       def resolution_effects
         [
-          Effects::Destroy.new(
+          Effects::CounterSpell.new(
+            stack: game.stack,
             valid_targets: -> (c) { c.enchantment? || c.artifact? }
           )
         ]

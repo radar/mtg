@@ -12,6 +12,10 @@ module Magic
       self.cards << card
     end
 
+    def remove(card)
+      @cards -= [card]
+    end
+
     def graveyard?
       true
     end

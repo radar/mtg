@@ -6,7 +6,10 @@ module Magic
 
       def resolution_effects
         [
-          Effects::CounterSpell.new
+          Effects::CounterSpell.new(
+            stack: game.stack,
+            valid_targets: -> (c) { true }
+          )
         ]
       end
     end
