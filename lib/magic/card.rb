@@ -105,9 +105,6 @@ module Magic
       false
     end
 
-    def entered_the_battlefield!
-    end
-
     def notify!(event)
       game.notify!(event)
     end
