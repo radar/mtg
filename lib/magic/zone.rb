@@ -4,9 +4,10 @@ module Magic
 
     def_delegator :@cards, :include?
 
-    attr_reader :cards
+    attr_reader :owner, :cards
 
-    def initialize(cards: [])
+    def initialize(owner:, cards: [])
+      @owner = owner
       @cards = CardList.new(cards)
     end
 

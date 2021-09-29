@@ -8,7 +8,13 @@ module Magic
     def_delegators :@stack, :effects, :add_effect, :resolve_effect, :next_effect
     def_delegators :@combat, :declare_attacker, :declare_blocker, :deal_combat_damage, :fatalities
 
-    def initialize(battlefield: Zones::Battlefield.new, stack: Stack.new, effects: [], players: [], step: Step.new(game: self))
+    def initialize(
+      battlefield: Zones::Battlefield.new(owner: self),
+      stack: Stack.new,
+      effects: [],
+      players: [],
+      step: Step.new(game: self)
+    )
       @logger = Logger.new(STDOUT)
       @logger.formatter = -> (_, _, _, msg) { "#{msg}\n" }
       @step = step

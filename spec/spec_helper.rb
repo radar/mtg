@@ -4,7 +4,7 @@ require "magic"
 
 module CardHelper
   def Card(name, **args)
-    Magic::Cards.const_get(name.gsub(" ", "")).new(**args)
+    Magic::Cards.const_get(name.gsub(" ", "")).new(game: game, **args)
   end
 end
 

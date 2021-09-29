@@ -5,7 +5,7 @@ module Magic
 
     attr_accessor :controller, :zone
 
-    COST = "{0}"
+    COST = {}
     KEYWORDS = []
 
     def initialize(game: Game.new, controller: Player.new, tapped: false, keywords: [], card_event: CardState.new(self))
