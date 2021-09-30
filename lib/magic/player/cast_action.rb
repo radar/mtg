@@ -79,7 +79,6 @@ module Magic
       end
 
       def deduct_from_pool(pool, mana)
-        binding.pry if mana == 0
         mana.each do |color, amount|
           pool[color] -= amount
         end
