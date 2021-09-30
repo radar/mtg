@@ -1,5 +1,5 @@
 module Magic
   module Cards
-    # include CardDSL
+    extend CardBuilder
   end
 end
