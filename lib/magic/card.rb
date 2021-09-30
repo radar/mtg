@@ -125,8 +125,8 @@ module Magic
     end
 
     def left_the_battlefield!
-      static_abilities = game.battlefield.static_abilities.select { |ability| ability.source == self }
-      static_abilities.each { |ability| game.battlefield.remove_static_ability(ability) }
+      static_abilities = game.battlefield.static_abilities.from(self)
+      static_abilities.each { |ability| game.battlefield.static_abilities.remove(ability) }
     end
 
 

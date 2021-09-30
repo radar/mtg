@@ -4,20 +4,12 @@ module Magic
       attr_reader :static_abilities
 
       def initialize(**args)
-        @static_abilities = []
+        @static_abilities = StaticAbilities.new([])
         super(**args)
       end
 
       def battlefield?
         true
-      end
-
-      def add_static_ability(ability)
-        @static_abilities << ability
-      end
-
-      def remove_static_ability(ability)
-        @static_abilities -= [ability]
       end
 
       def receive_event(event)

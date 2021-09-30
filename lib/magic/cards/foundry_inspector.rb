@@ -6,7 +6,7 @@ module Magic
       TYPE_LINE = "Artifact Creature -- Constructor"
 
       def entered_the_battlefield!
-        game.battlefield.add_static_ability(
+        game.battlefield.static_abilities.add(
           Abilities::Static::ReduceManaCost.new(
             source: self,
             reduction: { colorless: 1 },

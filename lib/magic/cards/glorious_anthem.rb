@@ -6,7 +6,7 @@ module Magic
       TYPE_LINE = "Enchantment"
 
       def entered_the_battlefield!
-        game.battlefield.add_static_ability(
+        game.battlefield.static_abilities.add(
           Abilities::Static::CreaturesGetBuffed.new(
             source: self,
             power: 1,
