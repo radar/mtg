@@ -44,6 +44,11 @@ module Magic
       end
     end
 
+    def convert_mana!(source_mana, target_mana)
+      pay_mana(source_mana)
+      add_mana(target_mana)
+    end
+
     def pay_mana(mana)
       if mana.any? { |color, count| mana_pool[color] - count < 0 }
         raise UnpayableMana, "Cannot pay mana #{mana.inspect}, there is only #{mana_pool.inspect} available"
@@ -52,6 +57,15 @@ module Magic
       mana.each do |color, count|
         @mana_pool[color] -= count
       end
+    end
+
+    def can_cast?(card)
+      action = CastAction.new(
+        player: self,
+        game: game,
+        card: card
+      )
+      action.can_cast?
     end
 
     def draw!

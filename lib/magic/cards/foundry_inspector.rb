@@ -2,7 +2,7 @@ module Magic
   module Cards
     class FoundryInspector < Creature
       NAME = "Foundry Inspector"
-      COST = { any: 3 }
+      COST = { generic: 3 }
       TYPE_LINE = "Artifact Creature -- Constructor"
 
       def entered_the_battlefield!

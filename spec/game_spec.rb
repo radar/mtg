@@ -14,9 +14,12 @@ RSpec.describe Magic::Game do
 
   context "state machine" do
     let(:p1_forest) { Magic::Cards::Forest.new(controller: p1, tapped: true) }
-    let(:battlefield) { Magic::Zones::Battlefield.new(cards: [p1_forest]) }
 
-    subject { Magic::Game.new(players: [p1, p2], battlefield: battlefield ) }
+    subject { Magic::Game.new(players: [p1, p2]) }
+
+    before do
+      subject.battlefield.add(p1_forest)
+    end
 
     it "transitions between each stage" do
       expect(subject.step).to be_untap

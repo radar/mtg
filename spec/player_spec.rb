@@ -26,34 +26,4 @@ RSpec.describe Magic::Player do
       end
     end
   end
-
-  context "float_mana" do
-    subject(:player) { described_class.new }
-    it "cannot float mana it does not have" do
-      player.add_mana(white: 1)
-      expect { player.float_mana(white: 2) }.to raise_error(Magic::Player::UnfloatableMana)
-    end
-  end
-
-  context "can_cast?" do
-    let(:card) { Magic::Cards::LoxodonWayfarer.new(controller: player) }
-    subject(:player) { described_class.new }
-
-    context "when the player has enough mana" do
-      it "is castable" do
-        player.add_mana(white: 1, red: 2)
-        player.float_mana(white: 1, red: 2)
-        expect(player.can_cast?(card)).to eq(true)
-      end
-    end
-
-    context "when the player does not have enough mana" do
-      let(:player) { described_class.new(mana_pool: { red: 1, white: 1 })}
-
-      it "is castable" do
-        player.float_mana(white: 1, red: 1)
-        expect(player.can_cast?(card)).to eq(false)
-      end
-    end
-  end
 end

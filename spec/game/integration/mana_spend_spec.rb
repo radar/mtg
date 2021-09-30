@@ -51,19 +51,19 @@ RSpec.describe Magic::Game, "Mana spend" do
 
       before do
         3.times { game.battlefield.add(Card("Mountain", controller: p1)) }
-        game.battlefield.add(foundry_inspector)
+        p1.hand.add(foundry_inspector)
         p1.hand.add(sol_ring)
       end
 
-      it "casts a forest, then an essence warden" do
+      it "casts a foundry inspector and then a sol ring" do
         mountains = game.battlefield.cards.select { |c| c.name == "Mountain" }
         mountains.each { |mountain| p1.tap!(mountain) }
 
         expect(p1.mana_pool[:red]).to eq(3)
         expect(p1.can_cast?(foundry_inspector)).to eq(true)
-        p1.cast!(foundry_inspector, { red: 3 })
+        p1.cast!(foundry_inspector, { generic: { red: 3 } })
         game.stack.resolve!
-        expect(p1.mana_pool[:red]).to eq(0)
+        expect(p1.mana_pool).to be_empty
         p1.cast!(sol_ring)
         game.stack.resolve!
         expect(sol_ring.zone).to be_battlefield
