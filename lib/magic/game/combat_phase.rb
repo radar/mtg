@@ -29,7 +29,15 @@ module Magic
           return if blocked?
           return if attacker.dead?
           target.take_damage(attacker.power)
-          puts "#{attacker} attacks #{target} for #{attacker.power}"
+          puts "#{attacker.name} attacks #{target} for #{attacker.power}"
+          resolve_lifelink
+        end
+
+        def resolve_lifelink
+          if attacker.lifelink?
+            attacker.controller.gain_life(attacker.power)
+            puts "#{attacker.name} has lifelink, controller gains #{attacker.power} life"
+          end
         end
       end
 
