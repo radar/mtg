@@ -54,10 +54,10 @@ module Magic
           attack.blockers.each do |blocker|
             attack.blocked!
             attacker = attack.attacker
+            attacker.fight(blocker)
             puts "#{blocker.name} damages #{attacker.name} for #{blocker.power}"
-            attacker.take_damage(blocker.power)
+            blocker.fight(attacker)
             puts "#{attacker.name} damages #{blocker.name} for #{attacker.power}"
-            blocker.take_damage(attacker.power)
           end
 
           attack.resolve

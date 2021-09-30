@@ -11,7 +11,9 @@ module Magic
         @base_toughness = self.class::TOUGHNESS
         @power_modifiers = []
         @toughness_modifiers = []
+
         @damage = 0
+        @marked_for_death = false
         super(**args)
       end
 
@@ -20,7 +22,7 @@ module Magic
       end
 
       def dead?
-        !alive?
+        @marked_for_death || !alive?
       end
 
       def power
@@ -29,6 +31,19 @@ module Magic
 
       def toughness
         @base_toughness + @toughness_modifiers.sum(&:toughness)
+      end
+
+      def deathtouch?
+        keywords.include?(Keywords::DEATHTOUCH)
+      end
+
+      def fight(creature)
+        creature.take_damage(power)
+        creature.mark_for_death! if deathtouch?
+      end
+
+      def mark_for_death!
+        @marked_for_death = true
       end
 
       def take_damage(damage_dealt)
