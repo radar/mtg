@@ -47,7 +47,7 @@ module Magic
         color_payment = payment.slice(*Mana::COLORS)
         deduct_from_pool(pool, color_payment)
 
-        color_costs.each do |color, amount|
+        color_payment.each do |color, amount|
           cost[color] -= amount
         end
 
