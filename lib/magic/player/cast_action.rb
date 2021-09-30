@@ -1,29 +1,63 @@
 module Magic
   class Player
     class CastAction
-      attr_reader :game, :player, :card
+      attr_reader :game, :player, :card, :payment
+
       def initialize(game:, player:, card:)
         @game = game
         @player = player
         @card = card
+        @payment = Hash.new(0)
+        @payment[:generic] = {}
+      end
+
+      def pay(mana)
+        @payment = mana
+        @payment[:generic] ||= {}
+      end
+
+      def final_cost
+        apply_cost_reductions(card)
       end
 
       def can_cast?
         return false unless card.zone.hand?
-
-        cost = apply_cost_reductions(card)
-        return true if cost.all? { |_color, cost| cost == 0 }
+        cost = final_cost
+        return true if cost.values.all?(&:zero?)
 
         pool = player.mana_pool.dup
-        cost.except(:colorless).each do |color, count|
-          pool[color] -= count
+        color_costs = cost.slice(*Mana::COLORS)
+
+        deduct_from_pool(pool, color_costs)
+
+        generic_mana_payable = pool.values.sum >= cost[:generic]
+
+        generic_mana_payable && (pool.values.all? { |v| v.zero? || v.positive? })
+      end
+
+      def cast!
+        cost = final_cost
+        pool = player.mana_pool.dup
+        deduct_from_pool(pool, payment[:generic])
+
+        payment[:generic].each do |_, amount|
+          cost[:generic] -= amount
         end
 
-        colorless_mana_payable = card.cost[:colorless].nil? || pool.any? { |_, count| count >= card.cost[:colorless] }
-        all_above_zero = pool.all? { |_, count| count >= 0 }
+        color_costs = payment.slice(*Mana::COLORS)
+        deduct_from_pool(pool, color_costs)
 
+        color_costs.each do |color, amount|
+          cost[color] -= amount
+        end
 
-        colorless_mana_payable && all_above_zero
+        if cost.values.all?(&:zero?)
+          player.pay_mana(payment.slice(*Mana::COLORS))
+          player.pay_mana(payment[:generic])
+          card.cast!
+        else
+          raise "Cost has not been fully paid."
+        end
       end
 
       private
@@ -42,6 +76,13 @@ module Magic
           end
 
         reduced_cost
+      end
+
+      def deduct_from_pool(pool, mana)
+        binding.pry if mana == 0
+        mana.each do |color, amount|
+          pool[color] -= amount
+        end
       end
     end
   end

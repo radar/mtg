@@ -60,12 +60,7 @@ module Magic
     end
 
     def can_cast?(card)
-      action = CastAction.new(
-        player: self,
-        game: game,
-        card: card
-      )
-      action.can_cast?
+      cast_action(card).can_cast?
     end
 
     def draw!
@@ -75,10 +70,15 @@ module Magic
       hand.add(card)
     end
 
-    def cast!(card, mana = {})
-      pay_mana(mana) if mana.any?
-      card.cast!
-      @hand.remove(card)
+    def pay_and_cast!(cost, card)
+      action = cast_action(card)
+      action.pay(cost)
+      action.cast!
+    end
+
+    def cast!(card)
+      action = cast_action(card)
+      action.cast!
     end
 
     def tap!(card)
@@ -87,6 +87,16 @@ module Magic
 
     def join_game(game)
       @game = game
+    end
+
+    private
+
+    def cast_action(card)
+      CastAction.new(
+        player: self,
+        game: game,
+        card: card
+      )
     end
   end
 end

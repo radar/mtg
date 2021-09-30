@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Player do
   let(:game) { Magic::Game.new }
   context "draw" do
-    let(:island) { Magic::Cards::Island.new(game: game) }
+    let(:island) { Card("Island") }
     subject(:player) { game.add_player(library: [island]) }
 
     it "draws a card" do
@@ -15,8 +15,8 @@ RSpec.describe Magic::Player do
 
   context "cast!" do
     context "with an island" do
-      let(:island) { Magic::Cards::Island.new }
-      subject(:player) { described_class.new(library: [island]) }
+      let(:island) { Card("Island") }
+      subject(:player) { game.add_player(library: [island]) }
 
       it "plays the island" do
         player.draw!

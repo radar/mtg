@@ -15,7 +15,9 @@ module Magic
       @game = game
       @controller = controller
       @zone = controller.library
-      @cost = self.class::COST
+      cost = self.class::COST.dup
+      cost.default = 0
+      @cost = cost
       @tapped = tapped
       @keywords = self.class::KEYWORDS
     end
