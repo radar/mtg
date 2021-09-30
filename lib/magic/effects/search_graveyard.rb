@@ -1,16 +1,13 @@
 module Magic
   module Effects
-    class SearchGraveyard
+    class SearchGraveyard < Effect
       attr_reader :graveyard, :condition, :resolve_action
 
       def initialize(graveyard:, condition:, resolve_action:)
         @graveyard = graveyard
         @condition = condition
         @resolve_action = resolve_action
-      end
-
-      def use_stack?
-        false
+        super()
       end
 
       def requires_choices?

@@ -2,7 +2,7 @@ module Magic
   class Stack
     extend Forwardable
 
-    def_delegator :@stack, :first
+    def_delegators :@stack, :first, :select, :count
 
     attr_reader :effects
 
@@ -39,7 +39,11 @@ module Magic
 
     def resolve_effect(effect, **args)
       if effect.single_choice?
-        effect.resolve(target: effect.choices.first)
+        if effect.multiple_targets?
+          effect.resolve(targets: [effect.choices.first])
+        else
+          effect.resolve(target: effect.choices.first)
+        end
       else
         effect.resolve(**args)
       end

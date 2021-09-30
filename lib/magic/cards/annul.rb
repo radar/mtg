@@ -7,8 +7,7 @@ module Magic
       def resolution_effects
         [
           Effects::CounterSpell.new(
-            stack: game.stack,
-            valid_targets: -> (c) { c.enchantment? || c.artifact? }
+            choices: game.stack.select { |c| c.enchantment? || c.artifact? }
           )
         ]
       end

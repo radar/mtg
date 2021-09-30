@@ -1,11 +1,12 @@
 module Magic
   module Cards
-    class AcidicSlime < Creature
-      NAME = "Acidic Slime"
-      COST = { generic: 3, green: 2 }
-      TYPE_LINE = "Creature -- Ooze"
-      KEYWORDS = [Keywords::DEATHTOUCH]
+    AcidicSlime = Creature("Acidic Slime") do
+      cost generic: 3, green: 2
+      type "Creature -- Ooze"
+      keywords Keywords::DEATHTOUCH
+    end
 
+    class AcidicSlime < Creature
       def entered_the_battlefield!
         game.add_effect(
           Effects::Destroy.new(

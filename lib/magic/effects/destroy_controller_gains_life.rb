@@ -1,13 +1,10 @@
 module Magic
   module Effects
-    class DestroyControllerGainsLife
+    class DestroyControllerGainsLife < Effect
       attr_reader :choices
       def initialize(choices:)
         @choices = choices
-      end
-
-      def use_stack?
-        false
+        super()
       end
 
       def requires_choices?

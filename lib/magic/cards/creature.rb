@@ -3,6 +3,15 @@ module Magic
     class Creature < Card
       attr_reader :damage, :power_modifiers, :toughness_modifiers
 
+      class Counter
+        attr_reader :power, :toughness
+
+        def initialize(power:, toughness:)
+          @power = power
+          @toughness = toughness
+        end
+      end
+
       POWER = 0
       TOUGHNESS = 0
 
@@ -11,6 +20,7 @@ module Magic
         @base_toughness = self.class::TOUGHNESS
         @power_modifiers = []
         @toughness_modifiers = []
+        @counters = []
 
         @damage = 0
         @marked_for_death = false
@@ -26,11 +36,11 @@ module Magic
       end
 
       def power
-        @base_power + @power_modifiers.sum(&:power)
+        @base_power + @power_modifiers.sum(&:power) + @counters.sum(&:power)
       end
 
       def toughness
-        @base_toughness + @toughness_modifiers.sum(&:toughness)
+        @base_toughness + @toughness_modifiers.sum(&:toughness) + @counters.sum(&:toughness)
       end
 
       def deathtouch?
@@ -49,6 +59,10 @@ module Magic
         keywords.include?(Keywords::VIGILANCE)
       end
 
+      def lifelink?
+        keywords.include?(Keywords::LIFELINK)
+      end
+
       def fight(creature)
         creature.take_damage(power)
         creature.mark_for_death! if deathtouch?
@@ -62,6 +76,10 @@ module Magic
         @damage += damage_dealt
 
         destroy! if dead?
+      end
+
+      def add_counter(power:, toughness:)
+        @counters << Counter.new(power: power, toughness: toughness)
       end
 
       def left_the_battlefield!

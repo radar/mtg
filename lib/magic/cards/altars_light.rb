@@ -1,9 +1,10 @@
 module Magic
   module Cards
-    class AltarsLight < Instant
-      NAME = "Altar's Light"
-      COST = { any: 2, white: 2 }
+    AltarsLight = Instant("Altar's Light") do
+      cost generic: 2, white: 2
+    end
 
+    class AltarsLight < Instant
       def resolve!
         game.add_effect(
           Effects::Exile.new(

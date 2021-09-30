@@ -12,10 +12,6 @@ module Magic
         @green = green
       end
 
-      def use_stack?
-        false
-      end
-
       def requires_choices?
         true
       end

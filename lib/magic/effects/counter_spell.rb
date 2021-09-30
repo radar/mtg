@@ -1,11 +1,11 @@
 module Magic
   module Effects
-    class CounterSpell
-      attr_reader :stack, :valid_targets
+    class CounterSpell < Effect
+      attr_reader :choices
 
-      def initialize(stack:, valid_targets:)
-        @stack = stack
-        @valid_targets = valid_targets
+      def initialize(choices:)
+        @choices = choices
+        super()
       end
 
       def requires_choices?
@@ -14,10 +14,6 @@ module Magic
 
       def single_choice?
         choices.count == 1
-      end
-
-      def choices
-        stack.select(&valid_targets)
       end
 
       def resolve(target:)

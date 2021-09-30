@@ -1,5 +1,12 @@
 module Magic
   module CardBuilder
+    def Instant(name, &block)
+      Card(name, Magic::Cards::Instant, &block)
+    end
+    def Creature(name, &block)
+      Card(name, Magic::Cards::Creature, &block)
+    end
+
     def Card(name, base_class = Magic::Card, &block)
       card = Class.new(base_class)
       card.const_set(:NAME, name)
@@ -28,7 +35,7 @@ module Magic
         @card.const_set(:TOUGHNESS, power)
       end
 
-      def keywords(keywords)
+      def keywords(*keywords)
         @card.const_set(:KEYWORDS, keywords)
       end
     end

@@ -8,10 +8,6 @@ module Magic
         @life = life
       end
 
-      def use_stack?
-        false
-      end
-
       def requires_choices?
         false
       end

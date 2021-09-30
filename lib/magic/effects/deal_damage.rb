@@ -1,11 +1,12 @@
 module Magic
   module Effects
-    class DealDamage
+    class DealDamage < Effect
       attr_reader :choices, :damage
 
       def initialize(choices:, damage:)
         @choices = choices
         @damage = damage
+        super()
       end
 
       def requires_choices?

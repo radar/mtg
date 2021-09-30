@@ -1,16 +1,13 @@
 module Magic
   module Effects
-    class SearchLibrary
+    class SearchLibrary < Effect
       attr_reader :library, :condition, :resolve_action
 
       def initialize(library:, condition:, resolve_action:)
         @library = library
         @condition = condition
         @resolve_action = resolve_action
-      end
-
-      def use_stack?
-        false
+        super()
       end
 
       def requires_choices?
