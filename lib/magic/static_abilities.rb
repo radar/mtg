@@ -5,7 +5,12 @@ module Magic
     end
 
     def remove(ability)
+      ability.remove
       delete(ability)
+    end
+
+    def select(...)
+      self.class.new(super(...))
     end
 
     def from(card)

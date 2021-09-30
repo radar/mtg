@@ -7,5 +7,10 @@ module Magic
     def creatures
       self.class.new(select(&:creature?))
     end
+
+    def apply_ability(ability)
+      applicable_cards = select { |card| ability.applies_to?(card) }
+      applicable_cards.each { |card| ability.apply(card) }
+    end
   end
 end

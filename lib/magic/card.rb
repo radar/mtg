@@ -125,15 +125,18 @@ module Magic
     end
 
     def left_the_battlefield!
-      static_abilities = game.battlefield.static_abilities.from(self)
+      static_abilities = game.remove_static_abilities_from(self)
       static_abilities.each { |ability| game.battlefield.static_abilities.remove(ability) }
     end
-
 
     def died!
     end
 
     def entered_the_battlefield!
+      applicable_abilities = game.battlefield.static_abilities.select do |ability|
+        ability.applies_to?(self) && ability.applies_while_entering_the_battlefield?
+      end
+      applicable_abilities.each { |ability| ability.apply(self) }
     end
 
     private

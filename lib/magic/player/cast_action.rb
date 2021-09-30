@@ -63,19 +63,13 @@ module Magic
       private
 
       def apply_cost_reductions(card)
-        base_cost = card.cost.dup
+        base_cost = card.cost
 
-        reduce_mana_cost_abilities = game.battlefield.static_abilities.select do |ability|
-          ability.is_a?(Abilities::Static::ReduceManaCost)
-        end
+        reduce_mana_cost_abilities = game.battlefield.static_abilities
+          .applies_to(card)
+          .select { |ability| ability.is_a?(Abilities::Static::ReduceManaCost) }
 
-        reduced_cost = reduce_mana_cost_abilities
-          .select { |ability| ability.applies_to?(card) }
-          .each_with_object(base_cost) do |ability, cost|
-            ability.apply(cost)
-          end
-
-        reduced_cost
+        reduce_mana_cost_abilities.each_with_object(base_cost) { |ability, cost| ability.apply(cost) }
       end
 
       def deduct_from_pool(pool, mana)
