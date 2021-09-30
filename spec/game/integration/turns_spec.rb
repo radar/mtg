@@ -14,6 +14,7 @@ RSpec.describe Magic::Game, "turn walkthrough" do
     6.times { p1.library.add(island.dup) }
     p1.library.add(aegis_turtle)
     p1.library.add(island.dup)
+    p1.library.add(aegis_turtle.dup)
 
     6.times { p2.library.add(mountain.dup) }
     p2.library.add(raging_goblin)
@@ -38,6 +39,10 @@ RSpec.describe Magic::Game, "turn walkthrough" do
     island = p1.hand.find { |card| card.name == "Island" }
     p1.cast!(island)
     island.tap!
+    expect(p1.lands_played).to eq(1)
+
+    island2 = p1.hand.find { |card| card.name == "Island" }
+    expect(p1.can_cast?(island2)).to eq(false)
 
     aegis_turtle = p1.hand.find { |card| card.name == "Aegis Turtle" }
     p1.pay_and_cast!({ blue: 1 }, aegis_turtle)
@@ -89,5 +94,20 @@ RSpec.describe Magic::Game, "turn walkthrough" do
     expect(aegis_turtle.zone).to be_battlefield
     expect(raging_goblin.zone).to be_battlefield
     expect(p2.life).to eq(20)
+
+    until subject.step.untap?
+      subject.next_step
+    end
+
+    p1_island = subject.battlefield.cards.controlled_by(p1).find { |c| c.name == "Island" }
+    expect(p1_island).to be_untapped
+
+    until subject.step.first_main?
+      subject.next_step
+    end
+
+    expect(p1.lands_played).to eq(0)
+    island = p1.hand.find { |card| card.name == "Island" }
+    expect(p1.can_cast?(island)).to be(true)
   end
 end

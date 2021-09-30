@@ -1,6 +1,6 @@
 module Magic
   class Player
-    attr_reader :name, :game, :library, :graveyard, :exile, :mana_pool, :hand, :life
+    attr_reader :name, :game, :library, :graveyard, :exile, :mana_pool, :hand, :life, :lands_played
 
     class UnpayableMana < StandardError; end
 
@@ -21,6 +21,7 @@ module Magic
       @mana_pool = mana_pool
       @floating_mana = floating_mana
       @life = life
+      @lands_played = 0
     end
 
     def gain_life(life)
@@ -36,6 +37,22 @@ module Magic
 
     def take_damage(damage)
       @life -= damage
+    end
+
+    def played_a_land!
+      @lands_played += 1
+    end
+
+    def reset_lands_played
+      @lands_played = 0
+    end
+
+    def max_lands_per_turn
+      1
+    end
+
+    def can_play_lands?
+      lands_played >= max_lands_per_turn
     end
 
     def add_mana(mana)

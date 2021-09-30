@@ -21,6 +21,7 @@ module Magic
       end
 
       def can_cast?
+        return false if card.land? && player.can_play_lands?
         return false unless card.zone.hand?
         cost = final_cost
         return true if cost.values.all?(&:zero?)
@@ -55,6 +56,7 @@ module Magic
           player.pay_mana(payment.slice(*Mana::COLORS))
           player.pay_mana(payment[:generic])
           card.cast!
+          player.played_a_land! if card.land?
         else
           raise "Cost has not been fully paid."
         end

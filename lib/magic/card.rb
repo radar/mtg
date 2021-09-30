@@ -30,8 +30,12 @@ module Magic
       type_line.split(" ").include?(type)
     end
 
+    def land?
+      type?("Land")
+    end
+
     def basic_land?
-      type?("Basic") && type?("Land")
+      type?("Basic")
     end
 
     def creature?

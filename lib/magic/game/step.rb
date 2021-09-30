@@ -39,7 +39,7 @@ module Magic
           transitions from: :end_of_combat, to: :second_main
           transitions from: :second_main, to: :end_of_turn
           transitions from: :end_of_turn, to: :cleanup
-          transitions from: :cleanup, to: :untap, after: -> { game.change_active_player }
+          transitions from: :cleanup, to: :untap, after: -> { game.change_active_player; game.active_player.reset_lands_played }
         end
       end
 
