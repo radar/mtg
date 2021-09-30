@@ -11,6 +11,10 @@ module Magic
       @cards = CardList.new(cards)
     end
 
+    def to_s
+      "#{self.class.name.split("::").last}"
+    end
+
     def add(card)
       card.zone = self
       self << card
