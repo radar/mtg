@@ -40,6 +40,7 @@ module Magic
       end
 
       def declare_attacker(attacker, target:)
+        attacker.tap!
         @attacks << Attack.new(attacker: attacker, target: target)
       end
 
@@ -58,7 +59,6 @@ module Magic
         first_strikers = @attacks.select { |attack| attack.attacker.double_strike? || attack.attacker.first_strike? }
         deal_damage(first_strikers)
       end
-
 
       def deal_combat_damage
         deal_damage(@attacks)
