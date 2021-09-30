@@ -1,8 +1,19 @@
 module Magic
   module Zones
     class Battlefield < Zone
+      attr_reader :static_abilities
+
+      def initialize(**args)
+        @static_abilities = []
+        super(**args)
+      end
+
       def battlefield?
         true
+      end
+
+      def add_static_ability(ability)
+        @static_abilities << ability
       end
 
       def receive_event(event)

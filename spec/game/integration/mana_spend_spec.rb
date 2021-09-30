@@ -12,6 +12,17 @@ RSpec.describe Magic::Game, "Mana spend" do
       subject.next_step
     end
 
+    context "when mana cost is not payable" do
+      let(:essence_warden) { Card("Essence Warden", game: game) }
+      before do
+        p1.hand.add(essence_warden)
+      end
+
+      it "cannot cast the essence warden" do
+        expect(p1.can_cast?(essence_warden)).to eq(false)
+      end
+    end
+
     context "with a forest on the battlefield, and essence warden in hand" do
       let(:essence_warden) { Card("Essence Warden", game: game) }
       let(:forest) { Card("Forest", game: game) }
@@ -27,7 +38,7 @@ RSpec.describe Magic::Game, "Mana spend" do
         p1.tap!(forest)
         expect(p1.mana_pool[:green]).to eq(1)
         expect(p1.can_cast?(essence_warden)).to eq(true)
-        p1.cast!(essence_warden)
+        p1.cast!(essence_warden, green: 1)
         game.stack.resolve!
         expect(essence_warden.zone).to be_battlefield
         expect(p1.mana_pool[:green]).to eq(0)
@@ -50,11 +61,12 @@ RSpec.describe Magic::Game, "Mana spend" do
 
         expect(p1.mana_pool[:red]).to eq(3)
         expect(p1.can_cast?(foundry_inspector)).to eq(true)
-        p1.cast!(foundry_inspector)
+        p1.cast!(foundry_inspector, { red: 3 })
         game.stack.resolve!
         expect(p1.mana_pool[:red]).to eq(0)
-        expect(essence_warden.zone).to be_battlefield
-        expect(p1.mana_pool[:green]).to eq(0)
+        p1.cast!(sol_ring)
+        game.stack.resolve!
+        expect(sol_ring.zone).to be_battlefield
       end
     end
   end

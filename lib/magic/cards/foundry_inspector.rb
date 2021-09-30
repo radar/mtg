@@ -4,6 +4,15 @@ module Magic
       NAME = "Foundry Inspector"
       COST = { any: 3 }
       TYPE_LINE = "Artifact Creature -- Constructor"
+
+      def entered_the_battlefield!
+        game.battlefield.add_static_ability(
+          Abilities::Static::ReduceManaCost.new(
+            reduction: { colorless: 1 },
+            applies_to: -> (c) { c.artifact? }
+          )
+        )
+      end
     end
   end
 end

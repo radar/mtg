@@ -61,26 +61,14 @@ module Magic
       hand.add(card)
     end
 
-    def cast!(card)
-      pay_mana(card.cost)
+    def cast!(card, mana = {})
+      pay_mana(mana) if mana.any?
       card.cast!
       @hand.remove(card)
     end
 
     def tap!(card)
       card.tap!
-    end
-
-    def can_cast?(card)
-      pool = mana_pool.dup
-      card.cost.except(:any).each do |color, count|
-        pool[color] -= count
-      end
-
-      any_mana_payable = card.cost[:any].nil? || pool.any? { |_, count| count >= card.cost[:any] }
-      all_above_zero = pool.all? { |_, count| count >= 0 }
-
-      any_mana_payable && all_above_zero
     end
 
     def join_game(game)
