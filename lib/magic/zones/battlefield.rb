@@ -16,6 +16,10 @@ module Magic
         @static_abilities << ability
       end
 
+      def remove_static_ability(ability)
+        @static_abilities -= [ability]
+      end
+
       def receive_event(event)
         case event
         when Events::ZoneChange

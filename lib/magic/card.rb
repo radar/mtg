@@ -117,9 +117,16 @@ module Magic
       case event
       when Events::ZoneChange
         died! if event.card == self && event.death?
+        left_the_battlefield! if event.card == self && event.from.battlefield?
         entered_the_battlefield! if event.card == self && event.to.battlefield?
       end
     end
+
+    def left_the_battlefield!
+      static_abilities = game.battlefield.static_abilities.select { |ability| ability.source == self }
+      static_abilities.each { |ability| game.battlefield.remove_static_ability(ability) }
+    end
+
 
     def died!
     end
