@@ -44,7 +44,11 @@ module Magic
       end
     end
 
-
+    def start!
+      players.each do |player|
+        7.times { player.draw! }
+      end
+    end
 
     def next_step
       step.next

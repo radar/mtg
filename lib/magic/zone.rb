@@ -2,7 +2,7 @@ module Magic
   class Zone
     extend Forwardable
 
-    def_delegator :@cards, :include?
+    def_delegators :@cards, :include?, :select, :find, :count, :<<
 
     attr_reader :owner, :cards
 
@@ -13,7 +13,7 @@ module Magic
 
     def add(card)
       card.zone = self
-      self.cards << card
+      self << card
     end
 
     def remove(card)

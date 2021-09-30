@@ -67,7 +67,6 @@ module Magic
       card = library.draw
       card.move_to_hand!(self)
       card.controller = self
-      hand.add(card)
     end
 
     def pay_and_cast!(cost, card)

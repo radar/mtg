@@ -1,6 +1,6 @@
 module Magic
   module Cards
-    class Mountain < Card
+    class Mountain < BasicLand
       NAME = "Mountain"
       TYPE_LINE = "Basic Land -- Mountain"
 
