@@ -37,6 +37,14 @@ module Magic
         keywords.include?(Keywords::DEATHTOUCH)
       end
 
+      def first_strike?
+        keywords.include?(Keywords::DOUBLE_STRIKE)
+      end
+
+      def double_strike?
+        keywords.include?(Keywords::DOUBLE_STRIKE)
+      end
+
       def fight(creature)
         creature.take_damage(power)
         creature.mark_for_death! if deathtouch?

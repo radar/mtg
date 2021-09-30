@@ -49,8 +49,28 @@ module Magic
         attack.declare_blocker(blocker)
       end
 
+      def deal_first_strike_damage
+        first_strikers = @attacks.select { |attack| attack.attacker.double_strike? || attack.attacker.first_strike? }
+        deal_damage(first_strikers)
+      end
+
+
       def deal_combat_damage
-        @attacks.each do |attack|
+        deal_damage(@attacks)
+      end
+
+      def fatalities
+        dead_attackers = attacks.map(&:attacker).select(&:dead?)
+        dead_blockers = attacks.flat_map(&:blockers).select(&:dead?)
+
+        dead_attackers + dead_blockers
+      end
+
+
+      private
+
+      def deal_damage(attacks)
+        attacks.each do |attack|
           attack.blockers.each do |blocker|
             attack.blocked!
             attacker = attack.attacker
@@ -63,16 +83,6 @@ module Magic
           attack.resolve
         end
       end
-
-      def fatalities
-        dead_attackers = attacks.map(&:attacker).select(&:dead?)
-        dead_blockers = attacks.flat_map(&:blockers).select(&:dead?)
-
-        dead_attackers + dead_blockers
-      end
-
-
-      private
 
     end
   end
