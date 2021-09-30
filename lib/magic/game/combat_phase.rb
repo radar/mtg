@@ -29,6 +29,7 @@ module Magic
           return if blocked?
           return if attacker.dead?
           target.take_damage(attacker.power)
+          puts "#{attacker} attacks #{target} for #{attacker.power}"
         end
       end
 
