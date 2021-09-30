@@ -45,6 +45,10 @@ module Magic
         keywords.include?(Keywords::DOUBLE_STRIKE)
       end
 
+      def vigilant?
+        keywords.include?(Keywords::VIGILANCE)
+      end
+
       def fight(creature)
         creature.take_damage(power)
         creature.mark_for_death! if deathtouch?

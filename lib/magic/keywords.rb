@@ -5,5 +5,6 @@ module Magic
     FIRST_STRIKE = "First strike".freeze
     FLYING = "Flying".freeze
     HASTE = "Haste".freeze
+    VIGILANCE = "Vigilance".freeze
   end
 end

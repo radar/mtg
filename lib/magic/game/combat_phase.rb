@@ -40,7 +40,7 @@ module Magic
       end
 
       def declare_attacker(attacker, target:)
-        attacker.tap!
+        attacker.tap! unless attacker.vigilant?
         @attacks << Attack.new(attacker: attacker, target: target)
       end
 
