@@ -40,15 +40,6 @@ RSpec.describe Magic::Game do
       expect(subject.step).to be_declare_attackers
 
       subject.next_step
-      expect(subject.step).to be_declare_blockers
-
-      subject.next_step
-      expect(subject.step).to be_first_strike
-
-      subject.next_step
-      expect(subject.step).to be_combat_damage
-
-      subject.next_step
       expect(subject.step).to be_end_of_combat
 
       subject.next_step

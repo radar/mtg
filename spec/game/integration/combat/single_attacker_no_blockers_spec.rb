@@ -40,6 +40,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, no blockers" do
       expect(subject.step).to be_combat_damage
 
       expect(p2.life).to eq(p2_starting_life - 1)
+      expect(loxodon_wayfarer).to be_tapped
     end
   end
 end

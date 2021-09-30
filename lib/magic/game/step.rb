@@ -24,7 +24,8 @@ module Magic
           transitions from: :draw, to: :first_main
           transitions from: :first_main, to: :beginning_of_combat
           transitions from: :beginning_of_combat, to: :declare_attackers
-          transitions from: :declare_attackers, to: :declare_blockers
+          transitions from: :declare_attackers, to: :declare_blockers, guard: -> { game.attackers_declared? }
+          transitions from: :declare_attackers, to: :end_of_combat
           transitions from: :declare_blockers, to: :first_strike, after: [
             -> { game.deal_first_strike_damage },
             -> { game.move_dead_creatures_to_graveyard },

@@ -6,7 +6,7 @@ module Magic
     attr_reader :logger, :battlefield, :stack, :players, :step, :attacks
 
     def_delegators :@stack, :effects, :add_effect, :resolve_effect, :next_effect
-    def_delegators :@combat, :declare_attacker, :declare_blocker, :deal_first_strike_damage, :deal_combat_damage, :fatalities
+    def_delegators :@combat, :declare_attacker, :declare_blocker, :deal_first_strike_damage, :deal_combat_damage, :fatalities, :attackers_declared?
 
     def initialize(
       battlefield: Zones::Battlefield.new(owner: self),

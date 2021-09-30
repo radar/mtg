@@ -43,6 +43,10 @@ module Magic
         @attacks << Attack.new(attacker: attacker, target: target)
       end
 
+      def attackers_declared?
+        @attacks.any?
+      end
+
       def declare_blocker(blocker, target:)
         attack = @attacks.find do |attack|
           attack.attacker == target
