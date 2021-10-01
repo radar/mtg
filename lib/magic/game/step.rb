@@ -5,7 +5,7 @@ module Magic
 
       aasm do
         state :untap, initial: true, after_enter: -> { game.untap_active_player_permanents }
-        state :upkeep
+        state :upkeep, after_enter: -> { game.beginning_of_upkeep! }
         state :draw, after_enter: -> { game.active_player.draw! }
         state :first_main
         state :beginning_of_combat, after_enter: -> { game.begin_combat! }

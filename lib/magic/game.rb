@@ -69,6 +69,12 @@ module Magic
       @players = players.rotate(1)
     end
 
+    def beginning_of_upkeep!
+      notify!(
+        Events::BeginningOfUpkeep.new
+      )
+    end
+
     def begin_combat!
       @combat = CombatPhase.new
       notify!(
