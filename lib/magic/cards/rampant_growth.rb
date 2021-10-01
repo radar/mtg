@@ -6,11 +6,7 @@ module Magic
 
       def resolve!
         game.add_effect(
-          Effects::SearchLibrary.new(
-            library: controller.library,
-            condition: -> (c) { c.basic_land? },
-            resolve_action: -> (c) { c.resolve!; c.tapped = true }
-          )
+          Effects::SearchLibraryBasicLandEntersTapped.new(library: controller.library)
         )
         super
       end

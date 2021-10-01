@@ -3,6 +3,7 @@ module Magic
     def Instant(name, &block)
       Card(name, Magic::Cards::Instant, &block)
     end
+
     def Creature(name, &block)
       Card(name, Magic::Cards::Creature, &block)
     end

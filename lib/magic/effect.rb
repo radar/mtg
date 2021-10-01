@@ -5,6 +5,10 @@ module Magic
       @targets = targets
     end
 
+    def no_choice?
+      false
+    end
+
     def multiple_targets?
       false
     end

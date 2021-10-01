@@ -39,6 +39,7 @@ module Magic
 
     def resolve_effect(effect, **args)
       if effect.single_choice?
+        puts "Only one choice for #{effect}, automatically applying."
         if effect.multiple_targets?
           effect.resolve(targets: [effect.choices.first])
         else
@@ -51,6 +52,11 @@ module Magic
       @effects.shift
     end
 
+    def skip_effect(effect)
+      puts "#{effect} has no valid choices, skipping."
+      @effects.delete(effect)
+    end
+
     def resolve!
       resolve_stack!
       resolve_effects!
@@ -58,7 +64,10 @@ module Magic
 
     def resolve_stack!
       return if @stack.empty?
-      return if pending_effects?
+      if pending_effects?
+        puts "Pending effects, pausing stack resolution."
+        return
+      end
 
       item = @stack.shift
       unless item.countered?
@@ -76,6 +85,11 @@ module Magic
       single_choice_effects = effects.select { |effect| effect.single_choice? }
       single_choice_effects.each do |effect|
         resolve_effect(effect)
+      end
+
+      no_choice_effects = effects.select { |effect| effect.no_choice? }
+      no_choice_effects.each do |effect|
+        skip_effect(effect)
       end
     end
   end

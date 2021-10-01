@@ -143,6 +143,10 @@ module Magic
       applicable_abilities.each { |ability| ability.apply(self) }
     end
 
+    def activated_abilities
+      []
+    end
+
     private
 
     def move_zone!(new_zone)

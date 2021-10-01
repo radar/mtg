@@ -1,7 +1,8 @@
 module Magic
   class Player
     class CastAction
-      attr_reader :game, :player, :card, :payment
+      include PayableAction
+      attr_reader :game, :player, :card
 
       def initialize(game:, player:, card:)
         @game = game
@@ -37,28 +38,9 @@ module Magic
       end
 
       def cast!
-        cost = final_cost
-        pool = player.mana_pool.dup
-        deduct_from_pool(pool, payment[:generic])
-
-        payment[:generic].each do |_, amount|
-          cost[:generic] -= amount
-        end
-
-        color_payment = payment.slice(*Mana::COLORS)
-        deduct_from_pool(pool, color_payment)
-
-        color_payment.each do |color, amount|
-          cost[color] -= amount
-        end
-
-        if cost.values.all?(&:zero?)
-          player.pay_mana(payment.slice(*Mana::COLORS))
-          player.pay_mana(payment[:generic])
+        perform!(final_cost) do
           card.cast!
           player.played_a_land! if card.land?
-        else
-          raise "Cost has not been fully paid."
         end
       end
 
@@ -72,12 +54,6 @@ module Magic
           .select { |ability| ability.is_a?(Abilities::Static::ReduceManaCost) }
 
         reduce_mana_cost_abilities.each_with_object(base_cost) { |ability, cost| ability.apply(cost) }
-      end
-
-      def deduct_from_pool(pool, mana)
-        mana.each do |color, amount|
-          pool[color] -= amount
-        end
       end
     end
   end
