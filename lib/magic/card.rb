@@ -1,5 +1,6 @@
 module Magic
   class Card
+    include Cards::Keywords
     attr_reader :game, :name, :cost, :type_line, :countered, :keywords
     attr_accessor :tapped
 
@@ -19,7 +20,7 @@ module Magic
       cost.default = 0
       @cost = cost
       @tapped = tapped
-      @keywords = self.class::KEYWORDS
+      super
     end
 
     def inspect
@@ -48,10 +49,6 @@ module Magic
 
     def enchantment?
       type?("Enchantment")
-    end
-
-    def flying?
-      keywords.include?(Keywords::FLYING)
     end
 
     def move_to_hand!(target_controller)

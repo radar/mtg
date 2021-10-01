@@ -71,6 +71,9 @@ module Magic
 
     def begin_combat!
       @combat = CombatPhase.new
+      notify!(
+        Events::BeginningOfCombat.new
+      )
     end
 
     def deal_damage_to_opponents(player, damage)

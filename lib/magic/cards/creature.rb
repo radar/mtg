@@ -43,26 +43,6 @@ module Magic
         @base_toughness + @toughness_modifiers.sum(&:toughness) + @counters.sum(&:toughness)
       end
 
-      def deathtouch?
-        keywords.include?(Keywords::DEATHTOUCH)
-      end
-
-      def first_strike?
-        keywords.include?(Keywords::DOUBLE_STRIKE)
-      end
-
-      def double_strike?
-        keywords.include?(Keywords::DOUBLE_STRIKE)
-      end
-
-      def vigilant?
-        keywords.include?(Keywords::VIGILANCE)
-      end
-
-      def lifelink?
-        keywords.include?(Keywords::LIFELINK)
-      end
-
       def fight(creature)
         creature.take_damage(power)
         creature.mark_for_death! if deathtouch?
