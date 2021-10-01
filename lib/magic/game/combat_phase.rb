@@ -69,7 +69,8 @@ module Magic
       end
 
       def deal_combat_damage
-        deal_damage(@attacks)
+        attacks_without_first_strike = @attacks.reject { |attack| attack.attacker.first_strike? }
+        deal_damage(attacks_without_first_strike)
       end
 
       def fatalities
