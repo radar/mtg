@@ -41,7 +41,7 @@ module Magic
       game.notify!(
         Events::LifeLoss.new(
           player: self,
-          life: life,
+          life: damage,
         )
       )
     end
