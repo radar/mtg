@@ -37,6 +37,13 @@ module Magic
 
     def take_damage(damage)
       @life -= damage
+
+      game.notify!(
+        Events::LifeLoss.new(
+          player: self,
+          life: life,
+        )
+      )
     end
 
     def played_a_land!
