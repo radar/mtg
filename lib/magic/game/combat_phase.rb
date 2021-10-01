@@ -21,22 +21,22 @@ module Magic
           @blocked
         end
 
-        def blocked!
-          @blocked = true
-        end
 
         def resolve
-          return if blocked?
           return if attacker.dead?
-          target.take_damage(attacker.power)
-          puts "#{attacker.name} attacks #{target} for #{attacker.power}"
-          resolve_lifelink
-        end
+          damage_output = attacker.power
 
-        def resolve_lifelink
-          if attacker.lifelink?
-            attacker.controller.gain_life(attacker.power)
-            puts "#{attacker.name} has lifelink, controller gains #{attacker.power} life"
+          if blockers.any?
+            blockers.each do |blocker|
+              blocker.fight(attacker)
+              assigned_damage = [blocker.toughness, damage_output].min
+              attacker.fight(blocker, assigned_damage)
+              damage_output -= assigned_damage
+            end
+
+            attacker.fight(target, damage_output) if attacker.trample?
+          else
+            attacker.fight(target)
           end
         end
       end
@@ -84,20 +84,8 @@ module Magic
       private
 
       def deal_damage(attacks)
-        attacks.each do |attack|
-          attack.blockers.each do |blocker|
-            attack.blocked!
-            attacker = attack.attacker
-            attacker.fight(blocker)
-            puts "#{blocker.name} damages #{attacker.name} for #{blocker.power}"
-            blocker.fight(attacker)
-            puts "#{attacker.name} damages #{blocker.name} for #{attacker.power}"
-          end
-
-          attack.resolve
-        end
+        attacks.each(&:resolve)
       end
-
     end
   end
 end

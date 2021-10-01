@@ -69,6 +69,10 @@ module Magic
       def lifelink?
         has_keyword?(Keywords::LIFELINK)
       end
+
+      def trample?
+        has_keyword?(Keywords::TRAMPLE)
+      end
     end
   end
 end

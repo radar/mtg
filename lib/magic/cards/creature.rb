@@ -43,9 +43,13 @@ module Magic
         @base_toughness + @toughness_modifiers.sum(&:toughness) + @counters.sum(&:toughness)
       end
 
-      def fight(creature)
-        creature.take_damage(power)
-        creature.mark_for_death! if deathtouch?
+      def fight(target, assigned_damage = power)
+        puts "#{self} fights #{target}, dealing #{assigned_damage} damage"
+        target.take_damage(assigned_damage)
+        controller.gain_life(assigned_damage) if lifelink?
+        if target.is_a?(Creature)
+          target.mark_for_death! if deathtouch? || target.dead?
+        end
       end
 
       def mark_for_death!
@@ -54,8 +58,6 @@ module Magic
 
       def take_damage(damage_dealt)
         @damage += damage_dealt
-
-        destroy! if dead?
       end
 
       def add_counter(power:, toughness:)

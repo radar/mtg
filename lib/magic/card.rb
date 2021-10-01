@@ -27,6 +27,10 @@ module Magic
       "#<Card name:#{name} controller:#{controller.name}>"
     end
 
+    def to_s
+      name
+    end
+
     def type?(type)
       type_line.split(" ").include?(type)
     end

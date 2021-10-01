@@ -4,6 +4,8 @@ module Magic
       cost generic: 3, green: 2
       type "Creature -- Ooze"
       keywords Keywords::DEATHTOUCH
+      power 2
+      toughness 2
     end
 
     class AcidicSlime < Creature
