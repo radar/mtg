@@ -3,8 +3,8 @@ module Magic
     attr_reader :loyalty
 
     def initialize(**args)
-      @loyalty = self.class::BASE_LOYALTY
-      super(**args)
+      @loyalty = args[:loyalty] || self.class::BASE_LOYALTY
+      super(**args.except(:loyalty))
     end
 
     class LoyaltyAbility
@@ -24,9 +24,7 @@ module Magic
       if ability.loyalty_change == :X
         @loyalty -= value_for_x
       else
-        if ability.loyalty_change.positive?
-          @loyalty += ability.loyalty_change
-        end
+        @loyalty += ability.loyalty_change
       end
 
       if value_for_x > 0
@@ -34,6 +32,8 @@ module Magic
       else
         ability.activate!
       end
+
+      destroy! if loyalty <= 0
     end
   end
 end
