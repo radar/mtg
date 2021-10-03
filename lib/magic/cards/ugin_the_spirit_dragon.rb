@@ -28,13 +28,13 @@ module Magic
           LoyaltyAbility.new(loyalty_change: -10, ability: -> {
             controller.gain_life(7)
             7.times { controller.draw! }
-            7.times do
-              game.add_effect(
-                Effects::MoveZone.new(
-                  choices: controller.hand.cards.permanents
-                )
+            game.add_effect(
+              Effects::MoveToBattlefield.new(
+                battlefield: game.battlefield,
+                targets: 7,
+                choices: controller.hand.cards.permanents
               )
-            end
+            )
           })
         ]
       end

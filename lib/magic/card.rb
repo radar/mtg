@@ -77,6 +77,10 @@ module Magic
       end
     end
 
+    def permanent?
+      true
+    end
+
     def tap!
       @tapped = true
     end

@@ -54,22 +54,41 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
   context "-10 ultimate ability" do
     subject { Card("Ugin, The Spirit Dragon", controller: p1, loyalty: 10) }
     let(:ability) { subject.loyalty_abilities[2] }
+    let(:forest) { Card("Forest") }
+    let(:glorious_anthem) { Card("Glorious Anthem") }
+    let(:acidic_slime) { Card("Acidic Slime") }
+    let(:fencing_ace) { Card("Fencing Ace") }
+    let(:great_furnace) { Card("Great Furnace") }
+    let(:island) { Card("Island") }
+    let(:mountain) { Card("Mountain") }
+
 
     before do
-      p1.library.add(Card("Forest"))
-      p1.library.add(Card("Glorious Anthem"))
-      p1.library.add(Card("Acidic Slime"))
-      p1.library.add(Card("Great Furnace"))
-      p1.library.add(Card("Profane Memento"))
-      p1.library.add(Card("Island"))
-      p1.library.add(Card("Mountain"))
+      p1.library.add(forest)
+      p1.library.add(glorious_anthem)
+      p1.library.add(acidic_slime)
+      p1.library.add(fencing_ace)
+      p1.library.add(great_furnace)
+      p1.library.add(island)
+      p1.library.add(mountain)
+      p1.library.add(forest)
     end
 
-    it "exiles wood elves, leaves the sol ring" do
+    it "controller gains 7 life, draws 7 cards and moves 7 permanents to the battlefield" do
       subject.activate_loyalty_ability!(ability)
       expect(subject.loyalty).to eq(0)
       expect(subject.zone).to be_graveyard
       expect(p1.life).to eq(27)
+
+      move_to_battlefield = game.next_effect
+      expect(move_to_battlefield).to be_a(Magic::Effects::MoveToBattlefield)
+      permanents = p1.hand.cards.permanents
+      expect(permanents.count).to eq(7)
+      game.resolve_effect(move_to_battlefield, targets: permanents)
+
+      permanents.each do |permanent|
+        expect(permanent.zone).to be_battlefield
+      end
     end
   end
 end

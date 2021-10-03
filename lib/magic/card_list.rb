@@ -8,6 +8,10 @@ module Magic
       self.class.new(select(&:creature?))
     end
 
+    def permanents
+      self.class.new(select(&:permanent?))
+    end
+
     def apply_ability(ability)
       applicable_cards = select { |card| ability.applies_to?(card) }
       applicable_cards.each { |card| ability.apply(card) }
