@@ -55,6 +55,16 @@ module Magic
       type?("Enchantment")
     end
 
+    def converted_mana_cost
+      cost.values.sum
+    end
+
+    def colors
+      cost.keys.reject { |k| k == :generic || k == :colorless }.count
+    end
+
+    alias_method :cmc, :converted_mana_cost
+
     def move_to_hand!(target_controller)
       move_zone!(target_controller.hand)
     end

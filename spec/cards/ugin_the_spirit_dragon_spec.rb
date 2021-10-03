@@ -5,14 +5,14 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
   let(:p1) { game.add_player }
   let(:p2) { game.add_player }
   subject { Card("Ugin, The Spirit Dragon", controller: p1) }
-  let(:wood_elves) { Card("Wood Elves", controller: p2) }
-
-  before do
-    game.battlefield.add(wood_elves)
-  end
 
   context "+2 triggered ability" do
     let(:ability) { subject.loyalty_abilities.first }
+    let(:wood_elves) { Card("Wood Elves", controller: p2) }
+
+    before do
+      game.battlefield.add(wood_elves)
+    end
 
     it "targets the wood elves" do
       subject.activate_loyalty_ability!(ability)
@@ -26,6 +26,25 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
       expect(game.effects.count).to eq(1)
       expect(game.next_effect).to be_a(Magic::Effects::DealDamage)
       game.resolve_effect(game.next_effect, target: p2)
+    end
+  end
+
+  context "-X triggered ability" do
+    let(:ability) { subject.loyalty_abilities[1] }
+    let(:wood_elves) { Card("Wood Elves", controller: p2) }
+    let(:sol_ring) { Card("Sol Ring", controller: p2) }
+
+    before do
+      game.battlefield.add(wood_elves)
+      game.battlefield.add(sol_ring)
+    end
+
+    it "exiles wood elves, leaves the sol ring" do
+      subject.activate_loyalty_ability!(ability, value_for_x: 3)
+      # Wood elves has a color, so it goes
+      expect(wood_elves.zone).to be_exile
+      # Meanwhile, Sol Ring is colorless, so it stays
+      expect(sol_ring.zone).to be_battlefield
     end
   end
 end

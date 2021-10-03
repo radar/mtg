@@ -1,10 +1,10 @@
 module Magic
   module Cards
-    class WoodElves < Creature
-      NAME = "Wood Elves"
-      POWER = 1
-      TOUGHNESS = 1
-      TYPE_LINE = "Creature -- Elf Scout"
+    WoodElves = Creature("Wood Elves") do
+      power 1
+      toughness 1
+      type "Creature -- Elf Scout"
+      cost generic: 2, green: 1
     end
   end
 end

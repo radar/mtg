@@ -18,16 +18,17 @@ module Magic
                 choices: game.battlefield.cards + [game.players],
               )
             )
+          }),
+
+          LoyaltyAbility.new(loyalty_change: :X, ability: -> (paid) {
+            cards = game.battlefield.cards.select do |card|
+              card.cmc <= paid &&
+              card.colors >= 1
+            end
+
+            cards.each(&:exile!)
           })
         ]
-      end
-
-      def activate_loyalty_ability!(ability)
-        if ability.loyalty_change.positive?
-          @loyalty += ability.loyalty_change
-        end
-
-        ability.activate!
       end
     end
   end
