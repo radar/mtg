@@ -1,5 +1,12 @@
 module Magic
   class Planeswalker < Card
+    attr_reader :loyalty
+
+    def initialize(**args)
+      @loyalty = self.class::BASE_LOYALTY
+      super(**args)
+    end
+
     class LoyaltyAbility
       attr_reader :loyalty_change, :ability
 

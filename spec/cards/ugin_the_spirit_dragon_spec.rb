@@ -16,6 +16,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
 
     it "targets the wood elves" do
       subject.activate_loyalty_ability!(ability)
+      expect(subject.loyalty).to eq(9)
       expect(game.effects.count).to eq(1)
       expect(game.next_effect).to be_a(Magic::Effects::DealDamage)
       game.resolve_effect(game.next_effect, target: wood_elves)
@@ -41,6 +42,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
 
     it "exiles wood elves, leaves the sol ring" do
       subject.activate_loyalty_ability!(ability, value_for_x: 3)
+      expect(subject.loyalty).to eq(4)
       # Wood elves has a color, so it goes
       expect(wood_elves.zone).to be_exile
       # Meanwhile, Sol Ring is colorless, so it stays

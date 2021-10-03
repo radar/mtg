@@ -3,11 +3,7 @@ module Magic
     class UginTheSpiritDragon < Planeswalker
       NAME = "Ugin, the Spirit Dragon"
       TYPE_LINE = "Legendary Planeswalker -- Ugin"
-
-      def initialize(**args)
-        @loyalty = 7
-        super(**args)
-      end
+      BASE_LOYALTY = 7
 
       def loyalty_abilities
         [
