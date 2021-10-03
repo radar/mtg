@@ -24,6 +24,7 @@ module Magic
 
         def resolve
           return if attacker.dead?
+
           damage_output = attacker.power
 
           if blockers.any?

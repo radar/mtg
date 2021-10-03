@@ -19,7 +19,7 @@ module Magic
 
       def resolve(target:)
         target.take_damage(damage)
-        target.destroy! if target.dead?
+        target.destroy! if target.is_a?(Card) && target.dead?
       end
     end
   end
