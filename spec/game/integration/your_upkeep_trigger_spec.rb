@@ -12,7 +12,7 @@ RSpec.describe Magic::Game, "your upkeep trigger" do
   end
 
   it "upkeep triggers dranas emissary's ability" do
-    expect(subject.step).to be_untap
+    expect(subject).to be_at_step(:untap)
     subject.next_step
 
     expect(p1.life).to eq(21)

@@ -21,20 +21,26 @@ RSpec.describe Magic::Game, "turn walkthrough" do
     p2.library.add(mountain.dup)
   end
 
+  def step_through_until(step)
+    until subject.at_step?(step)
+      subject.next_step
+    end
+  end
+
   it "walks through two turns" do
     subject.start!
     expect(p1.hand.count).to eq(7)
     expect(p2.hand.count).to eq(7)
 
-    expect(subject.step).to be_untap
+    expect(subject).to be_at_step(:untap)
     subject.next_step
 
-    expect(subject.step).to be_upkeep
+    expect(subject).to be_at_step(:upkeep)
     subject.next_step
 
-    expect(subject.step).to be_draw
+    expect(subject).to be_at_step(:draw)
     subject.next_step
-    expect(subject.step).to be_first_main
+    expect(subject).to be_at_step(:first_main)
 
     island = p1.hand.find { |card| card.name == "Island" }
     p1.cast!(island)
@@ -50,11 +56,9 @@ RSpec.describe Magic::Game, "turn walkthrough" do
     expect(aegis_turtle.zone).to be_battlefield
 
     subject.next_step
-    expect(subject.step).to be_beginning_of_combat
+    expect(subject).to be_at_step(:beginning_of_combat)
 
-    until subject.step.first_main?
-      subject.next_step
-    end
+    step_through_until(:first_main)
 
     expect(subject.active_player).to eq(p2)
 
@@ -68,10 +72,10 @@ RSpec.describe Magic::Game, "turn walkthrough" do
     expect(raging_goblin.zone).to be_battlefield
 
     subject.next_step
-    expect(subject.step).to be_beginning_of_combat
+    expect(subject).to be_at_step(:beginning_of_combat)
 
     subject.next_step
-    expect(subject.step).to be_declare_attackers
+    expect(subject).to be_at_step(:declare_attackers)
 
     subject.declare_attacker(
       raging_goblin,
@@ -79,7 +83,7 @@ RSpec.describe Magic::Game, "turn walkthrough" do
     )
 
     subject.next_step
-    expect(subject.step).to be_declare_blockers
+    expect(subject).to be_at_step(:declare_blockers)
 
     subject.declare_blocker(
       aegis_turtle,
@@ -87,24 +91,20 @@ RSpec.describe Magic::Game, "turn walkthrough" do
     )
 
     subject.next_step
-    expect(subject.step).to be_first_strike
+    expect(subject).to be_at_step(:first_strike)
 
     subject.next_step
-    expect(subject.step).to be_combat_damage
+    expect(subject).to be_at_step(:combat_damage)
     expect(aegis_turtle.zone).to be_battlefield
     expect(raging_goblin.zone).to be_battlefield
     expect(p2.life).to eq(20)
 
-    until subject.step.untap?
-      subject.next_step
-    end
+    step_through_until(:untap)
 
     p1_island = subject.battlefield.cards.controlled_by(p1).find { |c| c.name == "Island" }
     expect(p1_island).to be_untapped
 
-    until subject.step.first_main?
-      subject.next_step
-    end
+    step_through_until(:first_main)
 
     expect(p1.lands_played).to eq(0)
     island = p1.hand.find { |card| card.name == "Island" }

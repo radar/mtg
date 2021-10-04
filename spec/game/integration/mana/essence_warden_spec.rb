@@ -8,8 +8,7 @@ RSpec.describe Magic::Game, "Mana spend -- Essence Warden" do
 
   context "when at first main phase" do
     before do
-      subject.step.force_state!(:draw)
-      subject.next_step
+      subject.go_to_beginning_of_combat!
     end
 
     context "when mana cost is not payable" do

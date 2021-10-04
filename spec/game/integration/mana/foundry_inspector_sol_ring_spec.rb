@@ -8,8 +8,7 @@ RSpec.describe Magic::Game, "Mana spend -- Foundry Inspector + Free Sol Ring" do
 
   context "when at first main phase" do
     before do
-      subject.step.force_state!(:draw)
-      subject.next_step
+      subject.go_to_beginning_of_combat!
     end
 
     context "with 3 mountains and a foundry inspector on the battlefield, and a sol ring in hand" do

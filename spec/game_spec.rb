@@ -22,43 +22,43 @@ RSpec.describe Magic::Game do
     end
 
     it "transitions between each stage" do
-      expect(subject.step).to be_untap
+      expect(subject).to be_at_step(:untap)
       subject.next_step
-      expect(subject.step).to be_upkeep
+      expect(subject).to be_at_step(:upkeep)
 
       expect(p1).to receive(:draw!)
       subject.next_step
-      expect(subject.step).to be_draw
+      expect(subject).to be_at_step(:draw)
 
       subject.next_step
-      expect(subject.step).to be_first_main
+      expect(subject).to be_at_step(:first_main)
 
       subject.next_step
-      expect(subject.step).to be_beginning_of_combat
+      expect(subject).to be_at_step(:beginning_of_combat)
 
       subject.next_step
-      expect(subject.step).to be_declare_attackers
+      expect(subject).to be_at_step(:declare_attackers)
 
       subject.next_step
-      expect(subject.step).to be_end_of_combat
+      expect(subject).to be_at_step(:end_of_combat)
 
       subject.next_step
-      expect(subject.step).to be_second_main
+      expect(subject).to be_at_step(:second_main)
 
       subject.next_step
-      expect(subject.step).to be_end_of_turn
+      expect(subject).to be_at_step(:end_of_turn)
 
       subject.next_step
-      expect(subject.step).to be_cleanup
+      expect(subject).to be_at_step(:cleanup)
 
       subject.next_step
-      expect(subject.step).to be_untap
+      expect(subject).to be_at_step(:untap)
 
       expect(subject.active_player).to eq(p2)
       expect(p1_forest).to be_untapped
 
       subject.next_step
-      expect(subject.step).to be_upkeep
+      expect(subject).to be_at_step(:upkeep)
 
       expect(p2).to receive(:draw!)
       subject.next_step

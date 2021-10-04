@@ -17,8 +17,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
 
   context "when in combat" do
     before do
-      subject.step.force_state!(:first_main)
-      subject.next_step
+      subject.go_to_beginning_of_combat!
     end
 
     it "p2 blocks with a wood elves and vastwood gorger" do
@@ -27,10 +26,10 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
       expect(subject.battlefield.cards).to include(vastwood_gorger)
       p2_starting_life = p2.life
 
-      expect(subject.step).to be_beginning_of_combat
+      expect(subject).to be_at_step(:beginning_of_combat)
 
       subject.next_step
-      expect(subject.step).to be_declare_attackers
+      expect(subject).to be_at_step(:declare_attackers)
 
       subject.declare_attacker(
         odric,
@@ -38,7 +37,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
       )
 
       subject.next_step
-      expect(subject.step).to be_declare_blockers
+      expect(subject).to be_at_step(:declare_blockers)
 
       subject.declare_blocker(
         wood_elves,
@@ -51,10 +50,10 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
       )
 
       subject.next_step
-      expect(subject.step).to be_first_strike
+      expect(subject).to be_at_step(:first_strike)
 
       subject.next_step
-      expect(subject.step).to be_combat_damage
+      expect(subject).to be_at_step(:combat_damage)
       expect(odric.zone).to be_graveyard
       expect(wood_elves.zone).to be_graveyard
       expect(vastwood_gorger.zone).to be_battlefield

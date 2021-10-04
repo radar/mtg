@@ -15,12 +15,11 @@ RSpec.describe Magic::Game, "combat -- first striker and Odric" do
 
   context "when in combat" do
     before do
-      subject.step.force_state!(:first_main)
-      subject.next_step
+      subject.go_to_beginning_of_combat!
     end
 
     it "odric gains flying and first strike from battlefield raptor" do
-      expect(subject.step).to be_beginning_of_combat
+      expect(subject).to be_at_step(:beginning_of_combat)
       expect(odric.flying?).to eq(true)
       expect(odric.first_strike?).to eq(true)
     end
