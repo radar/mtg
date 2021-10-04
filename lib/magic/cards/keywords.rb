@@ -36,10 +36,18 @@ module Magic
           @keyword = keyword
           @until_eot = until_eot
         end
+
+        def until_eot?
+          @until_eot
+        end
       end
 
       def grant_keyword(keyword, until_eot:)
         @keyword_grants << KeywordGrant.new(keyword: keyword, until_eot: until_eot)
+      end
+
+      def remove_keyword_grant(grant)
+        @keyword_grants.delete(grant)
       end
 
       def has_keyword?(keyword)

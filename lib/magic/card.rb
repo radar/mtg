@@ -122,6 +122,10 @@ module Magic
       move_zone!(controller.exile)
     end
 
+    def cleanup!
+      remove_until_eot_keyword_grants!
+    end
+
     def resolution_effects
       []
     end
@@ -163,6 +167,13 @@ module Magic
     end
 
     private
+
+    def remove_until_eot_keyword_grants!
+      until_eot_grants = keyword_grants.select(&:until_eot?)
+      until_eot_grants.each do |grant|
+        remove_keyword_grant(grant)
+      end
+    end
 
     def move_zone!(new_zone)
       old_zone = zone

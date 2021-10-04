@@ -9,7 +9,7 @@ module Magic
     def_delegators :@combat, :declare_attacker, :declare_blocker, :deal_first_strike_damage, :deal_combat_damage, :fatalities, :attackers_declared?
 
     aasm :step, namespace: :step do
-      state :untap, initial: true, after_enter: -> { untap_active_player_permanents }
+      state :untap, initial: true, after_enter: -> { untap_active_player_permanents; active_player.reset_lands_played }
       state :upkeep, after_enter: -> { beginning_of_upkeep! }
       state :draw, after_enter: -> { active_player.draw! }
       state :first_main
@@ -21,7 +21,7 @@ module Magic
       state :end_of_combat
       state :second_main
       state :end_of_turn
-      state :cleanup
+      state :cleanup, after_enter: -> { cleanup! }
 
       after_all_transitions :log_step_change
 
@@ -46,7 +46,9 @@ module Magic
         transitions from: :end_of_combat, to: :second_main
         transitions from: :second_main, to: :end_of_turn
         transitions from: :end_of_turn, to: :cleanup
-        transitions from: :cleanup, to: :untap, after: -> { change_active_player; active_player.reset_lands_played }
+        transitions from: :cleanup, to: :untap, after: -> do
+          change_active_player
+        end
       end
 
       event :go_to_beginning_of_combat do
@@ -141,6 +143,10 @@ module Magic
 
     def move_dead_creatures_to_graveyard
       fatalities.each(&:destroy!)
+    end
+
+    def cleanup!
+      battlefield.creatures.each(&:cleanup!)
     end
   end
 end
