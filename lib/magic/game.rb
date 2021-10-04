@@ -9,7 +9,7 @@ module Magic
     def_delegators :@combat, :declare_attacker, :declare_blocker, :deal_first_strike_damage, :deal_combat_damage, :fatalities, :attackers_declared?
 
     aasm :step, namespace: :step do
-      state :untap, initial: true, after_enter: -> { untap_active_player_permanents; active_player.reset_lands_played }
+      state :untap, initial: true, after_enter: -> { untap_active_player_permanents }
       state :upkeep, after_enter: -> { beginning_of_upkeep! }
       state :draw, after_enter: -> { active_player.draw! }
       state :first_main
@@ -120,6 +120,8 @@ module Magic
     end
 
     def beginning_of_upkeep!
+      active_player.reset_lands_played
+
       notify!(
         Events::BeginningOfUpkeep.new
       )
