@@ -81,6 +81,10 @@ module Magic
       def trample?
         has_keyword?(Keywords::TRAMPLE)
       end
+
+      def indestructible?
+        has_keyword?(Keywords::INDESTRUCTIBLE)
+      end
     end
   end
 end

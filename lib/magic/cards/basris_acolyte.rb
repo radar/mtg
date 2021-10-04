@@ -11,6 +11,7 @@ module Magic
     class BasrisAcolyte < Creature
       def entered_the_battlefield!
         game.add_effect(
+
           Effects::AddCounter.new(
             power: 1,
             toughness: 1,

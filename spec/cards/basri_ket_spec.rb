@@ -14,15 +14,23 @@ RSpec.describe Magic::Cards::BasriKet do
       game.battlefield.add(wood_elves)
     end
 
-    xit "targets the wood elves" do
+    it "targets the wood elves" do
       subject.activate_loyalty_ability!(ability)
       expect(subject.loyalty).to eq(4)
       expect(game.effects.count).to eq(1)
-      expect(game.next_effect).to be_a(Magic::Effects::AddCounter)
+      expect(game.next_effect).to be_a(Magic::Effects::SingleTargetAndResolve)
       game.resolve_effect(game.next_effect, target: wood_elves)
       expect(wood_elves.power).to eq(2)
       expect(wood_elves.toughness).to eq(2)
       expect(wood_elves.indestructible?).to eq(true)
     end
+  end
+
+  context "-2 triggered ability" do
+    xit "whenever one or more nontoken..."
+  end
+
+  context "-6 triggered ability" do
+    xit "you get an emblem..."
   end
 end

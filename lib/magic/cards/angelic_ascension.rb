@@ -7,9 +7,15 @@ module Magic
     class AngelicAscension
       def resolution_effects
         [
-          Effects::ExileTargetControllerCreatesAToken.new(
+          Effects::SingleTargetAndResolve.new(
             choices: game.battlefield.select { |c| c.creature? || c.planeswalker? },
-            token: Tokens::Angel.new(game: game)
+            targets: 1,
+            resolution: -> (target) {
+              target.exile!
+              token = Tokens::Angel.new(game: game)
+              token.controller = target.controller
+              token.resolve!
+            }
           )
         ]
       end

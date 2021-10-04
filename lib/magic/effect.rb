@@ -10,7 +10,7 @@ module Magic
     end
 
     def multiple_targets?
-      false
+      targets > 1
     end
 
     def requires_choices?
