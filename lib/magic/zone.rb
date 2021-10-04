@@ -17,11 +17,11 @@ module Magic
 
     def add(card)
       card.zone = self
-      self << card
+      @cards << card
     end
 
     def remove(card)
-      @cards -= [card]
+      @cards.delete(card)
     end
 
     def library?

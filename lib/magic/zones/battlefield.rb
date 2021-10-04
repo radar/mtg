@@ -16,11 +16,11 @@ module Magic
         case event
         when Events::ZoneChange
           if event.to == :battlefield
-            cards << event.card
+            add(event.card)
           end
 
           if event.from == :battlefield
-            self.cards -= [event.card]
+            remove(event.card)
           end
         end
 
