@@ -19,8 +19,7 @@ module Magic
         end
 
         def apply(card)
-          card.power_modifiers << self if power > 0
-          card.toughness_modifiers << self if toughness > 0
+          card.modifiers << self
           @applied_to << card
         end
 

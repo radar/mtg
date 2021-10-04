@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class Creature < Card
-      attr_reader :damage, :power_modifiers, :toughness_modifiers
+      attr_reader :damage, :modifiers
 
       class Counter
         attr_reader :power, :toughness
@@ -12,14 +12,23 @@ module Magic
         end
       end
 
+      class Buff
+        attr_reader :power, :toughness, :until_eot
+
+        def initialize(power:, toughness:, until_eot: true)
+          @power = power
+          @toughness = toughness
+          @until_eot = until_eot
+        end
+      end
+
       POWER = 0
       TOUGHNESS = 0
 
       def initialize(**args)
         @base_power = self.class::POWER
         @base_toughness = self.class::TOUGHNESS
-        @power_modifiers = []
-        @toughness_modifiers = []
+        @modifiers = []
         @counters = []
 
         @damage = 0
@@ -36,11 +45,11 @@ module Magic
       end
 
       def power
-        @base_power + @power_modifiers.sum(&:power) + @counters.sum(&:power)
+        @base_power + @modifiers.sum(&:power) + @counters.sum(&:power)
       end
 
       def toughness
-        @base_toughness + @toughness_modifiers.sum(&:toughness) + @counters.sum(&:toughness)
+        @base_toughness + @modifiers.sum(&:toughness) + @counters.sum(&:toughness)
       end
 
       def fight(target, assigned_damage = power)
@@ -65,8 +74,14 @@ module Magic
       end
 
       def left_the_battlefield!
-        @power_modifiers.clear
-        @toughness_modifiers.clear
+        @modifiers.clear
+
+        super
+      end
+
+      def cleanup!
+        until_eot_modifiers = modifiers.select(&:until_eot?)
+        until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }
 
         super
       end
