@@ -36,7 +36,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, one blocker" do
 
       subject.declare_blocker(
         wood_elves,
-        target: colossal_dreadmaw,
+        attacker: colossal_dreadmaw,
       )
 
       subject.next_step

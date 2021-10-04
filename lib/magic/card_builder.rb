@@ -37,7 +37,7 @@ module Magic
       end
 
       def keywords(*keywords)
-        @card.const_set(:KEYWORDS, keywords)
+        @card.const_set(:KEYWORDS, Cards::Keywords[*keywords])
       end
     end
   end

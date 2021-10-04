@@ -38,7 +38,7 @@ RSpec.describe Magic::Game, "combat -- single attacker with deathtouch, stronger
 
       subject.declare_blocker(
         vastwood_gorger,
-        target: acidic_slime,
+        attacker: acidic_slime,
       )
 
       subject.next_step

@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::BasriKet do
       game.battlefield.add(wood_elves)
     end
 
-    it "targets the wood elves" do
+    xit "targets the wood elves" do
       subject.activate_loyalty_ability!(ability)
       expect(subject.loyalty).to eq(4)
       expect(game.effects.count).to eq(1)

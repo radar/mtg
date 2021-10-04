@@ -3,6 +3,8 @@ module Magic
     class CombatPhase
       include AASM
 
+      class AttackerHasProtection < StandardError; end
+
       class Attack
         attr_reader :attacker, :target, :blockers
 
@@ -57,9 +59,15 @@ module Magic
         @attacks.any?
       end
 
-      def declare_blocker(blocker, target:)
+      def can_block?(attacker:, blocker:)
+        !attacker.protected_from?(blocker)
+      end
+
+      def declare_blocker(blocker, attacker:)
+        raise AttackerHasProtection unless can_block?(attacker: attacker, blocker: blocker)
+
         attack = @attacks.find do |attack|
-          attack.attacker == target
+          attack.attacker == attacker
         end
         attack.declare_blocker(blocker)
       end

@@ -101,6 +101,10 @@ module Magic
       countered
     end
 
+    def protected_from?(_card)
+      false
+    end
+
     def controller?(other_controller)
       controller == other_controller
     end

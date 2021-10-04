@@ -18,8 +18,9 @@ module Magic
         @payment[:generic] ||= {}
       end
 
-      def perform!(cost, &block)
+      def perform!(initial_cost, &block)
         pool = player.mana_pool.dup
+        cost = initial_cost.dup
         deduct_from_pool(pool, payment[:generic])
 
         payment[:generic].each do |_, amount|

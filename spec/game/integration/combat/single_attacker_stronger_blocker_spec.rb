@@ -38,7 +38,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, stronger blocker" do
 
       subject.declare_blocker(
         vastwood_gorger,
-        target: loxodon_wayfarer,
+        attacker: loxodon_wayfarer,
       )
 
       subject.next_step

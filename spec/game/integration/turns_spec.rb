@@ -87,7 +87,7 @@ RSpec.describe Magic::Game, "turn walkthrough" do
 
     subject.declare_blocker(
       aegis_turtle,
-      target: raging_goblin,
+      attacker: raging_goblin,
     )
 
     subject.next_step

@@ -41,12 +41,12 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
 
       subject.declare_blocker(
         wood_elves,
-        target: odric,
+        attacker: odric,
       )
 
       subject.declare_blocker(
         vastwood_gorger,
-        target: odric,
+        attacker: odric,
       )
 
       subject.next_step

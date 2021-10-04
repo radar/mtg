@@ -6,7 +6,7 @@ module Magic
     attr_reader :logger, :battlefield, :stack, :players, :attacks
 
     def_delegators :@stack, :effects, :add_effect, :resolve_effect, :next_effect
-    def_delegators :@combat, :declare_attacker, :declare_blocker, :deal_first_strike_damage, :deal_combat_damage, :fatalities, :attackers_declared?
+    def_delegators :@combat, :declare_attacker, :declare_blocker, :deal_first_strike_damage, :deal_combat_damage, :fatalities, :attackers_declared?, :can_block?
 
     aasm :step, namespace: :step do
       state :untap, initial: true, after_enter: -> { untap_active_player_permanents }
