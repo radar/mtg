@@ -12,6 +12,11 @@ module Magic
       self.class.new(select(&:permanent?))
     end
 
+    def dead
+      self.class.new(select(&:dead?))
+    end
+
+
     def apply_ability(ability)
       applicable_cards = select { |card| ability.applies_to?(card) }
       applicable_cards.each { |card| ability.apply(card) }

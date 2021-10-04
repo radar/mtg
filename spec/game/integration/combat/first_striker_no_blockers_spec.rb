@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Game, "combat -- first striker, no blockers" do
-  subject(:game) { Magic::Game.new }
+  let(:game) { Magic::Game.new }
+  subject(:combat) { Magic::Game::CombatPhase.new(game: game) }
 
   let(:p1) { game.add_player }
   let(:p2) { game.add_player }
@@ -11,34 +12,28 @@ RSpec.describe Magic::Game, "combat -- first striker, no blockers" do
     game.battlefield.add(battlefield_raptor)
   end
 
-  context "when in combat" do
-    before do
-      subject.go_to_beginning_of_combat!
-    end
+  it "p1 attacks with battlefield raptor" do
+    p2_starting_life = p2.life
 
-    it "p1 attacks with battlefield raptor" do
-      p2_starting_life = p2.life
+    expect(combat).to be_at_step(:beginning_of_combat)
 
-      expect(subject).to be_at_step(:beginning_of_combat)
+    combat.next_step
+    expect(combat).to be_at_step(:declare_attackers)
 
-      subject.next_step
-      expect(subject).to be_at_step(:declare_attackers)
+    combat.declare_attacker(
+      battlefield_raptor,
+      target: p2,
+    )
 
-      subject.declare_attacker(
-        battlefield_raptor,
-        target: p2,
-      )
+    combat.next_step
+    expect(combat).to be_at_step(:declare_blockers)
 
-      subject.next_step
-      expect(subject).to be_at_step(:declare_blockers)
+    combat.next_step
+    expect(combat).to be_at_step(:first_strike)
 
-      subject.next_step
-      expect(subject).to be_at_step(:first_strike)
+    combat.next_step
+    expect(combat).to be_at_step(:combat_damage)
 
-      subject.next_step
-      expect(subject).to be_at_step(:combat_damage)
-
-      expect(p2.life).to eq(p2_starting_life - 1)
-    end
+    expect(p2.life).to eq(p2_starting_life - 1)
   end
 end

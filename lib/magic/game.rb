@@ -6,7 +6,6 @@ module Magic
     attr_reader :logger, :battlefield, :stack, :players, :attacks
 
     def_delegators :@stack, :effects, :add_effect, :resolve_effect, :next_effect
-    def_delegators :@combat, :declare_attacker, :declare_blocker, :deal_first_strike_damage, :deal_combat_damage, :fatalities, :attackers_declared?, :can_block?
 
     aasm :step, namespace: :step do
       state :untap, initial: true, after_enter: -> { untap_active_player_permanents }
@@ -14,6 +13,7 @@ module Magic
       state :draw, after_enter: -> { active_player.draw! }
       state :first_main
       state :beginning_of_combat, after_enter: -> { begin_combat! }
+      state :end_of_combat
       state :declare_attackers
       state :declare_blockers
       state :first_strike
@@ -30,19 +30,7 @@ module Magic
         transitions from: :upkeep, to: :draw
         transitions from: :draw, to: :first_main
         transitions from: :first_main, to: :beginning_of_combat
-        transitions from: :beginning_of_combat, to: :declare_attackers
-        transitions from: :declare_attackers, to: :declare_blockers, guard: -> { attackers_declared? }
-        transitions from: :declare_attackers, to: :end_of_combat
-        transitions from: :declare_blockers, to: :first_strike, after: [
-          -> { deal_first_strike_damage },
-          -> { move_dead_creatures_to_graveyard },
-        ]
-        transitions from: :first_strike, to: :combat_damage, after: [
-          -> { deal_combat_damage },
-          -> { move_dead_creatures_to_graveyard },
-        ]
-
-        transitions from: :combat_damage, to: :end_of_combat
+        transitions from: :beginning_of_combat, to: :end_of_combat
         transitions from: :end_of_combat, to: :second_main
         transitions from: :second_main, to: :end_of_turn
         transitions from: :end_of_turn, to: :cleanup
@@ -128,7 +116,6 @@ module Magic
     end
 
     def begin_combat!
-      @combat = CombatPhase.new
       notify!(
         Events::BeginningOfCombat.new
       )
@@ -144,7 +131,7 @@ module Magic
     end
 
     def move_dead_creatures_to_graveyard
-      fatalities.each(&:destroy!)
+      battlefield.creatures.dead.each(&:destroy!)
     end
 
     def cleanup!

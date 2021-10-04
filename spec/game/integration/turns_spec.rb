@@ -74,27 +74,29 @@ RSpec.describe Magic::Game, "turn walkthrough" do
     subject.next_step
     expect(subject).to be_at_step(:beginning_of_combat)
 
-    subject.next_step
-    expect(subject).to be_at_step(:declare_attackers)
+    combat = Magic::Game::CombatPhase.new(game: subject)
 
-    subject.declare_attacker(
+    combat.next_step
+    expect(combat).to be_at_step(:declare_attackers)
+
+    combat.declare_attacker(
       raging_goblin,
       target: p1,
     )
 
-    subject.next_step
-    expect(subject).to be_at_step(:declare_blockers)
+    combat.next_step
+    expect(combat).to be_at_step(:declare_blockers)
 
-    subject.declare_blocker(
+    combat.declare_blocker(
       aegis_turtle,
       attacker: raging_goblin,
     )
 
-    subject.next_step
-    expect(subject).to be_at_step(:first_strike)
+    combat.next_step
+    expect(combat).to be_at_step(:first_strike)
 
-    subject.next_step
-    expect(subject).to be_at_step(:combat_damage)
+    combat.next_step
+    expect(combat).to be_at_step(:combat_damage)
     expect(aegis_turtle.zone).to be_battlefield
     expect(raging_goblin.zone).to be_battlefield
     expect(p2.life).to eq(20)
