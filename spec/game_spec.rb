@@ -36,15 +36,10 @@ RSpec.describe Magic::Game do
       subject.next_step
       expect(subject).to be_at_step(:beginning_of_combat)
 
-      combat = Magic::Game::CombatPhase.new(game: subject)
-      expect(combat).to be_at_step(:beginning_of_combat)
+      subject.next_step
+      expect(subject).to be_at_step(:declare_attackers)
 
-      combat.next_step
-      expect(combat).to be_at_step(:declare_attackers)
-
-      combat.next_step
-      expect(combat).to be_at_step(:end_of_combat)
-
+      subject.next_step
       expect(subject).to be_at_step(:end_of_combat)
 
       subject.next_step

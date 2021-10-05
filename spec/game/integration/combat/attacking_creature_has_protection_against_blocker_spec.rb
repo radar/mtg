@@ -2,7 +2,6 @@ require 'spec_helper'
 
 RSpec.describe Magic::Game, "combat -- attacking creature has protection against blocker" do
   let(:game) { Magic::Game.new }
-  subject(:combat) { Magic::Game::CombatPhase.new(game: game) }
 
   let(:p1) { game.add_player }
   let(:p2) { game.add_player }
@@ -26,18 +25,19 @@ RSpec.describe Magic::Game, "combat -- attacking creature has protection against
       p2_starting_life = p2.life
 
       expect(game).to be_at_step(:beginning_of_combat)
+      combat = game.combat
 
-      expect(combat).to be_at_step(:beginning_of_combat)
-      combat.next_step
-      expect(combat).to be_at_step(:declare_attackers)
+      expect(game).to be_at_step(:beginning_of_combat)
+      game.next_step
+      expect(game).to be_at_step(:declare_attackers)
 
       combat.declare_attacker(
         baneslayer_angel,
         target: p2,
       )
 
-      combat.next_step
-      expect(combat).to be_at_step(:declare_blockers)
+      game.next_step
+      expect(game).to be_at_step(:declare_blockers)
 
       expect(combat.can_block?(attacker: baneslayer_angel, blocker: hellkite_punisher)).to eq(false)
 
@@ -48,18 +48,18 @@ RSpec.describe Magic::Game, "combat -- attacking creature has protection against
         )
       end.to raise_error(Magic::Game::CombatPhase::AttackerHasProtection)
 
-      combat.next_step
-      expect(combat).to be_at_step(:first_strike)
+      game.next_step
+      expect(game).to be_at_step(:first_strike)
 
-      combat.next_step
-      expect(combat).to be_at_step(:combat_damage)
+      game.next_step
+      expect(game).to be_at_step(:combat_damage)
 
       expect(p2.life).to eq(p2_starting_life - baneslayer_angel.power)
       # p1 gains life, as Baneslayer Angel has lifelink
       expect(p1.life).to eq(p1_starting_life + baneslayer_angel.power)
 
-      combat.next_step
-      expect(combat).to be_at_step(:end_of_combat)
+      game.next_step
+      expect(game).to be_at_step(:end_of_combat)
     end
   end
 end

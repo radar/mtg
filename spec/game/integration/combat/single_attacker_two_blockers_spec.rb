@@ -16,46 +16,53 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
     game.battlefield.add(vastwood_gorger)
   end
 
+  context "when in combat" do
+    before do
+      game.go_to_beginning_of_combat!
+    end
 
-  it "p2 blocks with a wood elves and vastwood gorger" do
-    expect(game.battlefield.cards).to include(odric)
-    expect(game.battlefield.cards).to include(wood_elves)
-    expect(game.battlefield.cards).to include(vastwood_gorger)
-    p2_starting_life = p2.life
+    let(:combat) { game.combat }
 
-    expect(combat).to be_at_step(:beginning_of_combat)
+    it "p2 blocks with a wood elves and vastwood gorger" do
+      expect(game.battlefield.cards).to include(odric)
+      expect(game.battlefield.cards).to include(wood_elves)
+      expect(game.battlefield.cards).to include(vastwood_gorger)
+      p2_starting_life = p2.life
 
-    combat.next_step
-    expect(combat).to be_at_step(:declare_attackers)
+      expect(game).to be_at_step(:beginning_of_combat)
 
-    combat.declare_attacker(
-      odric,
-      target: p2,
-    )
+      game.next_step
+      expect(game).to be_at_step(:declare_attackers)
 
-    combat.next_step
-    expect(combat).to be_at_step(:declare_blockers)
+      combat.declare_attacker(
+        odric,
+        target: p2,
+      )
 
-    combat.declare_blocker(
-      wood_elves,
-      attacker: odric,
-    )
+      game.next_step
+      expect(game).to be_at_step(:declare_blockers)
 
-    combat.declare_blocker(
-      vastwood_gorger,
-      attacker: odric,
-    )
+      combat.declare_blocker(
+        wood_elves,
+        attacker: odric,
+      )
 
-    combat.next_step
-    expect(combat).to be_at_step(:first_strike)
+      combat.declare_blocker(
+        vastwood_gorger,
+        attacker: odric,
+      )
 
-    combat.next_step
-    expect(combat).to be_at_step(:combat_damage)
-    expect(odric.zone).to be_graveyard
-    expect(wood_elves.zone).to be_graveyard
-    expect(vastwood_gorger.zone).to be_battlefield
-    expect(vastwood_gorger.damage).to eq(2)
+      game.next_step
+      expect(game).to be_at_step(:first_strike)
 
-    expect(p2.life).to eq(p2_starting_life)
+      game.next_step
+      expect(game).to be_at_step(:combat_damage)
+      expect(odric.zone).to be_graveyard
+      expect(wood_elves.zone).to be_graveyard
+      expect(vastwood_gorger.zone).to be_battlefield
+      expect(vastwood_gorger.damage).to eq(2)
+
+      expect(p2.life).to eq(p2_starting_life)
+    end
   end
 end

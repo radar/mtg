@@ -3,7 +3,7 @@ module Magic
     include AASM
     extend Forwardable
 
-    attr_reader :logger, :battlefield, :stack, :players, :attacks, :emblems
+    attr_reader :logger, :battlefield, :stack, :players, :attacks, :emblems, :combat
 
     def_delegators :@stack, :effects, :add_effect, :resolve_effect, :next_effect
 
@@ -13,7 +13,6 @@ module Magic
       state :draw, after_enter: -> { active_player.draw! }
       state :first_main
       state :beginning_of_combat, after_enter: -> { begin_combat! }
-      state :end_of_combat
       state :declare_attackers
       state :declare_blockers
       state :first_strike
@@ -30,6 +29,18 @@ module Magic
         transitions from: :upkeep, to: :draw
         transitions from: :draw, to: :first_main
         transitions from: :first_main, to: :beginning_of_combat
+        transitions from: :beginning_of_combat, to: :declare_attackers
+        transitions from: :declare_attackers, to: :declare_blockers, guard: -> { combat.attackers_declared? }
+        transitions from: :declare_attackers, to: :end_of_combat
+        transitions from: :declare_blockers, to: :first_strike, after: [
+          -> { combat.deal_first_strike_damage },
+          -> { move_dead_creatures_to_graveyard },
+        ]
+        transitions from: :first_strike, to: :combat_damage, after: [
+          -> { combat.deal_combat_damage },
+          -> { move_dead_creatures_to_graveyard },
+        ]
+        transitions from: [:combat_damage, :declare_attackers], to: :end_of_combat
         transitions from: :beginning_of_combat, to: :end_of_combat
         transitions from: :end_of_combat, to: :second_main
         transitions from: :second_main, to: :end_of_turn
@@ -65,7 +76,11 @@ module Magic
     end
 
     def at_step?(step)
-      aasm(:step).current_state == step
+      current_step == step
+    end
+
+    def current_step
+      aasm(:step).current_state
     end
 
     def add_player(**args)
@@ -125,6 +140,8 @@ module Magic
       notify!(
         Events::BeginningOfCombat.new(active_player: active_player)
       )
+
+      @combat = CombatPhase.new(game: self)
     end
 
     def deal_damage_to_opponents(player, damage)

@@ -12,29 +12,37 @@ RSpec.describe Magic::Game, "combat -- single attacker, no blockers" do
     game.battlefield.add(loxodon_wayfarer)
   end
 
-  it "p1 deals damage to p2" do
-    p2_starting_life = p2.life
+  context "when in combat" do
+    before do
+      game.go_to_beginning_of_combat!
+    end
 
-    expect(combat).to be_at_step(:beginning_of_combat)
+    let(:combat) { game.combat }
 
-    combat.next_step
-    expect(combat).to be_at_step(:declare_attackers)
+    it "p1 deals damage to p2" do
+      p2_starting_life = p2.life
 
-    combat.declare_attacker(
-      loxodon_wayfarer,
-      target: p2,
-    )
+      expect(game).to be_at_step(:beginning_of_combat)
 
-    combat.next_step
-    expect(combat).to be_at_step(:declare_blockers)
+      game.next_step
+      expect(game).to be_at_step(:declare_attackers)
 
-    combat.next_step
-    expect(combat).to be_at_step(:first_strike)
+      combat.declare_attacker(
+        loxodon_wayfarer,
+        target: p2,
+      )
 
-    combat.next_step
-    expect(combat).to be_at_step(:combat_damage)
+      game.next_step
+      expect(game).to be_at_step(:declare_blockers)
 
-    expect(p2.life).to eq(p2_starting_life - 1)
-    expect(loxodon_wayfarer).to be_tapped
+      game.next_step
+      expect(game).to be_at_step(:first_strike)
+
+      game.next_step
+      expect(game).to be_at_step(:combat_damage)
+
+      expect(p2.life).to eq(p2_starting_life - 1)
+      expect(loxodon_wayfarer).to be_tapped
+    end
   end
 end

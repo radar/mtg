@@ -1,34 +1,6 @@
 module Magic
   class Game
     class CombatPhase
-      include AASM
-
-      aasm :step, namespace: :step do
-        state :beginning_of_combat, initial: true
-        state :declare_attackers
-        state :declare_blockers
-        state :first_strike
-        state :combat_damage
-        state :end_of_combat, after_enter: -> { game.next_step! }
-
-        after_all_transitions :log_step_change
-
-        event :next do
-          transitions from: :beginning_of_combat, to: :declare_attackers
-          transitions from: :declare_attackers, to: :declare_blockers, guard: -> { attackers_declared? }
-          transitions from: :declare_attackers, to: :end_of_combat
-          transitions from: :declare_blockers, to: :first_strike, after: [
-            -> { deal_first_strike_damage },
-            -> { game.move_dead_creatures_to_graveyard },
-          ]
-          transitions from: :first_strike, to: :combat_damage, after: [
-            -> { deal_combat_damage },
-            -> { game.move_dead_creatures_to_graveyard },
-          ]
-          transitions from: [:combat_damage, :declare_attackers], to: :end_of_combat
-        end
-      end
-
       class AttackerHasProtection < StandardError; end
 
       class Attack
@@ -75,15 +47,6 @@ module Magic
       def initialize(game:)
         @game = game
         @attacks = []
-      end
-
-      def log_step_change
-        puts "COMBAT PHASE: changing from #{aasm(:step).from_state} to #{aasm(:step).to_state} (event: #{aasm(:step).current_event})"
-      end
-
-
-      def at_step?(step)
-        aasm(:step).current_state == step
       end
 
       def declare_attacker(attacker, target:)
