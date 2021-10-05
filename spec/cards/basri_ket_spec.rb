@@ -31,6 +31,12 @@ RSpec.describe Magic::Cards::BasriKet do
   end
 
   context "-6 triggered ability" do
-    xit "you get an emblem..."
+    subject { Card("Basri Ket", controller: p1, loyalty: 6) }
+    let(:ability) { subject.loyalty_abilities.last }
+
+    it "emblem for creating white soldier creature tokens and putting counters on all creatures" do
+      subject.activate_loyalty_ability!(ability)
+      expect(game.emblems.count).to eq(1)
+    end
   end
 end

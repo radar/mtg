@@ -3,7 +3,7 @@ module Magic
     include AASM
     extend Forwardable
 
-    attr_reader :logger, :battlefield, :stack, :players, :attacks
+    attr_reader :logger, :battlefield, :stack, :players, :attacks, :emblems
 
     def_delegators :@stack, :effects, :add_effect, :resolve_effect, :next_effect
 
@@ -57,6 +57,7 @@ module Magic
       @effects = effects
       @players = players
       @combat = nil
+      @emblems = []
     end
 
     def log_step_change
@@ -86,6 +87,10 @@ module Magic
       end
     end
 
+    def add_emblem(emblem)
+      @emblems << emblem
+    end
+
     def start!
       players.each do |player|
         7.times { player.draw! }
@@ -95,6 +100,7 @@ module Magic
     def notify!(*events)
       events.each do |event|
         logger.debug "EVENT: #{event.inspect}"
+        emblems.each { |emblem| emblem.receive_event(event) }
         battlefield.receive_event(event)
       end
     end
@@ -117,7 +123,7 @@ module Magic
 
     def begin_combat!
       notify!(
-        Events::BeginningOfCombat.new
+        Events::BeginningOfCombat.new(active_player: active_player)
       )
     end
 

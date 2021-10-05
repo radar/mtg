@@ -72,7 +72,7 @@ module Magic
       pay_mana(source_mana)
       add_mana(target_mana)
     end
-1
+
     def pay_mana(mana)
       if mana.any? { |color, count| mana_pool[color] - count < 0 }
         raise UnpayableMana, "Cannot pay mana #{mana.inspect}, there is only #{mana_pool.inspect} available"

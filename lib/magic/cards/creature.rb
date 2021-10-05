@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class Creature < Card
-      attr_reader :damage, :modifiers
+      attr_reader :damage, :modifiers, :counters
 
       class Counter
         attr_reader :power, :toughness

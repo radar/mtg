@@ -5,6 +5,23 @@ module Magic
       TYPE_LINE = "Legendary Planeswalker -- Ugin"
       BASE_LOYALTY = 3
 
+      class Emblem < Magic::Emblem
+        def receive_event(event)
+          case event
+          when Events::BeginningOfCombat
+            return unless event.active_player == controller
+            game = controller.game
+
+            token = Tokens::Soldier.new(game: game, controller: controller)
+            token.cast!
+
+            game.battlefield.creatures.controlled_by(controller).each do |creature|
+              creature.add_counter(power: 1, toughness: 1)
+            end
+          end
+        end
+      end
+
       def loyalty_abilities
         [
           LoyaltyAbility.new(loyalty_change: 1, ability: -> {
@@ -18,6 +35,9 @@ module Magic
                 }
               )
             )
+          }),
+          LoyaltyAbility.new(loyalty_change: -6, ability: -> {
+            game.add_emblem(Emblem.new(controller: controller))
           }),
         ]
       end
