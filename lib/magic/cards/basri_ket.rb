@@ -22,6 +22,20 @@ module Magic
         end
       end
 
+      class AfterAttackersDeclaredTrigger
+        def resolve(game)
+          attackers = game.combat.attacks.count
+
+          target = game.combat.attacks.first.target
+          attackers.times do
+            token = Tokens::Soldier.new(game: game, controller: game.active_player)
+            token.cast!
+            token.tap!
+            game.combat.declare_attacker(token, target: target)
+          end
+        end
+      end
+
       def loyalty_abilities
         [
           LoyaltyAbility.new(loyalty_change: 1, ability: -> {
@@ -35,6 +49,9 @@ module Magic
                 }
               )
             )
+          }),
+          LoyaltyAbility.new(loyalty_change: -2, ability: -> {
+            game.after_step(:declare_attackers, self.class::AfterAttackersDeclaredTrigger.new)
           }),
           LoyaltyAbility.new(loyalty_change: -6, ability: -> {
             game.add_emblem(Emblem.new(controller: controller))

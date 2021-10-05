@@ -27,7 +27,14 @@ RSpec.describe Magic::Cards::BasriKet do
   end
 
   context "-2 triggered ability" do
-    xit "whenever one or more nontoken..."
+    subject { Card("Basri Ket", controller: p1) }
+    let(:ability) { subject.loyalty_abilities[1] }
+
+    it "adds an after attackers declared step trigger" do
+      subject.activate_loyalty_ability!(ability)
+      expect(subject.loyalty).to eq(1)
+      expect(game.after_step_triggers[:declare_attackers].count).to eq(1)
+    end
   end
 
   context "-6 triggered ability" do

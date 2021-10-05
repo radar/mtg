@@ -3,7 +3,7 @@ module Magic
     include AASM
     extend Forwardable
 
-    attr_reader :logger, :battlefield, :stack, :players, :attacks, :emblems, :combat
+    attr_reader :logger, :battlefield, :stack, :players, :attacks, :emblems, :combat, :after_step_triggers
 
     def_delegators :@stack, :effects, :add_effect, :resolve_effect, :next_effect
 
@@ -23,6 +23,7 @@ module Magic
       state :cleanup, after_enter: -> { cleanup! }
 
       after_all_transitions :log_step_change
+      after_all_transitions :run_after_step_triggers
 
       event :next do
         transitions from: :untap, to: :upkeep
@@ -55,6 +56,23 @@ module Magic
       end
     end
 
+    class Trigger
+      attr_reader :action, :until_eot
+
+      def initialize(action:, until_eot:)
+        @action = action
+        @until_eot = until_eot
+      end
+
+      def until_eot?
+        until_eot
+      end
+
+      def resolve(game)
+        action.resolve(game)
+      end
+    end
+
     def initialize(
       battlefield: Zones::Battlefield.new(owner: self),
       stack: Stack.new,
@@ -69,10 +87,18 @@ module Magic
       @players = players
       @combat = nil
       @emblems = []
+      @after_step_triggers = Hash.new { |h, k| h[k] = [] }
     end
 
     def log_step_change
-      puts "changing from #{aasm(:step).from_state} to #{aasm(:step).to_state} (event: #{aasm(:step).current_event})"
+      from = aasm(:step).from_state
+      to = aasm(:step).to_state
+      puts "changing from #{from} to #{to} (event: #{aasm(:step).current_event})"
+    end
+
+    def run_after_step_triggers
+      last_step = aasm(:step).from_state
+      after_step_triggers[last_step].each { |trigger| trigger.resolve(self) }
     end
 
     def at_step?(step)
@@ -81,6 +107,13 @@ module Magic
 
     def current_step
       aasm(:step).current_state
+    end
+
+    def after_step(step, action, until_eot: true)
+      @after_step_triggers[step] << Trigger.new(
+        action: action,
+        until_eot: until_eot,
+      )
     end
 
     def add_player(**args)
@@ -159,6 +192,10 @@ module Magic
 
     def cleanup!
       battlefield.creatures.each(&:cleanup!)
+      until_eot_triggers = after_step_triggers.values.flatten.select { |trigger| trigger.until_eot? }
+      after_step_triggers.each do |key, triggers|
+        after_step_triggers[key] = triggers.reject { |trigger| until_eot_triggers.include?(trigger) }
+      end
     end
   end
 end
