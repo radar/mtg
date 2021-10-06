@@ -6,9 +6,8 @@ module Magic
 
       def receive_notification(event)
         case event
-        when Events::ZoneChange
+        when Events::EnteredTheBattlefield
           return if event.card != self
-          return if !event.to.battlefield?
 
           self.tapped = true
         end

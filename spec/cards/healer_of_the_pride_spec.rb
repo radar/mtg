@@ -8,10 +8,8 @@ RSpec.describe Magic::Cards::HealerOfThePride do
 
   context "when another creature controlled by this player enters the battlefield" do
     let(:event) do
-      Magic::Events::ZoneChange.new(
+      Magic::Events::EnteredTheBattlefield.new(
         loxodon_wayfarer,
-        from: :hand,
-        to: :battlefield
       )
     end
 

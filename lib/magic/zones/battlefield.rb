@@ -14,11 +14,12 @@ module Magic
 
       def receive_event(event)
         case event
-        when Events::ZoneChange
+        when Events::EnteredZone
           if event.to == :battlefield
             add(event.card)
           end
 
+        when Events::LeavingZone
           if event.from == :battlefield
             remove(event.card)
           end

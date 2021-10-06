@@ -28,7 +28,7 @@ module Magic
         super
 
         case event
-        when Events::ZoneChange
+        when Events::LeavingZone
           return unless event.death?
           return unless event.card.controller == controller
 

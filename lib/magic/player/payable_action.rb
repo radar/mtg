@@ -39,6 +39,7 @@ module Magic
           player.pay_mana(payment[:generic])
           yield
         else
+          binding.pry
           raise "Cost has not been fully paid."
         end
       end

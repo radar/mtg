@@ -10,10 +10,10 @@ RSpec.describe Magic::Cards::ProfaneMemento do
     context "when creature enters controller's graveyard" do
       let(:p1_creature) { Card("Loxodon Wayfarer", controller: p1) }
       let(:event) do
-        Magic::Events::ZoneChange.new(
+        Magic::Events::EnteredZone.new(
           p1_creature,
-          from: :battlefield,
-          to: :graveyard
+          from: game.battlefield,
+          to: p1.graveyard
         )
       end
 
@@ -25,10 +25,10 @@ RSpec.describe Magic::Cards::ProfaneMemento do
     context "when a creature enters opponent's graveyard" do
       let(:p2_creature) { Card("Loxodon Wayfarer", controller: p2) }
       let(:event) do
-        Magic::Events::ZoneChange.new(
+        Magic::Events::EnteredZone.new(
           p2_creature,
-          from: :battlefield,
-          to: :graveyard
+          from: game.battlefield,
+          to: p2.graveyard,
         )
       end
 
@@ -40,10 +40,10 @@ RSpec.describe Magic::Cards::ProfaneMemento do
     context "when an artifact enters opponent's graveyard" do
       let(:p2_artifact) { Card("Profane Memento", controller: p2) }
       let(:event) do
-        Magic::Events::ZoneChange.new(
+        Magic::Events::EnteredZone.new(
           p2_artifact,
-          from: :battlefield,
-          to: :graveyard
+          from: game.battlefield,
+          to: p2.graveyard,
         )
       end
 

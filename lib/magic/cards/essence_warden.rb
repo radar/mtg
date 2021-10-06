@@ -7,14 +7,12 @@ module Magic
 
       def receive_notification(event)
         case event
-        when Events::ZoneChange
-          card = event.card
-          return if event.to != :battlefield
+        when Events::EnteredTheBattlefield
 
           game.add_effect(
             Effects::AnotherCreatureEntersYouGainLife.new(
               source: self,
-              card: card,
+              card: event.card,
               life: 1
             )
           )

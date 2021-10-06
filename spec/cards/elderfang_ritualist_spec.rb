@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::ElderfangRitualist do
       end
 
       let(:event) do
-        Magic::Events::ZoneChange.new(
+        Magic::Events::LeavingZone.new(
           subject,
           from: game.battlefield,
           to: p1.graveyard

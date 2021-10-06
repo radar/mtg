@@ -7,12 +7,10 @@ module Magic
 
       def receive_notification(event)
         case event
-        when Events::ZoneChange
-          return if event.to != :graveyard
-          return if event.card.controller?(controller)
-          return unless event.card.creature?
-
-          controller.gain_life(1)
+        when Events::EnteredZone
+          if event.to.graveyard? && !event.card.controller?(controller) && event.card.creature?
+            controller.gain_life(1)
+          end
         end
       end
     end

@@ -9,10 +9,8 @@ RSpec.describe Magic::Cards::EssenceWarden do
   context "when another creature controlled by the same controller enters the battlefield" do
     let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(game: game, controller: p1) }
     let(:event) do
-      Magic::Events::ZoneChange.new(
+      Magic::Events::EnteredTheBattlefield.new(
         loxodon_wayfarer,
-        from: :hand,
-        to: :battlefield
       )
     end
 
@@ -25,10 +23,8 @@ RSpec.describe Magic::Cards::EssenceWarden do
     let(:p2) { game.add_player }
     let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(game: game, controller: p2) }
     let(:event) do
-      Magic::Events::ZoneChange.new(
+      Magic::Events::EnteredTheBattlefield.new(
         loxodon_wayfarer,
-        from: :hand,
-        to: :battlefield
       )
     end
 
@@ -41,9 +37,9 @@ RSpec.describe Magic::Cards::EssenceWarden do
     let(:p2) { game.add_player }
     let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(game: game, controller: p2) }
     let(:event) do
-      Magic::Events::ZoneChange.new(
+      Magic::Events::LeavingZone.new(
         loxodon_wayfarer,
-        from: :hand,
+        from: :battlefield,
         to: :graveyard
       )
     end

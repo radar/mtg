@@ -1,6 +1,6 @@
 module Magic
   module Events
-    class ZoneChange
+    class LeavingZone
       attr_reader :card, :from, :to
 
       def initialize(card, from:, to:)
@@ -14,7 +14,7 @@ module Magic
       end
 
       def inspect
-        "#<Events::ZoneChange card: #{card.name}, from: #{from}, to: #{to}>"
+        "#<Events::LeavingZone card: #{card.name}, from: #{from}, to: #{to}>"
       end
     end
   end

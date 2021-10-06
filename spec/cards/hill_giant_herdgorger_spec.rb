@@ -7,10 +7,8 @@ RSpec.describe Magic::Cards::HillGiantHerdgorger do
 
   context "ETB Event" do
     let(:event) do
-      Magic::Events::ZoneChange.new(
+      Magic::Events::EnteredTheBattlefield.new(
         card,
-        from: p1.hand,
-        to: game.battlefield,
       )
     end
 

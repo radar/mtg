@@ -144,10 +144,11 @@ module Magic
 
     def receive_notification(event)
       case event
-      when Events::ZoneChange
+      when Events::LeavingZone
         died! if event.card == self && event.death?
         left_the_battlefield! if event.card == self && event.from.battlefield?
-        entered_the_battlefield! if event.card == self && event.to.battlefield?
+      when Events::EnteredTheBattlefield
+        entered_the_battlefield! if event.card == self
       end
     end
 
@@ -182,16 +183,26 @@ module Magic
     def move_zone!(new_zone)
       old_zone = zone
 
-      old_zone.remove(self)
-      new_zone.add(self)
-
       game.notify!(
-        Events::ZoneChange.new(
+        Events::LeavingZoneTransition.new(
           self,
           from: old_zone,
           to: new_zone
         )
       )
+
+      old_zone.remove(self)
+
+      new_zone.add(self)
+
+      game.notify!(
+        Events::EnteredZoneTransition.new(
+          self,
+          from: old_zone,
+          to: new_zone
+        )
+      )
+
     end
   end
 end
