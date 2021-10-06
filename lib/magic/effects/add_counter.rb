@@ -1,28 +1,21 @@
 module Magic
   module Effects
-    class AddCounter
-      attr_reader :power, :toughness, :targets, :choices
+    class AddCounter < Effect
+      attr_reader :power, :toughness
 
-      def initialize(power: 1, toughness: 1, targets: 1, choices:)
+      def initialize(power: 1, toughness: 1, **args)
         @power = power
         @toughness = toughness
-        @targets = targets
-        @choices = choices
-      end
-
-      def multiple_targets?
-        targets > 1
+        super(**args)
       end
 
       def requires_choices?
         true
       end
 
-      def single_choice?
-        choices.count == 1
-      end
-
       def resolve(targets:)
+        raise InvalidTarget if targets.any? { |target| !choices.include?(target) }
+
         targets.each do |target|
           target.add_counter(power: power, toughness: toughness)
         end

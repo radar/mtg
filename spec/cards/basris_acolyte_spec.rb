@@ -2,14 +2,15 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::BasrisAcolyte do
   let(:game) { Magic::Game.new }
-  subject { Card("Basri's Acolyte") }
+  let(:p1) { game.add_player }
+  subject { Card("Basri's Acolyte", controller: p1) }
 
   it "has lifelink" do
     expect(subject.lifelink?).to eq(true)
   end
 
   context "when there are other creatures on the battlefield" do
-    let(:loxodon_wayfarer) { Card("Loxodon Wayfarer") }
+    let(:loxodon_wayfarer) { Card("Loxodon Wayfarer", controller: p1) }
     before do
       game.battlefield.add(loxodon_wayfarer)
     end

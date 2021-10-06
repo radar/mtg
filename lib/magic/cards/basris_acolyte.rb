@@ -11,12 +11,11 @@ module Magic
     class BasrisAcolyte < Creature
       def entered_the_battlefield!
         game.add_effect(
-
           Effects::AddCounter.new(
             power: 1,
             toughness: 1,
             targets: 2,
-            choices: game.battlefield.creatures,
+            choices: game.battlefield.creatures.controlled_by(controller),
           )
         )
       end
