@@ -23,6 +23,7 @@ RSpec.describe Magic::Cards::AcidicSlime do
       subject.cast!
       game.stack.resolve!
       effect = game.effects.first
+
       expect(effect).to be_a(Magic::Effects::Destroy)
       expect(effect.choices).to match_array([land, enchantment, artifact])
     end

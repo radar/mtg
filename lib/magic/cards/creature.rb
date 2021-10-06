@@ -10,6 +10,10 @@ module Magic
           @power = power
           @toughness = toughness
         end
+
+        def positive?
+          power.positive? && toughness.positive?
+        end
       end
 
       class Buff

@@ -15,7 +15,6 @@ module Magic
 
       def entered_the_battlefield!
         game.add_effect(
-
           Effects::AddCounter.new(
             power: 1,
             toughness: 1,
@@ -23,6 +22,22 @@ module Magic
             choices: game.battlefield.creatures.controlled_by(controller),
           )
         )
+      end
+
+      def receive_notification(event)
+        super
+
+        case event
+        when Events::ZoneChange
+          return unless event.death?
+          return unless event.card.controller == controller
+
+          if event.card.counters.any?(&:positive?)
+            token = Tokens::Knight.new(game: game, controller: controller)
+            token.resolve!
+          end
+        end
+
       end
     end
   end

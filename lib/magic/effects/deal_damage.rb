@@ -1,20 +1,15 @@
 module Magic
   module Effects
     class DealDamage < Effect
-      attr_reader :choices, :damage
+      attr_reader :damage
 
-      def initialize(choices:, damage:)
-        @choices = choices
+      def initialize(damage:, **args)
         @damage = damage
-        super()
+        super(**args)
       end
 
       def requires_choices?
         true
-      end
-
-      def single_choice?
-        choices.count == 1
       end
 
       def resolve(target:)

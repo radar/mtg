@@ -13,6 +13,10 @@ module Magic
         true
       end
 
+      def multiple_targets?
+        true
+      end
+
       def resolve(targets:)
         raise InvalidTarget if targets.any? { |target| !choices.include?(target) }
 

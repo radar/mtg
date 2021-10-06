@@ -1,13 +1,6 @@
 module Magic
   module Effects
     class Destroy < Effect
-      attr_reader :choices
-
-      def initialize(choices:)
-        @choices = choices
-        super()
-      end
-
       def requires_choices?
         true
       end

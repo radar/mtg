@@ -181,6 +181,7 @@ module Magic
 
     def move_zone!(new_zone)
       old_zone = zone
+
       old_zone.remove(self)
       new_zone.add(self)
 
