@@ -42,7 +42,7 @@ RSpec.describe Magic::Costs::Mana do
         end
 
         it "can pay and finalize" do
-          subject.pay({ generic: { red: 1 }, red: 1 })
+          subject.pay(player, { generic: { red: 1 }, red: 1 })
           subject.finalize!(player)
         end
       end
@@ -53,8 +53,7 @@ RSpec.describe Magic::Costs::Mana do
         end
 
         it "cannot pay" do
-          subject.pay({ generic: { red: 1 }, red: 1 })
-          subject.finalize!(player)
+          expect { subject.pay(player, { generic: { red: 1 }, red: 1 }) }.to raise_error(Magic::Costs::Mana::CannotPay)
         end
       end
     end

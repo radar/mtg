@@ -2,10 +2,11 @@ module Magic
   module Costs
     class Mana
       class Overpayment < StandardError; end
+      class CannotPay < StandardError; end
 
       attr_reader :balance, :cost
       def initialize(cost)
-        @balance = cost
+        @balance = cost.dup
         @cost = cost
         @payments = Hash.new(0)
         @payments[:generic] = Hash.new(0)
@@ -21,13 +22,15 @@ module Magic
         pool = player.mana_pool.dup
         deduct_from_pool(pool, color_costs)
 
-        generic_mana_payable = pool.values.sum >= cost[:generic]
+        generic_mana_payable = cost[:generic].nil? || pool.values.sum >= cost[:generic]
 
         generic_mana_payable && (pool.values.all? { |v| v.zero? || v.positive? })
       end
 
 
-      def pay(payment)
+      def pay(player, payment)
+        raise CannotPay unless can_pay?(player)
+
         pay_generic(payment[:generic]) if payment[:generic]
         pay_colors(payment.slice(*colors))
       end

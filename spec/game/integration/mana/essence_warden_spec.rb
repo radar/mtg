@@ -37,10 +37,13 @@ RSpec.describe Magic::Game, "Mana spend -- Essence Warden" do
         p1.tap!(forest)
         expect(p1.mana_pool[:green]).to eq(1)
         expect(p1.can_cast?(essence_warden)).to eq(true)
-        p1.pay_and_cast!({ green: 1 }, essence_warden)
+        cast = p1.prepare_to_cast!(essence_warden)
+        cast.pay(green: 1)
+        cast.perform!
         game.stack.resolve!
-        expect(essence_warden.zone).to be_battlefield
         expect(p1.mana_pool[:green]).to eq(0)
+        expect(essence_warden.zone).to be_battlefield
+
       end
     end
   end

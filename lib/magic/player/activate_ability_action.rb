@@ -10,7 +10,7 @@ module Magic
       end
 
       def pay(payment)
-        cost.pay(payment)
+        cost.pay(player, payment)
       end
 
       def activate!

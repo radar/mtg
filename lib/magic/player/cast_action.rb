@@ -7,7 +7,7 @@ module Magic
         @game = game
         @player = player
         @card = card
-        @cost = Costs::Mana.new(cost: apply_cost_reductions(card))
+        @cost = Costs::Mana.new(apply_cost_reductions(card))
       end
 
       def can_cast?
@@ -19,10 +19,10 @@ module Magic
       end
 
       def pay(payment)
-        cost.pay(payment)
+        cost.pay(player, payment)
       end
 
-      def cast!
+      def perform!
         cost.finalize!(player)
         card.cast!
         player.played_a_land! if card.land?

@@ -74,6 +74,7 @@ module Magic
     end
 
     def pay_mana(mana)
+      puts "Paying mana: #{mana.inspect}"
       if mana.any? { |color, count| mana_pool[color] - count < 0 }
         raise UnpayableMana, "Cannot pay mana #{mana.inspect}, there is only #{mana_pool.inspect} available"
       end
@@ -100,7 +101,7 @@ module Magic
     def pay_and_cast!(cost, card)
       action = cast_action(card)
       action.pay(cost)
-      action.cast!
+      action.perform!
     end
 
     def pay_and_activate_ability!(cost, ability)
@@ -111,7 +112,7 @@ module Magic
 
     def cast!(card)
       action = cast_action(card)
-      action.cast!
+      action.perform!
     end
 
     def tap!(card)
