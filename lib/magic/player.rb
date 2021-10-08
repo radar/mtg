@@ -93,6 +93,10 @@ module Magic
       card.controller = self
     end
 
+    def prepare_to_cast!(card)
+      cast_action(card)
+    end
+
     def pay_and_cast!(cost, card)
       action = cast_action(card)
       action.pay(cost)

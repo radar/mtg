@@ -1,47 +1,31 @@
 module Magic
   class Player
     class CastAction
-      include PayableAction
-      attr_reader :game, :player, :card
+      attr_reader :game, :player, :card, :cost
 
       def initialize(game:, player:, card:)
         @game = game
         @player = player
         @card = card
-        @payment = Hash.new(0)
-        @payment[:generic] = {}
-      end
-
-      def pay(mana)
-        @payment = mana
-        @payment[:generic] ||= {}
-      end
-
-      def final_cost
-        apply_cost_reductions(card)
+        @cost = Costs::Mana.new(cost: apply_cost_reductions(card))
       end
 
       def can_cast?
         return false if card.land? && player.can_play_lands?
         return false unless card.zone.hand?
-        cost = final_cost
-        return true if cost.values.all?(&:zero?)
+        return true if cost.zero?
 
-        pool = player.mana_pool.dup
-        color_costs = cost.slice(*Mana::COLORS)
+        cost.can_pay?(player)
+      end
 
-        deduct_from_pool(pool, color_costs)
-
-        generic_mana_payable = pool.values.sum >= cost[:generic]
-
-        generic_mana_payable && (pool.values.all? { |v| v.zero? || v.positive? })
+      def pay(payment)
+        cost.pay(payment)
       end
 
       def cast!
-        perform!(final_cost) do
-          card.cast!
-          player.played_a_land! if card.land?
-        end
+        cost.finalize!(player)
+        card.cast!
+        player.played_a_land! if card.land?
       end
 
       private

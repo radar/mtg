@@ -1,18 +1,21 @@
 module Magic
   class Player
     class ActivateAbilityAction
-      include PayableAction
-      attr_reader :player, :ability
+      attr_reader :player, :ability, :cost
 
       def initialize(player:, ability:)
         @player = player
         @ability = ability
+        @cost = Costs::Mana.new(ability.cost.dup)
+      end
+
+      def pay(payment)
+        cost.pay(payment)
       end
 
       def activate!
-        perform!(ability.cost) do
-          ability.activate!
-        end
+        cost.finalize!(player)
+        ability.activate!
       end
     end
   end
