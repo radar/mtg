@@ -40,8 +40,8 @@ module Magic
         raise Overpayment if overpaid?
         raise CannotPay unless can_pay?(player)
 
-        player.pay_mana(@payments[:generic])
-        player.pay_mana(color_costs)
+        player.pay_mana(@payments[:generic]) if @payments[:generic].any?
+        player.pay_mana(color_costs) if color_costs.values.any?(&:positive?)
       end
 
       private
