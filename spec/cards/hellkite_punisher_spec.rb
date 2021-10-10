@@ -9,13 +9,21 @@ RSpec.describe Magic::Cards::HellkitePunisher do
 
   context "triggered ability" do
     it "activated ability increases power" do
+      expect(subject.power).to eq(6)
       expect(subject.activated_abilities.count).to eq(1)
       p1.add_mana(red: 2)
+
       ability = subject.activated_abilities.first
-      expect(subject.power).to eq(6)
-      p1.pay_and_activate_ability!({ red: 1 }, ability)
+      activation = p1.prepare_to_activate(ability)
+      activation.pay(red: 1)
+      activation.activate!
       expect(subject.power).to eq(7)
-      p1.pay_and_activate_ability!({ red: 1 }, ability)
+
+      ability = subject.activated_abilities.first
+      activation = p1.prepare_to_activate(ability)
+      activation.pay(red: 1)
+      activation.activate!
+
       expect(subject.power).to eq(8)
       expect(subject.toughness).to eq(6)
     end

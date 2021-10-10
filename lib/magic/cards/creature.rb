@@ -19,7 +19,7 @@ module Magic
       class Buff
         attr_reader :power, :toughness, :until_eot
 
-        def initialize(power:, toughness:, until_eot: true)
+        def initialize(power: 0, toughness: 0, until_eot: true)
           @power = power
           @toughness = toughness
           @until_eot = until_eot

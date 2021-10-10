@@ -11,7 +11,12 @@ module Magic
     class HellkitePunisher < Creature
       def activated_abilities
         [
-          Abilities::Activated::ApplyBuff.new(self, cost: { red: 1}, power: 1, toughness: 0, until_eot: true)
+          ActivatedAbility.new(
+            mana_cost: { red: 1 },
+            ability: -> {
+              self.modifiers << Buff.new(power: 1, until_eot: true)
+            }
+          )
         ]
       end
     end

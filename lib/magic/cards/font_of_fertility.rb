@@ -8,7 +8,17 @@ module Magic
     class FontOfFertility < Card
       def activated_abilities
         [
-          Abilities::Activated::SacrificeAndSearchLibrary.new(self, cost: { generic: 1, green: 1})
+          ActivatedAbility.new(
+            mana_cost: { generic: 1, green: 1 },
+            ability: -> {
+              destroy!
+              game.add_effect(
+                Effects::SearchLibraryBasicLandEntersTapped.new(
+                  library: controller.library,
+                )
+              )
+            }
+          )
         ]
       end
     end

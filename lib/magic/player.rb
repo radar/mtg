@@ -98,16 +98,14 @@ module Magic
       cast_action(card)
     end
 
+    def prepare_to_activate(ability)
+      activate_ability_action(ability)
+    end
+
     def pay_and_cast!(cost, card)
       action = cast_action(card)
       action.pay(cost)
       action.perform!
-    end
-
-    def pay_and_activate_ability!(cost, ability)
-      action = activate_ability_action(ability)
-      action.pay(cost)
-      action.activate!
     end
 
     def cast!(card)

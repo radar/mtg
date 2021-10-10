@@ -10,12 +10,11 @@ module Magic
     class AnointedChorister < Creature
       def activated_abilities
         [
-          Abilities::Activated::ApplyBuff.new(
-            self,
-            cost: { generic: 4, white: 1 },
-            power: 3,
-            toughness: 3,
-            until_eot: true
+          ActivatedAbility.new(
+            mana_cost: { generic: 4, white: 1 },
+            ability: -> {
+              self.modifiers << Buff.new(power: 3, toughness: 3, until_eot: true)
+            }
           )
         ]
       end
