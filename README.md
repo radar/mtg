@@ -44,3 +44,7 @@ You might find some cards that do not use the `CardBuilder` DSL. These are cards
 ## Contributing in other ways
 
 Other than cards, you could contribute by adding additional test cases around things like combat, or existing card abilities. Be sure to check the Issues for this project to see if anything is open and listed there.
+
+## Copyright
+
+Magic: The Gathering is copyright of Wizards of the Coast.
