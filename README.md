@@ -39,6 +39,8 @@ You might end up implementing cards that are more complex, like [Annul](https://
 
 If you're unsure how to implement a card, read through the current cards that exist -- you might find something there that matches what you need.
 
+You might find some cards that do not use the `CardBuilder` DSL. These are cards that were implemented before the `CardBuilder` DSL was added. Can you switch these over to using the `CardBuilder` DSL?
+
 ## Contributing in other ways
 
 Other than cards, you could contribute by adding additional test cases around things like combat, or existing card abilities. Be sure to check the Issues for this project to see if anything is open and listed there.
