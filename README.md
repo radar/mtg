@@ -35,7 +35,7 @@ module Magic
 end
 ```
 
-You might end up implementing cards that are more complex, like [Annul](https://scryfall.com/card/khm/42/annul), which has a resolution effect that counters a target artifact or enchantment spell. You can see how this is handled at [lib/magic/cards/annul.rb](Magic::Cards::Annul).
+You might end up implementing cards that are more complex, like [Annul](https://scryfall.com/card/khm/42/annul), which has a resolution effect that counters a target artifact or enchantment spell. You can see how this is handled at [Magic::Cards::Annul](lib/magic/cards/annul.rb).
 
 If you're unsure how to implement a card, read through the current cards that exist -- you might find something there that matches what you need.
 
