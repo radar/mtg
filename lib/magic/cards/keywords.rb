@@ -42,7 +42,7 @@ module Magic
         end
       end
 
-      def grant_keyword(keyword, until_eot:)
+      def grant_keyword(keyword, until_eot: false)
         @keyword_grants << KeywordGrant.new(keyword: keyword, until_eot: until_eot)
       end
 

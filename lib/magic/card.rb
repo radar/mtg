@@ -1,7 +1,7 @@
 module Magic
   class Card
     include Cards::Keywords
-    attr_reader :game, :name, :cost, :type_line, :countered, :keywords
+    attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments
     attr_accessor :tapped
 
     attr_accessor :controller, :zone
@@ -20,6 +20,7 @@ module Magic
       cost.default = 0
       @cost = cost
       @tapped = tapped
+      @attachments = []
       super
     end
 
@@ -53,6 +54,10 @@ module Magic
 
     def enchantment?
       type?("Enchantment")
+    end
+
+    def grant_type(type)
+      @type_line += " #{type}"
     end
 
     def converted_mana_cost
@@ -169,6 +174,10 @@ module Magic
 
     def activated_abilities
       []
+    end
+
+    def attach(attachment)
+      attachment.apply_attachment_effects(self)
     end
 
     private
