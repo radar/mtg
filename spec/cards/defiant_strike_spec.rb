@@ -5,7 +5,7 @@ RSpec.describe Magic::Cards::DefiantStrike do
   let(:p1) { game.add_player(library: [Card("Forest")]) }
   subject { Card("Defiant Strike", controller: p1) }
 
-  context "ETB Event" do
+  context "resolution" do
     let(:wood_elves) { Card("Wood Elves", controller: p1) }
 
     before do
