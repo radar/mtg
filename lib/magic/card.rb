@@ -1,6 +1,6 @@
 module Magic
   class Card
-    include Cards::Keywords
+    include Keywords
     attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments
     attr_accessor :tapped
 

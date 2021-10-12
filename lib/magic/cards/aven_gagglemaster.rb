@@ -5,7 +5,7 @@ module Magic
       type "Creature -- Bird Warror"
       power 4
       toughness 3
-      keywords Keywords::FLYING
+      keywords :flying
     end
 
     class AvenGagglemaster < Creature

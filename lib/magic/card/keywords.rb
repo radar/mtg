@@ -1,5 +1,5 @@
 module Magic
-  module Cards
+  class Card
     module Keywords
       DEATHTOUCH = "Deathtouch".freeze
       DOUBLE_STRIKE = "Double strike".freeze

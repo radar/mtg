@@ -4,7 +4,7 @@ module Magic
       POWER = 4
       TOUGHNESS = 4
       NAME = "Angel"
-      KEYWORDS = [Cards::Keywords::FLYING]
+      KEYWORDS = [Keywords::FLYING]
       TYPE_LINE = "Angel"
 
       def colors

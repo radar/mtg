@@ -3,7 +3,7 @@ module Magic
     AcidicSlime = Creature("Acidic Slime") do
       cost generic: 3, green: 2
       type "Creature -- Ooze"
-      keywords Keywords::DEATHTOUCH
+      keywords :deathtouch
       power 2
       toughness 2
     end

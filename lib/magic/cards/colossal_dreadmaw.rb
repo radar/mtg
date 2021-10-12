@@ -5,7 +5,7 @@ module Magic
       type "Creature -- Dinosaur"
       power 6
       toughness 6
-      keywords Keywords::TRAMPLE
+      keywords :trample
     end
   end
 end

@@ -5,7 +5,7 @@ module Magic
       cost generic: 2, white: 2
       power 2
       toughness 3
-      keywords Keywords::LIFELINK
+      keywords :lifelink
     end
 
     class BasrisAcolyte < Creature

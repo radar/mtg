@@ -5,7 +5,7 @@ module Magic
       cost generic: 1, white: 1
       power 2
       toughness 2
-      keywords Keywords::VIGILANCE
+      keywords :vigilance
     end
   end
 end

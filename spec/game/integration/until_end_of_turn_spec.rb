@@ -18,7 +18,7 @@ RSpec.describe Magic::Game, "until end of turn effect" do
 
   context "granted keywords" do
     before do
-      dranas_emissary.grant_keyword(Magic::Cards::Keywords::DEATHTOUCH, until_eot: true)
+      dranas_emissary.grant_keyword(Magic::Card::Keywords::DEATHTOUCH, until_eot: true)
     end
 
     it "granted keywords are cleared at end of turn" do

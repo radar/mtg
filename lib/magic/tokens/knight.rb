@@ -4,7 +4,7 @@ module Magic
       POWER = 2
       TOUGHNESS = 2
       NAME = "Knight"
-      KEYWORDS = [Cards::Keywords::VIGILANCE]
+      KEYWORDS = [Keywords::VIGILANCE]
       TYPE_LINE = "Knight"
 
       def colors
