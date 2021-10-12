@@ -88,6 +88,7 @@ module Magic
       end
 
       no_choice_effects = effects.select { |effect| effect.no_choice? }
+
       no_choice_effects.each do |effect|
         skip_effect(effect)
       end

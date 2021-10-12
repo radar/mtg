@@ -9,6 +9,10 @@ module Magic
         super(**args)
       end
 
+      def multiple_targets?
+        true
+      end
+
       def requires_choices?
         true
       end
