@@ -27,5 +27,7 @@ RSpec.describe Magic::Cards::FaithsFetters do
     it "disables activated abilities for permanent"
 
     it "still allows mana abilities for permanent"
+
+    it "card goes to controller's graveyard when permanent leaves battlefield"
   end
 end

@@ -38,6 +38,15 @@ RSpec.describe Magic::Cards::Creature do
       subject.attachments << attachment
     end
 
+    context "with a generic attachment" do
+      let(:attachment) { double(:attachment) }
+
+      it "loses attachments when it leaves the battlefield" do
+        subject.left_the_battlefield!
+        expect(subject.attachments).to be_empty
+      end
+    end
+
     context "with an attachment that adds a type" do
       let(:attachment) { double(Magic::Aura, type_grants: ["Knight"]) }
 
