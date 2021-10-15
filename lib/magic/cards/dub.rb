@@ -5,15 +5,27 @@ module Magic
       TYPE_LINE = "Enchantment -- Aura"
       COST = { generic: 2, white: 1 }
 
-      def resolve!
-        attach_enchantment = Effects::AttachEnchantment.new(enchantment: self, choices: game.battlefield.creatures)
-        game.add_effect(attach_enchantment)
+      class DubAura < Aura
+        def power_buff
+          2
+        end
+
+        def toughness_buff
+          2
+        end
+
+        def keyword_grants
+          [Card::Keywords::FIRST_STRIKE]
+        end
+
+        def type_grants
+          ["Knight"]
+        end
       end
 
-      def apply_attachment_effects(creature)
-        creature.modifiers << Creature::Buff.new(power: 2, toughness: 2)
-        creature.grant_keyword(Keywords::FIRST_STRIKE)
-        creature.grant_type("Knight")
+      def resolve!
+        attach_enchantment = Effects::AttachEnchantment.new(enchantment: DubAura.new, choices: game.battlefield.creatures)
+        game.add_effect(attach_enchantment)
       end
     end
   end

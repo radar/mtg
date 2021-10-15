@@ -17,7 +17,7 @@ module Magic
       end
 
       def resolve(target:)
-        target.attach(enchantment)
+        target.attachments << enchantment
       end
     end
   end

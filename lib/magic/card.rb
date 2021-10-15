@@ -33,7 +33,11 @@ module Magic
     end
 
     def type?(type)
-      type_line.split(" ").include?(type)
+      types.include?(type)
+    end
+
+    def types
+      type_line.split(" ") + attachments.flat_map(&:type_grants)
     end
 
     def land?
@@ -54,10 +58,6 @@ module Magic
 
     def enchantment?
       type?("Enchantment")
-    end
-
-    def grant_type(type)
-      @type_line += " #{type}"
     end
 
     def converted_mana_cost
@@ -174,10 +174,6 @@ module Magic
 
     def activated_abilities
       []
-    end
-
-    def attach(attachment)
-      attachment.apply_attachment_effects(self)
     end
 
     private

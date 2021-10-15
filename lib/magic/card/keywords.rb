@@ -51,7 +51,9 @@ module Magic
       end
 
       def has_keyword?(keyword)
-        keywords.include?(keyword) || keyword_grants.map(&:keyword).include?(keyword)
+        keywords.include?(keyword) ||
+          keyword_grants.map(&:keyword).include?(keyword)
+          attachments.flat_map(&:keyword_grants).include?(keyword)
       end
 
       def flying?

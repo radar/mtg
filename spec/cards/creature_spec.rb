@@ -32,4 +32,42 @@ RSpec.describe Magic::Cards::Creature do
       expect(subject.modifiers).to be_empty
     end
   end
+
+  context "attachments" do
+    before do
+      subject.attachments << attachment
+    end
+
+    context "with an attachment that adds a type" do
+      let(:attachment) { double(Magic::Aura, type_grants: ["Knight"]) }
+
+      it "is considered a knight" do
+        expect(subject.type?("Knight")).to eq(true)
+      end
+    end
+
+    context "with an attachment that adds a keyword" do
+      let(:attachment) { double(Magic::Aura, keyword_grants: [Magic::Card::Keywords::FIRST_STRIKE]) }
+
+      it "has first strike" do
+        expect(subject).to be_first_strike
+      end
+    end
+
+    context "with an attachment that adds a power buff" do
+      let(:attachment) { double(Magic::Aura, power_buff: 2) }
+
+      it "has a power increase of 2" do
+        expect(subject.power).to eq(3)
+      end
+    end
+
+    context "with an attachment that adds a toughness buff" do
+      let(:attachment) { double(Magic::Aura, toughness_buff: 2) }
+
+      it "has a toughness increase of 2" do
+        expect(subject.toughness).to eq(3)
+      end
+    end
+  end
 end

@@ -49,11 +49,11 @@ module Magic
       end
 
       def power
-        @base_power + @modifiers.sum(&:power) + @counters.sum(&:power)
+        @base_power + @modifiers.sum(&:power) + @counters.sum(&:power) + @attachments.sum(&:power_buff)
       end
 
       def toughness
-        @base_toughness + @modifiers.sum(&:toughness) + @counters.sum(&:toughness)
+        @base_toughness + @modifiers.sum(&:toughness) + @counters.sum(&:toughness) + @attachments.sum(&:toughness_buff)
       end
 
       def fight(target, assigned_damage = power)
