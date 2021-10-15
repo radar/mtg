@@ -52,7 +52,7 @@ module Magic
 
       def has_keyword?(keyword)
         keywords.include?(keyword) ||
-          keyword_grants.map(&:keyword).include?(keyword)
+          keyword_grants.map(&:keyword).include?(keyword) ||
           attachments.flat_map(&:keyword_grants).include?(keyword)
       end
 
