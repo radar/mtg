@@ -26,6 +26,7 @@ module Magic
       def resolve!
         attach_enchantment = Effects::AttachEnchantment.new(enchantment: DubAura.new, choices: game.battlefield.creatures)
         game.add_effect(attach_enchantment)
+        super
       end
     end
   end

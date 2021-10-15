@@ -68,6 +68,22 @@ RSpec.describe Magic::Cards::Creature do
       it "has a toughness increase of 2" do
         expect(subject.toughness).to eq(3)
       end
+
+      context "with an attachment that prevents attacking" do
+        let(:attachment) { double(Magic::Aura, can_attack?: false) }
+
+        it "makes creature unable to attack" do
+          expect(subject.can_attack?).to eq(false)
+        end
+      end
+
+      context "with an attachment that prevents blocking" do
+        let(:attachment) { double(Magic::Aura, can_block?: false) }
+
+        it "makes creature unable to attack" do
+          expect(subject.can_block?).to eq(false)
+        end
+      end
     end
   end
 end

@@ -56,6 +56,14 @@ module Magic
         @base_toughness + @modifiers.sum(&:toughness) + @counters.sum(&:toughness) + @attachments.sum(&:toughness_buff)
       end
 
+      def can_attack?
+        @attachments.all?(&:can_attack?)
+      end
+
+      def can_block?
+        @attachments.all?(&:can_block?)
+      end
+
       def fight(target, assigned_damage = power)
         puts "#{self} fights #{target}, dealing #{assigned_damage} damage"
         target.take_damage(assigned_damage)
