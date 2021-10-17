@@ -14,6 +14,7 @@ RSpec.describe Magic::Cards::AngelicAscension do
   it "exiles the wood elves and creates a 4/4 white angel creature token with flying" do
     subject.cast!
     game.stack.resolve!
+    expect(wood_elves.zone).to be_exile
 
     expect(game.battlefield.creatures.count).to eq(1)
     angel = game.battlefield.creatures.first
