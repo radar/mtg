@@ -31,7 +31,9 @@ module Magic
         transitions from: :draw, to: :first_main
         transitions from: :first_main, to: :beginning_of_combat
         transitions from: :beginning_of_combat, to: :declare_attackers
-        transitions from: :declare_attackers, to: :declare_blockers, guard: -> { combat.attackers_declared? }
+        transitions from: :declare_attackers, to: :declare_blockers, guard: -> { combat.attackers_declared? }, after: [
+          -> { attackers_declared! }
+        ]
         transitions from: :declare_attackers, to: :end_of_combat
         transitions from: :declare_blockers, to: :first_strike, after: [
           -> { combat.deal_first_strike_damage },
@@ -175,6 +177,15 @@ module Magic
       )
 
       @combat = CombatPhase.new(game: self)
+    end
+
+    def attackers_declared!
+      attackers = combat.attacks.map(&:attacker)
+      attackers.each do |attacker|
+        notify!(
+          Events::AttackingCreature.new(creature: attacker)
+        )
+      end
     end
 
     def deal_damage_to_opponents(player, damage)
