@@ -1,0 +1,20 @@
+require 'spec_helper'
+
+RSpec.describe Magic::Cards::LlanowarElves do
+  let(:game) { Magic::Game.new }
+  let(:p1) { game.add_player }
+
+  subject { Card("Llanowar Elves", controller: p1) }
+
+  context "when on battlefield" do
+    before do
+      game.battlefield.add(subject)
+    end
+    it "can be tapped for one green mana" do
+      ability = subject.activated_abilities.first
+      activation = p1.prepare_to_activate(ability)
+      activation.activate!
+      expect(p1.mana_pool[:green]).to eq(1)
+    end
+  end
+end
