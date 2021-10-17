@@ -176,6 +176,10 @@ module Magic
       []
     end
 
+    def can_activate_ability?(ability)
+      @attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
+    end
+
     private
 
     def remove_until_eot_keyword_grants!

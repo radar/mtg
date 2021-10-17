@@ -23,11 +23,37 @@ RSpec.describe Magic::Cards::FaithsFetters do
       expect(wood_elves.can_attack?).to eq(false)
       expect(wood_elves.can_block?).to eq(false)
     end
+  end
 
-    it "disables activated abilities for permanent"
+  context "with llanowar elves" do
+    let(:llanowar_elves) { Card("Llanowar Elves") }
 
-    it "still allows mana abilities for permanent"
+    before do
+      game.battlefield.add(llanowar_elves)
+    end
 
-    it "card goes to controller's graveyard when permanent leaves battlefield"
+    it "enchants the llanowar elves" do
+      subject.resolve!
+      game.stack.resolve!
+      expect(llanowar_elves.can_attack?).to eq(false)
+      expect(llanowar_elves.can_block?).to eq(false)
+      expect(llanowar_elves.can_activate_ability?(llanowar_elves.activated_abilities.first)).to eq(true)
+    end
+  end
+
+  context "with hellkite punisher" do
+    let(:hellkite_punisher) { Card("Hellkite Punisher") }
+
+    before do
+      game.battlefield.add(hellkite_punisher)
+    end
+
+    it "enchants the llanowar elves" do
+      subject.resolve!
+      game.stack.resolve!
+      expect(hellkite_punisher.can_attack?).to eq(false)
+      expect(hellkite_punisher.can_block?).to eq(false)
+      expect(hellkite_punisher.can_activate_ability?(hellkite_punisher.activated_abilities.first)).to eq(false)
+    end
   end
 end

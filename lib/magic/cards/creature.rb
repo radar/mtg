@@ -87,6 +87,7 @@ module Magic
 
       def left_the_battlefield!
         @modifiers.clear
+        @attachments.each(&:destroy!)
         @attachments.clear
 
         super

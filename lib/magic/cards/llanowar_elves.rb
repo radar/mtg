@@ -10,7 +10,7 @@ module Magic
     class LlanowarElves < Creature
       def activated_abilities
         [
-          ActivatedAbility.new(
+          ManaAbility.new(
             mana_cost: {},
             additional_costs: [Costs::Tap.new(self)],
             ability: -> {
