@@ -13,6 +13,10 @@ module Magic
           @blocked = false
         end
 
+        def retarget(new_target)
+          @target = new_target
+        end
+
         def declare_blocker(blocker)
           @blockers << blocker
         end
@@ -51,7 +55,16 @@ module Magic
 
       def declare_attacker(attacker, target:)
         attacker.tap! unless attacker.vigilant?
-        @attacks << Attack.new(attacker: attacker, target: target)
+        attack = attack_for_attacker(attacker)
+        if attack
+          attack.retarget(target)
+        else
+          @attacks << Attack.new(attacker: attacker, target: target)
+        end
+      end
+
+      def attack_for_attacker(attacker)
+        @attacks.find { |attack| attack.attacker == attacker }
       end
 
       def attackers_declared?
