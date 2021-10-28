@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::AnointedChorister do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
+  include_context "two player game"
+
   subject { Card("Anointed Chorister", controller: p1) }
 
   context "triggered ability" do

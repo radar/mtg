@@ -24,6 +24,10 @@ module Magic
       @lands_played = 0
     end
 
+    def inspect
+      "#<Player name:#{name.inspect}>"
+    end
+
     def gain_life(life)
       @life += life
 

@@ -1,14 +1,13 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Game, "Mana spend -- Foundry Inspector + Free Sol Ring" do
-  subject(:game) { Magic::Game.new }
-
-  let(:p1) { game.add_player }
-  let(:p2) { game.add_player }
+  include_context "two player game"
 
   context "when at first main phase" do
     before do
-      subject.go_to_beginning_of_combat!
+      current_turn.upkeep!
+      current_turn.draw!
+      current_turn.first_main!
     end
 
     context "with 3 mountains and a foundry inspector on the battlefield, and a sol ring in hand" do

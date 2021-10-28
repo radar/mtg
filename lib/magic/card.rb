@@ -144,7 +144,7 @@ module Magic
     end
 
     def notify!(event)
-      game.notify!(event)
+      game.current_turn.notify!(event)
     end
 
     def receive_notification(event)

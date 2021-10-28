@@ -1,9 +1,14 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::CloudkinSeer do
-  let(:game) { Magic::Game.new }
-  let(:forest) { Magic::Cards::Forest.new }
-  let(:p1) { game.add_player(library: [forest]) }
+  include_context "two player game"
+
+  let(:forest) { Card("Forest") }
+
+  before do
+    p1.library.add(forest)
+  end
+
   subject { described_class.new(game: game, controller: p1) }
 
   context "ETB effect" do

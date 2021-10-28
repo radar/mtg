@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::HealerOfThePride do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
-  let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(game: game, controller: p1) }
+  include_context "two player game"
+
+  let(:loxodon_wayfarer) { Card("Loxodon Wayfarer", game: game, controller: p1) }
   let(:card) { described_class.new(game: game, controller: p1) }
 
   context "when another creature controlled by this player enters the battlefield" do

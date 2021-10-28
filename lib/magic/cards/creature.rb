@@ -93,6 +93,9 @@ module Magic
         super
       end
 
+      def whenever_this_attacks
+      end
+
       def cleanup!
         until_eot_modifiers = modifiers.select(&:until_eot?)
         until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }

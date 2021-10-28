@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::AcidicSlime do
-  let(:game) { Magic::Game.new }
+  let(:game) { Magic::Game.start! }
   subject { Card("Acidic Slime") }
 
   let(:land) { Card("Island") }

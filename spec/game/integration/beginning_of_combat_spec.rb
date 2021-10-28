@@ -1,9 +1,11 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Game, "beginning of combat on your turn" do
-  subject(:game) { Magic::Game.new }
+  include_context "two player game"
 
-  let!(:p1) { game.add_player(library: [Card("Forest")]) }
+  before do
+    p1.library.add(Card("Forest"))
+  end
 
   context "with basri ket's emblem" do
     before do
@@ -11,9 +13,7 @@ RSpec.describe Magic::Game, "beginning of combat on your turn" do
     end
 
     it "creates a 1/1 white soldier creature token" do
-      until subject.at_step?(:beginning_of_combat)
-        subject.next_step
-      end
+      skip_to_combat!
 
       creatures = game.battlefield.creatures
       expect(creatures.count).to eq(1)

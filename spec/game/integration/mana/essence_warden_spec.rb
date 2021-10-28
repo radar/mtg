@@ -1,16 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Game, "Mana spend -- Essence Warden" do
-  subject(:game) { Magic::Game.new }
-
-  let(:p1) { game.add_player }
-  let(:p2) { game.add_player }
+  include_context "two player game"
 
   context "when at first main phase" do
-    before do
-      subject.go_to_beginning_of_combat!
-    end
-
     context "when mana cost is not payable" do
       let(:essence_warden) { Card("Essence Warden", game: game) }
       before do

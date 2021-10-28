@@ -15,14 +15,8 @@ module Magic
         end
       end
 
-      private
-
-      def create_bird_token!
-        bird = Tokens::Bird.new(game: game, controller: controller)
-        bird.resolve!
-        bird.tap!
-
-        game.combat.declare_attacker(bird, target: nil)
+      def whenever_this_attacks
+        game.current_turn.add_attacking_token(Tokens::Bird)
       end
     end
   end

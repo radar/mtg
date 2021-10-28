@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::FontOfFertility do
-  let(:game) { Magic::Game.new }
-  let(:island) { Card("Island") }
-  let(:p1) { game.add_player(library: [island]) }
+  include_context "two player game"
+
   subject { Card("Font Of Fertility", controller: p1) }
 
   context "triggered ability" do
@@ -15,9 +14,10 @@ RSpec.describe Magic::Cards::FontOfFertility do
       activation.activate!
       game.stack.resolve!
       expect(subject.zone).to be_graveyard
-      expect(island.zone).to be_battlefield
-      expect(island).to be_tapped
-      expect(game.battlefield.cards).to include(island)
+
+      forest = game.battlefield.cards.by_name("Forest").first
+      expect(forest.zone).to be_battlefield
+      expect(forest).to be_tapped
     end
   end
 end

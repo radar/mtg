@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::HellkitePunisher do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
+  include_context "two player game"
+
   subject { Card("Hellkite Punisher", controller: p1) }
 
   it { is_expected.to be_flying }

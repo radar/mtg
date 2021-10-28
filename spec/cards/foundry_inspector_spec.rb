@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::FoundryInspector do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
+  include_context "two player game"
+
   let(:foundry_inspector) { Card("Foundry Inspector", controller: p1) }
 
   context "entering the battlefield adds a static ability" do

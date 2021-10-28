@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::HillGiantHerdgorger do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
+  include_context "two player game"
+
   let(:card) { described_class.new(game: game, controller: p1) }
 
   context "ETB Event" do

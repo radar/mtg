@@ -1,8 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::LlanowarElves do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
+  include_context "two player game"
 
   subject { Card("Llanowar Elves", controller: p1) }
 

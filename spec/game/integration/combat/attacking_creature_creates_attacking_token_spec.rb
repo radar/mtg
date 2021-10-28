@@ -1,10 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Game, "combat -- attacking creature creates attacking token" do
-  let(:game) { Magic::Game.new }
+  include_context "two player game"
 
-  let(:p1) { game.add_player }
-  let(:p2) { game.add_player }
   let(:falconer_adept) { Card("Falconer Adept", controller: p1) }
 
   before do
@@ -13,46 +11,38 @@ RSpec.describe Magic::Game, "combat -- attacking creature creates attacking toke
 
   context "when in combat" do
     before do
-      game.go_to_beginning_of_combat!
+      skip_to_combat!
     end
 
     it "falconer adept + bird attack p2" do
       expect(game.battlefield.cards).to include(falconer_adept)
       p2_starting_life = p2.life
 
-      expect(game).to be_at_step(:beginning_of_combat)
-      combat = game.combat
+      current_turn.declare_attackers!
 
-      expect(game).to be_at_step(:beginning_of_combat)
-      game.next_step
-      expect(game).to be_at_step(:declare_attackers)
-
-      combat.declare_attacker(
+      current_turn.declare_attacker(
         falconer_adept,
         target: p2,
       )
 
-      game.next_step
-      bird = game.battlefield.creatures.find { |creature| creature.name == "Bird" }
+      current_turn.attackers_declared!
+      bird = current_turn.battlefield.creatures.find { |creature| creature.name == "Bird" }
+      expect(current_turn).to be_at_step(:declare_attackers)
 
       expect(bird).not_to be_nil
-      combat.declare_attacker(
+      current_turn.declare_attacker(
         bird,
         target: p2,
       )
 
-      expect(game).to be_at_step(:declare_blockers)
+      current_turn.extra_attackers_declared!
+      expect(current_turn).to be_at_step(:declare_blockers)
 
-      game.next_step
-      expect(game).to be_at_step(:first_strike)
-
-      game.next_step
-      expect(game).to be_at_step(:combat_damage)
+      current_turn.first_strike!
+      current_turn.combat_damage!
 
       expect(p2.life).to eq(p2_starting_life - falconer_adept.power - bird.power)
 
-      game.next_step
-      expect(game).to be_at_step(:end_of_combat)
     end
   end
 end

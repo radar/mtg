@@ -1,9 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::BasriKet do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
-  let(:p2) { game.add_player }
+  include_context "two player game"
 
   context "+1 triggered ability" do
     subject { Card("Basri Ket", controller: p1) }
@@ -30,10 +28,15 @@ RSpec.describe Magic::Cards::BasriKet do
     subject { Card("Basri Ket", controller: p1) }
     let(:ability) { subject.loyalty_abilities[1] }
 
+    let(:turn) { double(Magic::Game::Turn) }
+    before do
+      allow(game).to receive(:current_turn) { turn }
+    end
+
     it "adds an after attackers declared step trigger" do
+      expect(turn).to receive(:after_attackers_declared)
       subject.activate_loyalty_ability!(ability)
       expect(subject.loyalty).to eq(1)
-      expect(game.after_step_triggers[:declare_attackers].count).to eq(1)
     end
   end
 

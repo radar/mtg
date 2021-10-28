@@ -1,47 +1,57 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Game, "attackers declared" do
-  subject(:game) { Magic::Game.new }
+  include_context "two player game"
 
-  let!(:p1) { game.add_player(library: [Card("Forest")]) }
-  let!(:p2) { game.add_player }
   let(:wood_elves) { Card("Wood Elves", controller: p1) }
+  let(:basri_ket) { Card("Basri Ket", controller: p1) }
 
   before do
+    p1.library.add(Card("Forest"))
     game.battlefield.add(wood_elves)
   end
 
   context "with basri ket's delayed trigger" do
     before do
-      game.after_step(:declare_attackers, Magic::Cards::BasriKet::AfterAttackersDeclaredTrigger.new)
+      current_turn.after_attackers_declared(basri_ket.method(:after_attackers_declared))
     end
 
-    it "creates a 1/1 white soldier creature token" do
-      until subject.at_step?(:declare_attackers)
-        subject.next_step
+    context "when in combat" do
+      before do
+        skip_to_combat!
       end
 
-      combat = game.begin_combat!
-      combat.declare_attacker(
-        wood_elves,
-        target: p2
-      )
+      it "creates a 1/1 white soldier creature token" do
+        turn = current_turn
+        p2_starting_life = p2.life
 
-      subject.next_step
-      creatures = game.battlefield.creatures
-      expect(creatures.count).to eq(2)
+        turn.declare_attackers!
 
-      soldier = creatures.find { |c| c.name == "Soldier" }
-      expect(soldier).to be_tapped
-      soldier_attack = combat.attacks.find { |attack| attack.attacker == soldier }
-      expect(soldier_attack.target).to eq(p2)
+        turn.declare_attacker(
+          wood_elves,
+          target: p2
+        )
 
-      until subject.at_step?(:cleanup)
-        subject.next_step
+        turn.attackers_declared!
+        creatures = game.battlefield.creatures
+        expect(creatures.count).to eq(2)
+
+        soldier = creatures.find { |c| c.name == "Soldier" }
+        expect(soldier).to be_tapped
+
+        current_turn.declare_attacker(
+          soldier,
+          target: p2,
+        )
+
+        current_turn.extra_attackers_declared!
+        expect(current_turn).to be_at_step(:declare_blockers)
+
+        current_turn.first_strike!
+        current_turn.combat_damage!
+
+        expect(p2.life).to eq(p2_starting_life - soldier.power - wood_elves.power)
       end
-
-      empty_triggers = subject.after_step_triggers.all? { |_key, triggers| triggers.empty? }
-      expect(empty_triggers).to eq(true)
     end
   end
 end

@@ -1,11 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
-  let(:game) { Magic::Game.new }
-  subject(:combat) { Magic::Game::CombatPhase.new(game: game) }
+  include_context "two player game"
 
-  let(:p1) { game.add_player }
-  let(:p2) { game.add_player }
   let(:odric) { Card("Odric, Lunarch Marshal") }
   let(:wood_elves) { Card("Wood Elves") }
 
@@ -16,7 +13,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
 
   context "when in combat" do
     before do
-      game.go_to_beginning_of_combat!
+      skip_to_combat!
     end
 
     let(:combat) { game.combat }
@@ -26,29 +23,23 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
       expect(game.battlefield.cards).to include(wood_elves)
       p2_starting_life = p2.life
 
-      expect(game).to be_at_step(:beginning_of_combat)
 
-      game.next_step
-      expect(game).to be_at_step(:declare_attackers)
+      current_turn.declare_attackers!
 
-      combat.declare_attacker(
+      current_turn.declare_attacker(
         odric,
         target: p2,
       )
 
-      game.next_step
-      expect(game).to be_at_step(:declare_blockers)
+      current_turn.declare_blockers!
 
-      combat.declare_blocker(
+      current_turn.declare_blocker(
         wood_elves,
         attacker: odric,
       )
 
-      game.next_step
-      expect(game).to be_at_step(:first_strike)
+      go_to_combat_damage!
 
-      game.next_step
-      expect(game).to be_at_step(:combat_damage)
       expect(odric.zone).to be_battlefield
 
       expect(wood_elves.zone).to be_graveyard

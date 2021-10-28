@@ -1,10 +1,8 @@
 require 'spec_helper'
 
-require 'spec_helper'
-
 RSpec.describe Magic::Cards::GloriousAnthem do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
+  include_context "two player game"
+
   let(:glorious_anthem) { Card("Glorious Anthem", controller: p1) }
   let(:wood_elves) { Card("Wood Elves", controller: p1) }
 

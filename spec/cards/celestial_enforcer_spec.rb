@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::CelestialEnforcer do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
+  include_context "two player game"
+
   subject { Card("Celestial Enforcer", controller: p1) }
   let(:wood_elves) { Card("Wood Elves") }
 

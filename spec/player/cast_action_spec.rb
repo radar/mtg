@@ -1,20 +1,19 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Player::CastAction do
-  let(:game) { Magic::Game.new }
-  let(:player) { game.add_player }
+  include_context "two player game"
 
   context "casting foundry inspector" do
     let(:foundry_inspector) { Card("Foundry Inspector") }
     before do
-      player.hand.add(foundry_inspector)
+      p1.hand.add(foundry_inspector)
     end
 
-    subject { described_class.new(game: game, player: player, card: foundry_inspector) }
+    subject { described_class.new(game: game, player: p1, card: foundry_inspector) }
 
     context "when the player has 3 red mana" do
       before do
-        player.add_mana(red: 3)
+        p1.add_mana(red: 3)
       end
 
       it "is castable" do
@@ -26,14 +25,14 @@ RSpec.describe Magic::Player::CastAction do
   context "casting path of peace" do
     let(:path_of_peace) { Card("Path Of Peace") }
     before do
-      player.hand.add(path_of_peace)
+      p1.hand.add(path_of_peace)
     end
 
-    subject { described_class.new(game: game, player: player, card: path_of_peace) }
+    subject { described_class.new(game: game, player: p1, card: path_of_peace) }
 
     context "when the player has 3 red, 1 white mana" do
       before do
-        player.add_mana(red: 3, white: 1)
+        p1.add_mana(red: 3, white: 1)
       end
 
       it "is castable" do
@@ -46,7 +45,7 @@ RSpec.describe Magic::Player::CastAction do
     let(:essence_warden) { Card("Essence Warden") }
 
     context "cannot cast a card that is not in the hand" do
-      subject { described_class.new(game: game, player: player, card: essence_warden) }
+      subject { described_class.new(game: game, player: p1, card: essence_warden) }
 
       it "cannot cast essence warden" do
         expect(subject.can_cast?).to eq(false)
@@ -55,11 +54,11 @@ RSpec.describe Magic::Player::CastAction do
 
     context "when essence warden is in the hand" do
       before do
-        player.hand.add(essence_warden)
+        p1.hand.add(essence_warden)
       end
 
       context "when there is not enough mana in the player's mana pool" do
-        subject { described_class.new(game: game, player: player, card: essence_warden) }
+        subject { described_class.new(game: game, player: p1, card: essence_warden) }
 
         it "cannot cast essence warden" do
           expect(subject.can_cast?).to eq(false)
@@ -67,10 +66,10 @@ RSpec.describe Magic::Player::CastAction do
       end
 
       context "when there is enough mana to pay the card's cost" do
-        subject { described_class.new(game: game, player: player, card: essence_warden) }
+        subject { described_class.new(game: game, player: p1, card: essence_warden) }
 
         before do
-          player.add_mana(green: 1)
+          p1.add_mana(green: 1)
         end
 
         it "can cast the essence warden" do
@@ -90,10 +89,10 @@ RSpec.describe Magic::Player::CastAction do
 
     context "with a sol ring in hand" do
       let(:sol_ring) { Card("Sol Ring") }
-      subject { described_class.new(game: game, player: player, card: sol_ring) }
+      subject { described_class.new(game: game, player: p1, card: sol_ring) }
 
       before do
-        player.hand.add(sol_ring)
+        p1.hand.add(sol_ring)
       end
 
       it "can cast the sol ring" do

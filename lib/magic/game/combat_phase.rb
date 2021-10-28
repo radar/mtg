@@ -25,7 +25,6 @@ module Magic
           @blocked
         end
 
-
         def resolve
           return if attacker.dead?
 
@@ -53,7 +52,7 @@ module Magic
         @attacks = []
       end
 
-      def declare_attacker(attacker, target:)
+      def declare_attacker(attacker, target: nil)
         attacker.tap! unless attacker.vigilant?
         attack = attack_for_attacker(attacker)
         if attack
@@ -65,6 +64,10 @@ module Magic
 
       def attack_for_attacker(attacker)
         @attacks.find { |attack| attack.attacker == attacker }
+      end
+
+      def attackers_without_targets?
+        @attacks.any? { |attack| attack.target.nil? }
       end
 
       def attackers_declared?
