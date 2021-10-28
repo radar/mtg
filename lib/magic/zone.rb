@@ -2,7 +2,7 @@ module Magic
   class Zone
     extend Forwardable
 
-    def_delegators :@cards, :include?, :select, :find, :count, :<<
+    def_delegators :@cards, :include?, :select, :find, :count, :<<, :by_name
 
     attr_reader :owner, :cards
 

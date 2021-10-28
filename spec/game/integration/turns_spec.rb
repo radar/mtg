@@ -30,15 +30,15 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_1.draw!
     turn_1.first_main!
 
-    island = p1.hand.find { |card| card.name == "Island" }
+    island = p1.hand.by_name("Island").first
     p1.cast!(island)
     island.tap!
     expect(p1.lands_played).to eq(1)
 
-    island2 = p1.hand.find { |card| card.name == "Island" }
+    island2 = p1.hand.by_name("Island").first
     expect(p1.can_cast?(island2)).to eq(false)
 
-    aegis_turtle = p1.hand.find { |card| card.name == "Aegis Turtle" }
+    aegis_turtle = p1.hand.by_name("Aegis Turtle").first
     p1.pay_and_cast!({ blue: 1 }, aegis_turtle)
     game.stack.resolve!
     expect(aegis_turtle.zone).to be_battlefield
@@ -58,11 +58,11 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_2.draw!
     turn_2.first_main!
 
-    mountain = p2.hand.find { |card| card.name == "Mountain" }
+    mountain = p2.hand.by_name("Mountain").first
     p2.cast!(mountain)
     mountain.tap!
 
-    raging_goblin = p2.hand.find { |card| card.name == "Raging Goblin" }
+    raging_goblin = p2.hand.by_name("Raging Goblin").first
     p2.pay_and_cast!({ red: 1 }, raging_goblin)
     game.stack.resolve!
     expect(raging_goblin.zone).to be_battlefield
@@ -97,7 +97,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
 
     turn_3 = game.next_turn
     expect(turn_3).to be_at_step(:untap)
-    p1_island = game.battlefield.cards.controlled_by(p1).find { |c| c.name == "Island" }
+    p1_island = game.battlefield.cards.controlled_by(p1).by_name("Island").first
     expect(p1_island).to be_untapped
 
     turn_3.upkeep!
@@ -105,7 +105,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_3.first_main!
 
     expect(p1.lands_played).to eq(0)
-    island = p1.hand.find { |card| card.name == "Island" }
+    island = p1.hand.by_name("Island").first
     expect(p1.can_cast?(island)).to be(true)
   end
 end
