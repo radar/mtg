@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::ChargeThrough do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
+  include_context "two player game"
+
   let(:charge_through) { described_class.new(game: game, controller: p1) }
 
   context "cast effect" do

@@ -1,9 +1,11 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Game, "until end of turn effect" do
-  subject(:game) { Magic::Game.new }
+  include_context "two player game"
 
-  let!(:p1) { game.add_player(library: [Card("Forest")]) }
+  before do
+    p1.library.add(Card("Forest"))
+  end
   let(:dranas_emissary) { Card("Drana's Emissary", controller: p1) }
 
   before do
@@ -11,8 +13,8 @@ RSpec.describe Magic::Game, "until end of turn effect" do
   end
 
   def go_to_cleanup
-    until subject.at_step?(:cleanup)
-      subject.next_step
+    until current_turn.at_step?(:cleanup)
+      current_turn.next_step
     end
   end
 
@@ -37,8 +39,8 @@ RSpec.describe Magic::Game, "until end of turn effect" do
     it "eot modifiers are cleared at end of turn" do
       expect(dranas_emissary.power).to eq(5)
 
-      until subject.at_step?(:cleanup)
-        subject.next_step
+      until current_turn.at_step?(:cleanup)
+        current_turn.next_step
       end
 
       expect(dranas_emissary.power).to eq(2)

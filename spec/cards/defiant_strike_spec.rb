@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::DefiantStrike do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player(library: [Card("Forest")]) }
+  include_context "two player game"
+
   subject { Card("Defiant Strike", controller: p1) }
 
   context "resolution" do

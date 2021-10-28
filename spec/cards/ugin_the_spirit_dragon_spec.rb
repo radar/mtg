@@ -1,9 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::UginTheSpiritDragon do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
-  let(:p2) { game.add_player }
+  include_context "two player game"
 
   context "+2 triggered ability" do
     subject { Card("Ugin, The Spirit Dragon", controller: p1) }

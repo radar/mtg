@@ -17,12 +17,13 @@ module Magic
 
       private
 
+      # This is way too far reaching.
       def create_bird_token!
         bird = Tokens::Bird.new(game: game, controller: controller)
         bird.resolve!
         bird.tap!
 
-        game.combat.declare_attacker(bird, target: nil)
+        game.current_turn.combat.declare_attacker(bird, target: nil)
       end
     end
   end

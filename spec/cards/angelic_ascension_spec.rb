@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::AngelicAscension do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player(p1) }
+  include_context "two player game"
+
   let(:wood_elves) { Card("Wood Elves") }
 
   subject { Card("Angelic Ascension") }

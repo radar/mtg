@@ -1,14 +1,13 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::AltarsLight do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
-  let(:p2) { game.add_player }
-  let(:sol_ring) { Magic::Cards::SolRing.new(controller: p2) }
+  include_context "two player game"
+  let(:sol_ring) { Card("Sol Ring", game: game, controller: p2) }
 
   let(:card) { described_class.new(game: game, controller: p1) }
 
   before do
+    game.next_turn
     game.battlefield.add(sol_ring)
   end
 

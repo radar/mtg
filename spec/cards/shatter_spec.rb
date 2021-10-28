@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::Shatter do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
-  let(:great_furnace) { Magic::Cards::GreatFurnace.new(controller: p1) }
+  include_context "two player game"
+
+  let(:great_furnace) { Card("Great Furnace", game: game, controller: p1) }
   let(:card) { described_class.new(game: game, controller: p1) }
 
   before do

@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::BasrisLieutenant do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
+  include_context "two player game"
+
   subject { Card("Basri's Lieutenant", controller: p1) }
 
   it "has vigilance" do

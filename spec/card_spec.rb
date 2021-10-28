@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Card do
-  subject { Magic::Cards::Forest.new }
+  let(:game) { Magic::Game.start! }
+  subject { Magic::Cards::Forest.new(game: game) }
 
   context "destroy!" do
     it "moves the card to the graveyard" do

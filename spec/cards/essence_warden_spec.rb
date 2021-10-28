@@ -1,13 +1,12 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::EssenceWarden do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
+  include_context "two player game"
 
   let(:card) { described_class.new(game: game, controller: p1) }
 
   context "when another creature controlled by the same controller enters the battlefield" do
-    let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(game: game, controller: p1) }
+    let(:loxodon_wayfarer) { Card("Loxodon Wayfarer", game: game, controller: p1) }
     let(:event) do
       Magic::Events::EnteredTheBattlefield.new(
         loxodon_wayfarer,
@@ -20,8 +19,7 @@ RSpec.describe Magic::Cards::EssenceWarden do
   end
 
   context "when another creature controlled by a different controller enters the battlefield" do
-    let(:p2) { game.add_player }
-    let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(game: game, controller: p2) }
+    let(:loxodon_wayfarer) { Card("Loxodon Wayfarer", game: game, controller: p2) }
     let(:event) do
       Magic::Events::EnteredTheBattlefield.new(
         loxodon_wayfarer,
@@ -34,8 +32,7 @@ RSpec.describe Magic::Cards::EssenceWarden do
   end
 
   context "when a creature controlled by this controller moves to the graveyard" do
-    let(:p2) { game.add_player }
-    let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(game: game, controller: p2) }
+    let(:loxodon_wayfarer) { Card("Loxodon Wayfarer", game: game, controller: p2) }
     let(:event) do
       Magic::Events::LeavingZone.new(
         loxodon_wayfarer,

@@ -1,10 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::PathOfPeace do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
-  let(:p2) { game.add_player }
-  let(:loxodon_wayfarer) { Magic::Cards::LoxodonWayfarer.new(controller: p2) }
+  include_context "two player game"
+
+  let(:loxodon_wayfarer) { Card("Loxodon Wayfarer", game: game, controller: p2) }
 
   let(:card) { described_class.new(game: game, controller: p1) }
 

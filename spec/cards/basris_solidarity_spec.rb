@@ -1,9 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::BasrisSolidarity do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
-  let(:p2) { game.add_player }
+  include_context "two player game"
+
   subject { Card("Basri's Solidarity", controller: p1) }
 
   let(:wood_elves) { Card("Wood Elves", controller: p1) }

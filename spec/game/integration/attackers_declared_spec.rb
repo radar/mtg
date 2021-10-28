@@ -1,13 +1,12 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Game, "attackers declared" do
-  subject(:game) { Magic::Game.new }
+  include_context "two player game"
 
-  let!(:p1) { game.add_player(library: [Card("Forest")]) }
-  let!(:p2) { game.add_player }
   let(:wood_elves) { Card("Wood Elves", controller: p1) }
 
   before do
+    p1.library.add(Card("Forest"))
     game.battlefield.add(wood_elves)
   end
 
@@ -17,17 +16,17 @@ RSpec.describe Magic::Game, "attackers declared" do
     end
 
     it "creates a 1/1 white soldier creature token" do
-      until subject.at_step?(:declare_attackers)
-        subject.next_step
+      turn = game.current_turn
+      until turn.at_step?(:declare_attackers)
+        turn.next_step
       end
 
-      combat = game.begin_combat!
-      combat.declare_attacker(
+      turn.declare_attacker(
         wood_elves,
         target: p2
       )
 
-      subject.next_step
+      turn.next_step
       creatures = game.battlefield.creatures
       expect(creatures.count).to eq(2)
 

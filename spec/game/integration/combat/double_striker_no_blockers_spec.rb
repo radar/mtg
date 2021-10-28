@@ -1,10 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Game, "combat -- double striker, no blockers" do
-  let(:game) { Magic::Game.new }
+  include_context "two player game"
 
-  let(:p1) { game.add_player }
-  let(:p2) { game.add_player }
   let(:fencing_ace) { Card("Fencing Ace") }
 
   before do
@@ -13,31 +11,30 @@ RSpec.describe Magic::Game, "combat -- double striker, no blockers" do
 
   context "when in combat" do
     before do
-      game.go_to_beginning_of_combat!
+      current_turn.go_to_beginning_of_combat!
     end
 
     it "p1 attacks with fencing ace" do
       p2_starting_life = p2.life
 
-      expect(game).to be_at_step(:beginning_of_combat)
-      combat = game.combat
+      expect(current_turn).to be_at_step(:beginning_of_combat)
 
-      game.next_step
-      expect(game).to be_at_step(:declare_attackers)
+      current_turn.next_step
+      expect(current_turn).to be_at_step(:declare_attackers)
 
-      combat.declare_attacker(
+      current_turn.declare_attacker(
         fencing_ace,
         target: p2,
       )
 
-      game.next_step
-      expect(game).to be_at_step(:declare_blockers)
+      current_turn.next_step
+      expect(current_turn).to be_at_step(:declare_blockers)
 
-      game.next_step
-      expect(game).to be_at_step(:first_strike)
+      current_turn.next_step
+      expect(current_turn).to be_at_step(:first_strike)
 
-      game.next_step
-      expect(game).to be_at_step(:combat_damage)
+      current_turn.next_step
+      expect(current_turn).to be_at_step(:combat_damage)
 
       expect(p2.life).to eq(p2_starting_life - 2)
     end

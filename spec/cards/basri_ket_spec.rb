@@ -1,9 +1,7 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::BasriKet do
-  let(:game) { Magic::Game.new }
-  let(:p1) { game.add_player }
-  let(:p2) { game.add_player }
+  include_context "two player game"
 
   context "+1 triggered ability" do
     subject { Card("Basri Ket", controller: p1) }

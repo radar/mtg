@@ -1,9 +1,13 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::FontOfFertility do
-  let(:game) { Magic::Game.new }
+  include_context "two player game"
+
+  before do
+    p1.library.add(island)
+  end
+
   let(:island) { Card("Island") }
-  let(:p1) { game.add_player(library: [island]) }
   subject { Card("Font Of Fertility", controller: p1) }
 
   context "triggered ability" do

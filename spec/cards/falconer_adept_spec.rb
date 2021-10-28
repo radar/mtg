@@ -1,7 +1,8 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::FalconerAdept do
-  let(:game) { Magic::Game.new }
+  include_context "two player game"
+
   subject { Card("Falconer Adept") }
 
   context "when falconer is on the battlefield" do
@@ -11,7 +12,7 @@ RSpec.describe Magic::Cards::FalconerAdept do
 
     context "and game is in combat phase" do
       before do
-        game.go_to_beginning_of_combat!
+        game.current_turn.go_to_beginning_of_combat!
       end
 
       it "attacks, creating a 1/1 white bird creature that is tapped and attacking" do
