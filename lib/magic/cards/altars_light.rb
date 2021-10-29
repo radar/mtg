@@ -5,13 +5,12 @@ module Magic
     end
 
     class AltarsLight < Instant
-      def resolve!
-        game.add_effect(
-          Effects::Exile.new(
-            choices: game.battlefield.cards.select { |c| c.artifact? || c.enchantment? },
-          )
-        )
-        super
+      def target_choices
+        game.battlefield.cards.select { |c| c.artifact? || c.enchantment? }
+      end
+
+      def resolve!(target:)
+        Effects::Exile.new.resolve(target: target)
       end
     end
   end
