@@ -1,7 +1,7 @@
 module Magic
   class Card
     include Keywords
-    attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments
+    attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections
     attr_accessor :tapped
 
     attr_accessor :controller, :zone
@@ -21,6 +21,7 @@ module Magic
       @cost = cost
       @tapped = tapped
       @attachments = []
+      @protections = []
       super
     end
 
@@ -64,8 +65,16 @@ module Magic
       cost.values.sum
     end
 
+    def multi_colored?
+      colors.count > 1
+    end
+
     def colors
-      cost.keys.reject { |k| k == :generic || k == :colorless }.count
+      cost.keys.reject { |k| k == :generic || k == :colorless }
+    end
+
+    def colorless?
+      colors.count == 0
     end
 
     alias_method :cmc, :converted_mana_cost
@@ -80,6 +89,39 @@ module Magic
       else
         game.stack.add(self)
       end
+    end
+
+    class TargetedCast
+      class InvalidTarget < StandardError; end
+
+      attr_reader :card
+
+      def initialize(card, targets:)
+        @card = card
+        @targets = targets
+      end
+
+      def countered?
+        card.countered?
+      end
+
+      def name
+        card.name
+      end
+
+      def validate!
+        raise InvalidTarget if @targets.any? { |target| !card.target_choices.include?(target) }
+      end
+
+      def resolve!
+        card.resolve!(target: @targets.first)
+      end
+    end
+
+    def targeted_cast!(targets:)
+      targeted_cast = TargetedCast.new(self, targets: targets)
+      targeted_cast.validate!
+      game.stack.add(targeted_cast)
     end
 
     def permanent?
@@ -106,8 +148,12 @@ module Magic
       countered
     end
 
-    def protected_from?(_card)
-      false
+    def protected_from?(card)
+      @protections.any? { |protection| protection.protected_from?(card) }
+    end
+
+    def gains_protection_from_color(color, until_eot:)
+      @protections << Protection.from_color(color, until_eot: until_eot)
     end
 
     def controller?(other_controller)
@@ -133,10 +179,7 @@ module Magic
 
     def cleanup!
       remove_until_eot_keyword_grants!
-    end
-
-    def resolution_effects
-      []
+      remove_until_eot_protections!
     end
 
     def skip_stack?
@@ -180,12 +223,28 @@ module Magic
       @attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
     end
 
+    def target(text)
+      case text
+      when "creatures you control"
+        game.battlefield.creatures.controlled_by(controller)
+      else
+        raise "INVALID TARGET TEXT SPECIFIED: #{text}"
+      end
+    end
+
     private
 
     def remove_until_eot_keyword_grants!
       until_eot_grants = keyword_grants.select(&:until_eot?)
       until_eot_grants.each do |grant|
         remove_keyword_grant(grant)
+      end
+    end
+
+    def remove_until_eot_protections!
+      until_eot_protections = protections.select(&:until_eot?)
+      until_eot_protections.each do |protection|
+        protections.delete(protection)
       end
     end
 

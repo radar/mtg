@@ -12,7 +12,7 @@ RSpec.describe Magic::Cards::AngelicAscension do
   end
 
   it "exiles the wood elves and creates a 4/4 white angel creature token with flying" do
-    subject.cast!
+    subject.targeted_cast!(targets: [wood_elves])
     game.stack.resolve!
     expect(wood_elves.zone).to be_exile
 

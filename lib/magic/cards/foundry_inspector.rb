@@ -9,7 +9,7 @@ module Magic
         game.battlefield.static_abilities.add(
           Abilities::Static::ReduceManaCost.new(
             source: self,
-            reduction: { colorless: 1 },
+            reduction: { generic: 1 },
             applies_to: -> (c) { c.artifact? }
           )
         )

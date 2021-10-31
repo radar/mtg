@@ -9,8 +9,13 @@ module Magic
     end
 
     class BaneslayerAngel < Creature
-      def protected_from?(card)
-        card.type?("Demon") || card.type?("Dragon")
+      def initialize(...)
+        super
+        @protections << Protection.new(
+          condition: ->(card) do
+            card.type?("Demon") || card.type?("Dragon")
+          end,
+          until_eot: false)
       end
     end
   end

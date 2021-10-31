@@ -46,4 +46,15 @@ RSpec.describe Magic::Game, "until end of turn effect" do
       expect(dranas_emissary.power).to eq(2)
     end
   end
+
+  context "protections" do
+    before do
+      dranas_emissary.gains_protection_from_color(:green, until_eot: true)
+    end
+
+    it "granted protections are cleaned up at end of turn" do
+      go_to_cleanup
+      expect(dranas_emissary).not_to be_protected_from(Card("Wood Elves"))
+    end
+  end
 end

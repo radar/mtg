@@ -4,12 +4,14 @@ module Magic
       NAME = "Counterspell"
       COST = { blue: 2 }
 
-      def resolution_effects
-        [
-          Effects::CounterSpell.new(
-            choices: game.stack,
-          )
-        ]
+      def target_choices
+        game.stack.cards
+      end
+
+      def resolve!(target:)
+        Effects::CounterSpell.new.resolve(target: target)
+
+        super()
       end
     end
   end

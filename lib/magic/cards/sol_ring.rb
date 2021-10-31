@@ -3,7 +3,7 @@ module Magic
     class SolRing < Card
       NAME = "Sol Ring"
       TYPE_LINE = "Artifact"
-      COST = { colorless: 1 }
+      COST = { generic: 1 }
 
       def tap!
         controller.add_mana(colorless: 2)

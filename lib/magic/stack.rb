@@ -2,7 +2,7 @@ module Magic
   class Stack
     extend Forwardable
 
-    def_delegators :@stack, :first, :select, :count
+    def_delegators :@stack, :first, :select, :count, :include?, :map
 
     attr_reader :effects
 
@@ -15,8 +15,10 @@ module Magic
       @stack.unshift(item)
     end
 
-    def select(...)
-      @stack.select(...)
+    def cards
+      @stack.map do |item|
+        item.respond_to?(:card) ? item.card : item
+      end
     end
 
     def add_effect(effect)
@@ -73,7 +75,6 @@ module Magic
       unless item.countered?
         puts "Resolving #{item.name}"
         item.resolve!
-        item.resolution_effects.each { |effect| add_effect(effect) }
       end
 
       resolve_effects!

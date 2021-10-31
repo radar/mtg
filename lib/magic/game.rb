@@ -3,7 +3,7 @@ module Magic
     include AASM
     extend Forwardable
 
-    attr_reader :battlefield, :stack, :players, :emblems, :current_turn
+    attr_reader :battlefield, :choices, :stack, :players, :emblems, :current_turn
 
     def_delegators :@stack, :effects, :add_effect, :resolve_effect, :next_effect
 
@@ -18,11 +18,13 @@ module Magic
     def initialize(
       battlefield: Zones::Battlefield.new(owner: self),
       stack: Stack.new,
+      choices: Choices.new([]),
       effects: [],
       players: []
     )
       @battlefield = battlefield
       @stack = stack
+      @choices = choices
       @effects = effects
       @player_count = 0
       @players = players

@@ -1,6 +1,7 @@
 module Magic
   module Costs
     class Mana
+      class OutstandingBalance < StandardError; end
       class Overpayment < StandardError; end
       class CannotPay < StandardError; end
 
@@ -26,7 +27,6 @@ module Magic
 
         generic_mana_payable && (pool.values.all? { |v| v.zero? || v.positive? })
       end
-
 
       def pay(player, payment)
         raise CannotPay unless can_pay?(player)

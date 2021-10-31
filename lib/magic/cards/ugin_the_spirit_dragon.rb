@@ -19,7 +19,7 @@ module Magic
           LoyaltyAbility.new(loyalty_change: :X, ability: -> (paid) {
             cards = game.battlefield.cards.select do |card|
               card.cmc <= paid &&
-              card.colors >= 1
+              !card.colorless?
             end
 
             cards.each(&:exile!)

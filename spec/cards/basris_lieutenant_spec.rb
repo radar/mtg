@@ -10,7 +10,7 @@ RSpec.describe Magic::Cards::BasrisLieutenant do
   end
 
   it "has protection from multicolored" do
-    multi_colored_card = double(Magic::Card, multi_colored?: true)
+    multi_colored_card = instance_double(Magic::Card, multi_colored?: true)
     expect(subject.protected_from?(multi_colored_card)).to eq(true)
   end
 

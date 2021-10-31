@@ -4,12 +4,14 @@ module Magic
       NAME = "Annul"
       COST = { blue: 1 }
 
-      def resolution_effects
-        [
-          Effects::CounterSpell.new(
-            choices: game.stack.select { |c| c.enchantment? || c.artifact? }
-          )
-        ]
+      def target_choices
+        game.stack.select { |c| c.enchantment? || c.artifact? }
+      end
+
+      def resolve!(target:)
+        Effects::CounterSpell.new.resolve(target: target)
+
+        super()
       end
     end
   end

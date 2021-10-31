@@ -1,13 +1,14 @@
 module Magic
   class Player
     class CastAction
-      attr_reader :game, :player, :card, :cost
+      attr_reader :game, :player, :card, :cost, :targets
 
-      def initialize(game:, player:, card:)
+      def initialize(game:, player:, card:, targets: nil)
         @game = game
         @player = player
         @card = card
         @cost = Costs::Mana.new(apply_cost_reductions(card))
+        @targets = targets
       end
 
       def can_cast?
@@ -24,7 +25,8 @@ module Magic
 
       def perform!
         cost.finalize!(player)
-        card.cast!
+        targets.any? ? card.targeted_cast!(targets: targets) : card.cast!
+
         player.played_a_land! if card.land?
       end
 
