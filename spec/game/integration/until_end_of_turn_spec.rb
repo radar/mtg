@@ -15,7 +15,7 @@ RSpec.describe Magic::Game, "until end of turn effect" do
     current_turn.first_main!
     current_turn.beginning_of_combat!
     current_turn.declare_attackers!
-    current_turn.finish_combat!
+    current_turn.end_of_combat!
     current_turn.second_main!
     current_turn.end!
     current_turn.cleanup!

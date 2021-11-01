@@ -45,7 +45,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
 
     turn_1.beginning_of_combat!
     turn_1.declare_attackers!
-    turn_1.finish_combat!
+    turn_1.end_of_combat!
     turn_1.second_main!
     turn_1.end!
 
@@ -84,7 +84,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
 
     turn_2.first_strike!
     turn_2.combat_damage!
-    turn_2.finish_combat!
+    turn_2.end_of_combat!
 
     expect(aegis_turtle.zone).to be_battlefield
     expect(raging_goblin.zone).to be_battlefield

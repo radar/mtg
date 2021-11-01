@@ -22,7 +22,7 @@ module Magic
       include AASM
       extend Forwardable
 
-      attr_reader :active_player, :number
+      attr_reader :active_player, :number, :events
 
       def_delegators :@game, :battlefield, :emblems
       def_delegators :@combat, :declare_attacker, :declare_blocker, :can_block?, :attacks
@@ -39,7 +39,7 @@ module Magic
         state :combat_damage
         state :end_of_combat
         state :second_main
-        state :end_of_turn
+        state :end_of_turn, after_enter: -> { begin_end_step! }
         state :cleanup, after_enter: -> { battlefield.creatures.each(&:cleanup!) }
 
         after_all_transitions :log_step_change
@@ -96,7 +96,7 @@ module Magic
           ]
         end
 
-        event :finish_combat do
+        event :end_of_combat do
           transitions from: [:combat_damage, :declare_attackers], to: :end_of_combat
         end
 
@@ -147,6 +147,12 @@ module Magic
 
         notify!(
           Events::BeginningOfUpkeep.new
+        )
+      end
+
+      def begin_end_step!
+        notify!(
+          Events::BeginningOfEndStep.new(active_player: active_player)
         )
       end
 
