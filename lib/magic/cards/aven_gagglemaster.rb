@@ -10,7 +10,7 @@ module Magic
 
     class AvenGagglemaster < Creature
       def entered_the_battlefield!
-        flying_creatures = game.battlefield
+        flying_creatures = battlefield
           .creatures
           .controlled_by(controller)
           .select(&:flying?)

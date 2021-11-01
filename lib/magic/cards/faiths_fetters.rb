@@ -7,7 +7,7 @@ module Magic
 
       def resolve!
         controller.gain_life(4)
-        attach_enchantment = Effects::AttachEnchantment.new(enchantment: self, choices: game.battlefield.creatures)
+        attach_enchantment = Effects::AttachEnchantment.new(enchantment: self, choices: battlefield.creatures)
         game.add_effect(attach_enchantment)
         super
       end

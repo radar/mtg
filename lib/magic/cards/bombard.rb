@@ -7,7 +7,7 @@ module Magic
       def resolve!
         game.add_effect(
           Effects::DealDamage.new(
-            choices: game.battlefield.creatures,
+            choices: battlefield.creatures,
             damage: 4,
           )
         )

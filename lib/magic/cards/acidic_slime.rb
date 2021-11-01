@@ -12,7 +12,7 @@ module Magic
       def entered_the_battlefield!
         game.add_effect(
           Effects::Destroy.new(
-            choices: game.battlefield.cards.select { |c| c.artifact? || c.enchantment? || c.land? },
+            choices: battlefield.cards.select { |c| c.artifact? || c.enchantment? || c.land? },
           )
         )
         super

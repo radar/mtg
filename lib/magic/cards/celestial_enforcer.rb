@@ -15,11 +15,11 @@ module Magic
             additional_costs: [Costs::Tap.new(self)],
             requirements: [
               -> {
-                game.battlefield.creatures.controlled_by(controller).any?(&:flying?)
+                battlefield.creatures.controlled_by(controller).any?(&:flying?)
               }
             ],
             ability: -> {
-              game.add_effect(Effects::TapTarget.new(choices: game.battlefield.creatures))
+              game.add_effect(Effects::TapTarget.new(choices: battlefield.creatures))
             }
           )
         ]

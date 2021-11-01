@@ -15,7 +15,7 @@ module Magic
             power: 1,
             toughness: 1,
             targets: 2,
-            choices: game.battlefield.creatures.controlled_by(controller),
+            choices: battlefield.creatures.controlled_by(controller),
           )
         )
       end

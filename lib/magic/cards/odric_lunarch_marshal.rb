@@ -25,7 +25,7 @@ module Magic
             :vigilance,
           ]
 
-          controlled_creatures = game.battlefield.creatures_controlled_by(controller)
+          controlled_creatures = battlefield.creatures.controlled_by(controller)
           applicable_keywords.each do |keyword|
             next unless controlled_creatures.any? { |creature| creature.has_keyword?(keyword) }
 

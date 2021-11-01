@@ -7,7 +7,7 @@ module Magic
 
     class BasrisSolidarity < Card
       def resolve!
-        creatures = game.battlefield.creatures.controlled_by(controller)
+        creatures = battlefield.creatures.controlled_by(controller)
         creatures.each do |creature|
           creature.add_counter(power: 1, toughness: 1)
         end

@@ -9,7 +9,7 @@ module Magic
       def resolve!
         game.add_effect(
           Effects::Destroy.new(
-            choices: game.battlefield.cards.select { |c| c.creature? || c.enchantment? },
+            choices: battlefield.cards.select { |c| c.creature? || c.enchantment? },
           )
         )
         super

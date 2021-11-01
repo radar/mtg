@@ -7,7 +7,7 @@ module Magic
     class AngelicAscension
 
       def target_choices
-        game.battlefield.select { |c| c.creature? || c.planeswalker? }
+        battlefield.select { |c| c.creature? || c.planeswalker? }
       end
 
       def resolve!(target:)

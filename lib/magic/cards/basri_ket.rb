@@ -27,7 +27,7 @@ module Magic
           LoyaltyAbility.new(loyalty_change: 1, ability: -> {
             game.add_effect(
               Effects::SingleTargetAndResolve.new(
-                choices: game.battlefield.creatures,
+                choices: battlefield.creatures,
                 targets: 1,
                 resolution: -> (target) {
                   target.add_counter(power: 1, toughness: 1)

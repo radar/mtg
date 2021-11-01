@@ -1,5 +1,8 @@
 module Magic
   class Card
+    extend Forwardable
+    def_delegators :@game, :battlefield
+
     include Keywords
     attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections
     attr_accessor :tapped

@@ -31,14 +31,6 @@ module Magic
       def untap(&block)
         block.call(cards).each(&:untap!)
       end
-
-      def creatures
-        @cards.creatures
-      end
-
-      def creatures_controlled_by(player)
-        @cards.creatures.controlled_by(player)
-      end
     end
   end
 end

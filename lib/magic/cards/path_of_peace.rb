@@ -8,7 +8,7 @@ module Magic
       def resolve!
         game.add_effect(
           Effects::DestroyControllerGainsLife.new(
-            choices: game.battlefield.cards.select { |c| c.creature? },
+            choices: battlefield.cards.select { |c| c.creature? },
           )
         )
         super

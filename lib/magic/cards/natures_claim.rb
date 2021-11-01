@@ -7,7 +7,7 @@ module Magic
       def resolve!
         game.add_effect(
           Effects::DestroyControllerGainsLife.new(
-            choices: game.battlefield.cards.select { |c| c.enchantment? || c.artifact? }
+            choices: battlefield.cards.select { |c| c.enchantment? || c.artifact? }
           )
         )
         super

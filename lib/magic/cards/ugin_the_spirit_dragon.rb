@@ -11,13 +11,13 @@ module Magic
             game.add_effect(
               Effects::DealDamage.new(
                 damage: 3,
-                choices: game.battlefield.cards + [game.players],
+                choices: battlefield.cards + [game.players],
               )
             )
           }),
 
           LoyaltyAbility.new(loyalty_change: :X, ability: -> (paid) {
-            cards = game.battlefield.cards.select do |card|
+            cards = battlefield.cards.select do |card|
               card.cmc <= paid &&
               !card.colorless?
             end
@@ -30,7 +30,7 @@ module Magic
             7.times { controller.draw! }
             game.add_effect(
               Effects::MoveToBattlefield.new(
-                battlefield: game.battlefield,
+                battlefield: battlefield,
                 targets: 7,
                 choices: controller.hand.cards.permanents
               )

@@ -3,13 +3,14 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::GeistHonoredMonk do
   include_context "two player game"
 
-  let(:geist) { described_class.new(controller: p1) }
+  let(:geist) { Card("Geist-Honored Monk", controller: p1) }
   let(:loxodon) { Magic::Cards::LoxodonWayfarer.new(controller: p1) }
 
   context "power and toughness" do
     context "when it's the only creature on the battlefield" do
       before do
         game.battlefield.add(geist)
+
       end
       it "has power and toughness equal to creatures" do
         expect(geist.power).to eq(1)

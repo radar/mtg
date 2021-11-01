@@ -6,7 +6,7 @@ module Magic
 
     class AltarsLight < Instant
       def target_choices
-        game.battlefield.cards.select { |c| c.artifact? || c.enchantment? }
+        battlefield.cards.select { |c| c.artifact? || c.enchantment? }
       end
 
       def resolve!(target:)
