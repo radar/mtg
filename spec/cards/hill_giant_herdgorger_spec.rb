@@ -5,6 +5,11 @@ RSpec.describe Magic::Cards::HillGiantHerdgorger do
 
   let(:card) { described_class.new(game: game, controller: p1) }
 
+  it "has base power and toughness" do
+    expect(card.power).to eq(7)
+    expect(card.toughness).to eq(6)
+  end
+
   context "ETB Event" do
     let(:event) do
       Magic::Events::EnteredTheBattlefield.new(
