@@ -3,6 +3,10 @@ module Magic
     class Sorcery < Card
       TYPE_LINE = "Sorcery"
 
+      def resolve!
+        move_zone!(controller.graveyard)
+      end
+
       def permanent?
         false
       end
