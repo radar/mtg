@@ -16,6 +16,10 @@ module Magic
       self.class.new(select(&:dead?))
     end
 
+    def with_power(&block)
+      self.class.new(select { |creature| yield(creature.power) })
+    end
+
     def by_name(name)
       self.class.new(select { |c| c.name == name })
     end
