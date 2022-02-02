@@ -94,39 +94,6 @@ module Magic
       end
     end
 
-    class TargetedCast
-      class InvalidTarget < StandardError; end
-
-      attr_reader :card
-
-      def initialize(card, targets:)
-        @card = card
-        @targets = targets
-      end
-
-      def countered?
-        card.countered?
-      end
-
-      def name
-        card.name
-      end
-
-      def validate!
-        raise InvalidTarget if @targets.any? { |target| !card.target_choices.include?(target) }
-      end
-
-      def resolve!
-        card.resolve!(target: @targets.first)
-      end
-    end
-
-    def targeted_cast!(targets:)
-      targeted_cast = TargetedCast.new(self, targets: targets)
-      targeted_cast.validate!
-      game.stack.add(targeted_cast)
-    end
-
     def permanent?
       true
     end

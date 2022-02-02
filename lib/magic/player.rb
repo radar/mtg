@@ -112,12 +112,6 @@ module Magic
       action.perform!
     end
 
-    def targeted_pay_and_cast!(cost, card, targets:)
-      action = cast_action(card, targets: targets)
-      action.pay(cost)
-      action.perform!
-    end
-
     def cast!(card)
       action = cast_action(card)
       action.perform!

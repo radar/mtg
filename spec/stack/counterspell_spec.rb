@@ -9,11 +9,11 @@ RSpec.describe Magic::Cards::Counterspell do
 
   context "counters annul, which was countering sol ring" do
     it "sol ring enters the battlefield" do
-      p2.add_mana(red: 1, blue: 2)
-      p1.add_mana(blue: 2)
-      p2.pay_and_cast!({ generic: { red: 1 } }, sol_ring)
-      p1.targeted_pay_and_cast!({ blue: 1 }, annul, targets: [sol_ring])
-      p2.targeted_pay_and_cast!({ blue: 2 }, counterspell, targets: [annul])
+
+      game.stack.cast(sol_ring)
+      game.stack.targeted_cast(annul, targeting: sol_ring)
+      game.stack.targeted_cast(counterspell, targeting: annul)
+
       game.stack.resolve!
       expect(annul).to be_countered
       expect(annul.zone).to be_graveyard

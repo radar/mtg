@@ -13,7 +13,7 @@ RSpec.describe Magic::Cards::FeatOfResistance do
   end
 
   it "adds a +1,+1 counter and protection from green to wood elves" do
-    subject.targeted_cast!(targets: [wood_elves])
+    game.stack.targeted_cast(subject, targeting: wood_elves)
 
     game.stack.resolve!
     expect(wood_elves.power).to eq(2)

@@ -6,6 +6,33 @@ module Magic
 
     attr_reader :effects
 
+    class TargetedCast
+      class InvalidTarget < StandardError; end
+
+      attr_reader :card
+
+      def initialize(card, targets:)
+        @card = card
+        @targets = targets
+      end
+
+      def countered?
+        card.countered?
+      end
+
+      def name
+        card.name
+      end
+
+      def validate!
+        raise InvalidTarget if @targets.any? { |target| !card.target_choices.include?(target) }
+      end
+
+      def resolve!
+        card.resolve!(target: @targets.first)
+      end
+    end
+
     def initialize(stack: [], effects: [])
       @stack = stack
       @effects = effects
@@ -13,6 +40,16 @@ module Magic
 
     def add(item)
       @stack.unshift(item)
+    end
+
+    def cast(card)
+      add(card)
+    end
+
+    def targeted_cast(card, targeting:)
+      targeted_cast = TargetedCast.new(card, targets: [*targeting])
+      targeted_cast.validate!
+      add(targeted_cast)
     end
 
     def cards
