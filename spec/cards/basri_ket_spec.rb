@@ -28,15 +28,16 @@ RSpec.describe Magic::Cards::BasriKet do
     subject { Card("Basri Ket", controller: p1) }
     let(:ability) { subject.loyalty_abilities[1] }
 
-    let(:turn) { double(Magic::Game::Turn) }
+    let(:turn) { double(Magic::Game::Turn, number: 1) }
     before do
       allow(game).to receive(:current_turn) { turn }
     end
 
     it "adds an after attackers declared step trigger" do
-      expect(turn).to receive(:after_attackers_declared)
       subject.activate_loyalty_ability!(ability)
       expect(subject.loyalty).to eq(1)
+      expect(subject.delayed_responses.count).to eq(1)
+      expect(subject.delayed_responses.first[:event_type]).to eq(Magic::Events::AttackersDeclared)
     end
   end
 

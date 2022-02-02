@@ -26,6 +26,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
 
     turn_1 = game.next_turn
 
+    turn_1.untap!
     turn_1.upkeep!
     turn_1.draw!
     turn_1.first_main!
@@ -54,6 +55,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
 
     expect(turn_2.active_player).to eq(p2)
 
+    turn_2.untap!
     turn_2.upkeep!
     turn_2.draw!
     turn_2.first_main!
@@ -75,7 +77,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
       target: p1,
     )
 
-    turn_2.declare_blockers!
+    turn_2.attackers_declared!
 
     turn_2.declare_blocker(
       aegis_turtle,
@@ -96,7 +98,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     game.next_active_player
 
     turn_3 = game.next_turn
-    expect(turn_3).to be_at_step(:untap)
+    turn_3.untap!
     p1_island = game.battlefield.cards.controlled_by(p1).by_name("Island").first
     expect(p1_island).to be_untapped
 

@@ -4,7 +4,7 @@ module Magic
     def_delegators :@game, :battlefield
 
     include Keywords
-    attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections
+    attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections, :delayed_responses
     attr_accessor :tapped
 
     attr_accessor :controller, :zone
@@ -12,7 +12,7 @@ module Magic
     COST = {}
     KEYWORDS = []
 
-    def initialize(game: Game.new, controller: Player.new, tapped: false, keywords: [], card_event: CardState.new(self))
+    def initialize(game: Game.new, controller: Player.new, tapped: false, keywords: [])
       @countered = false
       @name = self.class::NAME
       @type_line = self.class::TYPE_LINE
@@ -25,6 +25,7 @@ module Magic
       @tapped = tapped
       @attachments = []
       @protections = []
+      @delayed_responses = []
       super
     end
 
@@ -167,6 +168,19 @@ module Magic
         left_the_battlefield! if event.card == self && event.from.battlefield?
       when Events::EnteredTheBattlefield
         entered_the_battlefield! if event.card == self
+      end
+
+      trigger_delayed_response(event)
+    end
+
+    def delayed_response(turn:, event_type:, response:)
+      @delayed_responses << { turn: turn.number, event_type: event_type, response: response }
+    end
+
+    def trigger_delayed_response(event)
+      responses = delayed_responses.select { |response| event.is_a?(response[:event_type]) && response[:turn] == game.current_turn.number }
+      responses.each do |response|
+        response[:response].call
       end
     end
 

@@ -9,11 +9,12 @@ RSpec.describe Magic::Game, "attackers declared" do
   before do
     p1.library.add(Card("Forest"))
     game.battlefield.add(wood_elves)
+    game.battlefield.add(basri_ket)
   end
 
   context "with basri ket's delayed trigger" do
     before do
-      current_turn.after_attackers_declared(basri_ket.method(:after_attackers_declared))
+      basri_ket.loyalty_abilities[1].activate!
     end
 
     context "when in combat" do
@@ -44,8 +45,7 @@ RSpec.describe Magic::Game, "attackers declared" do
           target: p2,
         )
 
-        current_turn.extra_attackers_declared!
-        expect(current_turn).to be_at_step(:declare_blockers)
+        current_turn.declare_blockers!
 
         current_turn.first_strike!
         current_turn.combat_damage!

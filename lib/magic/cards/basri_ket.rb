@@ -37,24 +37,26 @@ module Magic
             )
           }),
           LoyaltyAbility.new(loyalty_change: -2, ability: -> {
-            game.current_turn.after_attackers_declared(method(:after_attackers_declared))
+            delayed_response(
+              turn: game.current_turn,
+              event_type: Events::AttackersDeclared,
+              response: -> {
+                attackers = game.current_turn.attacks.count
+
+                attackers.times do
+                  token = Tokens::Soldier.new(game: game, controller: controller)
+                  token.cast!
+                  token.tap!
+
+                  game.current_turn.declare_attacker(token)
+                end
+              }
+            )
           }),
           LoyaltyAbility.new(loyalty_change: -6, ability: -> {
             game.add_emblem(Emblem.new(controller: controller))
           }),
         ]
-      end
-
-      def after_attackers_declared
-        attackers = game.current_turn.attacks.count
-
-        attackers.times do
-          token = Tokens::Soldier.new(game: game, controller: controller)
-          token.cast!
-          token.tap!
-
-          game.current_turn.declare_attacker(token)
-        end
       end
     end
   end

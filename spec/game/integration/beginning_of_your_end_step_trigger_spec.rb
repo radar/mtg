@@ -16,14 +16,15 @@ RSpec.describe Magic::Game, "beginning of your end step" do
       p1.gain_life(3)
 
       turn = game.current_turn
-      turn.upkeep
-      turn.draw
-      turn.first_main
-      turn.beginning_of_combat
-      turn.declare_attackers
-      turn.end_of_combat
-      turn.second_main
-      turn.end
+      turn.untap!
+      turn.upkeep!
+      turn.draw!
+      turn.first_main!
+      turn.beginning_of_combat!
+      turn.declare_attackers!
+      turn.end_of_combat!
+      turn.second_main!
+      turn.end!
 
       creatures = game.battlefield.creatures
       expect(creatures.count).to eq(1)

@@ -35,9 +35,7 @@ RSpec.describe Magic::Game, "combat -- attacking creature creates attacking toke
         target: p2,
       )
 
-      current_turn.extra_attackers_declared!
-      expect(current_turn).to be_at_step(:declare_blockers)
-
+      current_turn.declare_blockers!
       current_turn.first_strike!
       current_turn.combat_damage!
 

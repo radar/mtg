@@ -10,13 +10,9 @@ module Magic
     class FalconerAdept < Creature
       def receive_notification(event)
         case event
-        when Events::AttackingCreature
-          create_bird_token! if event.creature == self
+        when Events::AttackersDeclared
+          game.current_turn.add_attacking_token(Tokens::Bird) if event.attackers.include?(self)
         end
-      end
-
-      def whenever_this_attacks
-        game.current_turn.add_attacking_token(Tokens::Bird)
       end
     end
   end

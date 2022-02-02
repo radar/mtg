@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "aasm"
 require_relative "magic/version"
 
+require "logger"
 require "zeitwerk"
 loader = Zeitwerk::Loader.for_gem
 loader.setup # ready!

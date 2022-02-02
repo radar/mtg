@@ -1,6 +1,5 @@
 module Magic
   class Game
-    include AASM
     extend Forwardable
 
     attr_reader :battlefield, :choices, :stack, :players, :emblems, :current_turn

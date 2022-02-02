@@ -2,16 +2,12 @@ PATH
   remote: .
   specs:
     magic (0.1.0)
-      aasm
       zeitwerk
 
 GEM
   remote: https://rubygems.org/
   specs:
-    aasm (5.2.0)
-      concurrent-ruby (~> 1.0)
     coderay (1.1.3)
-    concurrent-ruby (1.1.9)
     diff-lcs (1.4.4)
     method_source (1.0.0)
     pry (0.14.1)
