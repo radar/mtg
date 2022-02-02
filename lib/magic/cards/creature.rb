@@ -3,18 +3,12 @@ module Magic
     class Creature < Card
       attr_reader :damage, :modifiers, :counters
 
-      class Counter
-        attr_reader :power, :toughness
-
-        def initialize(power:, toughness:)
-          @power = power
-          @toughness = toughness
-        end
-
-        def positive?
-          power.positive? && toughness.positive?
+      class Counters < SimpleDelegator
+        def of_type(type)
+          select { |counter| counter.is_a?(type) }
         end
       end
+
 
       class Buff
         attr_reader :power, :toughness, :until_eot
@@ -33,7 +27,7 @@ module Magic
         @base_power = self.class::POWER
         @base_toughness = self.class::TOUGHNESS
         @modifiers = []
-        @counters = []
+        @counters = Counters.new([])
 
         @damage = 0
         @marked_for_death = false
@@ -81,8 +75,10 @@ module Magic
         @damage += damage_dealt
       end
 
-      def add_counter(counter)
-        @counters << counter
+      def add_counter(counter_type, amount: 1)
+        amount.times do
+          @counters << counter_type.new
+        end
       end
 
       def left_the_battlefield!

@@ -20,7 +20,7 @@ module Magic
         raise InvalidTarget if targets.any? { |target| !choices.include?(target) }
 
         targets.each do |target|
-          target.add_counter(counter_type.new)
+          target.add_counter(counter_type)
         end
       end
     end

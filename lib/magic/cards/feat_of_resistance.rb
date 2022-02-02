@@ -11,7 +11,7 @@ module Magic
       end
 
       def resolve!(target:)
-        target.add_counter(Counters::Plus1Plus1.new)
+        target.add_counter(Counters::Plus1Plus1)
         game.choices.add(
           Magic::Choice::Color.new(
             callback: -> (choice)  {

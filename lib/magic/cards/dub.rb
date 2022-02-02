@@ -6,8 +6,7 @@ module Magic
       COST = { generic: 2, white: 1 }
 
       def resolve!
-        attach_enchantment = Effects::AttachEnchantment.new(enchantment: self, choices: battlefield.creatures)
-        game.add_effect(attach_enchantment)
+        enchant_creature
         super
       end
 

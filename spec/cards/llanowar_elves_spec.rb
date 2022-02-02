@@ -9,6 +9,7 @@ RSpec.describe Magic::Cards::LlanowarElves do
     before do
       game.battlefield.add(subject)
     end
+
     it "can be tapped for one green mana" do
       ability = subject.activated_abilities.first
       activation = p1.prepare_to_activate(ability)

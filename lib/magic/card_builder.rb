@@ -8,6 +8,10 @@ module Magic
       Card(name, Magic::Cards::Sorcery, &block)
     end
 
+    def Enchantment(name, &block)
+      Card(name, Magic::Cards::Sorcery, &block)
+    end
+
     def Creature(name, &block)
       Card(name, Magic::Cards::Creature, &block)
     end
