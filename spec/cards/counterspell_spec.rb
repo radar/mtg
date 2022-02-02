@@ -3,8 +3,8 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::Counterspell do
   include_context "two player game"
 
-  let(:sol_ring) { Magic::Cards::SolRing.new(game: game, controller: p2)}
-  let(:annul) { Magic::Cards::Annul.new(game: game, controller: p1)}
+  let(:sol_ring) { Card("Sol Ring", controller: p2)}
+  let(:annul) { Card("Annul", controller: p1)}
   subject(:counterspell) { described_class.new(game: game, controller: p2) }
 
   context "counters annul, which was countering sol ring" do
