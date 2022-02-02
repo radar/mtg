@@ -16,7 +16,7 @@ module Magic
             token.resolve!
 
             game.battlefield.creatures.controlled_by(controller).each do |creature|
-              creature.add_counter(power: 1, toughness: 1)
+              creature.add_counter(Counters::Plus1Plus1.new)
             end
           end
         end
@@ -30,7 +30,7 @@ module Magic
                 choices: battlefield.creatures,
                 targets: 1,
                 resolution: -> (target) {
-                  target.add_counter(power: 1, toughness: 1)
+                  target.add_counter(Counters::Plus1Plus1.new)
                   target.grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
                 }
               )

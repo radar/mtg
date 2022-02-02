@@ -12,8 +12,7 @@ module Magic
       def entered_the_battlefield!
         game.add_effect(
           Effects::AddCounter.new(
-            power: 1,
-            toughness: 1,
+            Counters::Plus1Plus1,
             targets: 2,
             choices: battlefield.creatures.controlled_by(controller),
           )

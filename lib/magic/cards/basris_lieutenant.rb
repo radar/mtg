@@ -16,8 +16,7 @@ module Magic
       def entered_the_battlefield!
         game.add_effect(
           Effects::AddCounter.new(
-            power: 1,
-            toughness: 1,
+            Magic::Counters::Plus1Plus1,
             targets: 1,
             choices: battlefield.creatures.controlled_by(controller),
           )
@@ -32,7 +31,7 @@ module Magic
           return unless event.death?
           return unless event.card.controller == controller
 
-          if event.card.counters.any?(&:positive?)
+          if event.card.counters.any? { |counter| counter.is_a?(Counters::Plus1Plus1) }
             token = Tokens::Knight.new(game: game, controller: controller)
             token.resolve!
           end

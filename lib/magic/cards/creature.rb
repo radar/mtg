@@ -81,8 +81,8 @@ module Magic
         @damage += damage_dealt
       end
 
-      def add_counter(power:, toughness:)
-        @counters << Counter.new(power: power, toughness: toughness)
+      def add_counter(counter)
+        @counters << counter
       end
 
       def left_the_battlefield!

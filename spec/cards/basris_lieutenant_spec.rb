@@ -32,7 +32,7 @@ RSpec.describe Magic::Cards::BasrisLieutenant do
       let(:card) { subject }
       before do
         card.resolve!
-        card.add_counter(toughness: 1, power: 1)
+        card.add_counter(Magic::Counters::Plus1Plus1.new)
       end
 
       it "creates a 2/2 white knight creature token with vigilance" do
@@ -50,7 +50,7 @@ RSpec.describe Magic::Cards::BasrisLieutenant do
       let(:card) { Card("Wood Elves", controller: p1) }
       before do
         card.resolve!
-        card.add_counter(toughness: 1, power: 1)
+        card.add_counter(Magic::Counters::Plus1Plus1.new)
       end
 
       it "creates a 2/2 white knight creature token with vigilance" do

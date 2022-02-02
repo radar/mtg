@@ -1,11 +1,10 @@
 module Magic
   module Effects
     class AddCounter < Effect
-      attr_reader :power, :toughness
+      attr_reader :counter_type
 
-      def initialize(power: 1, toughness: 1, **args)
-        @power = power
-        @toughness = toughness
+      def initialize(counter_type, **args)
+        @counter_type = counter_type
         super(**args)
       end
 
@@ -21,7 +20,7 @@ module Magic
         raise InvalidTarget if targets.any? { |target| !choices.include?(target) }
 
         targets.each do |target|
-          target.add_counter(power: power, toughness: toughness)
+          target.add_counter(counter_type.new)
         end
       end
     end

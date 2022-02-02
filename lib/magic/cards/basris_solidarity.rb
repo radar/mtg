@@ -9,7 +9,7 @@ module Magic
       def resolve!
         creatures = battlefield.creatures.controlled_by(controller)
         creatures.each do |creature|
-          creature.add_counter(power: 1, toughness: 1)
+          creature.add_counter(Counters::Plus1Plus1.new)
         end
 
         super
