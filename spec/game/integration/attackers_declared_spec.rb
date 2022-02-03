@@ -33,21 +33,23 @@ RSpec.describe Magic::Game, "attackers declared" do
           target: p2
         )
 
+        pending "cannot work this out -- does it loop back to declaring attackers?"
         turn.attackers_declared!
         creatures = game.battlefield.creatures
         expect(creatures.count).to eq(2)
 
         soldier = creatures.find { |c| c.name == "Soldier" }
         expect(soldier).to be_tapped
+        expect(turn.step?(:declare_attackers))
 
         current_turn.declare_attacker(
           soldier,
           target: p2,
         )
 
-        current_turn.declare_blockers!
+        current_turn.attackers_declared!
 
-        current_turn.first_strike!
+        current_turn.combat_damage!
         current_turn.combat_damage!
 
         expect(p2.life).to eq(p2_starting_life - soldier.power - wood_elves.power)

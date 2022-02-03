@@ -45,6 +45,7 @@ RSpec.shared_context "two player game" do
   end
 
   def skip_to_combat!
+    current_turn.untap!
     current_turn.upkeep!
     current_turn.draw!
     current_turn.first_main!
@@ -52,9 +53,8 @@ RSpec.shared_context "two player game" do
   end
 
   def go_to_combat_damage!
-    current_turn.declare_blockers! if current_turn.at_step?(:declare_attackers)
-    current_turn.first_strike! if current_turn.at_step?(:declare_blockers)
-    current_turn.combat_damage! if current_turn.at_step?(:first_strike)
+    current_turn.attackers_declared! if current_turn.step?(:declare_attackers)
+    current_turn.combat_damage! if current_turn.step?(:declare_blockers)
   end
 
   before do

@@ -31,7 +31,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
         target: p2,
       )
 
-      current_turn.declare_blockers!
+      current_turn.attackers_declared!
 
       current_turn.declare_blocker(
         wood_elves,

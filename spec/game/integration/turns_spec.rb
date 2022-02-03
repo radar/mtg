@@ -84,7 +84,6 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
       attacker: raging_goblin,
     )
 
-    turn_2.first_strike!
     turn_2.combat_damage!
     turn_2.end_of_combat!
 

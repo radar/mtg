@@ -24,9 +24,7 @@ RSpec.describe Magic::Game, "combat -- double striker, no blockers" do
         target: p2,
       )
 
-      current_turn.declare_blockers!
-      current_turn.first_strike!
-      expect(p2.life).to eq(p2_starting_life - fencing_ace.power)
+      current_turn.attackers_declared!
       current_turn.combat_damage!
       expect(p2.life).to eq(p2_starting_life - fencing_ace.power * 2)
 

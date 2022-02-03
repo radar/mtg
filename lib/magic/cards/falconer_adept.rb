@@ -11,7 +11,13 @@ module Magic
       def receive_notification(event)
         case event
         when Events::AttackersDeclared
-          game.current_turn.add_attacking_token(Tokens::Bird) if event.attackers.include?(self)
+          if event.attackers.include?(self)
+            token = Tokens::Bird.new(game: game, controller: controller)
+            token.cast!
+            token.tap!
+
+            game.current_turn.declare_attacker(token)
+          end
         end
       end
     end

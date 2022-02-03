@@ -10,6 +10,7 @@ RSpec.describe Magic::Game, "until end of turn effect" do
   end
 
   def go_to_cleanup
+    current_turn.untap!
     current_turn.upkeep!
     current_turn.draw!
     current_turn.first_main!

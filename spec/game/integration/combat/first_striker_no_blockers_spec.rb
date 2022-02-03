@@ -10,6 +10,10 @@ RSpec.describe Magic::Game, "combat -- first striker, no blockers" do
   end
 
   context "when in combat" do
+    before do
+      skip_to_combat!
+    end
+
     it "p1 attacks with battlefield raptor" do
       p2_starting_life = p2.life
 

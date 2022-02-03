@@ -5,6 +5,7 @@ RSpec.describe Magic::Game, "Mana spend -- Foundry Inspector + Free Sol Ring" do
 
   context "when at first main phase" do
     before do
+      current_turn.untap!
       current_turn.upkeep!
       current_turn.draw!
       current_turn.first_main!

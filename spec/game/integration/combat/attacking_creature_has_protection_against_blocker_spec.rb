@@ -30,7 +30,7 @@ RSpec.describe Magic::Game, "combat -- attacking creature has protection against
         target: p2,
       )
 
-      current_turn.declare_blockers!
+      current_turn.attackers_declared!
 
       expect(current_turn.can_block?(attacker: baneslayer_angel, blocker: hellkite_punisher)).to eq(false)
 
@@ -40,8 +40,6 @@ RSpec.describe Magic::Game, "combat -- attacking creature has protection against
           attacker: baneslayer_angel,
         )
       end.to raise_error(Magic::Game::CombatPhase::AttackerHasProtection)
-
-      current_turn.first_strike!
 
       current_turn.combat_damage!
 

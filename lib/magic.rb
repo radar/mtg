@@ -2,6 +2,7 @@
 
 require_relative "magic/version"
 
+require "state_machines"
 require "logger"
 require "zeitwerk"
 loader = Zeitwerk::Loader.for_gem

@@ -28,8 +28,8 @@ module Magic
         @cards.each { |card| card.receive_notification(event) }
       end
 
-      def untap(&block)
-        block.call(cards).each(&:untap!)
+      def cleanup
+        creatures.each(&:cleanup!)
       end
     end
   end

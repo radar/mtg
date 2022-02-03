@@ -24,7 +24,7 @@ RSpec.describe Magic::Game, "combat -- single attacker with vigilance, no blocke
         target: p2,
       )
 
-      current_turn.declare_blockers!
+      current_turn.attackers_declared!
       go_to_combat_damage!
 
       expect(p2.life).to eq(p2_starting_life - 2)

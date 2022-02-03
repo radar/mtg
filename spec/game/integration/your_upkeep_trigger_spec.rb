@@ -10,6 +10,7 @@ RSpec.describe Magic::Game, "your upkeep trigger" do
   end
 
   it "upkeep triggers dranas emissary's ability" do
+    current_turn.untap!
     current_turn.upkeep!
 
     expect(p1.life).to eq(21)
