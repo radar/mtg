@@ -6,7 +6,7 @@ module Magic
       attr_reader :active_player, :number, :events, :combat
 
       def_delegators :@game, :battlefield, :emblems
-      def_delegators :@combat, :declare_attacker, :declare_blocker, :can_block?, :attacks
+      def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks
 
       state_machine :step, initial: :beginning do
         event :untap do
@@ -38,21 +38,6 @@ module Magic
         after_transition to: :combat_damage do |turn|
           turn.deal_combat_damage
         end
-
-        # around_transition from: :declare_attackers, to: :declare_blockers do |turn, transition, block|
-        #   attackers_declared = Events::AttackersDeclared.new(
-        #     active_player: turn.active_player,
-        #     turn: turn.number,
-        #     attackers: turn.combat.attacks.map(&:attacker),
-        #   )
-
-        #   turn.notify!(attackers_declared)
-        #   if turn.combat.attackers_without_targets?
-        #     turn.finalize_attackers!
-        #   else
-        #     block.call
-        #   end
-        # end
 
         after_transition to: :end do |turn|
           turn.notify!(
@@ -86,11 +71,15 @@ module Magic
 
         event :attackers_declared do
           transition declare_attackers: :declare_blockers
-          transition finalize_attackers: :declare_blockers
         end
 
         event :finalize_attackers do
           transition declare_attackers: :finalize_attackers
+        end
+
+        event :attackers_finalized do
+          transition declare_attackers: :declare_blockers
+          transition finalize_attackers: :declare_blockers
         end
 
         event :combat_damage do
@@ -125,6 +114,21 @@ module Magic
         @combat = CombatPhase.new(game: game)
         @after_attackers_declared_callbacks = []
         super()
+      end
+
+      def attackers_declared!
+        attackers_declared = Events::AttackersDeclared.new(
+          active_player: active_player,
+          turn: number,
+          attackers: combat.attacks.map(&:attacker),
+        )
+
+        notify!(attackers_declared)
+        if combat.attackers_without_targets?
+          finalize_attackers!
+        else
+          attackers_finalized!
+        end
       end
 
       def deal_combat_damage

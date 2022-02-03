@@ -62,6 +62,11 @@ module Magic
         end
       end
 
+      def choose_attacker_target(attacker, target:)
+        attack = attack_for_attacker(attacker)
+        attack.retarget(target)
+      end
+
       def attack_for_attacker(attacker)
         @attacks.find { |attack| attack.attacker == attacker }
       end
