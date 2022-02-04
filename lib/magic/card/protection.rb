@@ -12,8 +12,8 @@ module Magic
         @until_eot
       end
 
-      def self.from_color(color, until_eot:)
-        new(condition: -> (card) { card.colors.include?(color) }, until_eot: true)
+      def self.from_color(color, until_eot: false)
+        new(condition: -> (card) { card.colors.include?(color) }, until_eot: until_eot)
       end
 
       def protected_from?(card)
