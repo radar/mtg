@@ -12,7 +12,7 @@ module Magic
       def activated_abilities
         [
           ActivatedAbility.new(
-            mana_cost: { red: 1 },
+            costs: [Costs::Mana.new(red: 1)],
             ability: -> {
               self.modifiers << Buff.new(power: 1, until_eot: true)
             }

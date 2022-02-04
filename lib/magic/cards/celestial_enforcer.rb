@@ -11,8 +11,7 @@ module Magic
       def activated_abilities
         [
           ActivatedAbility.new(
-            mana_cost: { generic: 1, white: 1 },
-            additional_costs: [Costs::Tap.new(self)],
+            costs: [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(self)],
             requirements: [
               -> {
                 battlefield.creatures.controlled_by(controller).any?(&:flying?)

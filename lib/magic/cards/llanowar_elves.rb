@@ -11,8 +11,7 @@ module Magic
       def activated_abilities
         [
           ManaAbility.new(
-            mana_cost: {},
-            additional_costs: [Costs::Tap.new(self)],
+            costs: [Costs::Tap.new(self)],
             ability: -> {
               controller.add_mana(green: 1)
             }

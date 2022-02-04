@@ -29,7 +29,7 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
             expect(subject.activated_abilities.count).to eq(1)
             p1.add_mana(white: 5)
             activation = p1.prepare_to_activate(ability)
-            activation.pay(generic: { white: 1 }, white: 1)
+            activation.pay(:mana, generic: { white: 1 }, white: 1)
             activation.activate!
             expect(subject).to be_tapped
             tap_target = game.next_effect

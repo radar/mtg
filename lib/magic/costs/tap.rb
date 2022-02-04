@@ -11,7 +11,7 @@ module Magic
         card.untapped?
       end
 
-      def finalize!
+      def finalize!(_player)
         card.tap!
       end
     end
