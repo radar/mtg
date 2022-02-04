@@ -212,13 +212,13 @@ class Creature
           )
         DOC
       else
-        STDERR.puts("Error: #{value.inspect}")
+        # STDERR.puts("Error: #{value.inspect}")
         return
       end
 
       value = $'
     end
-  
+
     creature
   end
 end

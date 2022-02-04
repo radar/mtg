@@ -9,7 +9,7 @@ module Magic
       def activated_abilities
         [
           ActivatedAbility.new(
-            mana_cost: { generic: 1, green: 1 },
+            costs: [Costs::Mana.new(generic: 1, green: 1)],
             ability: -> {
               destroy!
               game.add_effect(

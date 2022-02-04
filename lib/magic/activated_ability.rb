@@ -1,27 +1,31 @@
 module Magic
   class ActivatedAbility
-    attr_reader :ability, :mana_cost, :additional_costs, :requirements
+    attr_reader :ability, :costs, :requirements
 
-    def initialize(ability:, mana_cost:, additional_costs: [], requirements: [])
+    def initialize(ability:, costs: [], requirements: [])
       @ability = ability
-      @mana_cost = Costs::Mana.new(mana_cost)
-      @additional_costs = additional_costs
+      @costs = costs
       @requirements = requirements
     end
 
     def can_be_activated?(player)
-      mana_cost.can_pay?(player) &&
-        additional_costs.all? { |cost| cost.can_pay?(player) } &&
-        requirements.all?(&:call)
+      costs.all? { |cost| cost.can_pay?(player) } && requirements.all?(&:call)
     end
 
-    def pay(player, payment)
-      @mana_cost.pay(player, payment)
+    def pay(player, cost_type, payment)
+      cost_type = case cost_type
+      when :mana
+        Costs::Mana
+      else
+        raise "unknown cost type: #{cost_type}"
+      end
+
+      cost = costs.find { |cost| cost.is_a?(cost_type) }
+      cost.pay(player, payment)
     end
 
     def finalize!(player)
-      mana_cost.finalize!(player)
-      additional_costs.each(&:finalize!)
+      costs.each { |cost| cost.finalize!(player) }
     end
 
     def activate!

@@ -12,8 +12,8 @@ module Magic
         ability.can_be_activated?(player)
       end
 
-      def pay(payment)
-        ability.pay(player, payment)
+      def pay(cost_type, payment)
+        ability.pay(player, cost_type, payment)
       end
 
       def activate!

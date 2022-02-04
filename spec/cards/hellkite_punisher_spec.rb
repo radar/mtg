@@ -15,13 +15,13 @@ RSpec.describe Magic::Cards::HellkitePunisher do
 
       ability = subject.activated_abilities.first
       activation = p1.prepare_to_activate(ability)
-      activation.pay(red: 1)
+      activation.pay(:mana, red: 1)
       activation.activate!
       expect(subject.power).to eq(7)
 
       ability = subject.activated_abilities.first
       activation = p1.prepare_to_activate(ability)
-      activation.pay(red: 1)
+      activation.pay(:mana, red: 1)
       activation.activate!
 
       expect(subject.power).to eq(8)
