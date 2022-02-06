@@ -57,6 +57,10 @@ module Magic
       type?("Creature")
     end
 
+    def planeswalker?
+      type?("Planeswalker")
+    end
+
     def artifact?
       type?("Artifact")
     end

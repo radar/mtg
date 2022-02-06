@@ -8,6 +8,11 @@ module Magic
       self.class.new(select(&:creature?))
     end
 
+    def planeswalkers
+      self.class.new(select(&:planeswalker?))
+    end
+
+
     def permanents
       self.class.new(select(&:permanent?))
     end

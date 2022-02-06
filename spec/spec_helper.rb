@@ -4,7 +4,7 @@ require "magic"
 
 module CardHelper
   def Card(name, **args)
-    Magic::Cards.const_get(name.gsub(/[^a-z]/i, "")).new(game: game, **args)
+    Magic::Cards.const_get(name.gsub(/[^a-z]/i, "").gsub(/\s(a-z)/) { $1.upcase }).new(game: game, **args)
   end
 end
 
@@ -31,8 +31,8 @@ end
 
 RSpec.shared_context "two player game" do
   let(:game) { Magic::Game.start! }
-  let(:p1) { Magic::Player.new }
-  let(:p2) { Magic::Player.new }
+  let(:p1) { Magic::Player.new(name: "P1") }
+  let(:p2) { Magic::Player.new(name: "P2") }
 
   def p1_library
     [

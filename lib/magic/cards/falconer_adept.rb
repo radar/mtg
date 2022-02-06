@@ -11,7 +11,7 @@ module Magic
       def receive_notification(event)
         case event
         when Events::AttackersDeclared
-          if event.attackers.include?(self)
+          if event.attacks.any? { |attack| attack.attacker == self }
             token = Tokens::Bird.new(game: game, controller: controller)
             token.cast!
             token.tap!

@@ -120,7 +120,7 @@ module Magic
         attackers_declared = Events::AttackersDeclared.new(
           active_player: active_player,
           turn: number,
-          attackers: combat.attacks.map(&:attacker),
+          attacks: combat.attacks,
         )
 
         notify!(attackers_declared)
