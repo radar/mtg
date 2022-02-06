@@ -9,7 +9,6 @@ module Magic
         end
       end
 
-
       class Buff
         attr_reader :power, :toughness, :until_eot
 

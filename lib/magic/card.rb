@@ -12,6 +12,28 @@ module Magic
     COST = {}
     KEYWORDS = []
 
+    class << self
+      def type(type)
+        const_set(:TYPE_LINE, type)
+      end
+
+      def cost(cost)
+        const_set(:COST, cost)
+      end
+
+      def power(power)
+        const_set(:POWER, power)
+      end
+
+      def toughness(power)
+        const_set(:TOUGHNESS, power)
+      end
+
+      def keywords(*keywords)
+        const_set(:KEYWORDS, Card::Keywords[*keywords])
+      end
+    end
+
     def initialize(game: Game.new, controller: Player.new, tapped: false, keywords: [])
       @countered = false
       @name = self.class::NAME

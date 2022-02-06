@@ -17,36 +17,9 @@ module Magic
     end
 
     def Card(name, base_class = Magic::Card, &block)
-      card = Class.new(base_class)
+      card = Class.new(base_class, &block)
       card.const_set(:NAME, name)
-      CardTemplate.new(card).instance_eval(&block)
       card
-    end
-
-    class CardTemplate
-      def initialize(card)
-        @card = card
-      end
-
-      def type(type)
-        @card.const_set(:TYPE_LINE, type)
-      end
-
-      def cost(cost)
-        @card.const_set(:COST, cost)
-      end
-
-      def power(power)
-        @card.const_set(:POWER, power)
-      end
-
-      def toughness(power)
-        @card.const_set(:TOUGHNESS, power)
-      end
-
-      def keywords(*keywords)
-        @card.const_set(:KEYWORDS, Card::Keywords[*keywords])
-      end
     end
   end
 end

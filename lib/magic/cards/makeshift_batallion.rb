@@ -5,9 +5,7 @@ module Magic
       type "Human Soldier"
       power 3
       toughness 2
-    end
 
-    class MakeshiftBatallion < Creature
       def receive_notification(event)
         case event
         when Events::AttackersDeclared
