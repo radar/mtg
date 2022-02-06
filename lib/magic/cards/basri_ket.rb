@@ -45,7 +45,7 @@ module Magic
 
                 attackers.times do
                   token = Tokens::Soldier.new(game: game, controller: controller)
-                  token.cast!
+                  token.play!
                   token.tap!
 
                   game.current_turn.declare_attacker(token)

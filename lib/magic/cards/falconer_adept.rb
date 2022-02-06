@@ -13,7 +13,7 @@ module Magic
         when Events::AttackersDeclared
           if event.attacks.any? { |attack| attack.attacker == self }
             token = Tokens::Bird.new(game: game, controller: controller)
-            token.cast!
+            token.play!
             token.tap!
 
             game.current_turn.declare_attacker(token)

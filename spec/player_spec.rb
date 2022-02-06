@@ -19,7 +19,7 @@ RSpec.describe Magic::Player do
       end
 
       it "plays the island" do
-        p1.cast!(island)
+        island.play!
         expect(p1.hand).not_to include(island)
         expect(island.zone).to be_battlefield
       end

@@ -7,9 +7,6 @@ module Magic
       toughness 4
       keywords :lifelink
 
-    end
-
-    class MangaraTheDiplomat < Creature
       def receive_notification(event)
         case event
         when Events::AttackersDeclared

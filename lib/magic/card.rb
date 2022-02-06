@@ -114,11 +114,7 @@ module Magic
     end
 
     def cast!
-      if skip_stack?
-        move_zone!(game.battlefield)
-      else
-        game.stack.add(self)
-      end
+      game.stack.add(self)
     end
 
     def permanent?
@@ -161,6 +157,8 @@ module Magic
       move_zone!(game.battlefield)
     end
 
+    alias_method :play!, :resolve!
+
     def counter!
       @countered = true
       move_zone!(controller.graveyard)
@@ -177,10 +175,6 @@ module Magic
     def cleanup!
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
-    end
-
-    def skip_stack?
-      false
     end
 
     def notify!(event)

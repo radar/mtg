@@ -1,8 +1,8 @@
 module Magic
   module Cards
     class Land < Card
-      def skip_stack?
-        true
+      def play!
+        move_zone!(game.battlefield)
       end
     end
   end
