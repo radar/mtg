@@ -94,6 +94,11 @@ module Magic
 
     def draw!
       card = library.draw
+      game.notify!(
+        Events::CardDraw.new(
+          player: self,
+        )
+      )
       card.move_to_hand!(self)
       card.controller = self
     end

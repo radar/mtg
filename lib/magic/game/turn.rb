@@ -147,6 +147,10 @@ module Magic
         end
       end
 
+      def spells_cast
+        events.select { |event| event.is_a?(Events::SpellCast) }
+      end
+
       private
 
       attr_reader :game, :logger

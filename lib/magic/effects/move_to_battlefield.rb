@@ -3,9 +3,9 @@ module Magic
     class MoveToBattlefield
       attr_reader :battlefield, :targets, :choices
 
-      def initialize(battlefield:, targets:, choices:)
+      def initialize(battlefield:, maximum_choices:, choices:)
         @battlefield = battlefield
-        @targets = targets
+        @maximum_choices = maximum_choices
         @choices = choices
       end
 
@@ -19,6 +19,10 @@ module Magic
       end
 
       def resolve(targets:)
+        if targets.count > @maximum_choices
+          raise "Too many targets chosen for Effects::MoveToBattlefield"
+        end
+
         targets.each(&:resolve!)
       end
     end

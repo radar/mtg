@@ -27,6 +27,8 @@ module Magic
         cost.finalize!(player)
         targets.any? ? card.targeted_cast!(targets: targets) : card.cast!
 
+        game.notify!(Events::SpellCast.new(spell: card, player: player))
+
         player.played_a_land! if card.land?
       end
 

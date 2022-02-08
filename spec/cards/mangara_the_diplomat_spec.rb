@@ -9,10 +9,7 @@ RSpec.describe Magic::Cards::MangaraTheDiplomat do
   subject(:wood_elves_2) { Card("Wood Elves", controller: p1) }
 
   before do
-    game.battlefield.add(ugin)
     game.battlefield.add(mangara)
-    game.battlefield.add(wood_elves_1)
-    game.battlefield.add(wood_elves_2)
   end
 
   it "has lifelink" do
@@ -21,6 +18,9 @@ RSpec.describe Magic::Cards::MangaraTheDiplomat do
 
   context "whenever an opponent attacks... ability" do
     before do
+      game.battlefield.add(ugin)
+      game.battlefield.add(wood_elves_1)
+      game.battlefield.add(wood_elves_2)
       skip_to_combat!
       current_turn.declare_attackers!
     end
@@ -56,4 +56,12 @@ RSpec.describe Magic::Cards::MangaraTheDiplomat do
     end
   end
 
+  context "when opponent casts spell" do
+    it "p1 casts two wood elves, p2 draws" do
+      p1.add_mana({ green: 6 })
+      p1.pay_and_cast!({ generic: { green: 2 }, green: 1 }, wood_elves_1)
+      expect(p2).to receive(:draw!)
+      p1.pay_and_cast!({ generic: { green: 2 }, green: 1 }, wood_elves_2)
+    end
+  end
 end

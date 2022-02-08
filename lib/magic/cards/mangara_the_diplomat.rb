@@ -15,6 +15,9 @@ module Magic
             (attack.target.planeswalker? || attack.target.controller == controller)
           end
           controller.draw! if incoming_attacks.count >= 2
+        when Events::SpellCast
+          spells_cast_by_player = current_turn.spells_cast.count { |spell| spell.player == event.player }
+          controller.draw! if spells_cast_by_player == 2
         end
       end
     end

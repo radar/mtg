@@ -3,8 +3,10 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::UginTheSpiritDragon do
   include_context "two player game"
 
+  subject { Card("Ugin, The Spirit Dragon", controller: p1) }
+  before { game.battlefield.add(subject) }
+
   context "+2 triggered ability" do
-    subject { Card("Ugin, The Spirit Dragon", controller: p1) }
     let(:ability) { subject.loyalty_abilities.first }
     let(:wood_elves) { Card("Wood Elves", controller: p2) }
 
@@ -80,8 +82,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
 
       move_to_battlefield = game.next_effect
       expect(move_to_battlefield).to be_a(Magic::Effects::MoveToBattlefield)
-      permanents = p1.hand.cards.permanents
-      expect(permanents.count).to eq(7)
+      permanents = p1.hand.cards.permanents.last(7)
       game.resolve_effect(move_to_battlefield, targets: permanents)
 
       permanents.each do |permanent|
