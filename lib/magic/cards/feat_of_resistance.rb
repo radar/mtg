@@ -6,8 +6,7 @@ module Magic
 
     class FeatOfResistance < Instant
       def target_choices
-        battlefield.creatures
-        target("creatures you control")
+        game.battlefield.creatures.controlled_by(controller)
       end
 
       def resolve!(target:)

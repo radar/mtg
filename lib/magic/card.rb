@@ -227,15 +227,6 @@ module Magic
       @attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
     end
 
-    def target(text)
-      case text
-      when "creatures you control"
-        game.battlefield.creatures.controlled_by(controller)
-      else
-        raise "INVALID TARGET TEXT SPECIFIED: #{text}"
-      end
-    end
-
     private
 
     def remove_until_eot_keyword_grants!
