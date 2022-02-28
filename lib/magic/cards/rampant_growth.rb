@@ -5,9 +5,7 @@ module Magic
       COST = { any: 1, green: 1 }
 
       def resolve!
-        game.add_effect(
-          Effects::SearchLibraryBasicLandEntersTapped.new(library: controller.library)
-        )
+        add_effect("SearchLibraryBasicLandEntersTapped", library: controller.library)
         super
       end
     end

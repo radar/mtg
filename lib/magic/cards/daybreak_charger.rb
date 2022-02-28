@@ -10,7 +10,7 @@ module Magic
 
     class DaybreakCharger < Creature
       def entered_the_battlefield!
-        apply_buff_effect = Effects::ApplyBuff.new(power: 2, choices: battlefield.creatures)
+        apply_buff_effect = Effects::ApplyBuff.new(source: self, power: 2, choices: battlefield.creatures)
         game.add_effect(apply_buff_effect)
       end
     end

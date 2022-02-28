@@ -5,10 +5,9 @@ module Magic
       COST = { green: 1 }
 
       def resolve!
-        game.add_effect(
-          Effects::DestroyControllerGainsLife.new(
-            choices: battlefield.cards.select { |c| c.enchantment? || c.artifact? }
-          )
+        add_effect(
+          "DestroyControllerGainsLife",
+          choices: battlefield.cards.select { |c| c.enchantment? || c.artifact? }
         )
         super
       end

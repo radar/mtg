@@ -1,12 +1,13 @@
 module Magic
   class Effect
-    attr_reader :targets, :choices
+    attr_reader :source, :targets, :choices
 
     class InvalidTarget < StandardError; end;
 
-    def initialize(targets: 1, choices: [])
+    def initialize(source:, targets: [], choices: [])
+      @source = source
       @targets = targets
-      @choices = choices
+      @choices = choices.select { |choice| choice.can_be_targeted_by?(source) }
     end
 
     def multiple_targets?
@@ -17,9 +18,6 @@ module Magic
       false
     end
 
-    def single_choice?
-      choices.count == 1
-    end
 
     def no_choice?
       false
@@ -27,10 +25,6 @@ module Magic
 
     def multiple_targets?
       targets > 1
-    end
-
-    def requires_choices?
-      false
     end
   end
 end

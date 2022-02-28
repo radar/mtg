@@ -1,15 +1,17 @@
 module Magic
   module Effects
-    class AddManaOrAbility
+    class AddManaOrAbility < Effect
       attr_reader :player, :white, :blue, :black, :red, :green
 
-      def initialize(player:, white: 0, blue: 0, black: 0, red: 0, green: 0)
+      def initialize(player:, white: 0, blue: 0, black: 0, red: 0, green: 0, **args)
         @player = player
         @white = white
         @blue = blue
         @black = black
         @red = red
         @green = green
+
+        super(**args)
       end
 
       def requires_choices?

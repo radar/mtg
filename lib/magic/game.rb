@@ -4,7 +4,7 @@ module Magic
 
     attr_reader :battlefield, :choices, :stack, :players, :emblems, :current_turn
 
-    def_delegators :@stack, :effects, :add_effect, :resolve_effect, :next_effect
+    def_delegators :@stack, :effects, :add_effect, :resolve_pending_effect, :next_effect
 
     def self.start!(players: [])
       new.tap do |game|
@@ -76,6 +76,15 @@ module Magic
     def deal_damage_to_opponents(player, damage)
       opponents = players - [player]
       opponents.each { |opponent| opponent.take_damage(damage) }
+    end
+
+    def tick!
+      stack.resolve!
+      move_dead_creatures_to_graveyard
+    end
+
+    def move_dead_creatures_to_graveyard
+      battlefield.creatures.dead.each(&:destroy!)
     end
   end
 end

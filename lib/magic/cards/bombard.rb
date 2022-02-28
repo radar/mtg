@@ -5,11 +5,10 @@ module Magic
       COST = { any: 2, red: 1 }
 
       def resolve!
-        game.add_effect(
-          Effects::DealDamage.new(
-            choices: battlefield.creatures,
-            damage: 4,
-          )
+        add_effect(
+          "DealDamage",
+          choices: battlefield.creatures,
+          damage: 4,
         )
       end
     end

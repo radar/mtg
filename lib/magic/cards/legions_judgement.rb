@@ -6,11 +6,8 @@ module Magic
 
     class LegionsJudgement < Sorcery
       def resolve!
-        game.add_effect(
-          Effects::Destroy.new(
-            choices: battlefield.creatures.with_power { |power| power >= 4 },
-          )
-        )
+        add_effect("DestroyTarget", choices: battlefield.creatures.with_power { |power| power >= 4 })
+
         super
       end
     end

@@ -4,8 +4,7 @@ module Magic
       attr_reader :attached_to
 
       def enchant_creature
-        attach_enchantment = Effects::AttachEnchantment.new(enchantment: self, choices: battlefield.creatures)
-        game.add_effect(attach_enchantment)
+        add_effect("AttachEnchantment", choices: battlefield.creatures)
       end
 
       def attach!(target)

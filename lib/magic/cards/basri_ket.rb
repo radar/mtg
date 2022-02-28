@@ -25,15 +25,13 @@ module Magic
       def loyalty_abilities
         [
           LoyaltyAbility.new(loyalty_change: 1, ability: -> {
-            game.add_effect(
-              Effects::SingleTargetAndResolve.new(
-                choices: battlefield.creatures,
-                targets: 1,
-                resolution: -> (target) {
-                  target.add_counter(Counters::Plus1Plus1)
-                  target.grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
-                }
-              )
+            add_effect(
+              "SingleTargetAndResolve",
+              choices: battlefield.creatures,
+              resolution: -> (target) {
+                target.add_counter(Counters::Plus1Plus1)
+                target.grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
+              }
             )
           }),
           LoyaltyAbility.new(loyalty_change: -2, ability: -> {

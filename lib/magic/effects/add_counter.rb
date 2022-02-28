@@ -1,9 +1,9 @@
 module Magic
   module Effects
-    class AddCounter < Effect
+    class AddCounter < TargetedEffect
       attr_reader :counter_type
 
-      def initialize(counter_type, **args)
+      def initialize(counter_type:, **args)
         @counter_type = counter_type
         super(**args)
       end
@@ -16,7 +16,7 @@ module Magic
         true
       end
 
-      def resolve(targets:)
+      def resolve(*targets)
         raise InvalidTarget if targets.any? { |target| !choices.include?(target) }
 
         targets.each do |target|

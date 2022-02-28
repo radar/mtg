@@ -9,14 +9,12 @@ module Magic
 
     class GaleSwooper < Creature
       def entered_the_battlefield!
-        game.add_effect(
-          Effects::SingleTargetAndResolve.new(
-            choices: battlefield.creatures,
-            targets: 1,
-            resolution: -> (target) {
-              target.grant_keyword(Keywords::FLYING, until_eot: true)
-            }
-          )
+        add_effect(
+          "SingleTargetAndResolve",
+          choices: battlefield.creatures,
+          resolution: -> (target) {
+            target.grant_keyword(Keywords::FLYING, until_eot: true)
+          }
         )
       end
     end

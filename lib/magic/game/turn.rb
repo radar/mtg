@@ -133,9 +133,9 @@ module Magic
 
       def deal_combat_damage
         combat.deal_first_strike_damage
-        move_dead_creatures_to_graveyard
+        game.tick!
         combat.deal_combat_damage
-        move_dead_creatures_to_graveyard
+        game.tick!
       end
 
       def notify!(*events)
@@ -157,10 +157,6 @@ module Magic
 
       def track_event(event)
         @events << event
-      end
-
-      def move_dead_creatures_to_graveyard
-        battlefield.creatures.dead.each(&:destroy!)
       end
     end
   end

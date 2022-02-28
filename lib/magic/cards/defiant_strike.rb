@@ -6,11 +6,8 @@ module Magic
 
     class DefiantStrike < Instant
       def resolve!
-        apply_buff_effect = Effects::ApplyBuff.new(power: 1, choices: battlefield.creatures)
-        game.add_effect(apply_buff_effect)
-
-        draw_cards_effect = Effects::DrawCards.new(player: controller)
-        game.add_effect(draw_cards_effect)
+        add_effect("ApplyBuff", power: 1, choices: battlefield.creatures)
+        add_effect("DrawCards", player: controller)
         super
       end
     end

@@ -19,14 +19,14 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
       expect(subject.loyalty).to eq(9)
       expect(game.effects.count).to eq(1)
       expect(game.next_effect).to be_a(Magic::Effects::DealDamage)
-      game.resolve_effect(game.next_effect, target: wood_elves)
+      game.resolve_pending_effect(wood_elves)
     end
 
     it "targets the other player" do
       subject.activate_loyalty_ability!(ability)
       expect(game.effects.count).to eq(1)
       expect(game.next_effect).to be_a(Magic::Effects::DealDamage)
-      game.resolve_effect(game.next_effect, target: p2)
+      game.resolve_pending_effect(p2)
     end
   end
 
@@ -83,7 +83,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
       move_to_battlefield = game.next_effect
       expect(move_to_battlefield).to be_a(Magic::Effects::MoveToBattlefield)
       permanents = p1.hand.cards.permanents.last(7)
-      game.resolve_effect(move_to_battlefield, targets: permanents)
+      game.resolve_pending_effect(permanents)
 
       permanents.each do |permanent|
         expect(permanent.zone).to be_battlefield

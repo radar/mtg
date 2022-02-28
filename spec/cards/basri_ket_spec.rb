@@ -15,9 +15,6 @@ RSpec.describe Magic::Cards::BasriKet do
     it "targets the wood elves" do
       subject.activate_loyalty_ability!(ability)
       expect(subject.loyalty).to eq(4)
-      expect(game.effects.count).to eq(1)
-      expect(game.next_effect).to be_a(Magic::Effects::SingleTargetAndResolve)
-      game.resolve_effect(game.next_effect, target: wood_elves)
       expect(wood_elves.power).to eq(2)
       expect(wood_elves.toughness).to eq(2)
       expect(wood_elves.indestructible?).to eq(true)

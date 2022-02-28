@@ -14,12 +14,10 @@ module Magic
       end
 
       def entered_the_battlefield!
-        game.add_effect(
-          Effects::AddCounter.new(
-            Magic::Counters::Plus1Plus1,
-            targets: 1,
-            choices: battlefield.creatures.controlled_by(controller),
-          )
+        add_effect(
+          "AddCounter",
+          counter_type: Counters::Plus1Plus1,
+          choices: battlefield.creatures.controlled_by(controller),
         )
       end
 

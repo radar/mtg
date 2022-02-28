@@ -66,6 +66,10 @@ module Magic
       lands_played >= max_lands_per_turn
     end
 
+    def can_be_targeted_by?(source)
+      true
+    end
+
     def add_mana(mana)
       mana.each do |color, count|
         @mana_pool[color] += count

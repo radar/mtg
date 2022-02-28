@@ -22,9 +22,11 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
 
       context "when celestial enforcer is untapped" do
         context "and p1 controls a creature with flying" do
+          let(:aven_gagglemaster) { Card("Aven Gagglemaster", controller: p1) }
           before do
-            game.battlefield.add(Card("Aven Gagglemaster", controller: p1))
+            game.battlefield.add(aven_gagglemaster)
           end
+
           it "taps a target creature" do
             expect(subject.activated_abilities.count).to eq(1)
             p1.add_mana(white: 5)
@@ -34,7 +36,8 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
             expect(subject).to be_tapped
             tap_target = game.next_effect
             expect(tap_target).to be_a(Magic::Effects::TapTarget)
-            game.resolve_effect(tap_target, target: wood_elves)
+            expect(tap_target.choices).to include(wood_elves, aven_gagglemaster)
+            game.resolve_pending_effect(wood_elves)
             expect(wood_elves).to be_tapped
           end
         end

@@ -18,7 +18,9 @@ module Magic
               }
             ],
             ability: -> {
-              game.add_effect(Effects::TapTarget.new(choices: battlefield.creatures))
+              add_effect(
+                "TapTarget", choices: battlefield.creatures
+              )
             }
           )
         ]

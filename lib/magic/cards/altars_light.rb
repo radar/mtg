@@ -10,7 +10,7 @@ module Magic
       end
 
       def resolve!(target:)
-        Effects::Exile.new.resolve(target: target)
+        Effects::Exile.new(source: self).resolve(target: target)
       end
     end
   end

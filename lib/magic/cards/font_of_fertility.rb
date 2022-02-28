@@ -12,10 +12,9 @@ module Magic
             costs: [Costs::Mana.new(generic: 1, green: 1)],
             ability: -> {
               destroy!
-              game.add_effect(
-                Effects::SearchLibraryBasicLandEntersTapped.new(
-                  library: controller.library,
-                )
+              add_effect(
+                "SearchLibraryBasicLandEntersTapped",
+                library: controller.library,
               )
             }
           )

@@ -1,10 +1,10 @@
 module Magic
   module Effects
-    class YouGainLife
-      attr_reader :source, :life
-      def initialize(source:, life:)
-        @source = source
+    class YouGainLife < Effect
+      attr_reader :life
+      def initialize(life:, **args)
         @life = life
+        super(**args)
       end
 
       def requires_choices?

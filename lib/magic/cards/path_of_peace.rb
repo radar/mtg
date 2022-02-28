@@ -6,10 +6,9 @@ module Magic
 
 
       def resolve!
-        game.add_effect(
-          Effects::DestroyControllerGainsLife.new(
-            choices: battlefield.cards.select { |c| c.creature? },
-          )
+        add_effect(
+          "DestroyControllerGainsLife",
+          choices: battlefield.cards.select(&:creature?),
         )
         super
       end

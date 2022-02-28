@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::Bombard do
   it "destroys the wood elves" do
     p2_starting_life = p2.life
     card.cast!
-    game.stack.resolve!
+    game.tick!
     expect(wood_elves.zone).to be_graveyard
   end
 end

@@ -9,9 +9,7 @@ module Magic
       KEYWORDS = [Keywords::FLYING]
 
       def entered_the_battlefield!
-        game.add_effect(
-          Effects::DrawCards.new(player: controller)
-        )
+        add_effect("DrawCards", player: controller)
 
         super
       end

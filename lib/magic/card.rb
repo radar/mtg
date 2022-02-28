@@ -227,6 +227,14 @@ module Magic
       @attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
     end
 
+    def can_be_targeted_by?(source)
+      true
+    end
+
+    def add_effect(klass, **args)
+      game.add_effect(Effects.const_get(klass).new(**args.merge(source: self)))
+    end
+
     private
 
     def remove_until_eot_keyword_grants!

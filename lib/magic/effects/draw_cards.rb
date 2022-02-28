@@ -3,9 +3,10 @@ module Magic
     class DrawCards < Effect
       attr_reader :player, :number_to_draw
 
-      def initialize(player:, number_to_draw: 1)
+      def initialize(player:, number_to_draw: 1, **args)
         @player = player
         @number_to_draw = number_to_draw
+        super(**args)
       end
 
       def resolve

@@ -10,11 +10,11 @@ module Magic
 
     class AcidicSlime < Creature
       def entered_the_battlefield!
-        game.add_effect(
-          Effects::Destroy.new(
-            choices: battlefield.cards.select { |c| c.artifact? || c.enchantment? || c.land? },
-          )
+        add_effect(
+          "DestroyTarget",
+          choices: game.battlefield.cards.select { |c| c.artifact? || c.enchantment? || c.land? },
         )
+
         super
       end
     end

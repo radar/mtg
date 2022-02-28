@@ -9,7 +9,7 @@ module Magic
       end
 
       def resolve!(target:)
-        Effects::CounterSpell.new.resolve(target: target)
+        Effects::CounterSpell.new(source: self).resolve(target)
 
         super()
       end

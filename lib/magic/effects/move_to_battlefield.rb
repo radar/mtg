@@ -18,7 +18,7 @@ module Magic
         choices.count == 1
       end
 
-      def resolve(targets:)
+      def resolve(targets)
         if targets.count > @maximum_choices
           raise "Too many targets chosen for Effects::MoveToBattlefield"
         end

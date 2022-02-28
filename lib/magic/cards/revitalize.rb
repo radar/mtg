@@ -5,8 +5,8 @@ module Magic
       COST = { generic: 1, white: 1 }
 
       def resolve!
-        game.add_effect(Effects::YouGainLife.new(source: self, life: 3))
-        game.add_effect(Effects::DrawCards.new(player: controller))
+        add_effect("YouGainLife", life: 3)
+        add_effect("DrawCards", player: controller)
       end
     end
   end

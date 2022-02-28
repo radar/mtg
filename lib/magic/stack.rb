@@ -59,10 +59,15 @@ module Magic
     end
 
     def add_effect(effect)
-      puts "New effect added: #{effect}, requires_choices: #{effect.requires_choices?}"
+      puts "New effect added: #{effect}, choice required: #{effect.requires_choices?}"
+
       if effect.requires_choices?
-        @effects << effect
-        # wait for a choice to be made
+        if effect.single_choice?
+          effect.resolve(effect.choices.first)
+        else
+          @effects << effect
+          # wait for a choice to be made
+        end
       else
         effect.resolve
       end
@@ -76,29 +81,26 @@ module Magic
       @effects.first
     end
 
-    def resolve_effect(effect, **args)
-      if effect.single_choice?
-        puts "Only one choice for #{effect}, automatically applying."
-        if effect.multiple_targets?
-          effect.resolve(targets: [effect.choices.first])
-        else
-          effect.resolve(target: effect.choices.first)
-        end
-      else
-        effect.resolve(**args)
-      end
+    def resolve_pending_effect(...)
+      puts "Resolving effect: #{effects.first}"
+      effects.shift.resolve(...)
+    end
 
-      @effects.shift
+    def resolve_single_target_effect(effect)
+      puts "Resolving single target effect: #{effect}"
+      effect.resolve(effect.choices.first)
+
+      effects.shift
     end
 
     def skip_effect(effect)
-      puts "#{effect} has no valid choices, skipping."
-      @effects.delete(effect)
+
     end
 
     def resolve!
       resolve_stack!
       resolve_effects!
+
     end
 
     def resolve_stack!
@@ -120,15 +122,17 @@ module Magic
     end
 
     def resolve_effects!
-      single_choice_effects = effects.select { |effect| effect.single_choice? }
-      single_choice_effects.each do |effect|
-        resolve_effect(effect)
+      resolvable_effects = effects.select { |effect| effect.single_choice? }
+      resolvable_effects.each do |effect|
+        resolve_single_target_effect(effect)
       end
 
       no_choice_effects = effects.select { |effect| effect.no_choice? }
 
       no_choice_effects.each do |effect|
         skip_effect(effect)
+        puts "#{effect} has no valid choices, skipping."
+        effects.shift
       end
     end
   end

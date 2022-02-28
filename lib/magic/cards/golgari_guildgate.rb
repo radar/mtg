@@ -14,7 +14,13 @@ module Magic
       end
 
       def tap!
-        controller.game.add_effect(Effects::AddManaOrAbility.new(player: controller, black: 1, green: 1))
+        add_effect(
+          "AddManaOrAbility",
+          player: controller,
+          black: 1,
+          green: 1
+        )
+
         super
       end
     end

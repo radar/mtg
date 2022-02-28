@@ -1,28 +1,20 @@
 module Magic
   module Effects
-    class SearchGraveyard < Effect
+    class SearchGraveyard < TargetedEffect
       attr_reader :graveyard, :condition, :resolve_action
 
-      def initialize(graveyard:, condition:, resolve_action:)
+      def initialize(graveyard:, condition:, resolve_action:, **args)
         @graveyard = graveyard
         @condition = condition
         @resolve_action = resolve_action
-        super()
-      end
-
-      def requires_choices?
-        true
-      end
-
-      def single_choice?
-        choices.count == 1
+        super(**args)
       end
 
       def choices
         graveyard.cards.select(&condition)
       end
 
-      def resolve(target:)
+      def resolve(target)
         resolve_action.call(target)
       end
 

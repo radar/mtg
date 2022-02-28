@@ -5,11 +5,7 @@ module Magic
       COST = { any: 1, red: 1 }
 
       def resolve!
-        game.add_effect(
-          Effects::Destroy.new(
-            choices: battlefield.cards.select(&:artifact?),
-          )
-        )
+        add_effect("DestroyTarget", choices: battlefield.cards.select(&:artifact?))
         super
       end
     end

@@ -8,11 +8,10 @@ module Magic
       def loyalty_abilities
         [
           LoyaltyAbility.new(loyalty_change: 2, ability: -> {
-            game.add_effect(
-              Effects::DealDamage.new(
-                damage: 3,
-                choices: battlefield.cards + [game.players],
-              )
+            add_effect(
+              "DealDamage",
+              damage: 3,
+              choices: battlefield.cards + game.players,
             )
           }),
 

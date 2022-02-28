@@ -1,23 +1,12 @@
 module Magic
   module Effects
-    class AttachEnchantment < Effect
-      attr_reader :enchantment
-
-      def initialize(enchantment:, **args)
-        @enchantment = enchantment
-        super(**args)
-      end
-
+    class AttachEnchantment < TargetedEffect
       def requires_choices?
         true
       end
 
-      def multiple_targets?
-        false
-      end
-
-      def resolve(target:)
-        enchantment.attach!(target)
+      def resolve(target)
+        source.attach!(target)
       end
     end
   end
