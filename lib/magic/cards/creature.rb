@@ -11,6 +11,10 @@ module Magic
           @toughness = toughness
           @until_eot = until_eot
         end
+
+        def until_eot?
+          @until_eot
+        end
       end
 
       POWER = 0

@@ -16,7 +16,12 @@ RSpec.describe Magic::Cards::DefiantStrike do
       expect(p1).to receive(:draw!)
       subject.resolve!
       game.stack.resolve!
+      buff = wood_elves.modifiers.first
+      expect(buff.power).to eq(1)
+      expect(buff.toughness).to eq(0)
+      expect(buff.until_eot?).to eq(true)
       expect(wood_elves.power).to eq(2)
+
     end
   end
 end
