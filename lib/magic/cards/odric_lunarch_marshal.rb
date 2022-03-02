@@ -36,6 +36,8 @@ module Magic
             end
           end
         end
+
+        super
       end
     end
   end

@@ -6,6 +6,7 @@ module Magic
       FIRST_STRIKE = "First strike".freeze
       FLYING = "Flying".freeze
       HASTE = "Haste".freeze
+      HEXPROOF = "Hexproof".freeze
       INDESTRUCTIBLE = "Indestructible".freeze
       LIFELINK = "Lifelink".freeze
       REACH = "Reach".freeze
@@ -54,6 +55,10 @@ module Magic
         keywords.include?(keyword) ||
           keyword_grants.map(&:keyword).include?(keyword) ||
           attachments.flat_map(&:keyword_grants).include?(keyword)
+      end
+
+      def hexproof?
+        has_keyword?(Keywords::HEXPROOF)
       end
 
       def flying?

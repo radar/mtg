@@ -1,6 +1,6 @@
 module Magic
   class Player
-    attr_reader :name, :game, :library, :graveyard, :exile, :mana_pool, :hand, :life, :lands_played
+    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :lands_played
 
     class UnpayableMana < StandardError; end
 
@@ -14,6 +14,7 @@ module Magic
       life: 20
     )
       @name = name
+      @lost = false
       @library = Zones::Library.new(owner: self, cards: library)
       @graveyard = graveyard
       @exile = Zones::Exile.new(owner: self)
@@ -26,6 +27,19 @@ module Magic
 
     def inspect
       "#<Player name:#{name.inspect}>"
+    end
+
+    def lost?
+      @lost
+    end
+
+    def lose!
+      @lost = true
+
+      game.notify!(
+        Events::PlayerLoses,
+        player: self,
+      )
     end
 
     def gain_life(life)
@@ -132,6 +146,15 @@ module Magic
 
     def join_game(game)
       @game = game
+    end
+
+    def receive_event(event)
+      case event
+      when Events::DamageDealt
+        return unless event.target == self
+
+        take_damage(event.damage)
+      end
     end
 
     private

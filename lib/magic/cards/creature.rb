@@ -3,12 +3,6 @@ module Magic
     class Creature < Card
       attr_reader :damage, :modifiers, :counters
 
-      class Counters < SimpleDelegator
-        def of_type(type)
-          select { |counter| counter.is_a?(type) }
-        end
-      end
-
       class Buff
         attr_reader :power, :toughness, :until_eot
 
@@ -26,8 +20,6 @@ module Magic
         @base_power = self.class::POWER
         @base_toughness = self.class::TOUGHNESS
         @modifiers = []
-        @counters = Counters.new([])
-
         @damage = 0
         @marked_for_death = false
         super(**args)
@@ -58,8 +50,9 @@ module Magic
       end
 
       def fight(target, assigned_damage = power)
-        puts "#{self} fights #{target}, dealing #{assigned_damage} damage"
-        target.take_damage(assigned_damage)
+        game.notify!(
+          Events::DamageDealt.new(source: self, target: target, damage: assigned_damage)
+        )
         controller.gain_life(assigned_damage) if lifelink?
         if target.is_a?(Creature)
           target.mark_for_death! if deathtouch? || target.dead?

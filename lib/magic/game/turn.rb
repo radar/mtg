@@ -5,7 +5,7 @@ module Magic
 
       attr_reader :active_player, :number, :events, :combat
 
-      def_delegators :@game, :battlefield, :emblems
+      def_delegators :@game, :battlefield, :emblems, :players
       def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks
 
       state_machine :step, initial: :beginning do
@@ -142,8 +142,10 @@ module Magic
         events.each do |event|
           track_event(event)
           logger.debug "EVENT: #{event.inspect}"
+          next if event.is_a?(Events::DamageDealt) && battlefield.any? { |permanent| permanent.respond_to?(:prevent_damage!) && permanent.prevent_damage!(event) }
           emblems.each { |emblem| emblem.receive_event(event) }
           battlefield.receive_event(event)
+          players.each { |player| player.receive_event(event) }
         end
       end
 

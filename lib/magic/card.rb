@@ -3,8 +3,14 @@ module Magic
     extend Forwardable
     def_delegators :@game, :battlefield, :current_turn
 
+    class Counters < SimpleDelegator
+      def of_type(type)
+        select { |counter| counter.is_a?(type) }
+      end
+    end
+
     include Keywords
-    attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections, :delayed_responses
+    attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections, :delayed_responses, :counters
     attr_accessor :tapped
 
     attr_accessor :controller, :zone
@@ -48,6 +54,7 @@ module Magic
       @attachments = []
       @protections = []
       @delayed_responses = []
+      @counters = Counters.new([])
       super
     end
 
@@ -183,6 +190,10 @@ module Magic
 
     def receive_notification(event)
       case event
+      when Events::DamageDealt
+        return unless event.target == self
+
+        take_damage(event.damage)
       when Events::LeavingZone
         died! if event.card == self && event.death?
         left_the_battlefield! if event.card == self && event.from.battlefield?
