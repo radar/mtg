@@ -11,7 +11,7 @@ module Magic
             source: self,
             power: 1,
             toughness: 1,
-            condition: -> (creature) { creature.controller == controller }
+            condition: -> (permanent) { permanent.creature? && permanent.controller == controller }
           )
         ]
       end
