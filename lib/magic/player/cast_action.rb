@@ -38,8 +38,8 @@ module Magic
         base_cost = card.cost
 
         reduce_mana_cost_abilities = game.battlefield.static_abilities
+          .of_type(Abilities::Static::ReduceManaCost)
           .applies_to(card)
-          .select { |ability| ability.is_a?(Abilities::Static::ReduceManaCost) }
 
         reduce_mana_cost_abilities.each_with_object(base_cost) { |ability, cost| ability.apply(cost) }
       end

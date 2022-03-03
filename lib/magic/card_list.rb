@@ -28,10 +28,5 @@ module Magic
     def by_name(name)
       self.class.new(select { |c| c.name == name })
     end
-
-    def apply_ability(ability)
-      applicable_cards = select { |card| ability.applies_to?(card) }
-      applicable_cards.each { |card| ability.apply(card) }
-    end
   end
 end

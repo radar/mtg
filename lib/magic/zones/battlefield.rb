@@ -1,15 +1,16 @@
 module Magic
   module Zones
     class Battlefield < Zone
-      attr_reader :static_abilities
-
       def initialize(**args)
-        @static_abilities = StaticAbilities.new([])
         super(**args)
       end
 
       def battlefield?
         true
+      end
+
+      def static_abilities
+        StaticAbilities.new(@cards.flat_map(&:static_abilities))
       end
 
       def receive_event(event)

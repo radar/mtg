@@ -5,14 +5,14 @@ module Magic
       COST = { generic: 3 }
       TYPE_LINE = "Artifact Creature -- Constructor"
 
-      def entered_the_battlefield!
-        battlefield.static_abilities.add(
+      def static_abilities
+        [
           Abilities::Static::ReduceManaCost.new(
             source: self,
             reduction: { generic: 1 },
             applies_to: -> (c) { c.artifact? }
           )
-        )
+        ]
       end
     end
   end

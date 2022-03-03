@@ -9,6 +9,10 @@ module Magic
       delete(ability)
     end
 
+    def of_type(type)
+      select { |ability| ability.is_a?(type) }
+    end
+
     def select(...)
       self.class.new(super(...))
     end

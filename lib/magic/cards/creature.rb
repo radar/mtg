@@ -38,11 +38,19 @@ module Magic
       end
 
       def power
-        @base_power + @modifiers.sum(&:power) + @counters.sum(&:power) + @attachments.sum(&:power_buff)
+        @base_power +
+          @modifiers.sum(&:power) +
+          @counters.sum(&:power) +
+          @attachments.sum(&:power_buff) +
+          static_ability_buffs.sum(&:power)
       end
 
       def toughness
-        @base_toughness + @modifiers.sum(&:toughness) + @counters.sum(&:toughness) + @attachments.sum(&:toughness_buff)
+        @base_toughness +
+          @modifiers.sum(&:toughness) +
+          @counters.sum(&:toughness) +
+          @attachments.sum(&:toughness_buff) +
+          static_ability_buffs.sum(&:toughness)
       end
 
       def can_attack?
@@ -93,6 +101,12 @@ module Magic
         until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }
 
         super
+      end
+
+      private
+
+      def static_ability_buffs
+        battlefield.static_abilities.of_type(Abilities::Static::CreaturesGetBuffed)
       end
     end
   end

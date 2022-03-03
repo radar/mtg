@@ -13,9 +13,7 @@ RSpec.describe Magic::Cards::GloriousAnthem do
 
     context "entering the battlefield adds a static ability" do
       it "adds a creatures get buffed ability" do
-        glorious_anthem.entered_the_battlefield!
-        ability = game.battlefield.static_abilities.first
-        expect(ability).to be_a(Magic::Abilities::Static::CreaturesGetBuffed)
+        game.battlefield.add(glorious_anthem)
         expect(wood_elves.power).to eq(2)
         expect(wood_elves.toughness).to eq(2)
       end

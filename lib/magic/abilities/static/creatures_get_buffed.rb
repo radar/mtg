@@ -2,32 +2,12 @@ module Magic
   module Abilities
     module Static
       class CreaturesGetBuffed
-        attr_reader :source, :power, :toughness, :applied_to
-        def initialize(source:, power:, toughness:)
+        attr_reader :source, :power, :toughness
+        def initialize(source:, power:, toughness:, condition:)
           @source = source
           @power = power
           @toughness = toughness
           @applied_to = []
-        end
-
-        def applies_to?(card)
-          card.creature? && card.controller?(source.controller)
-        end
-
-        def applies_while_entering_the_battlefield?
-          true
-        end
-
-        def apply(card)
-          card.modifiers << self
-          @applied_to << card
-        end
-
-        def remove
-          @applied_to.each do |card|
-            card.power_modifiers.delete(self)
-            card.toughness_modifiers.delete(self)
-          end
         end
       end
     end

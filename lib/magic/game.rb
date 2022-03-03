@@ -38,18 +38,6 @@ module Magic
       player.join_game(self)
     end
 
-    def add_static_ability(ability)
-      battlefield.static_abilities.add(ability)
-      battlefield.cards.apply_ability(ability)
-    end
-
-    def remove_static_abilities_from(card)
-      abilities = battlefield.static_abilities.from(card)
-      abilities.each do |ability|
-        battlefield.static_abilities.remove(ability)
-      end
-    end
-
     def add_emblem(emblem)
       @emblems << emblem
     end
