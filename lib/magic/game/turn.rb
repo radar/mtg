@@ -112,7 +112,6 @@ module Magic
         @active_player = active_player
         @events = []
         @combat = CombatPhase.new(game: game)
-        @after_attackers_declared_callbacks = []
         super()
       end
 

@@ -106,7 +106,7 @@ module Magic
       private
 
       def static_ability_buffs
-        battlefield.static_abilities.of_type(Abilities::Static::CreaturesGetBuffed)
+        battlefield.static_abilities.of_type(Abilities::Static::CreaturesGetBuffed).applies_to(self)
       end
     end
   end

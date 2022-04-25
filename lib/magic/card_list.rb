@@ -12,7 +12,6 @@ module Magic
       self.class.new(select(&:planeswalker?))
     end
 
-
     def permanents
       self.class.new(select(&:permanent?))
     end
@@ -27,6 +26,14 @@ module Magic
 
     def by_name(name)
       self.class.new(select { |c| c.name == name })
+    end
+
+    def by_type(type)
+      self.class.new(select { |c| c.type?(type) })
+    end
+
+    def except(target)
+      self.class.new(reject { |c| c == target })
     end
   end
 end

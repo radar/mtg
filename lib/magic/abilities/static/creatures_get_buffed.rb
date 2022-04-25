@@ -2,12 +2,17 @@ module Magic
   module Abilities
     module Static
       class CreaturesGetBuffed
-        attr_reader :source, :power, :toughness
-        def initialize(source:, power:, toughness:, condition:)
+        attr_reader :source, :power, :toughness, :applicable_targets
+        def initialize(source:, power:, toughness:, applicable_targets:)
           @source = source
           @power = power
           @toughness = toughness
+          @applicable_targets = applicable_targets
           @applied_to = []
+        end
+
+        def applies_to?(target)
+          applicable_targets.call.include?(target)
         end
       end
     end
