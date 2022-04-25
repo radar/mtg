@@ -9,7 +9,7 @@ module Magic
       def resolve!
         add_effect(
           "DestroyTarget",
-          choices: battlefield.cards.select { |c| c.creature? || c.enchantment? }
+          choices: battlefield.cards.by_any_type("Creature", "Enchantment")
         )
         super
       end
