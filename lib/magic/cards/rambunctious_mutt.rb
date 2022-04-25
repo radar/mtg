@@ -1,18 +1,18 @@
 module Magic
   module Cards
-    AcidicSlime = Creature("Acidic Slime") do
+    RambunctiousMutt = Creature("Rambunctious Mutt") do
       cost generic: 3, green: 2
-      type "Creature -- Ooze"
+      type "Creature -- Dog"
       keywords :deathtouch
       power 2
       toughness 2
     end
 
-    class AcidicSlime < Creature
+    class RambunctiousMutt < Creature
       def entered_the_battlefield!
         add_effect(
           "DestroyTarget",
-          choices: game.battlefield.cards.by_any_type("Artifact", "Enchantment", "Land"),
+          choices: game.battlefield.cards.by_any_type("Artifact", "Enchantment").not_controlled_by(controller),
         )
 
         super

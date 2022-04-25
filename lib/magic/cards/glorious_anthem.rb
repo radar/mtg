@@ -11,7 +11,7 @@ module Magic
             source: self,
             power: 1,
             toughness: 1,
-            condition: -> (permanent) { permanent.creature? && permanent.controller == controller }
+            applicable_targets: -> { battlefield.creatures.controlled_by(controller) }
           )
         ]
       end

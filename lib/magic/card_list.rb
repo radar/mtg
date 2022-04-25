@@ -4,6 +4,10 @@ module Magic
       self.class.new(select { |card| card.controller == player })
     end
 
+    def not_controlled_by(player)
+      self.class.new(select { |card| card.controller != player })
+    end
+
     def creatures
       self.class.new(select(&:creature?))
     end
@@ -28,9 +32,10 @@ module Magic
       self.class.new(select { |c| c.name == name })
     end
 
-    def by_type(type)
-      self.class.new(select { |c| c.type?(type) })
+    def by_any_type(*types)
+      self.class.new(select { |c| types.any? { |type| c.type?(type) } })
     end
+    alias_method :by_type, :by_any_type
 
     def except(target)
       self.class.new(reject { |c| c == target })
