@@ -64,7 +64,8 @@ module Magic
       )
     end
 
-    def played_a_land!
+    def play_land(land)
+      land.resolve!
       @lands_played += 1
     end
 
@@ -121,23 +122,16 @@ module Magic
       card.controller = self
     end
 
-    def prepare_to_cast!(card)
+    def prepare_to_cast(card)
       cast_action(card)
     end
 
-    def prepare_to_activate(ability)
-      activate_ability_action(ability)
-    end
-
-    def pay_and_cast!(cost, card)
-      action = cast_action(card)
-      action.pay(cost)
-      action.perform!
-    end
-
-    def cast!(card)
-      action = cast_action(card)
-      action.perform!
+    def activate_ability(ability)
+      ActivateAbilityAction.new(
+        game: game,
+        player: self,
+        ability: ability
+      )
     end
 
     def tap!(card)
@@ -159,19 +153,11 @@ module Magic
 
     private
 
-    def cast_action(card, targets: [])
+    def cast_action(card)
       CastAction.new(
         player: self,
         game: game,
         card: card,
-        targets: targets,
-      )
-    end
-
-    def activate_ability_action(ability)
-      ActivateAbilityAction.new(
-        player: self,
-        ability: ability
       )
     end
   end

@@ -12,8 +12,9 @@ RSpec.describe Magic::Cards::LlanowarElves do
 
     it "can be tapped for one green mana" do
       ability = subject.activated_abilities.first
-      activation = p1.prepare_to_activate(ability)
+      activation = p1.activate_ability(ability)
       activation.activate!
+      game.stack.resolve!
       expect(p1.mana_pool[:green]).to eq(1)
     end
   end

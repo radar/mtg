@@ -58,10 +58,16 @@ RSpec.describe Magic::Cards::MangaraTheDiplomat do
 
   context "when opponent casts spell" do
     it "p1 casts two wood elves, p2 draws" do
-      p1.add_mana({ green: 6 })
-      p1.pay_and_cast!({ generic: { green: 2 }, green: 1 }, wood_elves_1)
       expect(p2).to receive(:draw!)
-      p1.pay_and_cast!({ generic: { green: 2 }, green: 1 }, wood_elves_2)
+      p1.add_mana({ green: 6 })
+      cast_action = p1.prepare_to_cast(wood_elves_1)
+      cast_action.pay({ generic: { green: 2 }, green: 1 })
+      cast_action.perform!
+      cast_action = p1.prepare_to_cast(wood_elves_2)
+      cast_action.pay({ generic: { green: 2 }, green: 1 })
+      cast_action.perform!
+
+      game.stack.resolve!
     end
   end
 end

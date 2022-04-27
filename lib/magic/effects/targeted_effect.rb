@@ -3,9 +3,10 @@ module Magic
     class TargetedEffect
       class InvalidTarget < StandardError; end;
 
-      attr_reader :source, :choices
+      attr_reader :source, :targets, :choices
 
-      def initialize(source:, choices: [])
+      def initialize(source:, targets: [], choices: source.target_choices)
+        @targets = targets
         @source = source
         @choices = choices
       end

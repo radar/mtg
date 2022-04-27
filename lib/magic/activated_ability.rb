@@ -28,8 +28,8 @@ module Magic
       costs.each { |cost| cost.finalize!(player) }
     end
 
-    def activate!
-      ability.call
+    def activate!(**args)
+      ability.call(**args)
     end
   end
 end

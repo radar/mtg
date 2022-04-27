@@ -17,13 +17,17 @@ module Magic
                 battlefield.creatures.controlled_by(controller).any?(&:flying?)
               }
             ],
-            ability: -> {
-              add_effect(
-                "TapTarget", choices: battlefield.creatures
-              )
+            ability: -> (targets:) {
+              Effects::TapTarget.new(source: self, choices: tap_choices, targets: targets).resolve
             }
           )
         ]
+      end
+
+      private
+
+      def tap_choices
+        battlefield.creatures
       end
     end
   end

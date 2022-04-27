@@ -3,12 +3,12 @@ module Magic
     class CastAction
       attr_reader :game, :player, :card, :cost, :targets
 
-      def initialize(game:, player:, card:, targets: nil)
+      def initialize(game:, player:, card:)
         @game = game
         @player = player
         @card = card
         @cost = Costs::Mana.new(apply_cost_reductions(card))
-        @targets = targets
+        @targets = []
       end
 
       def can_cast?
@@ -19,17 +19,21 @@ module Magic
         cost.can_pay?(player)
       end
 
+      def targeting(*targets)
+        @targets = targets
+        self
+      end
+
       def pay(payment)
         cost.pay(player, payment)
+        self
       end
 
       def perform!
         cost.finalize!(player)
-        targets.any? ? card.targeted_cast!(targets: targets) : card.cast!
+        targets.any? ? card.resolve!(targets: targets) : card.resolve!
 
         game.notify!(Events::SpellCast.new(spell: card, player: player))
-
-        player.played_a_land! if card.land?
       end
 
       private

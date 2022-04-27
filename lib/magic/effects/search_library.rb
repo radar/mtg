@@ -1,17 +1,11 @@
 module Magic
   module Effects
     class SearchLibrary < TargetedEffect
-      attr_reader :library, :condition, :resolve_action
+      attr_reader :resolve_action
 
-      def initialize(library:, condition:, resolve_action:, **args)
-        @library = library
-        @condition = condition
+      def initialize(resolve_action:, **args)
         @resolve_action = resolve_action
         super(**args)
-      end
-
-      def choices
-        library.cards.select(&condition)
       end
 
       def resolve(target)

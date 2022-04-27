@@ -9,8 +9,7 @@ module Magic
       def died!
         add_effect(
           "SearchGraveyard",
-          graveyard: controller.graveyard,
-          condition: -> (c) { c.creature? && c.type?("Elf") },
+          choices: controller.graveyard.by_any_type("Elf"),
           resolve_action: -> (c) { c.move_to_hand!(controller) }
         )
       end

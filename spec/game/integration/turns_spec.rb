@@ -32,7 +32,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_1.first_main!
 
     island = p1.hand.by_name("Island").first
-    p1.cast!(island)
+    p1.play_land(island)
     island.tap!
     expect(p1.lands_played).to eq(1)
 
@@ -40,7 +40,8 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     expect(p1.can_cast?(island2)).to eq(false)
 
     aegis_turtle = p1.hand.by_name("Aegis Turtle").first
-    p1.pay_and_cast!({ blue: 1 }, aegis_turtle)
+
+    cast = p1.prepare_to_cast(aegis_turtle).pay(blue: 1).perform!
     game.stack.resolve!
     expect(aegis_turtle.zone).to be_battlefield
 
@@ -61,11 +62,11 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_2.first_main!
 
     mountain = p2.hand.by_name("Mountain").first
-    p2.cast!(mountain)
+    p2.play_land(mountain)
     mountain.tap!
 
     raging_goblin = p2.hand.by_name("Raging Goblin").first
-    p2.pay_and_cast!({ red: 1 }, raging_goblin)
+    p2.prepare_to_cast(raging_goblin).pay(red: 1).perform!
     game.stack.resolve!
     expect(raging_goblin.zone).to be_battlefield
 

@@ -30,21 +30,18 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
           it "taps a target creature" do
             expect(subject.activated_abilities.count).to eq(1)
             p1.add_mana(white: 5)
-            activation = p1.prepare_to_activate(ability)
+            activation = p1.activate_ability(ability).targeting(wood_elves)
             activation.pay(:mana, generic: { white: 1 }, white: 1)
             activation.activate!
+            game.stack.resolve!
             expect(subject).to be_tapped
-            tap_target = game.next_effect
-            expect(tap_target).to be_a(Magic::Effects::TapTarget)
-            expect(tap_target.choices).to include(wood_elves, aven_gagglemaster)
-            game.resolve_pending_effect(wood_elves)
             expect(wood_elves).to be_tapped
           end
         end
 
         context "when p1 does not control any creatures with flying" do
           it "cannot be activated" do
-            activation = p1.prepare_to_activate(ability)
+            activation = p1.activate_ability(ability)
             expect(activation.can_be_activated?(p1)).to eq(false)
           end
         end
@@ -54,7 +51,7 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
         before { subject.tap! }
 
         it "cannot be activated" do
-          activation = p1.prepare_to_activate(ability)
+          activation = p1.activate_ability(ability)
           expect(activation.can_be_activated?(p1)).to eq(false)
         end
       end

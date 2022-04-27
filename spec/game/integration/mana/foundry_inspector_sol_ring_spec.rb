@@ -27,13 +27,15 @@ RSpec.describe Magic::Game, "Mana spend -- Foundry Inspector + Free Sol Ring" do
 
         expect(p1.mana_pool[:red]).to eq(3)
         expect(p1.can_cast?(foundry_inspector)).to eq(true)
-        cast = p1.prepare_to_cast!(foundry_inspector)
+        cast = p1.prepare_to_cast(foundry_inspector)
         cast.pay(generic: { red: 3 })
         cast.perform!
         game.stack.resolve!
         expect(game.battlefield.creatures).to include(foundry_inspector)
         expect(p1.mana_pool[:red]).to eq(0)
-        p1.cast!(sol_ring)
+        cast = p1.prepare_to_cast(sol_ring)
+        expect(cast.cost).to be_zero
+        cast.perform!
         game.stack.resolve!
         expect(sol_ring.zone).to be_battlefield
       end

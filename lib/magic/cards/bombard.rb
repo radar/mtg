@@ -2,12 +2,16 @@ module Magic
   module Cards
     class Bombard < Instant
       NAME = "Bombard"
-      COST = { any: 2, red: 1 }
+      COST = { generic: 2, red: 1 }
 
-      def resolve!
+      def target_choices
+        game.battlefield.creatures
+      end
+
+      def resolve!(targets:)
         add_effect(
           "DealDamage",
-          choices: battlefield.creatures,
+          targets: targets,
           damage: 4,
         )
       end

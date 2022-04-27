@@ -14,7 +14,7 @@ module Magic
               destroy!
               add_effect(
                 "SearchLibraryBasicLandEntersTapped",
-                library: controller.library,
+                choices: controller.library.basic_lands
               )
             }
           )

@@ -1,8 +1,8 @@
 module Magic
   module Effects
     class TapTarget < TargetedEffect
-      def resolve(target)
-        target.tap!
+      def resolve
+        targets.map(&:tap!)
       end
     end
   end

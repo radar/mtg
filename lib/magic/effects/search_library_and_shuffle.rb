@@ -1,7 +1,7 @@
 module Magic
   module Effects
-    class SearchGraveyard < TargetedEffect
-      attr_reader :graveyard, :condition, :resolve_action
+    class SearchLibraryAndShuffle < TargetedEffect
+      attr_reader :resolve_action
 
       def initialize(resolve_action:, **args)
         @resolve_action = resolve_action
@@ -10,10 +10,7 @@ module Magic
 
       def resolve(target)
         resolve_action.call(target)
-      end
-
-      def resolve_single_choice
-        resolve_action.call(choices.first)
+        target.controller.shuffle!
       end
     end
   end
