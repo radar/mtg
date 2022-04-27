@@ -2,6 +2,15 @@ require 'spec_helper'
 
 RSpec.describe Magic::Costs::Mana do
 
+  context "cost reduction" do
+    subject { described_class.new({ generic: 3, red: 1 }).reduced_by(-> { 2 }, generic: 1) }
+
+    it "reduces generic cost by 2" do
+      expect(subject.cost).to eq({ generic: 1, red: 1 })
+      expect(subject.balance).to eq({ generic: 1, red: 1 })
+    end
+  end
+
   context "can_pay?" do
     let(:player) { Magic::Player.new }
 

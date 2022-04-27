@@ -13,6 +13,18 @@ module Magic
         @payments[:generic] = Hash.new(0)
       end
 
+      def reduced_by(count, change)
+        count.call.times do
+          @cost.merge!(change) do |key, original_cost, reduction|
+            original_cost - reduction.to_i
+          end
+        end
+
+        @balance = @cost.dup
+
+        self
+      end
+
       def zero?
         @cost.values.all?(&:zero?)
       end
