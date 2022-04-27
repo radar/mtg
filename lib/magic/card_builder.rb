@@ -9,7 +9,7 @@ module Magic
     end
 
     def Enchantment(name, &block)
-      Card(name, Magic::Cards::Sorcery, &block)
+      Card(name, Magic::Cards::Enchantment, &block)
     end
 
     def Creature(name, &block)

@@ -151,6 +151,10 @@ module Magic
       end
     end
 
+    def protected_from?(card)
+      game.battlefield.controlled_by(self).flat_map { |card| card.protections.player }.any? { |protection| protection.protected_from?(card) }
+    end
+
     private
 
     def cast_action(card)

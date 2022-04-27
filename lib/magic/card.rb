@@ -9,6 +9,12 @@ module Magic
       end
     end
 
+    class Protections < SimpleDelegator
+      def player
+        select { |protection| protection.protects_player? }
+      end
+    end
+
     include Keywords
     attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections, :delayed_responses, :counters
     attr_accessor :tapped
@@ -52,7 +58,7 @@ module Magic
       @cost = cost
       @tapped = tapped
       @attachments = []
-      @protections = []
+      @protections = Protections.new([])
       @delayed_responses = []
       @counters = Counters.new([])
       super

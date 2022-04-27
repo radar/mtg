@@ -3,9 +3,14 @@ module Magic
     class Protection
       attr_reader :condition, :until_eot
 
-      def initialize(condition:, until_eot:)
+      def initialize(condition:, until_eot: false, protects_player: false)
         @condition = condition
         @until_eot = until_eot
+        @protects_player = protects_player
+      end
+
+      def protects_player?
+        @protects_player
       end
 
       def until_eot?
