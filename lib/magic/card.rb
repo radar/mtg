@@ -181,6 +181,7 @@ module Magic
       move_zone!(controller.graveyard)
     end
     alias_method :discard!, :destroy!
+    alias_method :sacrifice!, :destroy!
 
     def exile!
       move_zone!(controller.exile)

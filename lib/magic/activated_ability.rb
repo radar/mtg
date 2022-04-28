@@ -19,6 +19,8 @@ module Magic
         Costs::Mana
       when :discard
         Costs::Discard
+      when :sacrifice
+        Costs::Sacrifice
       else
         raise "unknown cost type: #{cost_type}"
       end
