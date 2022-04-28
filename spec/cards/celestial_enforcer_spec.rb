@@ -10,7 +10,7 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
     game.battlefield.add(wood_elves)
   end
 
-  context "triggered ability" do
+  context "activated ability" do
     def ability
       subject.activated_abilities.first
     end

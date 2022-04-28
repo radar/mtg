@@ -1,11 +1,12 @@
 module Magic
   class ActivatedAbility
-    attr_reader :ability, :costs, :requirements
+    attr_reader :ability, :costs, :requirements, :targets
 
-    def initialize(ability:, costs: [], requirements: [])
+    def initialize(ability:, costs: [], requirements: [], targets: [])
       @ability = ability
       @costs = costs
       @requirements = requirements
+      @targets = targets
     end
 
     def can_be_activated?(player)
@@ -16,6 +17,8 @@ module Magic
       cost_type = case cost_type
       when :mana
         Costs::Mana
+      when :discard
+        Costs::Discard
       else
         raise "unknown cost type: #{cost_type}"
       end

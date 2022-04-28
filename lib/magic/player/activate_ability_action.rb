@@ -7,6 +7,7 @@ module Magic
         @game = game
         @player = player
         @ability = ability
+        @targets = ability.targets
       end
 
       def can_be_activated?(player)
@@ -36,7 +37,7 @@ module Magic
       end
 
       def resolve!
-        if targets
+        if targets.any?
           ability.activate!(targets: targets)
         else
           ability.activate!

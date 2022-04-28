@@ -7,6 +7,10 @@ module Magic
         super(card)
       end
 
+      def discard(card)
+        card.discard!
+      end
+
       def hand?
         true
       end
