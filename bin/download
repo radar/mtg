@@ -1,0 +1,279 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "json"
+require "net/http"
+
+class ManaCost
+  def self.parse(value)
+    value.scan(/\{(?:\d+|W|U|B|R|G)\}/).tally.map do |key, count|
+      case key
+      when "{W}" then "white: #{count}"
+      when "{U}" then "blue: #{count}"
+      when "{B}" then "black: #{count}"
+      when "{R}" then "red: #{count}"
+      when "{G}" then "green: #{count}"
+      else "generic: #{key[/(\d+)/, 1]}"
+      end
+    end.join(", ")
+  end
+end
+
+class Creature
+  COLORS = "white|blue|black|red|green"
+
+  attr_reader :card, :constant, :keywords, :protections, :abilities
+
+  def initialize(card)
+    @card = card
+    @constant = card[:name].gsub(/[^a-zA-Z]/, "")
+
+    @keywords = []
+    @protections = []
+    @abilities = []
+  end
+
+  def keyword(value)
+    @keywords << value
+  end
+
+  def protect(value)
+    @protections << value
+  end
+
+  def ability(value)
+    @abilities << value
+  end
+
+  def to_ruby
+    # These are the DSL methods that are going to be called in the body of
+    # the class.
+    methods = {
+      type: card[:type].inspect,
+      power: card[:power],
+      toughness: card[:toughness],
+    }
+
+    methods[:cost] = ManaCost.parse(card[:manaCost]) if card[:manaCost]
+    methods[:keywords] = keywords.map(&:inspect).join(", ") if keywords.any?
+
+    # First, print out the contents of the DSL.
+    output = +<<~DOC
+      #{constant} = Creature(#{card[:name].inspect}) do
+        #{methods.map { |key, value| "#{key} #{value}" }.join("\n  ")}
+      end
+    DOC
+
+    # Next, we're going to check if there's anything on this card that would
+    # require the explicit class to be written.
+    class_body = []
+
+    if protections.any?
+      class_body << <<~DOC
+        def initialize(...)
+          super
+
+          #{protections.map { |protection| "@protections << Protection.new(conditions: ->(card) { #{protection} }, until_eot: false)" }.join("\n  ")}
+        end
+      DOC
+    end
+
+    if abilities.any?
+      class_body << <<~DOC
+        def activated_abilities
+          [
+            #{abilities.map { |value| value.split("\n").join("\n    ") }.join(",\n")}
+          ]
+        end
+      DOC
+    end
+
+    if class_body.any?
+      output << <<~DOC
+
+        class #{constant} < Creature
+          #{class_body.map { |body| body.split("\n").join("\n  ") }.join("\n\n")}
+        end
+      DOC
+    end
+
+    output
+  end
+
+  def self.parse(card, text)
+    creature = new(card)
+    value = text
+
+    until value.empty?
+      case value
+      when /\A[,;] /, /\A\s+/
+      when /\Aflying/i
+        creature.keyword(:flying)
+      when /\Areach( \(this creature can block creatures with flying.\))?/i
+        creature.keyword(:reach)
+      when /\Alifelink( \(damage dealt by this creature also causes you to gain that much life\.\))?/i
+        creature.keyword(:lifelink)
+      when /\Afirst strike( \(this creature deals combat damage before creatures without first strike\.\))?/i
+        creature.keyword(:first_strike)
+      when /^\Ahaste/i
+        creature.keyword(:haste)
+      when /\Avigilance( \(attacking doesn't cause this creature to tap\.\))?/i
+        creature.keyword(:vigilance)
+      when /\Adeathtouch( \(any amount of damage this deals to a creature is enough to destroy it\.\))?/i
+        creature.keyword(:deathtouch)
+      when /\Adouble strike( \(this creature deals both first-strike and regular combat damage\.\))?/i
+        creature.keyword(:double_strike)
+      when /\Aindestructible/i
+        creature.keyword(:indestructable)
+      when /\Atrample( \(this creature can deal excess combat damage to the player or planeswalker it's attacking\.\))?/i
+        creature.keyword(:trample)
+      when /\Aprotection from creatures/i
+        creature.protect("card.creature?")
+      when /\Aprotection from (#{COLORS}) and from (#{COLORS})/i
+        creature.protect("(card.colors & [:#{$1}, :#{$2}]).any?")
+      when /\Aprotection from (#{COLORS})/i
+        creature.protect("card.colors.include?(:#{$1})")
+      when /\Aprotection from all colors/i
+        creature.protect("!card.colorless?")
+      when /\Aprotection from multicolored/i
+        creature.protect("card.multi_colored?")
+      when /\Aprotection from monocolored/i
+        creature.protect("card.colors.length == 1")
+      when /\Aprotection from mana value (\d+) or greater/i
+        creature.protect("card.converted_mana_cost >= #{$1}")
+      when /\Aprotection from (dragons|vampires)/i
+        creature.protect("card.creature? && card.type?(\"#{$1.capitalize[0...-1]}\")")
+      when /\Aprotection from artifacts/i
+        creature.protect("card.artifact?")
+      when /\Aprotection from enchantments/i
+        creature.protect("card.enchantment?")
+      when /\A\{T\}: Destroy target creature token\./
+        creature.ability(<<~DOC)
+          ActivatedAbility.new(
+            mana_cost: {},
+            additional_costs: [Costs::Tap.new(self)],
+            ability: -> { game.add_effect(Effects::Destroy.new(choices: battlefield.creatures.select { |card| card.is_a?(CreatureToken) })) }
+          )
+        DOC
+      when /\A\{T\}: Destroy target tapped creature\./
+        creature.ability(<<~DOC)
+          ActivatedAbility.new(
+            mana_cost: {},
+            additional_costs: [Costs::Tap.new(self)],
+            ability: -> { game.add_effect(Effects::Destroy.new(choices: battlefield.creatures.select(&:tapped?))) }
+          )
+        DOC
+      when /\A\{T\}: Destroy target Wall\./
+        creature.ability(<<~DOC)
+          ActivatedAbility.new(
+            mana_cost: {},
+            additional_costs: [Costs::Tap.new(self)],
+            ability: -> { game.add_effect(Effects::Destroy.new(choices: battlefield.creatures.select { |card| card.type?(\"Wall\") })) }
+          )
+        DOC
+      when /\A\{T\}: Destroy target (#{COLORS}) creature\./
+        creature.ability(<<~DOC)
+          ActivatedAbility.new(
+            mana_cost: {},
+            additional_costs: [Costs::Tap.new(self)],
+            ability: -> { game.add_effect(Effects::Destroy.new(choices: battlefield.creatures.select { |card| card.colors.include?(:#{$1}) })) }
+          )
+        DOC
+      when /\A\{T\}: You gain (\d+) life\./
+        creature.ability(<<~DOC)
+          ActivatedAbility.new(
+            mana_cost: {},
+            additional_costs: [Costs::Tap.new(self)],
+            ability: -> { game.add_effect(Effects::YouGainLife.new(source: self, life: #{$1})) }
+          )
+        DOC
+      when /\A\{T\}: Target creature gets ([+-]\d+)\/([+-]\d+) until end of turn\./
+        creature.ability(<<~DOC)
+          ActivatedAbility.new(
+            mana_cost: {},
+            additional_costs: [Costs::Tap.new(self)],
+            ability: -> { game.add_effect(Effects::ApplyBuff.new(power: #{$1}, toughness: #{$2}, choices: battlefield.creatures)) }
+          )
+        DOC
+      when /\A\{T\}: Tap target creature with power (\d+) or less\./
+        creature.ability(<<~DOC)
+          ActivatedAbility.new(
+            mana_cost: {},
+            additional_costs: [Costs::Tap.new(self)],
+            ability: -> { game.add_effect(Effects::TapTarget.new(choices: battlefield.creatures.select { |card| card.power <= #{$1} })) }
+          )
+        DOC
+      when /\A\{T\}: Tap target creature with toughness (\d+) or less\./
+        creature.ability(<<~DOC)
+          ActivatedAbility.new(
+            mana_cost: {},
+            additional_costs: [Costs::Tap.new(self)],
+            ability: -> { game.add_effect(Effects::TapTarget.new(choices: battlefield.creatures.select { |card| card.toughness <= #{$1} })) }
+          )
+        DOC
+      else
+        STDERR.puts("Error: #{value.inspect}")
+        return
+      end
+
+      value = $'
+    end
+  
+    creature
+  end
+end
+
+# This is an open API that returns information about cards. It _is_ rate
+# limited, but we're not explicitly handling that since this is just meant to be
+# run locally and you can just wait.
+query = ENV["PAGE"] ? "?page=#{ENV["PAGE"]}" : ""
+uri = URI("https://api.magicthegathering.io/v1/cards#{query}")
+
+# This is the list of constants that have already been created. It's appended to
+# when new cards are found in the API. The same card can be found in multiple
+# versions, so it's important to switch on name to make sure we don't duplicate.
+done = []
+
+# We're going to reuse the same HTTP connection for multiple requests to save
+# subsequent requests from having to perform DNS/SSL resolution multiple times.
+Net::HTTP.start(uri.host, uri.port, use_ssl: true) do |http|
+  # We're going to loop through each page. By default the API returns cards in
+  # batches of 100. At the time of writing this script, there were 646 pages.
+  until uri.nil?
+    STDERR.puts("\033[1m<#{uri}>\033[0m")
+
+    # First, create the request object and set any necessary headers.
+    request = Net::HTTP::Get.new(uri)
+    request["Content-Type"] = "application/json; charset=utf-8"
+
+    # Next, request the endpoint from the server and ensure it was a 200
+    # response.
+    response = http.request(request)
+    raise "Rate limited, got to #{done.length}" if response.code != "200"
+
+    # There is only one top-level key in the JSON response, which is "cards".
+    # It's an array with an expected shape. You can find the description of the
+    # shape here: https://docs.magicthegathering.io/#api_v1cards_list.
+    JSON.parse(response.body, symbolize_names: true)[:cards].each do |card|
+      case card
+      in { types: ["Creature"], text: } if creature = Creature.parse(card, text)
+        next if done.include?(creature.constant)
+        puts creature.to_ruby
+        done << creature.constant
+      else
+        # We're using pattern matching so that everything that isn't explicitly
+        # handled will end up here. If we don't have this else, it will raise an
+        # error so this clause is necessary.
+      end
+    end
+
+    # Pagination is handled through the "Link" response header. It contains two:
+    # the last page and the next page. In this case we're going to parse out the
+    # next page and set that to the new uri.
+    links = response["Link"].scan(/<(.+?)>; rel="(.+?)"/).to_h { |(value, key)| [key, value] }
+    uri = (URI(links["next"]) if links.key?("next"))
+  end
+end
+
+STDERR.puts(done.sort.inspect)
+STDERR.puts(done.length)
