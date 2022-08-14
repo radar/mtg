@@ -31,10 +31,16 @@ end
 
 RSpec.shared_context "two player game" do
   let(:game) { Magic::Game.start! }
-  let(:p1) { Magic::Player.new(name: "P1") }
-  let(:p2) { Magic::Player.new(name: "P2") }
+  let(:p1) { Magic::Player.new(name: "P1", library: p1_library) }
+  let(:p2) { Magic::Player.new(name: "P2", library: p2_library) }
 
   def p1_library
+    [
+      Card("Forest")
+    ]
+  end
+
+  def p2_library
     [
       Card("Forest")
     ]
@@ -61,7 +67,5 @@ RSpec.shared_context "two player game" do
     game.add_player(p1)
     game.add_player(p2)
     game.next_turn
-
-    p1_library.each { |card| p1.library.add(card) }
   end
 end

@@ -8,15 +8,12 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
   let(:aegis_turtle) { Card("Aegis Turtle") }
   let(:raging_goblin) { Card("Raging Goblin") }
 
-  before do
-    6.times { p1.library.add(island.dup) }
-    p1.library.add(aegis_turtle)
-    p1.library.add(island.dup)
-    p1.library.add(aegis_turtle.dup)
+  let(:p1_library) do
+    6.times.map { island.dup } + [aegis_turtle, island.dup, aegis_turtle.dup]
+  end
 
-    6.times { p2.library.add(mountain.dup) }
-    p2.library.add(raging_goblin)
-    p2.library.add(mountain.dup)
+  let(:p2_library) do
+    6.times.map { mountain.dup } + [raging_goblin, mountain.dup]
   end
 
   it "walks through two turns" do
