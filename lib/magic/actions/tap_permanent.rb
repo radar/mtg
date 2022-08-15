@@ -9,6 +9,11 @@ module Magic
 
       def perform
         permanent.tap!
+        game.notify!(
+          Events::PermanentTapped.new(
+            permanent: permanent
+          )
+        )
       end
     end
   end

@@ -113,7 +113,6 @@ module Magic
         )
       )
       card.move_to_hand!(self)
-      card.controller = self
     end
 
     def prepare_to_cast(card)
