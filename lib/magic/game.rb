@@ -48,6 +48,10 @@ module Magic
       end
     end
 
+    def take_action(action)
+      current_turn.take_action(action)
+    end
+
     def notify!(*events)
       current_turn.notify!(*events)
     end

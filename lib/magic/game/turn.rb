@@ -3,7 +3,7 @@ module Magic
     class Turn
       extend Forwardable
 
-      attr_reader :active_player, :number, :events, :combat
+      attr_reader :active_player, :number, :events, :combat, :actions
 
       def_delegators :@game, :battlefield, :emblems, :players
       def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks
@@ -18,8 +18,6 @@ module Magic
         end
 
         after_transition to: :upkeep do |turn|
-          turn.active_player.reset_lands_played
-
           turn.notify!(
             Events::BeginningOfUpkeep.new
           )
@@ -110,9 +108,15 @@ module Magic
         @logger.formatter = -> (_, _, _, msg) { "#{msg}\n" }
         @game = game
         @active_player = active_player
+        @actions = []
         @events = []
         @combat = CombatPhase.new(game: game)
         super()
+      end
+
+      def take_action(action)
+        @actions << action
+        action.perform
       end
 
       def attackers_declared!

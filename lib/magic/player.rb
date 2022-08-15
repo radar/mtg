@@ -1,6 +1,6 @@
 module Magic
   class Player
-    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :lands_played
+    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life
 
     class UnpayableMana < StandardError; end
 
@@ -22,7 +22,6 @@ module Magic
       @mana_pool = mana_pool
       @floating_mana = floating_mana
       @life = life
-      @lands_played = 0
     end
 
     def inspect
@@ -64,13 +63,8 @@ module Magic
       )
     end
 
-    def play_land(land)
-      land.resolve!
-      @lands_played += 1
-    end
-
-    def reset_lands_played
-      @lands_played = 0
+    def lands_played
+      game.current_turn.actions.count { |action| action.player == self && action.is_a?(Magic::Actions::PlayLand) }
     end
 
     def max_lands_per_turn
@@ -140,6 +134,10 @@ module Magic
 
     def join_game(game)
       @game = game
+    end
+
+    def permanents
+      game.battlefield.controlled_by(self).permanents
     end
 
     def receive_event(event)

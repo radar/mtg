@@ -166,7 +166,8 @@ module Magic
       controller == other_controller
     end
 
-    def resolve!
+    def resolve!(controller = nil)
+      self.controller = controller if controller
       move_zone!(game.battlefield)
     end
 

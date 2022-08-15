@@ -28,19 +28,26 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_1.draw!
     turn_1.first_main!
 
-    island = p1.hand.by_name("Island").first
-    p1.play_land(island)
-    island.tap!
+    # expect(p1.possible_actions.any? { |action| action.is_a?(Magic::Actions::PlayLand) }).to eq(true)
+    action = Magic::Actions::PlayLand.new(player: p1, zone: p1.hand, name: "Island")
+    game.take_action(action)
+    expect(p1.permanents.by_name("Island").count).to eq(1)
     expect(p1.lands_played).to eq(1)
+
+    island = p1.permanents.by_name("Island").first
+    action = Magic::Actions::TapPermanent.new(player: p1, permanent: island)
+    game.take_action(action)
+    expect(p1.mana_pool).to eq(blue: 1)
 
     island2 = p1.hand.by_name("Island").first
     expect(p1.can_cast?(island2)).to eq(false)
 
     aegis_turtle = p1.hand.by_name("Aegis Turtle").first
-
-    cast = p1.prepare_to_cast(aegis_turtle).pay(blue: 1).perform!
+    action = Magic::Actions::Cast.new(player: p1, card: aegis_turtle, cost: { blue: 1 } )
+    game.take_action(action)
     game.stack.resolve!
     expect(aegis_turtle.zone).to be_battlefield
+    expect(p1.permanents.by_name("Aegis Turtle").count).to eq(1)
 
     turn_1.beginning_of_combat!
     turn_1.declare_attackers!
@@ -58,14 +65,20 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_2.draw!
     turn_2.first_main!
 
-    mountain = p2.hand.by_name("Mountain").first
-    p2.play_land(mountain)
-    mountain.tap!
+    action = Magic::Actions::PlayLand.new(player: p2, zone: p2.hand, name: "Mountain")
+    game.take_action(action)
+    mountain = p2.permanents.by_name("Mountain").first
+    action = Magic::Actions::TapPermanent.new(player: p2, permanent: mountain)
+    game.take_action(action)
+    expect(p2.mana_pool).to eq(red: 1)
 
     raging_goblin = p2.hand.by_name("Raging Goblin").first
-    p2.prepare_to_cast(raging_goblin).pay(red: 1).perform!
+    action = Magic::Actions::Cast.new(player: p2, card: raging_goblin, cost: { red: 1 })
+    game.take_action(action)
+
     game.stack.resolve!
     expect(raging_goblin.zone).to be_battlefield
+    expect(p2.permanents.by_name("Raging Goblin").count).to eq(1)
 
     turn_2.beginning_of_combat!
     turn_2.declare_attackers!

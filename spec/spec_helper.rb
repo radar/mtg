@@ -42,7 +42,7 @@ RSpec.shared_context "two player game" do
 
   def p2_library
     [
-      Card("Forest")
+      Card("Mountain")
     ]
   end
 
