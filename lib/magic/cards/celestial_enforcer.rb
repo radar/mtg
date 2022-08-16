@@ -14,7 +14,7 @@ module Magic
             costs: [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(self)],
             requirements: [
               -> {
-                battlefield.creatures.controlled_by(controller).any?(&:flying?)
+                controller.creatures.any?(&:flying?)
               }
             ],
             ability: -> (targets:) {

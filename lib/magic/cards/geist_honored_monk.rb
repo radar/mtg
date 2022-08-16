@@ -15,7 +15,7 @@ module Magic
       private
 
       def controlled_creatures_count
-        battlefield.creatures.controlled_by(controller).count
+        controller.creatures.count
       end
     end
   end

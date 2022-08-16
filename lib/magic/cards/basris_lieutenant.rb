@@ -17,7 +17,7 @@ module Magic
         add_effect(
           "AddCounter",
           counter_type: Counters::Plus1Plus1,
-          choices: battlefield.creatures.controlled_by(controller),
+          choices: controller.creatures,
         )
       end
 

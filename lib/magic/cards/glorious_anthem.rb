@@ -11,7 +11,7 @@ module Magic
             source: self,
             power: 1,
             toughness: 1,
-            applicable_targets: -> { battlefield.creatures.controlled_by(controller) }
+            applicable_targets: -> { controller.creatures }
           )
         ]
       end

@@ -15,7 +15,7 @@ module Magic
             token = Tokens::Soldier.new(game: game, controller: controller)
             token.resolve!
 
-            game.battlefield.creatures.controlled_by(controller).each do |creature|
+            controller.creatures.each do |creature|
               creature.add_counter(Counters::Plus1Plus1)
             end
           end
