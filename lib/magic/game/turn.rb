@@ -116,17 +116,30 @@ module Magic
 
       def take_action(action)
         @actions << action
+        puts "ACTION: #{action.inspect}"
         action.perform
       end
 
+      def take_actions(*actions)
+        actions.each { take_action(_1) }
+      end
+
       def attackers_declared!
-        attackers_declared = Events::AttackersDeclared.new(
+        combat.attacks.each do |attack|
+          attack_declared = Events::AttackDeclared.new(
+            active_player: active_player,
+            turn: number,
+            attack: attack,
+          )
+          notify!(attack_declared)
+        end
+
+        notify!(Events::AttackersDeclared.new(
           active_player: active_player,
           turn: number,
-          attacks: combat.attacks,
-        )
+          attacks: attacks,
+        ))
 
-        notify!(attackers_declared)
         if combat.attackers_without_targets?
           finalize_attackers!
         else

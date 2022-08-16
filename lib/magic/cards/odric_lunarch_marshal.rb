@@ -25,11 +25,10 @@ module Magic
             :vigilance,
           ]
 
-          controlled_creatures = battlefield.creatures.controlled_by(controller)
           applicable_keywords.each do |keyword|
-            next unless controlled_creatures.any? { |creature| creature.has_keyword?(keyword) }
+            next unless controller.creatures.any? { |creature| creature.has_keyword?(keyword) }
 
-            controlled_creatures.each do |creature|
+            controller.creatures.each do |creature|
               next if creature.has_keyword?(keyword)
               puts "Granting #{keyword} to #{creature}"
               creature.grant_keyword(keyword, until_eot: true)

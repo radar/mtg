@@ -3,9 +3,9 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
   include_context "two player game"
 
-  let(:odric) { Card("Odric, Lunarch Marshal") }
-  let(:wood_elves) { Card("Wood Elves") }
-  let(:vastwood_gorger) { Card("Vastwood Gorger") }
+  let(:odric) { Card("Odric, Lunarch Marshal", controller: p1) }
+  let(:wood_elves) { Card("Wood Elves", controller: p2) }
+  let(:vastwood_gorger) { Card("Vastwood Gorger", controller: p2) }
 
   before do
     game.battlefield.add(odric)

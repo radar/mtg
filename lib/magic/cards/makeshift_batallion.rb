@@ -9,8 +9,10 @@ module Magic
       def receive_notification(event)
         case event
         when Events::AttackersDeclared
-          return unless event.attacks.any? { |attack| attack.attacker == self }
-          return if event.attacks.count < 3
+          attackers_declared_events = current_turn.actions.select { |action| action.is_a?(Magic::Actions::DeclareAttacker) }
+
+          return if attackers_declared_events.none? { |event| event.attacker == self }
+          return if attackers_declared_events.count < 3
 
           add_counter(Counters::Plus1Plus1)
         end

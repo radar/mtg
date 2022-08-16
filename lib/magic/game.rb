@@ -5,6 +5,7 @@ module Magic
     attr_reader :battlefield, :choices, :stack, :players, :emblems, :current_turn
 
     def_delegators :@stack, :effects, :add_effect, :resolve_pending_effect, :next_effect
+    def_delegators :@current_turn, :take_action, :take_actions
 
     def self.start!(players: [])
       new.tap do |game|
@@ -46,10 +47,6 @@ module Magic
       players.each do |player|
         7.times { player.draw! }
       end
-    end
-
-    def take_action(action)
-      current_turn.take_action(action)
     end
 
     def notify!(*events)

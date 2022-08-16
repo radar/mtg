@@ -139,6 +139,10 @@ module Magic
       game.battlefield.controlled_by(self).permanents
     end
 
+    def creatures
+      permanents.creatures
+    end
+
     def receive_event(event)
       case event
       when Events::DamageDealt
@@ -149,7 +153,7 @@ module Magic
     end
 
     def protected_from?(card)
-      game.battlefield.controlled_by(self).flat_map { |card| card.protections.player }.any? { |protection| protection.protected_from?(card) }
+      permanents.flat_map { |card| card.protections.player }.any? { |protection| protection.protected_from?(card) }
     end
 
     private
