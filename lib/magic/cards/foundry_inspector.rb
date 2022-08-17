@@ -1,9 +1,10 @@
 module Magic
   module Cards
-    class FoundryInspector < Creature
-      NAME = "Foundry Inspector"
-      COST = { generic: 3 }
-      TYPE_LINE = "Artifact Creature -- Constructor"
+    FoundryInspector = Creature("Foundry Inspector") do
+      cost generic: 3
+      type "Artifact Creature -- Constructor"
+      power 3
+      toughness 2
 
       def static_abilities
         [

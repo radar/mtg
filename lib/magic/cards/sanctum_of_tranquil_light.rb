@@ -10,7 +10,7 @@ module Magic
           ActivatedAbility.new(
             costs: [
               Costs::Mana.new(generic: 5, white: 1)
-              .reduced_by(-> { controller.permanents.by_any_type("Shrine").count }, generic: 1)
+                .reduced_by(generic: -> { controller.permanents.by_any_type("Shrine").count })
             ],
             ability: -> (targets:) {
               Effects::TapTarget.new(source: self, choices: tap_choices, targets: targets).resolve

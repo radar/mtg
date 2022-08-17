@@ -53,8 +53,7 @@ module Magic
       @game = game
       @controller = controller
       @zone = controller.library
-      cost = self.class::COST.dup
-      cost.default = 0
+      cost = Costs::Mana.new(self.class::COST.dup)
       @cost = cost
       @tapped = tapped
       @attachments = []
@@ -104,23 +103,24 @@ module Magic
       type?("Enchantment")
     end
 
-    def converted_mana_cost
-      cost.values.sum
+    def mana_value
+      cost.mana_value
     end
+    alias_method :cmc, :mana_value
+    alias_method :converted_mana_cost, :mana_value
 
     def multi_colored?
       colors.count > 1
     end
 
     def colors
-      cost.keys.reject { |k| k == :generic || k == :colorless }
+      cost.colors
     end
 
     def colorless?
       colors.count == 0
     end
 
-    alias_method :cmc, :converted_mana_cost
 
     def move_to_hand!(target_controller)
       move_zone!(target_controller.hand)

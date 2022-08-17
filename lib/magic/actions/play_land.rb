@@ -1,12 +1,16 @@
 module Magic
   module Actions
     class PlayLand < Action
-      attr_reader :name
+      attr_reader :name, :zone
 
       def initialize(zone:, name:, **args)
         @zone = zone
         @name = name
         super(**args)
+      end
+
+      def inspect
+        "#<Actions::PlayLand name: #{name}, player: #{player.inspect}>"
       end
 
       def perform

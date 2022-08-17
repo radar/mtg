@@ -18,10 +18,7 @@ module Magic
         end
 
         def apply(cost)
-          @reduction.each do |mana, count|
-            cost[mana] -= count
-            cost[mana] = 0 if cost[mana] < 0
-          end
+          cost.reduced_by(@reduction)
         end
 
         def remove

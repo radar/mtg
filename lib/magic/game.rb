@@ -73,7 +73,10 @@ module Magic
     end
 
     def move_dead_creatures_to_graveyard
-      battlefield.creatures.dead.each(&:destroy!)
+      battlefield.creatures.dead.each do |creature|
+        puts "#{creature.name} died, moving to graveyard."
+        creature.destroy!
+      end
     end
   end
 end

@@ -26,17 +26,18 @@ RSpec.describe Magic::Game, "Mana spend -- Foundry Inspector + Free Sol Ring" do
         mountains.each { |mountain| p1.tap!(mountain) }
 
         expect(p1.mana_pool[:red]).to eq(3)
-        expect(p1.can_cast?(foundry_inspector)).to eq(true)
-        cast = p1.prepare_to_cast(foundry_inspector)
-        cast.pay(generic: { red: 3 })
-        cast.perform!
-        game.stack.resolve!
-        expect(game.battlefield.creatures).to include(foundry_inspector)
-        expect(p1.mana_pool[:red]).to eq(0)
-        cast = p1.prepare_to_cast(sol_ring)
-        expect(cast.cost).to be_zero
-        cast.perform!
-        game.stack.resolve!
+        action = Magic::Actions::Cast.new(player: p1, card: foundry_inspector)
+        expect(action.can_perform?).to eq(true)
+        action.pay_mana(generic: { red: 3 } )
+        game.take_action(action)
+        game.tick!
+
+
+        action = Magic::Actions::Cast.new(player: p1, card: sol_ring)
+        expect(action.can_perform?).to eq(true)
+        game.take_action(action)
+
+        game.tick!
         expect(sol_ring.zone).to be_battlefield
       end
     end

@@ -13,11 +13,18 @@ module Magic
         @payments[:generic] = Hash.new(0)
       end
 
-      def reduced_by(count, change)
-        count.call.times do
-          @cost.merge!(change) do |key, original_cost, reduction|
-            original_cost - reduction.to_i
-          end
+      def mana_value
+        @cost.values.sum
+      end
+
+      def colors
+        cost.keys.reject { |k| k == :generic || k == :colorless }
+      end
+
+      def reduced_by(change)
+        @cost.merge!(change) do |key, original_cost, reduction|
+          amount = reduction.respond_to?(:call) ? reduction.call : reduction
+          original_cost - amount
         end
 
         @balance = @cost.dup
@@ -44,7 +51,7 @@ module Magic
         raise CannotPay unless can_pay?(player)
 
         pay_generic(payment[:generic]) if payment[:generic]
-        pay_colors(payment.slice(*colors))
+        pay_colors(payment.slice(*Magic::Mana::COLORS))
       end
 
       def finalize!(player)
@@ -78,12 +85,8 @@ module Magic
         balance.values.any?(&:negative?)
       end
 
-      def colors
-        Magic::Mana::COLORS
-      end
-
       def color_costs
-        cost.slice(*colors)
+        cost.slice(*Magic::Mana::COLORS)
       end
 
       def deduct_from_pool(pool, mana)

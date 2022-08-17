@@ -40,10 +40,12 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     expect(p1.mana_pool).to eq(blue: 1)
 
     island2 = p1.hand.by_name("Island").first
-    expect(p1.can_cast?(island2)).to eq(false)
+    action = Magic::Actions::Cast.new(player: p1, card: island2)
+    expect(action.can_perform?).to eq(false)
 
     aegis_turtle = p1.hand.by_name("Aegis Turtle").first
-    action = Magic::Actions::Cast.new(player: p1, card: aegis_turtle, cost: { blue: 1 } )
+    action = Magic::Actions::Cast.new(player: p1, card: aegis_turtle)
+    action.pay_mana(blue: 1)
     game.take_action(action)
     game.stack.resolve!
     expect(aegis_turtle.zone).to be_battlefield
@@ -73,7 +75,8 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     expect(p2.mana_pool).to eq(red: 1)
 
     raging_goblin = p2.hand.by_name("Raging Goblin").first
-    action = Magic::Actions::Cast.new(player: p2, card: raging_goblin, cost: { red: 1 })
+    action = Magic::Actions::Cast.new(player: p2, card: raging_goblin)
+    action.pay_mana(red: 1)
     game.take_action(action)
 
     game.stack.resolve!
@@ -118,6 +121,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
 
     expect(p1.lands_played).to eq(0)
     island = p1.hand.by_name("Island").first
-    expect(p1.can_cast?(island)).to be(true)
+    action = Magic::Actions::Cast.new(player: p1, card: island)
+    expect(action.can_perform?).to eq(true)
   end
 end

@@ -13,7 +13,6 @@ module Magic
       end
 
       def resolve
-        return if card == source
         return unless card.creature?
 
         source.controller.gain_life(life)

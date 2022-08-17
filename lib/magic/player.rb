@@ -101,10 +101,6 @@ module Magic
       end
     end
 
-    def can_cast?(card)
-      cast_action(card).can_cast?
-    end
-
     def draw!
       card = library.draw
       game.notify!(
@@ -113,10 +109,6 @@ module Magic
         )
       )
       card.move_to_hand!(self)
-    end
-
-    def prepare_to_cast(card)
-      cast_action(card)
     end
 
     def activate_ability(ability)
@@ -154,16 +146,6 @@ module Magic
 
     def protected_from?(card)
       permanents.flat_map { |card| card.protections.player }.any? { |protection| protection.protected_from?(card) }
-    end
-
-    private
-
-    def cast_action(card)
-      CastAction.new(
-        player: self,
-        game: game,
-        card: card,
-      )
     end
   end
 end

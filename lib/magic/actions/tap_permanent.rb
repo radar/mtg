@@ -7,6 +7,10 @@ module Magic
         super(**args)
       end
 
+      def inspect
+        "#<Actions::TapPermanent permanent: #{permanent.name}, player: #{player.inspect}>"
+      end
+
       def perform
         permanent.tap!
         game.notify!(
