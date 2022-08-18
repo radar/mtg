@@ -6,6 +6,14 @@ module CardHelper
   def Card(name, **args)
     Magic::Cards.const_get(name.gsub(/[^a-z]/i, "").gsub(/\s(a-z)/) { $1.upcase }).new(game: game, **args)
   end
+
+  def Permanent(name, **args)
+    Magic::Permanent.new(game: game, card: Card(name), **args)
+  end
+
+  def ResolvePermanent(name, **args)
+    Magic::Permanent.resolve(game: game, card: Card(name), **args)
+  end
 end
 
 module PlayerHelper

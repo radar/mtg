@@ -236,8 +236,8 @@ module Magic
       true
     end
 
-    def add_effect(klass, **args)
-      game.add_effect(Effects.const_get(klass).new(**args.merge(source: self)))
+    def etb_triggers
+      []
     end
 
     def static_abilities

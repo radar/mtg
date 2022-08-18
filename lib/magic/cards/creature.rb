@@ -15,6 +15,11 @@ module Magic
         super(**args)
       end
 
+      def inspect
+        "#<Magic::Permanent name:#{card.name} controller:#{controller.name}>"
+      end
+      alias_method :to_s, :inspect
+
       def alive?
         (toughness - damage).positive?
       end

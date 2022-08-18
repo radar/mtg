@@ -9,15 +9,14 @@ module Magic
     end
 
     class AvenGagglemaster < Creature
-      def entered_the_battlefield!
-        flying_creatures = battlefield
-          .creatures
-          .controlled_by(controller)
-          .select(&:flying?)
-
-
-        controller.gain_life(2 * flying_creatures.count)
+      class ETB < TriggeredAbility::EnterTheBattlefield
+        def perform
+          flying_creatures = controller.creatures.count(&:flying?)
+          controller.gain_life(2 * flying_creatures)
+        end
       end
+
+      def etb_triggers = [ETB]
     end
   end
 end

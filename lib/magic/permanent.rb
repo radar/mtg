@@ -31,7 +31,6 @@ module Magic
       permanent
     end
 
-
     def initialize(game:, controller:, card:)
       @game = game
       @controller = controller
@@ -49,12 +48,12 @@ module Magic
     end
 
     def inspect
-      "#<Magic::Permanent name:#{card.name} controller:#{player.name}>"
+      "#<Magic::Permanent name:#{card.name} controller:#{controller.name}>"
     end
 
     alias_method :to_s, :inspect
 
-    def move_zone!(from:, to:)
+    def move_zone!(from: zone, to:)
       game.notify!(
         Events::LeavingZoneTransition.new(
           self,
@@ -98,7 +97,9 @@ module Magic
     end
 
     def entered_the_battlefield!
-      card.entered_the_battlefield!
+      card.etb_triggers.each do |trigger|
+        trigger.new(game: game, permanent: self).perform
+      end
     end
 
     def type?(type)
@@ -162,7 +163,11 @@ module Magic
     end
 
     def destroy!
-      move_zone!(from: zone, to: controller.graveyard)
+      move_zone!(to: controller.graveyard)
+    end
+
+    def exile!
+      move_zone!(to: controller.exile)
     end
 
     def delayed_response(turn:, event_type:, response:)

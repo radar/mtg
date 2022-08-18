@@ -1,12 +1,13 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::AcidicSlime do
-  let(:game) { Magic::Game.start! }
+  include_context "two player game"
+
   subject { Card("Acidic Slime") }
 
-  let(:land) { Card("Island") }
-  let(:enchantment) { Card("Glorious Anthem") }
-  let(:artifact) { Card("Sol Ring") }
+  let(:land) { Permanent("Island", controller: p1) }
+  let(:enchantment) { Permanent("Glorious Anthem", controller: p1) }
+  let(:artifact) { Permanent("Sol Ring", controller: p1) }
 
   it "has deathtouch" do
     expect(subject).to be_deathtouch
@@ -17,6 +18,7 @@ RSpec.describe Magic::Cards::AcidicSlime do
       game.battlefield.add(land)
       game.battlefield.add(enchantment)
       game.battlefield.add(artifact)
+
     end
 
     it "triggers a destroy effect" do

@@ -3,17 +3,12 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::AngelicAscension do
   include_context "two player game"
 
-  let(:wood_elves) { Card("Wood Elves") }
-
+  subject(:wood_elves) { Magic::Permanent.resolve(game: game, controller: p1, card: Card("Wood Elves")) }
   subject { Card("Angelic Ascension") }
 
-  before do
-    game.battlefield.add(wood_elves)
-  end
-
   it "exiles the wood elves and creates a 4/4 white angel creature token with flying" do
-    game.stack.targeted_cast(subject, targeting: [wood_elves])
-    game.stack.resolve!
+    subject.resolve!(target: wood_elves)
+
     expect(wood_elves.zone).to be_exile
 
     expect(game.battlefield.creatures.count).to eq(1)

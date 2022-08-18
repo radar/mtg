@@ -10,15 +10,12 @@ RSpec.describe Magic::Cards::BasrisAcolyte do
   end
 
   context "when there are other creatures on the battlefield" do
-    let(:loxodon_wayfarer) { Card("Loxodon Wayfarer", controller: p1) }
-    let(:wood_elves) { Card("Wood Elves", controller: p1) }
-    before do
-      game.battlefield.add(loxodon_wayfarer)
-      game.battlefield.add(wood_elves)
-    end
+    let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", controller: p1) }
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
 
     it "can add two +1/+1 counters to other creatures" do
-      subject.entered_the_battlefield!
+      subject.cast!
+      game.stack.resolve!
       add_counter = game.next_effect
       expect(add_counter).to be_a(Magic::Effects::SingleTargetAndResolve)
       expect(add_counter.choices).to include(loxodon_wayfarer)

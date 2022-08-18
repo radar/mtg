@@ -9,22 +9,30 @@ module Magic
     end
 
     class BasrisAcolyte < Creature
-      def entered_the_battlefield!
-        add_effect(
-          "SingleTargetAndResolve",
-          choices: battlefield.creatures,
-          resolution: -> (target) {
-            target.add_counter(Counters::Plus1Plus1)
-            add_effect(
-              "SingleTargetAndResolve",
-              choices: battlefield.creatures - [target],
-              resolution: -> (target) {
-                target.add_counter(Counters::Plus1Plus1)
-              }
-            )
-          }
-        )
+      class ETB < TriggeredAbility::EnterTheBattlefield
+        def perform
+          choices = battlefield.creatures - [permanent]
+          effect = Effects::SingleTargetAndResolve.new(
+            source: permanent,
+            choices: choices,
+            resolution: -> (target) {
+              target.add_counter(Counters::Plus1Plus1)
+              effect = Effects::SingleTargetAndResolve.new(
+                source: permanent,
+                choices: choices - [target],
+                resolution: -> (target) {
+                  target.add_counter(Counters::Plus1Plus1)
+                }
+              )
+              game.add_effect(effect)
+            }
+          )
+          game.add_effect(effect)
+        end
       end
+
+      def etb_triggers = [ETB]
+
     end
   end
 end

@@ -9,6 +9,11 @@ module Magic
         true
       end
 
+      def add(permanent)
+        raise "#{permanent} is not a permanent, so cannot be added to the battlefield." unless permanent.is_a?(Permanent)
+        super(permanent)
+      end
+
       def static_abilities
         StaticAbilities.new(@cards.flat_map(&:static_abilities))
       end
