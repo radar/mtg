@@ -3,19 +3,13 @@ module Magic
     extend Forwardable
     def_delegators :@game, :battlefield, :current_turn
 
-    class Counters < SimpleDelegator
-      def of_type(type)
-        select { |counter| counter.is_a?(type) }
-      end
-    end
-
     class Protections < SimpleDelegator
       def player
         select { |protection| protection.protects_player? }
       end
     end
 
-    include Keywords
+    include Cards::Keywords
     attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections, :delayed_responses, :counters
     attr_accessor :tapped
 
@@ -42,7 +36,7 @@ module Magic
       end
 
       def keywords(*keywords)
-        const_set(:KEYWORDS, Card::Keywords[*keywords])
+        const_set(:KEYWORDS, Keywords[*keywords])
       end
     end
 
@@ -59,7 +53,7 @@ module Magic
       @attachments = []
       @protections = Protections.new([])
       @delayed_responses = []
-      @counters = Counters.new([])
+      @keywords = self.class::KEYWORDS
       super
     end
 
@@ -167,8 +161,7 @@ module Magic
     end
 
     def resolve!(controller = nil)
-      self.controller = controller if controller
-      move_zone!(game.battlefield)
+      Magic::Permanent.resolve(game: game, controller: controller, card: self, from_zone: zone)
     end
 
     alias_method :play!, :resolve!
@@ -178,11 +171,9 @@ module Magic
       move_zone!(controller.graveyard)
     end
 
-    def destroy!
+    def discard!
       move_zone!(controller.graveyard)
     end
-    alias_method :discard!, :destroy!
-    alias_method :sacrifice!, :destroy!
 
     def exile!
       move_zone!(controller.exile)

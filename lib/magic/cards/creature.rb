@@ -1,21 +1,7 @@
 module Magic
   module Cards
     class Creature < Card
-      attr_reader :damage, :modifiers, :counters
-
-      class Buff
-        attr_reader :power, :toughness, :until_eot
-
-        def initialize(power: 0, toughness: 0, until_eot: true)
-          @power = power
-          @toughness = toughness
-          @until_eot = until_eot
-        end
-
-        def until_eot?
-          @until_eot
-        end
-      end
+      attr_reader :damage, :modifiers, :counters, :base_power, :base_toughness
 
       POWER = 0
       TOUGHNESS = 0
@@ -35,22 +21,6 @@ module Magic
 
       def dead?
         @marked_for_death || !alive?
-      end
-
-      def power
-        @base_power +
-          @modifiers.sum(&:power) +
-          @counters.sum(&:power) +
-          @attachments.sum(&:power_buff) +
-          static_ability_buffs.sum(&:power)
-      end
-
-      def toughness
-        @base_toughness +
-          @modifiers.sum(&:toughness) +
-          @counters.sum(&:toughness) +
-          @attachments.sum(&:toughness_buff) +
-          static_ability_buffs.sum(&:toughness)
       end
 
       def can_attack?
@@ -79,12 +49,6 @@ module Magic
         @damage += damage_dealt
       end
 
-      def add_counter(counter_type, amount: 1)
-        amount.times do
-          @counters << counter_type.new
-        end
-      end
-
       def left_the_battlefield!
         @modifiers.clear
         @attachments.each(&:destroy!)
@@ -101,12 +65,6 @@ module Magic
         until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }
 
         super
-      end
-
-      private
-
-      def static_ability_buffs
-        battlefield.static_abilities.of_type(Abilities::Static::CreaturesGetBuffed).applies_to(self)
       end
     end
   end

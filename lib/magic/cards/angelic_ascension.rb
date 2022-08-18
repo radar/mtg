@@ -13,8 +13,7 @@ module Magic
       def resolve!(target:)
         target.exile!
         token = Tokens::Angel.new(game: game)
-        token.controller = target.controller
-        token.resolve!
+        token.resolve!(controller)
       end
     end
   end

@@ -1,5 +1,5 @@
 module Magic
-  class Card
+  module Cards
     module Keywords
       DEATHTOUCH = "Deathtouch".freeze
       DOUBLE_STRIKE = "Double strike".freeze
@@ -26,7 +26,6 @@ module Magic
       end
 
       def initialize(...)
-        @keywords = self.class::KEYWORDS
         @keyword_grants = []
       end
 

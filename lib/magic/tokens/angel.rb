@@ -5,7 +5,7 @@ module Magic
       TOUGHNESS = 4
       NAME = "Angel"
       KEYWORDS = [Keywords::FLYING]
-      TYPE_LINE = "Angel"
+      TYPE_LINE = "Token Creature -- Angel"
 
       def colors
         [:white]

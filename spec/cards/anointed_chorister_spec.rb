@@ -3,16 +3,22 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::AnointedChorister do
   include_context "two player game"
 
-  subject { Card("Anointed Chorister", controller: p1) }
+  let(:card) { Card("Anointed Chorister", controller: p1) }
+  subject(:permanent) { Magic::Permanent.resolve(game: game, controller: p1, card: card) }
+
+  before do
+    game.battlefield.add(permanent)
+  end
 
   context "triggered ability" do
     it "applies a buff of +3/+3" do
-      expect(subject.activated_abilities.count).to eq(1)
       p1.add_mana(white: 5)
-      activation = p1.activate_ability(subject.activated_abilities.first)
-      activation.pay(:mana, { generic: { white: 4 }, white: 1 })
-      activation.activate!
-      game.stack.resolve!
+
+      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: permanent, ability: card.class::ActivatedAbility)
+      action.pay_mana({ generic: { white: 4 }, white: 1 })
+      game.take_action(action)
+      game.tick!
+
       expect(p1.mana_pool[:white]).to eq(0)
       expect(subject.power).to eq(4)
       expect(subject.toughness).to eq(4)

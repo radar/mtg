@@ -6,8 +6,7 @@ RSpec.describe Magic::Card do
 
   context "destroy!" do
     it "moves the card to the graveyard" do
-      subject.cast!
-      subject.destroy!
+      subject.discard!
       expect(subject.zone).to be_graveyard
     end
   end
