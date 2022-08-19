@@ -72,6 +72,10 @@ module Magic
       type_line.split(" ") + attachments.flat_map(&:type_grants)
     end
 
+    def any_type?(*types)
+      types.any? { |type| type?(type) }
+    end
+
     def land?
       type?("Land")
     end

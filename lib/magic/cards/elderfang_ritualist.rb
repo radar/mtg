@@ -7,10 +7,12 @@ module Magic
       TOUGHNESS = 1
 
       def died!
-        add_effect(
-          "SearchGraveyard",
-          choices: controller.graveyard.by_any_type("Elf"),
-          resolve_action: -> (c) { c.move_to_hand!(controller) }
+        game.add_effect(
+          Effects::SearchGraveyard.new(
+            source: self,
+            choices: controller.graveyard.by_any_type("Elf"),
+            resolve_action: -> (c) { c.move_to_hand!(controller) }
+          )
         )
       end
     end
