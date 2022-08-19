@@ -30,7 +30,6 @@ module Magic
             remove(event.card)
           end
         end
-
         @cards.each { |card| card.receive_notification(event) }
       end
 

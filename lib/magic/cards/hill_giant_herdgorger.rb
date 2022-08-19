@@ -8,9 +8,13 @@ module Magic
     end
 
     class HillGiantHerdgorger < Creature
-      def entered_the_battlefield!
-        controller.gain_life(3)
+      class ETB < TriggeredAbility::EnterTheBattlefield
+        def perform
+          controller.gain_life(3)
+        end
       end
+
+      def etb_triggers = [ETB]
     end
   end
 end

@@ -71,14 +71,15 @@ module Magic
       end
 
       def resolve!
-        if targets.any?
-          if card.single_target?
-            card.resolve!(target: targets.first)
-          else
-            card.resolve!(targets: target)
-          end
-        else
+        if targets.none?
           card.resolve!(player)
+          return
+        end
+
+        if card.single_target?
+          card.resolve!(target: targets.first)
+        else
+          card.resolve!(targets: target)
         end
       end
     end

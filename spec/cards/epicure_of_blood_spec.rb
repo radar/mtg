@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::EpicureOfBlood do
   include_context "two player game"
 
-  subject { Card("Epicure Of Blood", controller: p1, game: game) }
+  subject { Permanent("Epicure Of Blood", controller: p1, game: game) }
 
   context "receive notification" do
     let(:event) do
@@ -30,8 +30,7 @@ RSpec.describe Magic::Cards::EpicureOfBlood do
     end
 
     def hill_giant_etb
-      hill_giant_herdgorger.cast!
-      game.stack.resolve!
+      cast_and_resolve(card: hill_giant_herdgorger, player: p1)
     end
 
     it "deals damage to other player" do

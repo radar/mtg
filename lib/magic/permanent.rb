@@ -106,6 +106,7 @@ module Magic
     end
 
     def entered_the_battlefield!
+
       card.etb_triggers.each do |trigger|
         trigger.new(game: game, permanent: self).perform
       end

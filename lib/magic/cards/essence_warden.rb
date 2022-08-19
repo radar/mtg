@@ -6,19 +6,22 @@ module Magic
       power 1
       toughness 1
 
-      def receive_notification(event)
-        case event
-        when Events::EnteredTheBattlefield
-          return if event.card == self
 
-          game.add_effect(
-            Effects::AnotherCreatureEntersYouGainLife.new(
-              source: self,
-              card: event.card,
-              life: 1
+      def event_handlers
+        {
+          # Whenever you gain life, each opponent loses 1 life.
+          Events::EnteredTheBattlefield => -> (receiver, event) do
+            return if event.permanent == receiver
+
+            game.add_effect(
+              Effects::AnotherCreatureEntersYouGainLife.new(
+                source: receiver,
+                card: event.permanent,
+                life: 1
+              )
             )
-          )
-        end
+          end
+        }
       end
     end
   end
