@@ -9,10 +9,14 @@ module Magic
     end
 
     class DaybreakCharger < Creature
-      def entered_the_battlefield!
-        apply_buff_effect = Effects::ApplyBuff.new(source: self, power: 2, choices: battlefield.creatures)
-        game.add_effect(apply_buff_effect)
+      class ETB < TriggeredAbility::EnterTheBattlefield
+        def perform
+          effect = Effects::ApplyBuff.new(source: self, power: 2, choices: battlefield.creatures)
+          game.add_effect(effect)
+        end
       end
+
+      def etb_triggers = [ETB]
     end
   end
 end

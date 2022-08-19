@@ -5,9 +5,13 @@ module Magic
       TYPE_LINE = "Enchantment -- Aura"
       COST = { generic: 2, white: 1 }
 
-      def resolve!
-        enchant_creature
-        super
+      def target_choices
+        battlefield.creatures
+      end
+
+      def resolve!(target:)
+        enchant_creature(target: target)
+        super(controller)
       end
 
       def power_buff
@@ -19,7 +23,7 @@ module Magic
       end
 
       def keyword_grants
-        [Card::Keywords::FIRST_STRIKE]
+        [Keywords::FIRST_STRIKE]
       end
 
       def type_grants

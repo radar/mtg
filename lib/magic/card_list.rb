@@ -36,8 +36,12 @@ module Magic
       select { |c| c.name == name }
     end
 
+    def cmc_lte(cmc)
+      select { |c| c.cmc <= cmc }
+    end
+
     def by_any_type(*types)
-      select { |c| types.any? { |type| c.type?(type) } }
+      select { |c| c.any_type?(*types) }
     end
     alias_method :by_type, :by_any_type
 

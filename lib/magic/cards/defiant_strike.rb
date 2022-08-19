@@ -5,10 +5,21 @@ module Magic
     end
 
     class DefiantStrike < Instant
-      def resolve!
-        add_effect("ApplyBuff", power: 1, choices: battlefield.creatures)
-        add_effect("DrawCards", player: controller)
-        super
+      def target_choices
+        battlefield.creatures
+      end
+
+      def single_target?
+        true
+      end
+
+      def resolve!(target:)
+        if target.zone == battlefield
+          game.add_effect(Effects::ApplyBuff.new(source: self, power: 1, targets: target))
+          controller.draw!
+        end
+
+        super()
       end
     end
   end

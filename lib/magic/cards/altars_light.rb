@@ -5,6 +5,10 @@ module Magic
     end
 
     class AltarsLight < Instant
+      def single_target?
+        true
+      end
+
       def target_choices
         battlefield.cards.by_any_type("Artifact", "Enchantment")
       end

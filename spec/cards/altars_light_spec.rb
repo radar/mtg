@@ -12,8 +12,10 @@ RSpec.describe Magic::Cards::AltarsLight do
   end
 
   it "exiles the sol ring" do
-    expect(card.target_choices).to eq([sol_ring])
-    card.resolve!(target: sol_ring)
+    action = cast_action(card: card, player: p1)
+    action.targeting(sol_ring)
+    add_to_stack_and_resolve(action)
+
     expect(sol_ring.zone).to be_exile
   end
 end

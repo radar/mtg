@@ -23,6 +23,10 @@ module Magic
         @damage = 0
       end
 
+      def inspect
+        "#<Magic::Permanent::Creature name:#{card.name} controller:#{controller.name}>"
+      end
+
       def dead?
         @marked_for_death || !alive?
       end
@@ -50,6 +54,21 @@ module Magic
           @attachments.sum(&:toughness_buff) +
           static_ability_buffs.sum(&:toughness)
       end
+
+      def take_damage(damage_dealt)
+        @damage += damage_dealt
+      end
+
+      def fight(target, assigned_damage = power)
+        game.notify!(
+          Events::DamageDealt.new(source: self, target: target, damage: assigned_damage)
+        )
+        controller.gain_life(assigned_damage) if lifelink?
+        if target.is_a?(Creature)
+          target.mark_for_death! if deathtouch? || target.dead?
+        end
+      end
+
 
       def add_counter(counter_type, amount: 1)
         amount.times do

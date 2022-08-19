@@ -8,12 +8,12 @@ module Magic
         game.battlefield.creatures
       end
 
-      def resolve!(targets:)
-        add_effect(
-          "DealDamage",
-          targets: targets,
-          damage: 4,
-        )
+      def single_target?
+        true
+      end
+
+      def resolve!(target:)
+        game.add_effect(Effects::DealDamage.new(source: self, targets: [target], damage: 4))
       end
     end
   end

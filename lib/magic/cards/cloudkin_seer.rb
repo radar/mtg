@@ -8,11 +8,13 @@ module Magic
       TOUGHNESS = 1
       KEYWORDS = [Keywords::FLYING]
 
-      def entered_the_battlefield!
-        add_effect("DrawCards", player: controller)
-
-        super
+      class ETB < TriggeredAbility::EnterTheBattlefield
+        def perform
+          game.add_effect(Effects::DrawCards.new(source: permanent, player: controller))
+        end
       end
+
+      def etb_triggers = [ETB]
     end
   end
 end

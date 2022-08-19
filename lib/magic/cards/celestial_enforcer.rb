@@ -8,26 +8,25 @@ module Magic
     end
 
     class CelestialEnforcer < Creature
-      def activated_abilities
-        [
-          ActivatedAbility.new(
-            costs: [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(self)],
+      class ActivatedAbility < Magic::ActivatedAbility
+        attr_reader :source
+
+        def initialize(source:)
+          @source = source
+          super(
+            source: source,
+            costs: [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(source)],
             requirements: [
               -> {
-                controller.creatures.any?(&:flying?)
+                source.controller.creatures.any?(&:flying?)
               }
-            ],
-            ability: -> (targets:) {
-              Effects::TapTarget.new(source: self, choices: tap_choices, targets: targets).resolve
-            }
+            ]
           )
-        ]
-      end
+        end
 
-      private
-
-      def tap_choices
-        battlefield.creatures
+        def resolve!(targets:)
+          Effects::TapTarget.new(source: self, choices: battlefield.creatures, targets: targets).resolve
+        end
       end
     end
   end

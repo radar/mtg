@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::BaneslayerAngel do
-  let(:game) { Magic::Game.new }
-   subject { Card("Baneslayer Angel") }
+  include_context "two player game"
+
+  subject { Permanent("Baneslayer Angel", controller: p1) }
 
   it "has keywords" do
     expect(subject.flying?).to eq(true)
@@ -11,12 +12,12 @@ RSpec.describe Magic::Cards::BaneslayerAngel do
   end
 
   it "has protection from dragons" do
-    dragon = Card("Hellkite Punisher")
+    dragon = Permanent("Hellkite Punisher", controller: p2)
     expect(subject).to be_protected_from(dragon)
   end
 
   it "has protection from demons" do
-    demon = Card("Renegade Demon")
+    demon = Permanent("Renegade Demon", controller: p2)
     expect(subject).to be_protected_from(demon)
   end
 end

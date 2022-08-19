@@ -14,6 +14,20 @@ module CardHelper
   def ResolvePermanent(name, **args)
     Magic::Permanent.resolve(game: game, card: Card(name), **args)
   end
+
+  def cast_action(card:, player:)
+    Magic::Actions::Cast.new(card: card, player: player)
+  end
+
+  def add_to_stack_and_resolve(action)
+    game.stack.add(action)
+    game.stack.resolve!
+  end
+
+  def cast_and_resolve(card:, player:)
+    game.stack.add(cast_action(card: card, player: player))
+    game.stack.resolve!
+  end
 end
 
 module PlayerHelper

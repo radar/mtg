@@ -7,12 +7,17 @@ module Magic
 
     # TODO: Move to permanent / creature sub-type
 
-
-    def_delegators :@card, :name
+    def_delegators :@card, :name, :cmc, :mana_value
 
     class Counters < SimpleDelegator
       def of_type(type)
         select { |counter| counter.is_a?(type) }
+      end
+    end
+
+    class Protections < SimpleDelegator
+      def player
+        select { |protection| protection.protects_player? }
       end
     end
 
@@ -44,6 +49,7 @@ module Magic
       @counters = Counters.new([])
       @activated_abilities = card.activated_abilities
       @damage = 0
+      @protections = Protections.new(card.protections)
       super
     end
 
@@ -84,8 +90,11 @@ module Magic
         died! if event.card == self && event.death?
         left_the_battlefield! if event.card == self && event.from.battlefield?
       when Events::EnteredTheBattlefield
-        entered_the_battlefield! if event.card == self
+        entered_the_battlefield! if event.permanent == self
       end
+
+      handler = card.event_handlers[event.class]
+      handler.call(self, event) if handler
 
       trigger_delayed_response(event)
     end
@@ -104,6 +113,10 @@ module Magic
 
     def type?(type)
       types.include?(type)
+    end
+
+    def any_type?(*types)
+      types.any? { |type| type?(type) }
     end
 
     def types
@@ -134,6 +147,14 @@ module Magic
       type?("Creature")
     end
 
+    def protected_from?(card)
+      @protections.any? { |protection| protection.protected_from?(card) }
+    end
+
+    def gains_protection_from_color(color, until_eot:)
+      @protections << Protection.from_color(color, until_eot: until_eot)
+    end
+
     def permanent?
       true
     end
@@ -148,6 +169,10 @@ module Magic
 
     def tapped?
       @tapped
+    end
+
+    def untapped?
+      !tapped?
     end
 
     def static_abilities

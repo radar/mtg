@@ -6,35 +6,35 @@ module Magic
       power 3
       toughness 4
       keywords :vigilance
+      protections [Card::Protection.new(condition: -> (card) { card.multi_colored? })]
     end
 
     class BasrisLieutenant < Creature
-      def protected_from?(card)
-        card.multi_colored?
-      end
-
-      def entered_the_battlefield!
-        add_effect(
-          "AddCounter",
-          counter_type: Counters::Plus1Plus1,
-          choices: controller.creatures,
-        )
-      end
-
-      def receive_notification(event)
-        super
-
-        case event
-        when Events::LeavingZone
-          return unless event.death?
-          return unless event.card.controller == controller
-
-          if event.card.counters.any? { |counter| counter.is_a?(Counters::Plus1Plus1) }
-            token = Tokens::Knight.new(game: game, controller: controller)
-            token.resolve!
-          end
+      class ETB < TriggeredAbility::EnterTheBattlefield
+        def perform
+          effect = Effects::AddCounter.new(
+            source: permanent,
+            counter_type: Counters::Plus1Plus1,
+            choices: controller.creatures,
+          )
+          game.add_effect(effect)
         end
+      end
 
+      def etb_triggers = [ETB]
+
+      def event_handlers
+        {
+          Events::LeavingZone => -> (receiver, event) do
+            return unless event.death?
+            return unless event.card.controller == receiver.controller
+
+            if event.card.counters.any? { |counter| counter.is_a?(Counters::Plus1Plus1) }
+              token = Tokens::Knight.new(game: game, controller: controller)
+              token.resolve!(controller)
+            end
+          end
+        }
       end
     end
   end

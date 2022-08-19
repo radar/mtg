@@ -6,7 +6,7 @@ module Magic
     end
 
     class BasrisSolidarity < Card
-      def resolve!
+      def resolve!(controller)
         controller.creatures.each do |creature|
           creature.add_counter(Counters::Plus1Plus1)
         end

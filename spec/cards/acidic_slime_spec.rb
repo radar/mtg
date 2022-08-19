@@ -22,8 +22,7 @@ RSpec.describe Magic::Cards::AcidicSlime do
     end
 
     it "triggers a destroy effect" do
-      subject.cast!
-      game.stack.resolve!
+      cast_and_resolve(card: subject, player: p1)
       effect = game.effects.first
 
       expect(effect).to be_a(Magic::Effects::SingleTargetAndResolve)

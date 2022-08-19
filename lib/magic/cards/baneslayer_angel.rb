@@ -6,17 +6,7 @@ module Magic
       power 5
       toughness 5
       keywords :flying, :first_strike, :lifelink
-    end
-
-    class BaneslayerAngel < Creature
-      def initialize(...)
-        super
-        @protections << Protection.new(
-          condition: ->(card) do
-            card.type?("Demon") || card.type?("Dragon")
-          end,
-          until_eot: false)
-      end
+      protections [Card::Protection.new(condition: -> (card) { card.any_type?("Demon", "Dragon") })]
     end
   end
 end

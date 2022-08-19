@@ -1,14 +1,15 @@
 module Magic
   module Events
     class EnteredTheBattlefield
-      attr_reader :card
+      attr_reader :permanent
 
-      def initialize(card)
-        @card = card
+      def initialize(permanent)
+        @permanent = permanent
       end
 
       def inspect
-        "#<Events::EnteredTheBattlefield card: #{card.name}>"
+        binding.pry unless permanent.controller
+        "#<Events::EnteredTheBattlefield permanent: #{permanent.name}, controller: #{permanent.controller.name}>"
       end
     end
   end

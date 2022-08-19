@@ -1,12 +1,13 @@
 module Magic
   module Actions
     class ActivateAbility < Action
-      attr_reader :ability, :costs, :permanent, :targets
+      attr_reader :permanent, :ability, :costs, :requirements, :targets
 
       def initialize(permanent:, ability:, **args)
         @permanent = permanent
         @ability = ability.new(source: permanent)
         @costs = @ability.costs
+        @requirements = @ability.requirements
         @targets = []
         super(**args)
       end
@@ -16,7 +17,7 @@ module Magic
       end
 
       def can_be_activated?(player)
-        ability.can_be_activated?(player)
+        costs.all? { |cost| cost.can_pay?(player) } && requirements.all?(&:call)
       end
 
       def countered?
@@ -36,6 +37,10 @@ module Magic
         pay(player, :mana, payment)
       end
 
+      def pay_tap
+        pay(player, :tap)
+      end
+
       def perform
         if targets.any?
           ability.resolve!(targets: targets)
@@ -44,10 +49,12 @@ module Magic
         end
       end
 
-      def pay(player, cost_type, payment)
+      def pay(player, cost_type, payment = nil)
         cost_type = case cost_type
         when :mana
           Costs::Mana
+        when :tap
+          Costs::Tap
         when :discard
           Costs::Discard
         when :sacrifice

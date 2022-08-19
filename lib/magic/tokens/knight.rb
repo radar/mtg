@@ -5,7 +5,7 @@ module Magic
       TOUGHNESS = 2
       NAME = "Knight"
       KEYWORDS = [Keywords::VIGILANCE]
-      TYPE_LINE = "Knight"
+      TYPE_LINE = "Token Creature -- Knight"
 
       def colors
         [:white]

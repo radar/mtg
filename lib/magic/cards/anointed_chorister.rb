@@ -11,9 +11,8 @@ module Magic
       class ActivatedAbility < Magic::ActivatedAbility
         attr_reader :source
 
-        def initialize(source:)
-          @source = source
-          super(costs: [Costs::Mana.new(generic: 4, white: 1)])
+        def initialize(**args)
+          super(**args, costs: [Costs::Mana.new(generic: 4, white: 1)])
         end
 
         def resolve!

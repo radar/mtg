@@ -3,12 +3,6 @@ module Magic
     extend Forwardable
     def_delegators :@game, :battlefield, :current_turn
 
-    class Protections < SimpleDelegator
-      def player
-        select { |protection| protection.protects_player? }
-      end
-    end
-
     include Cards::Keywords
     attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections, :delayed_responses, :counters
     attr_accessor :tapped
@@ -17,6 +11,7 @@ module Magic
 
     COST = {}
     KEYWORDS = []
+    PROTECTIONS = []
 
     class << self
       def type(type)
@@ -38,6 +33,10 @@ module Magic
       def keywords(*keywords)
         const_set(:KEYWORDS, Keywords[*keywords])
       end
+
+      def protections(*protections)
+        const_set(:PROTECTIONS, *protections)
+      end
     end
 
     def initialize(game: Game.new, controller: Player.new, tapped: false, keywords: [])
@@ -51,9 +50,9 @@ module Magic
       @cost = cost
       @tapped = tapped
       @attachments = []
-      @protections = Protections.new([])
       @delayed_responses = []
       @keywords = self.class::KEYWORDS
+      @protections = self.class::PROTECTIONS
       super
     end
 
@@ -97,6 +96,10 @@ module Magic
       type?("Enchantment")
     end
 
+    def permanent?
+      land? || creature? || planeswalker? || artifact? || enchantment?
+    end
+
     def mana_value
       cost.mana_value
     end
@@ -115,17 +118,8 @@ module Magic
       colors.count == 0
     end
 
-
     def move_to_hand!(target_controller)
       move_zone!(target_controller.hand)
-    end
-
-    def cast!
-      game.stack.add(self)
-    end
-
-    def permanent?
-      true
     end
 
     def tap!
@@ -148,26 +142,19 @@ module Magic
       countered
     end
 
-    def protected_from?(card)
-      @protections.any? { |protection| protection.protected_from?(card) }
-    end
-
-    def gains_protection_from_color(color, until_eot:)
-      @protections << Protection.from_color(color, until_eot: until_eot)
-    end
-
     def controller?(other_controller)
       controller == other_controller
     end
 
     def resolve!(controller = nil)
-      Magic::Permanent.resolve(game: game, controller: controller, card: self, from_zone: zone)
+      if permanent?
+        Magic::Permanent.resolve(game: game, controller: controller, card: self, from_zone: zone)
+      end
     end
 
     alias_method :play!, :resolve!
 
-    def counter!
-      @countered = true
+    def countered!
       move_zone!(controller.graveyard)
     end
 
@@ -242,6 +229,10 @@ module Magic
 
     def static_abilities
       []
+    end
+
+    def event_handlers
+      {}
     end
 
     private

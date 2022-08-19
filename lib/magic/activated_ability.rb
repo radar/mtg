@@ -1,14 +1,16 @@
 module Magic
   class ActivatedAbility
-    attr_reader :ability, :costs, :requirements, :targets
+    attr_reader :source, :costs, :requirements
 
-    def initialize(costs: [], requirements: [])
+    def initialize(source:, costs: [], requirements: [])
+      @source = source
       @costs = costs
       @requirements = requirements
     end
 
-    def can_be_activated?(player)
-      costs.all? { |cost| cost.can_pay?(player) } && requirements.all?(&:call)
+
+    def battlefield
+      source.game.battlefield
     end
   end
 end

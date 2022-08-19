@@ -1,18 +1,21 @@
 module Magic
   module Costs
     class Tap
-      attr_reader :card
+      attr_reader :permanent
 
-      def initialize(card)
-        @card = card
+      def initialize(permanent)
+        @permanent = permanent
+      end
+
+      def pay(_player, _payment)
+        @permanent.tap!
       end
 
       def can_pay?(_player)
-        card.untapped?
+        permanent.untapped?
       end
 
       def finalize!(_player)
-        card.tap!
       end
     end
   end

@@ -3,19 +3,12 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::DaybreakCharger do
   include_context "two player game"
 
-  subject { Card("Daybreak Charger", controller: p1) }
-
 
   context "ETB Event" do
-    let(:wood_elves) { Card("Wood Elves", controller: p1) }
-
-    before do
-      game.battlefield.add(wood_elves)
-    end
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
 
     it "buffs a target" do
-      subject.resolve!
-      game.stack.resolve!
+      cast_and_resolve(card: Card("Daybreak Charger"), player: p1)
       apply_buff_effect = game.next_effect
       expect(apply_buff_effect).to be_a(Magic::Effects::ApplyBuff)
       game.resolve_pending_effect(wood_elves)

@@ -5,17 +5,12 @@ RSpec.describe Magic::Cards::BasrisSolidarity do
 
   subject { Card("Basri's Solidarity", controller: p1) }
 
-  let(:wood_elves) { Card("Wood Elves", controller: p1) }
-  let(:loxodon_wayfarer) { Card("Loxodon Wayfarer", controller: p2) }
-
-  before do
-    game.battlefield.add(wood_elves)
-    game.battlefield.add(loxodon_wayfarer)
-  end
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+  let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", controller: p2) }
 
   it "adds a counter to each creature under p1's control" do
-    subject.cast!
-    game.stack.resolve!
+    cast_and_resolve(card: subject, player: p1)
+
     expect(wood_elves.counters.count).to eq(1)
     expect(wood_elves.power).to eq(2)
     expect(wood_elves.toughness).to eq(2)

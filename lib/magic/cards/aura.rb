@@ -3,11 +3,11 @@ module Magic
     class Aura < Card
       attr_reader :attached_to
 
-      def enchant_creature
-        add_effect("AttachEnchantment", choices: battlefield.creatures)
+      def single_target?
+        true
       end
 
-      def attach!(target)
+      def enchant_creature(target:)
         @attached_to = target
         target.attachments << self
       end

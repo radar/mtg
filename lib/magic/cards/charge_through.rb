@@ -4,9 +4,21 @@ module Magic
       NAME = "Charge Through"
       COST = { green: 1 }
 
-      def resolve!
-        controller.draw!
-        super
+      def target_choices
+        game.battlefield.creatures
+      end
+
+      def single_target?
+        true
+      end
+
+      def resolve!(target:)
+        if target.zone == battlefield
+          target.grant_keyword(Keywords::TRAMPLE, until_eot: true)
+          controller.draw!
+        end
+
+        super()
       end
     end
   end

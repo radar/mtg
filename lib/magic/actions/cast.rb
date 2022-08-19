@@ -1,6 +1,9 @@
 module Magic
   module Actions
     class Cast < Action
+      extend Forwardable
+
+      def_delegators :@card, :enchantment?, :artifact?
       attr_reader :card, :targets
       def initialize(card:, **args)
         @card = card
@@ -9,7 +12,20 @@ module Magic
       end
 
       def inspect
-        "#<Actions::Cast card: #{card.name}, mana: #{mana_cost.inspect}, player: #{player.inspect}>"
+        "#<Actions::Cast card: #{card.name}, player: #{player.inspect}>"
+      end
+      alias_method :name, :inspect
+
+      def countered?
+        @countered
+      end
+
+      def counter!
+        @countered = true
+      end
+
+      def countered!
+        card.countered!
       end
 
       def mana_cost
@@ -30,20 +46,40 @@ module Magic
         mana_cost.can_pay?(player)
       end
 
+      def can_target?(target)
+        card.target_choices.include?(target)
+      end
+
       def targeting(*targets)
+        targets.each do |target|
+          raise "Invalid target for #{card.name}: #{target}" unless can_target?(target)
+        end
         @targets = targets
         self
       end
 
       def pay_mana(payment)
         mana_cost.pay(player, payment)
+        self
       end
 
       def perform
         mana_cost.finalize!(player)
-        targets.any? ? card.resolve!(targets: targets) : card.resolve!
+        game.stack.add(self)
 
         game.notify!(Events::SpellCast.new(spell: card, player: player))
+      end
+
+      def resolve!
+        if targets.any?
+          if card.single_target?
+            card.resolve!(target: targets.first)
+          else
+            card.resolve!(targets: target)
+          end
+        else
+          card.resolve!(player)
+        end
       end
     end
   end

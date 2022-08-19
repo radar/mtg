@@ -9,12 +9,12 @@ RSpec.describe Magic::Cards::CloudkinSeer do
     p1.library.add(forest)
   end
 
-  subject { described_class.new(game: game, controller: p1) }
+  subject { Card("Cloudkin Seer") }
 
   context "ETB effect" do
     it "controller draws a card" do
-      subject.cast!
       expect(p1).to receive(:draw!)
+      subject.resolve!(p1)
       game.stack.resolve!
     end
   end

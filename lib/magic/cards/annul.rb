@@ -4,6 +4,10 @@ module Magic
       NAME = "Annul"
       COST = { blue: 1 }
 
+      def single_target?
+        true
+      end
+
       def target_choices
         game.stack.select { |c| c.enchantment? || c.artifact? }
       end

@@ -6,15 +6,15 @@ RSpec.describe Magic::Cards::DefiantStrike do
   subject { Card("Defiant Strike", controller: p1) }
 
   context "resolution" do
-    let(:wood_elves) { Card("Wood Elves", controller: p1) }
-
-    before do
-      game.battlefield.add(wood_elves)
-    end
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
 
     it "buffs a target + controller draws a card" do
       expect(p1).to receive(:draw!)
-      subject.resolve!
+      p1.add_mana(white: 1)
+      action = cast_action(player: p1, card: subject)
+                .pay_mana(white: 1)
+                .targeting(wood_elves)
+      game.take_action(action)
       game.stack.resolve!
       buff = wood_elves.modifiers.first
       expect(buff.power).to eq(1)

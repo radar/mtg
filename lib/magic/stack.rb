@@ -16,10 +16,6 @@ module Magic
         @targets = targets
       end
 
-      def countered?
-        card.countered?
-      end
-
       def name
         card.name
       end
@@ -40,16 +36,6 @@ module Magic
 
     def add(item)
       @stack.unshift(item)
-    end
-
-    def cast(card)
-      add(card)
-    end
-
-    def targeted_cast(card, targeting:)
-      targeted_cast = TargetedCast.new(card, targets: [*targeting])
-      targeted_cast.validate!
-      add(targeted_cast)
     end
 
     def cards
@@ -111,7 +97,9 @@ module Magic
       end
 
       item = @stack.shift
-      unless item.countered?
+      if item.countered?
+        item.countered!
+      else
         puts "Resolving #{item.name}"
         item.resolve!
       end
