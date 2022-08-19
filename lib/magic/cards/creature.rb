@@ -12,14 +12,6 @@ module Magic
         super(**args)
       end
 
-      def can_attack?
-        @attachments.all?(&:can_attack?)
-      end
-
-      def can_block?
-        @attachments.all?(&:can_block?)
-      end
-
       def whenever_this_attacks
       end
 

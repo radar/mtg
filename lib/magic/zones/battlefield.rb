@@ -5,6 +5,8 @@ module Magic
         super(**args)
       end
 
+      alias_method :permanents, :cards
+
       def battlefield?
         true
       end

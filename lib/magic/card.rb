@@ -219,10 +219,6 @@ module Magic
       []
     end
 
-    def can_activate_ability?(ability)
-      @attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
-    end
-
     def can_be_targeted_by?(source)
       true
     end

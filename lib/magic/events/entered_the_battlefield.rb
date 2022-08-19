@@ -8,7 +8,6 @@ module Magic
       end
 
       def inspect
-        binding.pry unless permanent.controller
         "#<Events::EnteredTheBattlefield permanent: #{permanent.name}, controller: #{permanent.controller.name}>"
       end
     end

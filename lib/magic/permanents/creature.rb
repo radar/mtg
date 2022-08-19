@@ -69,6 +69,13 @@ module Magic
         end
       end
 
+      def can_attack?
+        attachments.all?(&:can_attack?)
+      end
+
+      def can_block?
+        attachments.all?(&:can_block?)
+      end
 
       def add_counter(counter_type, amount: 1)
         amount.times do

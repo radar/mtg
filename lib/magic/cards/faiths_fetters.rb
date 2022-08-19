@@ -3,12 +3,16 @@ module Magic
     class FaithsFetters < Aura
       NAME = "Faith's Fetters"
       TYPE_LINE = "Enchantment -- Aura"
-      COST = { generic: 2, white: 1 }
+      COST = { generic: 3, white: 1 }
 
-      def resolve!
+      def target_choices
+        battlefield.permanents
+      end
+
+      def resolve!(target:)
         controller.gain_life(4)
-        enchant_creature
-        super
+        enchant_creature(target: target)
+        super(controller)
       end
 
       def can_attack?
@@ -20,7 +24,7 @@ module Magic
       end
 
       def can_activate_ability?(ability)
-        ability.is_a?(ManaAbility)
+        ability < ManaAbility
       end
     end
   end
