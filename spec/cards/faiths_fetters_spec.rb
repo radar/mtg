@@ -30,7 +30,7 @@ RSpec.describe Magic::Cards::FaithsFetters do
 
   context "with llanowar elves" do
     let!(:llanowar_elves) { ResolvePermanent("Llanowar Elves", controller: p2) }
-    let(:mana_ability) { Magic::Cards::LlanowarElves::ManaAbility }
+    let(:mana_ability) { llanowar_elves.activated_abilities.first }
 
     it "enchants the llanowar elves" do
       cast_faiths_fetters(llanowar_elves)
@@ -42,9 +42,9 @@ RSpec.describe Magic::Cards::FaithsFetters do
 
   context "with hellkite punisher" do
     let!(:hellkite_punisher) { ResolvePermanent("Hellkite Punisher", controller: p2) }
-    let(:activated_ability) { hellkite_punisher.card.class::ActivatedAbility }
+    let(:activated_ability) { hellkite_punisher.activated_abilities.first }
 
-    it "enchants the llanowar elves" do
+    it "enchants the hellkite punisher" do
       cast_faiths_fetters(hellkite_punisher)
       expect(hellkite_punisher.can_attack?).to eq(false)
       expect(hellkite_punisher.can_block?).to eq(false)

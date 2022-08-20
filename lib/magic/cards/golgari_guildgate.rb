@@ -4,25 +4,30 @@ module Magic
       NAME = "Golgari Guildgate"
       TYPE_LINE = "Land -- Gate"
 
-      def receive_notification(event)
-        case event
-        when Events::EnteredTheBattlefield
-          return if event.card != self
+      def enters_tapped?
+        true
+      end
 
-          self.tapped = true
+      class ManaAbility < Magic::ManaAbility
+        def initialize(source:)
+          @costs = [Costs::Tap.new(source)]
+
+          super
+        end
+
+        def resolve!
+          game.add_effect(
+            Effects::AddManaOrAbility.new(
+              source: source,
+              player: source.controller,
+              black: 1,
+              green: 1
+            )
+          )
         end
       end
 
-      def tap!
-        add_effect(
-          "AddManaOrAbility",
-          player: controller,
-          black: 1,
-          green: 1
-        )
-
-        super
-      end
+      def activated_abilities = [ManaAbility]
     end
   end
 end

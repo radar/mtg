@@ -1,5 +1,6 @@
 module Magic
   class Card
+    include Types
     extend Forwardable
     def_delegators :@game, :battlefield, :current_turn
 
@@ -56,52 +57,16 @@ module Magic
       super
     end
 
+    def types
+      type_line.scan(/\w+/) + attachments.flat_map(&:type_grants)
+    end
+
     def inspect
       "#<Card name:#{name} controller:#{controller.name}>"
     end
 
     def to_s
       name
-    end
-
-    def type?(type)
-      types.include?(type)
-    end
-
-    def types
-      type_line.split(" ") + attachments.flat_map(&:type_grants)
-    end
-
-    def any_type?(*types)
-      types.any? { |type| type?(type) }
-    end
-
-    def land?
-      type?("Land")
-    end
-
-    def basic_land?
-      type?("Basic")
-    end
-
-    def creature?
-      type?("Creature")
-    end
-
-    def planeswalker?
-      type?("Planeswalker")
-    end
-
-    def artifact?
-      type?("Artifact")
-    end
-
-    def enchantment?
-      type?("Enchantment")
-    end
-
-    def permanent?
-      land? || creature? || planeswalker? || artifact? || enchantment?
     end
 
     def mana_value
@@ -124,22 +89,6 @@ module Magic
 
     def move_to_hand!(target_controller)
       move_zone!(target_controller.hand)
-    end
-
-    def tap!
-      @tapped = true
-    end
-
-    def untap!
-      @tapped = false
-    end
-
-    def tapped?
-      @tapped
-    end
-
-    def untapped?
-      !tapped?
     end
 
     def countered?
@@ -179,51 +128,19 @@ module Magic
       game.current_turn.notify!(event)
     end
 
-    def receive_notification(event)
-      case event
-      when Events::DamageDealt
-        return unless event.target == self
-
-        take_damage(event.damage)
-      when Events::LeavingZone
-        died! if event.card == self && event.death?
-        left_the_battlefield! if event.card == self && event.from.battlefield?
-      when Events::EnteredTheBattlefield
-        entered_the_battlefield! if event.card == self
-      end
-
-      trigger_delayed_response(event)
-    end
-
-    def delayed_response(turn:, event_type:, response:)
-      @delayed_responses << { turn: turn.number, event_type: event_type, response: response }
-    end
-
-    def trigger_delayed_response(event)
-      responses = delayed_responses.select { |response| event.is_a?(response[:event_type]) && response[:turn] == game.current_turn.number }
-      responses.each do |response|
-        response[:response].call
-      end
-    end
-
-    def died!
-    end
-
-    def left_the_battlefield!
-    end
-
-    def entered_the_battlefield!
+    def enters_tapped?
+      false
     end
 
     def activated_abilities
       []
     end
 
-    def can_be_targeted_by?(source)
-      true
+    def etb_triggers
+      []
     end
 
-    def etb_triggers
+    def death_triggers
       []
     end
 

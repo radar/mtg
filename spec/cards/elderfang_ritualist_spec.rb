@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::ElderfangRitualist do
   include_context "two player game"
 
-  subject { described_class.new(controller: p1, game: game) }
+  let(:elderfang_ritualist) { ResolvePermanent("Elderfang Ritualist", controller: p1) }
 
   context "dies" do
     context "when p1 has wood elves in the graveyard" do
@@ -13,18 +13,8 @@ RSpec.describe Magic::Cards::ElderfangRitualist do
         p1.graveyard.add(wood_elves)
       end
 
-      let(:event) do
-        Magic::Events::LeavingZone.new(
-          subject,
-          from: game.battlefield,
-          to: p1.graveyard
-        )
-      end
-
       it "brings back wood elves" do
-        subject.receive_notification(event)
-        game.stack.resolve!
-        expect(game.stack.pending_effects?).to eq(false)
+        elderfang_ritualist.destroy!
         expect(wood_elves.zone).to eq(p1.hand)
       end
     end

@@ -6,15 +6,19 @@ module Magic
       POWER = 3
       TOUGHNESS = 1
 
-      def died!
-        game.add_effect(
-          Effects::SearchGraveyard.new(
-            source: self,
-            choices: controller.graveyard.by_any_type("Elf"),
-            resolve_action: -> (c) { c.move_to_hand!(controller) }
+      class Death < TriggeredAbility::Death
+        def perform
+          game.add_effect(
+            Effects::SearchGraveyard.new(
+              source: permanent,
+              choices: controller.graveyard.by_any_type("Elf"),
+              resolve_action: -> (c) { c.move_to_hand!(controller) }
+            )
           )
-        )
+        end
       end
+
+      def death_triggers = [Death]
     end
   end
 end

@@ -1,6 +1,7 @@
 module Magic
   class Permanent
     include Keywords
+    include Types
 
     extend Forwardable
     attr_reader :game, :controller, :card,:types, :delayed_responses, :attachments, :modifiers, :counters, :keywords, :activated_abilities
@@ -32,6 +33,7 @@ module Magic
         permanent = Magic::Permanent.new(game: game, controller: controller, card: card)
       end
 
+      permanent.tap! if card.enters_tapped?
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       permanent
     end
@@ -51,6 +53,10 @@ module Magic
       @damage = 0
       @protections = Protections.new(card.protections)
       super
+    end
+
+    def types
+      @base_types + attachments.flat_map(&:type_grants)
     end
 
     def inspect
@@ -100,52 +106,18 @@ module Magic
     end
 
     def died!
+      card.death_triggers.each do |trigger|
+        trigger.new(game: game, permanent: self).perform
+        end
     end
 
     def left_the_battlefield!
     end
 
     def entered_the_battlefield!
-
       card.etb_triggers.each do |trigger|
         trigger.new(game: game, permanent: self).perform
       end
-    end
-
-    def type?(type)
-      types.include?(type)
-    end
-
-    def any_type?(*types)
-      types.any? { |type| type?(type) }
-    end
-
-    def types
-      @base_types + attachments.flat_map(&:type_grants)
-    end
-
-    def land?
-      type?("Land")
-    end
-
-    def basic_land?
-      type?("Basic")
-    end
-
-    def planeswalker?
-      type?("Planeswalker")
-    end
-
-    def artifact?
-      type?("Artifact")
-    end
-
-    def enchantment?
-      type?("Enchantment")
-    end
-
-    def creature?
-      type?("Creature")
     end
 
     def protected_from?(card)

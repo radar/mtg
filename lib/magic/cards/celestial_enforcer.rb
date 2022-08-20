@@ -13,9 +13,9 @@ module Magic
 
         def initialize(source:)
           @source = source
+          @costs = [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(source)]
           super(
             source: source,
-            costs: [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(source)],
             requirements: [
               -> {
                 source.controller.creatures.any?(&:flying?)

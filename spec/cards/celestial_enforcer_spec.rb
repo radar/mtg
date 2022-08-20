@@ -44,7 +44,7 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
       end
 
       context "when celestial enforcer is tapped" do
-        before { subject.tap! }
+        before { permanent.tap! }
 
         it "cannot be activated" do
           action = Magic::Actions::ActivateAbility.new(player: p1, permanent: permanent, ability: ability)

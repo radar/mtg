@@ -10,10 +10,9 @@ module Magic
 
     class HellkitePunisher < Creature
       class ActivatedAbility < Magic::ActivatedAbility
-        attr_reader :source
+        attr_reader
 
-        def initialize(source:)
-          @source = source
+        def initialize(...)
           super(costs: [Costs::Mana.new(generic: 4, white: 1)])
         end
 
@@ -21,6 +20,8 @@ module Magic
           self.modifiers << Buff.new(power: 3, toughness: 3, until_eot: true)
         end
       end
+
+      def activated_abilities = [ActivatedAbility]
     end
   end
 end

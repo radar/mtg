@@ -1,16 +1,26 @@
 module Magic
   class ActivatedAbility
-    attr_reader :source, :costs, :requirements
+    attr_reader :source, :requirements
 
-    def initialize(source:, costs: [], requirements: [])
+    def self.costs(costs)
+      const_set(:COSTS, costs)
+    end
+
+    def initialize(source:, requirements: [])
       @source = source
-      @costs = costs
       @requirements = requirements
     end
 
+    def costs
+      @costs || self.class::COSTS
+    end
+
+    def game
+      source.game
+    end
 
     def battlefield
-      source.game.battlefield
+      game.battlefield
     end
   end
 end

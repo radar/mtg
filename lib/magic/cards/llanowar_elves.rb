@@ -9,16 +9,14 @@ module Magic
 
     class LlanowarElves < Creature
       class ManaAbility < Magic::ManaAbility
-        attr_reader :source
-
-        def initialize(**args)
-          super(**args, costs: [Costs::Tap.new(self)])
-        end
+        costs [Costs::Tap.new(self)]
 
         def resolve!
           controller.add_mana(green: 1)
         end
       end
+
+      def activated_abilities = [ManaAbility]
     end
   end
 end
