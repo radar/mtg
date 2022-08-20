@@ -4,7 +4,7 @@ RSpec.describe Magic::Cards::FeatOfResistance do
   include_context "two player game"
 
   subject { Card("Feat Of Resistance", controller: p1) }
-  let(:wood_elves) { Card("Wood Elves", controller: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
 
   let(:green_card) { double(Magic::Card, colors: [:green] )}
 
@@ -13,9 +13,12 @@ RSpec.describe Magic::Cards::FeatOfResistance do
   end
 
   it "adds a +1,+1 counter and protection from green to wood elves" do
-    game.stack.targeted_cast(subject, targeting: wood_elves)
-
+    p1.add_mana(white: 2)
+    action = cast_action(card: subject, player: p1).targeting(wood_elves)
+    action.pay_mana(white: 1, generic: { white: 1})
+    game.take_action(action)
     game.stack.resolve!
+
     expect(wood_elves.power).to eq(2)
     expect(wood_elves.toughness).to eq(2)
     choice = game.choices.last

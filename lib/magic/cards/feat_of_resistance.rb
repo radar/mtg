@@ -5,6 +5,10 @@ module Magic
     end
 
     class FeatOfResistance < Instant
+      def single_target?
+        true
+      end
+
       def target_choices
         controller.creatures
       end

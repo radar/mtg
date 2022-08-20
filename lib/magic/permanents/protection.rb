@@ -1,5 +1,5 @@
 module Magic
-  class Card
+  module Permanents
     class Protection
       attr_reader :condition, :until_eot
 

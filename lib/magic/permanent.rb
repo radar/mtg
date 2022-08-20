@@ -125,7 +125,7 @@ module Magic
     end
 
     def gains_protection_from_color(color, until_eot:)
-      @protections << Protection.from_color(color, until_eot: until_eot)
+      @protections << Permanents::Protection.from_color(color, until_eot: until_eot)
     end
 
     def permanent?
