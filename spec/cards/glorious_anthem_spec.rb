@@ -3,57 +3,23 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::GloriousAnthem do
   include_context "two player game"
 
-  let(:glorious_anthem) { Card("Glorious Anthem", controller: p1) }
-  let(:wood_elves) { Card("Wood Elves", controller: p1) }
+  let!(:glorious_anthem) { ResolvePermanent("Glorious Anthem", controller: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
 
-  context "when wood elves is already on the field" do
-    before do
-      game.battlefield.add(wood_elves)
-    end
-
-    context "entering the battlefield adds a static ability" do
-      it "adds a creatures get buffed ability" do
-        game.battlefield.add(glorious_anthem)
-        expect(wood_elves.power).to eq(2)
-        expect(wood_elves.toughness).to eq(2)
-      end
-    end
-  end
-
-  context "when glorious anthem is already on the battlefield" do
-    before do
-      game.battlefield.add(glorious_anthem)
-      glorious_anthem.entered_the_battlefield!
-    end
-
-    context "a creature from the same controller enters the battlefield" do
-      it "creature gets buffed" do
-        game.battlefield.add(wood_elves)
-        wood_elves.entered_the_battlefield!
-        expect(wood_elves.power).to eq(2)
-        expect(wood_elves.toughness).to eq(2)
-      end
-    end
-
-    context "a creature from the same controller enters the battlefield" do
-      it "creature gets buffed" do
-        game.battlefield.add(wood_elves)
-        wood_elves.entered_the_battlefield!
-        expect(wood_elves.power).to eq(2)
-        expect(wood_elves.toughness).to eq(2)
-      end
+  context "a creature from the same controller is on the battlefield" do
+    it "creature gets buffed" do
+      expect(wood_elves.power).to eq(2)
+      expect(wood_elves.toughness).to eq(2)
     end
   end
 
   context "when this card's ability exists" do
-    before do
-      glorious_anthem.entered_the_battlefield!
-    end
-
     context "leaving the battlefield" do
       it "clears the static ability" do
-        glorious_anthem.left_the_battlefield!
+        glorious_anthem.destroy!
         expect(game.battlefield.static_abilities.count).to eq(0)
+        expect(wood_elves.power).to eq(1)
+      expect(wood_elves.toughness).to eq(1)
       end
     end
   end
