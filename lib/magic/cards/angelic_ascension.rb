@@ -12,8 +12,8 @@ module Magic
 
       def resolve!(target:)
         target.exile!
-        token = Tokens::Angel.new(game: game)
-        token.resolve!(controller)
+
+        Permanent.resolve(game: game, controller: controller, card: Tokens::Angel.new)
       end
     end
   end

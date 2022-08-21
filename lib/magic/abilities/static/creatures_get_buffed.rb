@@ -12,7 +12,7 @@ module Magic
         end
 
         def applies_to?(target)
-          applicable_targets.call.include?(target)
+          applicable_targets.include?(target)
         end
       end
     end

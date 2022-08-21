@@ -1,6 +1,6 @@
 module Magic
   module Tokens
-    class Knight < CreatureToken
+    class Knight < Creature
       POWER = 2
       TOUGHNESS = 2
       NAME = "Knight"

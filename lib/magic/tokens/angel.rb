@@ -1,6 +1,6 @@
 module Magic
   module Tokens
-    class Angel < CreatureToken
+    class Angel < Creature
       POWER = 4
       TOUGHNESS = 4
       NAME = "Angel"

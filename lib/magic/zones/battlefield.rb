@@ -12,7 +12,7 @@ module Magic
       end
 
       def add(permanent)
-        raise "#{permanent} is not a permanent, so cannot be added to the battlefield." unless permanent.is_a?(Permanent)
+        raise "#{permanent} is not a permanent, so cannot be added to the battlefield." unless permanent.is_a?(Permanent) || permanent.is_a?(Token)
         super(permanent)
       end
 

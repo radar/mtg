@@ -4,19 +4,40 @@ module Magic
       NAME = "Geist Honored Monk"
       TYPE_LINE = "Creature -- Human Monk"
 
-      def power
-        controlled_creatures_count
+      class DynamicPowerAndToughness < Abilities::Static::CreaturesGetBuffed
+        def initialize(source:)
+          @source = source
+        end
+
+        def power
+          creature_count
+        end
+
+        def toughness
+          creature_count
+        end
+
+        def creature_count
+          source.controller.creatures.count
+        end
+
+        def applicable_targets
+          source.controller.creatures.select { |creature| creature.card == source.card }
+        end
       end
 
-      def toughness
-        controlled_creatures_count
+      class ETB < TriggeredAbility::EnterTheBattlefield
+        def perform
+          2.times do
+            token = Tokens::Spirit.new(game: game)
+            token.resolve!(controller)
+          end
+        end
       end
 
-      private
+      def etb_triggers = [ETB]
 
-      def controlled_creatures_count
-        controller.creatures.count
-      end
+      def static_abilities = [DynamicPowerAndToughness]
     end
   end
 end
