@@ -3,18 +3,12 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::GaleSwooper do
   include_context "two player game"
 
-  subject { Card("Gale Swooper", controller: p1) }
-  let(:wood_elves) { Card("Wood Elves", controller: p1) }
-
-  let(:green_card) { double(Magic::Card, colors: [:green] )}
-
-  before do
-    game.battlefield.add(wood_elves)
-  end
+  subject { Card("Gale Swooper") }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
 
   it "grants wood elves flying" do
-    subject.cast!
-    game.stack.resolve!
+    cast_and_resolve(card: subject, player: p1)
+
     grant_flying = game.next_effect
     expect(grant_flying).to be_a(Magic::Effects::SingleTargetAndResolve)
     game.resolve_pending_effect(wood_elves)
