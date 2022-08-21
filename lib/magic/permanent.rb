@@ -24,7 +24,7 @@ module Magic
 
     attr_accessor :zone
 
-    def self.resolve(game:, controller:, card:, from_zone: controller.library)
+    def self.resolve(game:, controller:, card:, from_zone: controller.library, enters_tapped: false)
       if card.planeswalker?
         permanent = Magic::Permanents::Planeswalker.new(game: game, controller: controller, card: card)
       elsif card.creature?
@@ -33,7 +33,7 @@ module Magic
         permanent = Magic::Permanent.new(game: game, controller: controller, card: card)
       end
 
-      permanent.tap! if card.enters_tapped?
+      permanent.tap! if enters_tapped
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       permanent
     end
@@ -125,7 +125,7 @@ module Magic
     end
 
     def gains_protection_from_color(color, until_eot:)
-      @protections << Permanents::Protection.from_color(color, until_eot: until_eot)
+      @protections << Protection.from_color(color, until_eot: until_eot)
     end
 
     def permanent?
@@ -149,7 +149,7 @@ module Magic
     end
 
     def static_abilities
-      []
+      card.static_abilities.map { |ability| ability.new(source: self) }
     end
 
     def alive?
@@ -163,6 +163,7 @@ module Magic
     def destroy!
       move_zone!(to: controller.graveyard)
     end
+    alias_method :sacrifice!, :destroy!
 
     def exile!
       move_zone!(to: controller.exile)

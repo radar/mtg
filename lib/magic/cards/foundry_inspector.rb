@@ -6,15 +6,15 @@ module Magic
       power 3
       toughness 2
 
-      def static_abilities
-        [
-          Abilities::Static::ReduceManaCost.new(
-            source: self,
-            reduction: { generic: 1 },
-            applies_to: -> (c) { c.artifact? }
-          )
-        ]
+      class ReduceManaCost < Abilities::Static::ReduceManaCost
+        def initialize(source:)
+          @source = source
+          @reduction = { generic: 1 }
+          @applies_to = -> (c) { c.artifact? }
+        end
       end
+
+      def static_abilities = [ReduceManaCost]
     end
   end
 end

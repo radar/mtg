@@ -1,11 +1,11 @@
 module Magic
   module Effects
     class SearchLibraryBasicLandEntersTapped
-      def self.new(source:, choices:)
+      def self.new(source:, library:)
         Effects::SearchLibrary.new(
-          choices: choices,
+          choices: library.basic_lands,
           source: source,
-          resolve_action: -> (c) { c.resolve!; c.tapped = true }
+          resolve_action: -> (c) { c.resolve!(source.controller, enters_tapped: true) }
         )
       end
     end

@@ -1,25 +1,27 @@
 module Magic
   module Cards
-    FontOfFertility = Card("Font of Fertility") do
+    FontOfFertility = Enchantment("Font of Fertility") do
       type "Enchantment"
       cost green: 1
     end
 
-    class FontOfFertility < Card
-      def activated_abilities
-        [
-          ActivatedAbility.new(
-            costs: [Costs::Mana.new(generic: 1, green: 1)],
-            ability: -> {
-              destroy!
-              add_effect(
-                "SearchLibraryBasicLandEntersTapped",
-                choices: controller.library.basic_lands
-              )
-            }
+
+    class FontOfFertility < Enchantment
+      class ActivatedAbility < Magic::ActivatedAbility
+
+        def initialize(source:)
+          @costs = [Costs::Mana.new(green: 1), Costs::Sacrifice.new(source)]
+          super
+        end
+
+        def resolve!
+          game.add_effect(
+            Effects::SearchLibraryBasicLandEntersTapped.new(source: source, library: source.controller.library)
           )
-        ]
+        end
       end
+
+      def activated_abilities = [ActivatedAbility]
     end
   end
 end

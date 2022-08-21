@@ -6,7 +6,7 @@ module Magic
       power 5
       toughness 5
       keywords :flying, :first_strike, :lifelink
-      protections [Card::Protection.new(condition: -> (card) { card.any_type?("Demon", "Dragon") })]
+      protections [Protection.new(condition: -> (card) { card.any_type?("Demon", "Dragon") })]
     end
   end
 end

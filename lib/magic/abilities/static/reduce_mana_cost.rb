@@ -21,8 +21,6 @@ module Magic
           cost.reduced_by(@reduction)
         end
 
-        def remove
-        end
       end
     end
   end

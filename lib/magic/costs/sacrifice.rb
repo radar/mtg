@@ -1,11 +1,12 @@
 module Magic
   module Costs
     class Sacrifice
+      attr_reader :target
       def initialize(target)
         @target = target
       end
 
-      def pay(player, target)
+      def pay(player, chosen_target)
         target.sacrifice!
       end
 

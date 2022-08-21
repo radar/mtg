@@ -6,7 +6,7 @@ module Magic
       power 3
       toughness 4
       keywords :vigilance
-      protections [Card::Protection.new(condition: -> (card) { card.multi_colored? })]
+      protections [Protection.new(condition: -> (card) { card.multi_colored? })]
     end
 
     class BasrisLieutenant < Creature
