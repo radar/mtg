@@ -24,8 +24,10 @@ module CardHelper
     game.stack.resolve!
   end
 
-  def cast_and_resolve(card:, player:)
-    game.stack.add(cast_action(card: card, player: player))
+  def cast_and_resolve(card:, player:, targeting: nil)
+    action = cast_action(card: card, player: player)
+    action = action.targeting(targeting) if targeting
+    game.stack.add(action)
     game.stack.resolve!
   end
 end

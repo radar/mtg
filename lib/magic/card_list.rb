@@ -13,7 +13,7 @@ module Magic
     end
 
     def creatures
-      select(&:creature?)
+       select(&:creature?)
     end
 
     def planeswalkers

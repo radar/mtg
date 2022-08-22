@@ -1,6 +1,10 @@
 module Magic
   module Zones
     class Battlefield < Zone
+      extend Forwardable
+
+      def_delegators :permanents, :creatures
+
       def initialize(**args)
         super(**args)
       end
