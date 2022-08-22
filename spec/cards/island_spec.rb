@@ -1,12 +1,14 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::Island do
-  let(:p1) { Magic::Player.new }
-  let(:card) { described_class.new(controller: p1) }
+  include_context "two player game"
+
+  subject { ResolvePermanent("Island", controller: p1) }
 
   it "taps for a single blue mana" do
-    card.tap!
-    expect(p1.mana_pool[:blue]).to eq(1)
-    expect(card).to be_tapped
+    expect(p1).to receive(:add_mana).with(blue: 1)
+    action = Magic::Actions::ActivateAbility.new(player: p1, permanent: subject, ability: subject.activated_abilities.first)
+    action.pay_tap
+    game.take_action(action)
   end
 end

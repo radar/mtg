@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::HellkitePunisher do
   include_context "two player game"
 
-  subject { Card("Hellkite Punisher", controller: p1) }
+  subject { ResolvePermanent("Hellkite Punisher", controller: p1) }
 
   it { is_expected.to be_flying }
 
@@ -14,16 +14,15 @@ RSpec.describe Magic::Cards::HellkitePunisher do
       p1.add_mana(red: 2)
 
       ability = subject.activated_abilities.first
-      activation = p1.activate_ability(ability)
-      activation.pay(:mana, red: 1)
-      activation.activate!
+      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: subject, ability: ability)
+      action.pay_mana(red: 1)
+      game.take_action(action)
       game.stack.resolve!
       expect(subject.power).to eq(7)
 
-      ability = subject.activated_abilities.first
-      activation = p1.activate_ability(ability)
-      activation.pay(:mana, red: 1)
-      activation.activate!
+      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: subject, ability: ability)
+      action.pay_mana(red: 1)
+      game.take_action(action)
       game.stack.resolve!
 
       expect(subject.power).to eq(8)

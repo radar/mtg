@@ -95,10 +95,6 @@ module Magic
       countered
     end
 
-    def controller?(other_controller)
-      controller == other_controller
-    end
-
     def resolve!(controller = nil, enters_tapped: enters_tapped?)
       if permanent?
         Magic::Permanent.resolve(game: game, controller: controller, card: self, from_zone: zone, enters_tapped: enters_tapped)

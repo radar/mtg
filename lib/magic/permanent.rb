@@ -65,6 +65,10 @@ module Magic
 
     alias_method :to_s, :inspect
 
+    def controller?(other_controller)
+      controller == other_controller
+    end
+
     def move_zone!(from: zone, to:)
       game.notify!(
         Events::LeavingZoneTransition.new(

@@ -12,7 +12,7 @@ module Magic
     end
 
     def costs
-      @costs || self.class::COSTS
+      @costs || self.class::COSTS.dup
     end
 
     def game

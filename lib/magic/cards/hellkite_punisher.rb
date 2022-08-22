@@ -12,12 +12,12 @@ module Magic
       class ActivatedAbility < Magic::ActivatedAbility
         attr_reader
 
-        def initialize(...)
-          super(costs: [Costs::Mana.new(generic: 4, white: 1)])
+        def costs
+          [Costs::Mana.new(red: 1)]
         end
 
         def resolve!
-          self.modifiers << Buff.new(power: 3, toughness: 3, until_eot: true)
+          source.modifiers << Magic::Permanents::Creature::Buff.new(power: 1, toughness: 0, until_eot: true)
         end
       end
 
