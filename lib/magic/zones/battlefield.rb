@@ -5,19 +5,20 @@ module Magic
         super(**args)
       end
 
-      alias_method :permanents, :cards
-
       def battlefield?
         true
       end
 
       def add(permanent)
-        raise "#{permanent} is not a permanent, so cannot be added to the battlefield." unless permanent.is_a?(Permanent) || permanent.is_a?(Token)
         super(permanent)
       end
 
       def static_abilities
         StaticAbilities.new(@cards.flat_map(&:static_abilities))
+      end
+
+      def permanents
+        cards.permanents
       end
 
       def receive_event(event)
@@ -32,7 +33,7 @@ module Magic
             remove(event.card)
           end
         end
-        @cards.each { |card| card.receive_notification(event) }
+        permanents.each { |permanent| permanent.receive_notification(event) }
       end
 
       def cleanup

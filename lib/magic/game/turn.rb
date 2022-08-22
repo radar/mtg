@@ -24,7 +24,16 @@ module Magic
         end
 
         after_transition to: :draw do |turn|
+          turn.notify!(
+            Events::DrawStep.new
+          )
           turn.active_player.draw!
+        end
+
+        after_transition to: :first_main do |turn|
+          turn.notify!(
+            Events::FirstMainPhase.new
+          )
         end
 
         after_transition to: :beginning_of_combat do |turn|

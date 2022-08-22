@@ -38,6 +38,10 @@ module Magic
       @stack.unshift(item)
     end
 
+    def spells
+      @stack.select { |item| item.is_a?(Magic::Actions::Cast) }
+    end
+
     def cards
       @stack.map do |item|
         item.respond_to?(:card) ? item.card : item

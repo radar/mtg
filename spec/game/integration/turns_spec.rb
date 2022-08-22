@@ -29,13 +29,14 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_1.first_main!
 
     # expect(p1.possible_actions.any? { |action| action.is_a?(Magic::Actions::PlayLand) }).to eq(true)
-    action = Magic::Actions::PlayLand.new(player: p1, zone: p1.hand, name: "Island")
+    action = Magic::Actions::PlayLand.new(player: p1, card: p1.hand.by_name("Island").first)
     game.take_action(action)
     expect(p1.permanents.by_name("Island").count).to eq(1)
     expect(p1.lands_played).to eq(1)
+    expect(p1.hand.by_name("Island").count).to eq(6)
 
     island = p1.permanents.by_name("Island").first
-    action = Magic::Actions::TapPermanent.new(player: p1, permanent: island)
+    action = Magic::Actions::ActivateAbility.new(player: p1, permanent: island, ability: island.activated_abilities.first)
     game.take_action(action)
     expect(p1.mana_pool).to eq(blue: 1)
 
@@ -67,10 +68,10 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_2.draw!
     turn_2.first_main!
 
-    action = Magic::Actions::PlayLand.new(player: p2, zone: p2.hand, name: "Mountain")
+    action = Magic::Actions::PlayLand.new(player: p2, card: p2.hand.by_name("Mountain").first)
     game.take_action(action)
     mountain = p2.permanents.by_name("Mountain").first
-    action = Magic::Actions::TapPermanent.new(player: p2, permanent: mountain)
+    action = Magic::Actions::ActivateAbility.new(player: p1, permanent: mountain, ability: mountain.activated_abilities.first)
     game.take_action(action)
     expect(p2.mana_pool).to eq(red: 1)
 

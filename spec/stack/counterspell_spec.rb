@@ -3,21 +3,31 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::Counterspell do
   include_context "two player game"
 
-  let(:sol_ring) { Card("Sol Ring", controller: p2)}
-  let(:annul) { Card("Annul", controller: p1)}
-  subject(:counterspell) { described_class.new(game: game, controller: p2) }
+  let(:sol_ring) { Card("Sol Ring", game: game) }
+  let(:annul) { Card("Annul", game: game) }
+  let(:counterspell) { described_class.new(game: game) }
 
   context "counters annul, which was countering sol ring" do
     it "sol ring enters the battlefield" do
+      p1.add_mana(red: 1)
+      sol_ring_action = cast_action(card: sol_ring, player: p1)
+      sol_ring_action.pay_mana(generic: { red: 1 } )
+      game.take_action(sol_ring_action)
 
-      game.stack.cast(sol_ring)
-      game.stack.targeted_cast(annul, targeting: sol_ring)
-      game.stack.targeted_cast(counterspell, targeting: annul)
+      p2.add_mana(blue: 1)
+      annul_action = cast_action(card: annul, player: p2).targeting(sol_ring_action)
+      annul_action.pay_mana(blue: 1)
+      game.take_action(annul_action)
+
+      p1.add_mana(blue: 2)
+      counterspell_action = cast_action(card: counterspell, player: p1).targeting(annul_action)
+      counterspell_action.pay_mana(blue: 2)
+      game.take_action(counterspell_action)
 
       game.stack.resolve!
-      expect(annul).to be_countered
       expect(annul.zone).to be_graveyard
-      expect(sol_ring.zone).to be_battlefield
+
+      expect(p1.permanents.by_name("Sol Ring").count).to eq(1)
     end
   end
 end

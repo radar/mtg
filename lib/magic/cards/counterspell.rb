@@ -5,7 +5,11 @@ module Magic
       COST = { blue: 2 }
 
       def target_choices
-        game.stack.cards
+        game.stack.spells
+      end
+
+      def single_target?
+        true
       end
 
       def resolve!(target:)

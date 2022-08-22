@@ -21,7 +21,7 @@ module Magic
     end
 
     def permanents
-      select(&:permanent?)
+      select { |card| card.is_a?(Magic::Permanent) }
     end
 
     def dead
