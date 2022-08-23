@@ -5,17 +5,18 @@ module Magic
       TYPE_LINE = "Enchantment -- Aura"
       COST = { generic: 2, white: 1 }
 
-      def resolve!
-        enchant_creature
-        super
+      def target_choices
+        battlefield.creatures
       end
 
-      def receive_notification(event)
-        case event
-        when Events::LifeGain
-          return unless event.player == controller
-          attached_to.add_counter(Counters::Plus1Plus1, amount: event.life)
-        end
+      def event_handlers
+        {
+          # Whenever you gain life, put that many +1/+1 counters on this creature.”
+          Events::LifeGain => -> (receiver, event) do
+            return unless event.player == receiver.controller
+            receiver.attached_to.add_counter(Counters::Plus1Plus1, amount: event.life)
+          end
+        }
       end
     end
   end

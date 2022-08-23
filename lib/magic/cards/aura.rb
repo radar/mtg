@@ -1,15 +1,13 @@
 module Magic
   module Cards
     class Aura < Card
-      attr_reader :attached_to
-
       def single_target?
         true
       end
 
-      def enchant_creature(target:)
-        @attached_to = target
-        target.attachments << self
+      def resolve!(target:)
+        permanent = super(controller)
+        permanent.attach_to!(target)
       end
 
       def power_buff

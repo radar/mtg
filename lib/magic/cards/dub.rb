@@ -9,11 +9,6 @@ module Magic
         battlefield.creatures
       end
 
-      def resolve!(target:)
-        enchant_creature(target: target)
-        super(controller)
-      end
-
       def power_buff
         2
       end

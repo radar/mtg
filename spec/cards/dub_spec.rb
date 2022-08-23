@@ -15,6 +15,9 @@ RSpec.describe Magic::Cards::Dub do
         .targeting(wood_elves)
       game.take_action(action)
       game.stack.resolve!
+      expect(wood_elves.attachments.count).to eq(1)
+      expect(wood_elves.attachments.first).to be_a(Magic::Permanent)
+      expect(wood_elves.attachments.first.name).to eq("Dub")
       expect(wood_elves.power).to eq(3)
       expect(wood_elves.toughness).to eq(3)
       expect(wood_elves.first_strike?).to eq(true)

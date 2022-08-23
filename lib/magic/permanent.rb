@@ -29,6 +29,8 @@ module Magic
         permanent = Magic::Permanents::Planeswalker.new(game: game, controller: controller, card: card)
       elsif card.creature?
         permanent = Magic::Permanents::Creature.new(game: game, controller: controller, card: card)
+      elsif card.enchantment?
+        permanent = Magic::Permanents::Enchantment.new(game: game, controller: controller, card: card)
       elsif card.permanent?
         permanent = Magic::Permanent.new(game: game, controller: controller, card: card)
       end

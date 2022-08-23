@@ -11,8 +11,7 @@ module Magic
 
       def resolve!(target:)
         controller.gain_life(4)
-        enchant_creature(target: target)
-        super(controller)
+        super
       end
 
       def can_attack?

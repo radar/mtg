@@ -97,8 +97,9 @@ module Magic
 
     def resolve!(controller = nil, enters_tapped: enters_tapped?)
       if permanent?
-        Magic::Permanent.resolve(game: game, controller: controller, card: self, from_zone: zone, enters_tapped: enters_tapped)
+        permanent = Magic::Permanent.resolve(game: game, controller: controller, card: self, from_zone: zone, enters_tapped: enters_tapped)
         move_zone!(game.battlefield)
+        permanent
       end
     end
 
