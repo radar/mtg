@@ -11,15 +11,11 @@ module Magic
         end
 
         def power
-          creature_count
+          1
         end
 
         def toughness
-          creature_count
-        end
-
-        def creature_count
-          source.controller.creatures.count
+          1
         end
 
         def applicable_targets
