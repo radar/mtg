@@ -1,6 +1,6 @@
 module Magic
   module Events
-    class EnteredZone
+    class CardEnteredZone
       attr_reader :card, :from, :to
 
       def initialize(card, from:, to:)
@@ -14,7 +14,7 @@ module Magic
       end
 
       def inspect
-        "#<Events::EnteredZone card: #{card.name}, from: #{from}, to: #{to}>"
+        "#<Events::CardEnteredZone card: #{card.name}, from: #{from}, to: #{to}>"
       end
     end
   end

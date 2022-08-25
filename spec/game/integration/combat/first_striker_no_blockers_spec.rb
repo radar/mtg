@@ -3,11 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- first striker, no blockers" do
   include_context "two player game"
 
-  let(:battlefield_raptor) { Card("Battlefield Raptor") }
-
-  before do
-    game.battlefield.add(battlefield_raptor)
-  end
+  let!(:battlefield_raptor) { ResolvePermanent("Battlefield Raptor", controller: p1) }
 
   context "when in combat" do
     before do

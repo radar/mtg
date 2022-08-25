@@ -6,11 +6,17 @@ module Magic
     end
 
     class Mortify < Instant
-      def resolve!
-        add_effect(
-          "DestroyTarget",
-          choices: battlefield.cards.by_any_type("Creature", "Enchantment")
-        )
+      def target_choices
+        battlefield.cards.by_any_type("Creature", "Enchantment")
+      end
+
+      def single_target?
+        true
+      end
+
+      def resolve!(_controller, target:)
+        target.destroy!
+
         super
       end
     end

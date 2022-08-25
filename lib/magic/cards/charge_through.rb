@@ -12,13 +12,13 @@ module Magic
         true
       end
 
-      def resolve!(target:)
+      def resolve!(controller, target:)
         if target.zone == battlefield
           target.grant_keyword(Keywords::TRAMPLE, until_eot: true)
           controller.draw!
         end
 
-        super()
+        super
       end
     end
   end

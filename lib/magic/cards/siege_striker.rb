@@ -9,16 +9,17 @@ module Magic
     end
 
     class SiegeStriker < Creature
-      def receive_notification(event)
-        case event
-        when Events::PermanentTapped
-          # TODO: Only apply if within attack phase of controller's turn
-          return unless game.current_turn.active_player == controller
-          return unless game.current_turn.step?(:declare_attackers)
-          return unless event.permanent.creature?
+      def event_handlers
+        {
+          Events::PermanentTapped => -> (receiver, event) do
+            # TODO: Only apply if within attack phase of controller's turn
+            return unless game.current_turn.active_player == receiver.controller
+            return unless game.current_turn.step?(:declare_attackers)
+            return unless event.permanent.creature?
 
-          self.modifiers << Buff.new(power: 1, toughness: 1, until_eot: true)
-        end
+            receiver.modifiers << Permanents::Creature::Buff.new(power: 1, toughness: 1, until_eot: true)
+          end
+        }
       end
     end
   end

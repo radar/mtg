@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::LightOfPromise do
   include_context "two player game"
 
-  subject { Card("Light Of Promise", controller: p1) }
+  subject { Card("Light Of Promise") }
 
   context "resolution" do
     let(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }

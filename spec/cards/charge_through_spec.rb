@@ -5,8 +5,8 @@ RSpec.describe Magic::Cards::ChargeThrough do
 
   let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
 
-  let(:eliminate) { Magic::Cards::Eliminate.new(game: game, controller: p1) }
-  let(:charge_through) { described_class.new(game: game, controller: p1) }
+  let(:eliminate) { Magic::Cards::Eliminate.new(game: game) }
+  let(:charge_through) { described_class.new(game: game) }
 
   context "cast effect" do
     it "makes the player draw a card" do

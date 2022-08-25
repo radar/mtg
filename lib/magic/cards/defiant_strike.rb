@@ -13,13 +13,13 @@ module Magic
         true
       end
 
-      def resolve!(target:)
+      def resolve!(controller, target:)
         if target.zone == battlefield
           game.add_effect(Effects::ApplyBuff.new(source: self, power: 1, targets: target))
           controller.draw!
         end
 
-        super()
+        super
       end
     end
   end

@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::DefiantStrike do
   include_context "two player game"
 
-  subject { Card("Defiant Strike", controller: p1) }
+  subject { Card("Defiant Strike") }
 
   context "resolution" do
     let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }

@@ -3,7 +3,11 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::BasrisAcolyte do
   include_context "two player game"
 
-  subject { Card("Basri's Acolyte", controller: p1) }
+  subject { Card("Basri's Acolyte") }
+
+  before do
+    p1.hand.add(subject)
+  end
 
   it "has lifelink" do
     expect(subject.lifelink?).to eq(true)

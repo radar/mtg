@@ -5,13 +5,20 @@ module Magic
     end
 
     class RunedHalo < Enchantment
-      def entered_the_battlefield!
-        add_effect(
-          "ChooseACard",
-        )
-
-        super
+      class ETB < TriggeredAbility::EnterTheBattlefield
+        def perform
+          game.add_effect(
+            Effects::ChooseACard.new(
+              source: permanent,
+              resolution: -> (chosen_card) do
+                permanent.protections << Protection.new(condition: -> (c) { chosen_card == c.class }, protects_player: true)
+              end
+            )
+          )
+        end
       end
+
+      def etb_triggers = [ETB]
     end
   end
 end

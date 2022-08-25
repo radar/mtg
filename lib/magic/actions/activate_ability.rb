@@ -35,6 +35,7 @@ module Magic
 
       def pay_mana(payment)
         pay(player, :mana, payment)
+        self
       end
 
       def pay_tap
@@ -43,7 +44,11 @@ module Magic
 
       def perform
         if targets.any?
-          ability.resolve!(targets: targets)
+          if ability.single_target?
+            ability.resolve!(target: targets.first)
+          else
+            ability.resolve!(targets: targets)
+          end
         else
           ability.resolve!
         end
@@ -66,6 +71,8 @@ module Magic
         cost = costs.find { |cost| cost.is_a?(cost_type) }
         cost.pay(player, payment)
         costs.each { |cost| cost.finalize!(player) }
+
+        self
       end
     end
   end

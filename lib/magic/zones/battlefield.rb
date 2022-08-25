@@ -26,17 +26,6 @@ module Magic
       end
 
       def receive_event(event)
-        case event
-        when Events::EnteredZone
-          if event.to == :battlefield
-            add(event.card)
-          end
-
-        when Events::LeavingZone
-          if event.from == :battlefield
-            remove(event.card)
-          end
-        end
         permanents.each { |permanent| permanent.receive_notification(event) }
       end
 

@@ -2,10 +2,18 @@ module Magic
   module Cards
     class Shatter < Instant
       NAME = "Shatter"
-      COST = { any: 1, red: 1 }
+      COST = { generic: 1, red: 1 }
 
-      def resolve!
-        add_effect("DestroyTarget", choices: battlefield.cards.select(&:artifact?))
+      def target_choices
+        battlefield.permanents.by_any_type("Artifact")
+      end
+
+      def single_target?
+        true
+      end
+
+      def resolve!(_controller, target:)
+        target.destroy!
         super
       end
     end

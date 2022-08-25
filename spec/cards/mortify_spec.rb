@@ -3,31 +3,23 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::Mortify do
   include_context "two player game"
 
-  subject { Card("Mortify", controller: p1) }
+  subject(:card) { Card("Mortify") }
 
   context "destroys a creature" do
-    let(:loxodon_wayfarer) { Card("Loxodon Wayfarer", controller: p2) }
-    before do
-      game.battlefield.add(loxodon_wayfarer)
-    end
-
+    let(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", controller: p1) }
     it "destroys the creature" do
-      subject.cast!
-      game.stack.resolve!
+      action = cast_action(card: card, player: p1).targeting(loxodon_wayfarer)
+      add_to_stack_and_resolve(action)
       expect(loxodon_wayfarer.zone).to be_graveyard
     end
   end
 
   context "destroys an enchantment" do
-    let(:glorious_anthem) { Card("Glorious Anthem", controller: p2) }
-
-    before do
-      game.battlefield.add(glorious_anthem)
-    end
+    let(:glorious_anthem) { ResolvePermanent("Glorious Anthem", controller: p1) }
 
     it "destroys the enchantment" do
-      subject.cast!
-      game.stack.resolve!
+      action = cast_action(card: card, player: p1).targeting(glorious_anthem)
+      add_to_stack_and_resolve(action)
       expect(glorious_anthem.zone).to be_graveyard
     end
   end

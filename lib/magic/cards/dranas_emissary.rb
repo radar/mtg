@@ -8,15 +8,20 @@ module Magic
       toughness 2
     end
 
-    class DranasEmissary < Creature
-      def receive_notification(event)
-        case event
-        when Events::BeginningOfUpkeep
-          return unless game.current_turn.active_player == controller
 
-          controller.gain_life(1)
-          game.deal_damage_to_opponents(controller, 1)
-        end
+    class DranasEmissary < Creature
+
+      def event_handlers
+        {
+          Events::BeginningOfUpkeep => -> (receiver, event) do
+            controller = receiver.controller
+            return unless game.current_turn.active_player == controller
+
+            controller.gain_life(1)
+            game.deal_damage_to_opponents(controller, 1)
+
+          end
+        }
       end
     end
   end

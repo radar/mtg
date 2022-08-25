@@ -5,13 +5,20 @@ module Magic
     end
 
     class SecureTheScene < Sorcery
-      def resolve!(targets:)
-        add_effect("ExileTarget", choices: battlefield.creatures, targets: targets)
+      def target_choices
+        battlefield.creatures
+      end
 
-        token = Tokens::Soldier.new(game: game, controller: targets.first.controller)
-        token.resolve!
+      def single_target?
+        true
+      end
 
-        super()
+      def resolve!(controller, target:)
+        target.exile!
+
+        Permanent.resolve(game: game, controller: target.controller, card: Tokens::Soldier.new)
+
+        super
       end
     end
   end

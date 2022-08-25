@@ -9,13 +9,16 @@ module Magic
         @choices = choices
       end
 
-
       def requires_choices?
         true
       end
 
       def single_choice?
         choices.count == 1
+      end
+
+      def no_choice?
+        choices.count == 0
       end
 
       def resolve(targets)

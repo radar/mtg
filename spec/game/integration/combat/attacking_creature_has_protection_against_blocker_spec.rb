@@ -3,13 +3,8 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- attacking creature has protection against blocker" do
   include_context "two player game"
 
-  let(:baneslayer_angel) { Card("Baneslayer Angel", controller: p1) }
-  let(:hellkite_punisher) { Card("Hellkite Punisher", controller: p2) }
-
-  before do
-    game.battlefield.add(baneslayer_angel)
-    game.battlefield.add(hellkite_punisher)
-  end
+  let!(:baneslayer_angel) { ResolvePermanent("Baneslayer Angel", controller: p1) }
+  let!(:hellkite_punisher) { ResolvePermanent("Hellkite Punisher", controller: p2) }
 
   context "when in combat" do
     before do
@@ -17,8 +12,6 @@ RSpec.describe Magic::Game, "combat -- attacking creature has protection against
     end
 
     it "p2 cannot block with its hellkite" do
-      expect(game.battlefield.cards).to include(baneslayer_angel)
-      expect(game.battlefield.cards).to include(hellkite_punisher)
       p1_starting_life = p1.life
       p2_starting_life = p2.life
 

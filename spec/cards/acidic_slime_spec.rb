@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::AcidicSlime do
   include_context "two player game"
 
-  subject { Card("Acidic Slime") }
+  subject { add_to_library("Acidic Slime", player: p1) }
 
   let(:land) { Permanent("Island", controller: p1) }
   let(:enchantment) { Permanent("Glorious Anthem", controller: p1) }

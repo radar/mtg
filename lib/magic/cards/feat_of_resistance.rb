@@ -9,11 +9,11 @@ module Magic
         true
       end
 
-      def target_choices
+      def target_choices(controller)
         controller.creatures
       end
 
-      def resolve!(target:)
+      def resolve!(controller, target:)
         target.add_counter(Counters::Plus1Plus1)
         game.choices.add(
           Magic::Choice::Color.new(

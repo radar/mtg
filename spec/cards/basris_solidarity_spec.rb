@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::BasrisSolidarity do
   include_context "two player game"
 
-  subject { Card("Basri's Solidarity", controller: p1) }
+  subject { Card("Basri's Solidarity") }
 
   let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
   let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", controller: p2) }

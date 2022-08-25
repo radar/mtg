@@ -12,10 +12,8 @@ module Magic
         game.stack.select { |c| c.enchantment? || c.artifact? }
       end
 
-      def resolve!(target:)
+      def resolve!(_controller, target:)
         Effects::CounterSpell.new(source: self).resolve(target)
-
-        super()
       end
     end
   end

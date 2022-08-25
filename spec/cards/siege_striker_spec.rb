@@ -3,17 +3,10 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::SiegeStriker do
   include_context "two player game"
 
-  subject(:siege_striker) { Card("Siege Striker", controller: p1) }
-  let(:wood_elves) { Card("Wood Elves", controller: p1) }
-
-  let(:p1_library) do
-    2.times.map { Card("Island") }
-  end
+  subject(:siege_striker) { ResolvePermanent("Siege Striker", controller: p1) }
+  let(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
 
   before do
-    p1.draw!
-    game.battlefield.add(wood_elves)
-    game.battlefield.add(subject)
     skip_to_combat!
   end
 

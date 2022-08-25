@@ -3,13 +3,8 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- single attacker, stronger blocker" do
   include_context "two player game"
 
-  let(:loxodon_wayfarer) { Card("Loxodon Wayfarer") }
-  let(:vastwood_gorger) { Card("Vastwood Gorger") }
-
-  before do
-    game.battlefield.add(loxodon_wayfarer)
-    game.battlefield.add(vastwood_gorger)
-  end
+  let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", controller: p1) }
+  let!(:vastwood_gorger) { ResolvePermanent("Vastwood Gorger", controller: p2) }
 
   context "when in combat" do
     before do
@@ -17,10 +12,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, stronger blocker" do
     end
 
     it "p2 blocks with a vastwood gorger" do
-      expect(game.battlefield.cards).to include(loxodon_wayfarer)
-      expect(game.battlefield.cards).to include(vastwood_gorger)
       p2_starting_life = p2.life
-
 
       current_turn.declare_attackers!
 

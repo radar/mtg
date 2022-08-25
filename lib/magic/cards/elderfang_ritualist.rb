@@ -11,7 +11,7 @@ module Magic
           game.add_effect(
             Effects::SearchGraveyard.new(
               source: permanent,
-              choices: controller.graveyard.by_any_type("Elf"),
+              choices: controller.graveyard.by_any_type("Elf") - [permanent.card],
               resolve_action: -> (c) { c.move_to_hand!(controller) }
             )
           )

@@ -8,18 +8,23 @@ module Magic
     end
 
     class SeasonedHallowblade < Creature
-      def activated_abilities
-        [
-          ActivatedAbility.new(
-            costs: [Costs::Discard.new(controller)],
-            ability: -> (targets:) {
-              Effects::TapTarget.new(source: self, choices: [self], targets: [self]).resolve
-              grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
-            },
-            targets: [self]
-          )
-        ]
+      class ActivatedAbility < Magic::ActivatedAbility
+
+        def costs
+          [Costs::Discard.new(source.controller)]
+        end
+
+        def single_target?
+          true
+        end
+
+        def resolve!
+          source.tap!
+          source.grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
+        end
       end
+
+      def activated_abilities = [ActivatedAbility]
     end
   end
 end

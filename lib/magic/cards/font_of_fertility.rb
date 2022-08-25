@@ -16,7 +16,7 @@ module Magic
 
         def resolve!
           game.add_effect(
-            Effects::SearchLibraryBasicLandEntersTapped.new(source: source, library: source.controller.library)
+            Effects::SearchLibraryBasicLandEntersTapped.new(source: source, controller: source.controller)
           )
         end
       end

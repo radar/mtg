@@ -4,9 +4,11 @@ module Magic
       NAME = "Revitalize"
       COST = { generic: 1, white: 1 }
 
-      def resolve!
-        add_effect("YouGainLife", life: 3)
-        add_effect("DrawCards", player: controller)
+      def resolve!(controller)
+        controller.gain_life(3)
+        controller.draw!
+
+        super
       end
     end
   end

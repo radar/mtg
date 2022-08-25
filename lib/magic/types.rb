@@ -31,6 +31,14 @@ module Magic
       type?("Enchantment")
     end
 
+    def instant?
+      type?("Instant")
+    end
+
+    def sorcery?
+      type?("Sorcery")
+    end
+
     def permanent?
       land? || creature? || planeswalker? || artifact? || enchantment?
     end

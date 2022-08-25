@@ -4,11 +4,9 @@ module Magic
     include Types
 
     extend Forwardable
-    attr_reader :game, :controller, :card,:types, :delayed_responses, :attachments, :modifiers, :counters, :keywords, :activated_abilities
+    attr_reader :game, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :activated_abilities
 
-    # TODO: Move to permanent / creature sub-type
-
-    def_delegators :@card, :name, :cmc, :mana_value
+    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?
 
     class Counters < SimpleDelegator
       def of_type(type)
@@ -53,7 +51,7 @@ module Magic
       @counters = Counters.new([])
       @activated_abilities = card.activated_abilities
       @damage = 0
-      @protections = Protections.new(card.protections)
+      @protections = Protections.new(card.protections.dup)
       super
     end
 
@@ -72,19 +70,22 @@ module Magic
     end
 
     def move_zone!(from: zone, to:)
-      game.notify!(
-        Events::LeavingZoneTransition.new(
-          self,
-          from: from,
-          to: to
+      if from
+        game.notify!(
+          Events::PermanentLeavingZoneTransition.new(
+            self,
+            from: from,
+            to: to
+          )
         )
-      )
 
-      from.remove(self)
+        from.remove(self)
+      end
+
       to.add(self)
 
       game.notify!(
-        Events::EnteredZoneTransition.new(
+        Events::PermanentEnteredZoneTransition.new(
           self,
           from: from,
           to: to
@@ -93,31 +94,31 @@ module Magic
     end
 
     def receive_notification(event)
-      case event
-      when Events::DamageDealt
-        return unless event.target == self
+      trigger_delayed_response(event)
 
-        take_damage(event.damage)
-      when Events::LeavingZone
-        died! if event.card == self && event.death?
-        left_the_battlefield! if event.card == self && event.from.battlefield?
+      case event
+      when Events::PermanentLeavingZone
+        died! if event.permanent == self && event.death?
+        left_the_battlefield! if event.permanent == self && event.from.battlefield?
       when Events::EnteredTheBattlefield
         entered_the_battlefield! if event.permanent == self
       end
 
       handler = card.event_handlers[event.class]
-      handler.call(self, event) if handler
-
-      trigger_delayed_response(event)
+      if handler
+        puts "EVENT HANDLER: #{self} handling #{event}"
+        handler.call(self, event)
+      end
     end
 
     def died!
       card.death_triggers.each do |trigger|
         trigger.new(game: game, permanent: self).perform
-        end
+      end
     end
 
     def left_the_battlefield!
+      @attachments.each(&:destroy!)
     end
 
     def entered_the_battlefield!
@@ -162,11 +163,8 @@ module Magic
       (toughness - damage).positive?
     end
 
-    def colors
-      @card.colors
-    end
-
     def destroy!
+      card.move_to_graveyard!(controller)
       move_zone!(to: controller.graveyard)
     end
     alias_method :sacrifice!, :destroy!
@@ -187,6 +185,27 @@ module Magic
       responses = delayed_responses.select { |response| event.is_a?(response[:event_type]) && response[:turn] == game.current_turn.number }
       responses.each do |response|
         response[:response].call
+      end
+    end
+
+    def cleanup!
+      remove_until_eot_keyword_grants!
+      remove_until_eot_protections!
+    end
+
+    private
+
+    def remove_until_eot_keyword_grants!
+      until_eot_grants = keyword_grants.select(&:until_eot?)
+      until_eot_grants.each do |grant|
+        remove_keyword_grant(grant)
+      end
+    end
+
+    def remove_until_eot_protections!
+      until_eot_protections = protections.select(&:until_eot?)
+      until_eot_protections.each do |protection|
+        protections.delete(protection)
       end
     end
   end

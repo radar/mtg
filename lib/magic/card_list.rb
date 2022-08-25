@@ -24,6 +24,10 @@ module Magic
       select { |card| card.is_a?(Magic::Permanent) }
     end
 
+    def permanent_types
+      by_any_type(*%w(Artifact Creature Enchantment Land Planeswalker))
+    end
+
     def dead
       select(&:dead?)
     end

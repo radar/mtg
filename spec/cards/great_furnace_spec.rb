@@ -10,6 +10,7 @@ RSpec.describe Magic::Cards::GreatFurnace do
     action = Magic::Actions::ActivateAbility.new(player: p1, permanent: subject, ability: subject.activated_abilities.first)
     action.pay_tap
     game.take_action(action)
+    expect(subject).to be_tapped
   end
 
   it "is an artifact" do

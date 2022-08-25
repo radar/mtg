@@ -8,7 +8,7 @@ module Magic
     attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections, :delayed_responses, :counters
     attr_accessor :tapped
 
-    attr_accessor :controller, :zone
+    attr_accessor :zone
 
     COST = {}
     KEYWORDS = []
@@ -40,13 +40,11 @@ module Magic
       end
     end
 
-    def initialize(game: Game.new, controller: Player.new, tapped: false, keywords: [])
+    def initialize(game: Game.new)
       @countered = false
       @name = self.class::NAME
       @type_line = self.class::TYPE_LINE
       @game = game
-      @controller = controller
-      @zone = controller.library
       cost = Costs::Mana.new(self.class::COST.dup)
       @cost = cost
       @tapped = tapped
@@ -62,7 +60,7 @@ module Magic
     end
 
     def inspect
-      "#<Card name:#{name} controller:#{controller.name}>"
+      "#<Card name:#{name}>"
     end
 
     def to_s
@@ -91,6 +89,10 @@ module Magic
       move_zone!(target_controller.hand)
     end
 
+    def move_to_graveyard!(target_controller)
+      move_zone!(target_controller.graveyard)
+    end
+
     def countered?
       countered
     end
@@ -105,21 +107,12 @@ module Magic
 
     alias_method :play!, :resolve!
 
-    def countered!
-      move_zone!(controller.graveyard)
-    end
-
     def discard!
-      move_zone!(controller.graveyard)
+      move_zone!(zone.owner.graveyard)
     end
 
     def exile!
       move_zone!(controller.exile)
-    end
-
-    def cleanup!
-      remove_until_eot_keyword_grants!
-      remove_until_eot_protections!
     end
 
     def notify!(event)
@@ -152,37 +145,24 @@ module Magic
 
     private
 
-    def remove_until_eot_keyword_grants!
-      until_eot_grants = keyword_grants.select(&:until_eot?)
-      until_eot_grants.each do |grant|
-        remove_keyword_grant(grant)
-      end
-    end
-
-    def remove_until_eot_protections!
-      until_eot_protections = protections.select(&:until_eot?)
-      until_eot_protections.each do |protection|
-        protections.delete(protection)
-      end
-    end
-
     def move_zone!(new_zone)
       old_zone = zone
-
-      game.notify!(
-        Events::LeavingZoneTransition.new(
-          self,
-          from: old_zone,
-          to: new_zone
+      if old_zone
+        game.notify!(
+          Events::CardLeavingZoneTransition.new(
+            self,
+            from: old_zone,
+            to: new_zone
+          )
         )
-      )
 
-      old_zone.remove(self)
+        old_zone.remove(self)
+      end
 
       new_zone.add(self)
 
       game.notify!(
-        Events::EnteredZoneTransition.new(
+        Events::CardEnteredZoneTransition.new(
           self,
           from: old_zone,
           to: new_zone

@@ -32,7 +32,9 @@ RSpec.describe Magic::Game, "Mana spend -- Essence Warden" do
         game.take_action(action)
         game.tick!
 
-        p1.tap!(forest)
+        forest = p1.permanents.by_name("Forest").first
+        action = Magic::Actions::ActivateAbility.new(player: p1, permanent: forest, ability: forest.activated_abilities.first)
+        game.take_action(action)
         expect(p1.mana_pool[:green]).to eq(1)
         action = Magic::Actions::Cast.new(player: p1, card: essence_warden)
         expect(action.can_perform?).to eq(true)

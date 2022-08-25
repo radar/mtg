@@ -27,6 +27,10 @@ module Magic
         "#<Magic::Permanent::Creature name:#{card.name} controller:#{controller.name}>"
       end
 
+      def mark_for_death!
+        @marked_for_death = true
+      end
+
       def dead?
         @marked_for_death || !alive?
       end
@@ -60,12 +64,13 @@ module Magic
       end
 
       def fight(target, assigned_damage = power)
+        target.take_damage(assigned_damage)
         game.notify!(
           Events::DamageDealt.new(source: self, target: target, damage: assigned_damage)
         )
         controller.gain_life(assigned_damage) if lifelink?
         if target.is_a?(Creature)
-          target.mark_for_death! if deathtouch? || target.dead?
+          target.mark_for_death! if deathtouch?
         end
       end
 
@@ -82,6 +87,14 @@ module Magic
           @counters << counter_type.new
         end
       end
+
+      def cleanup!
+        until_eot_modifiers = modifiers.select(&:until_eot?)
+        until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }
+
+        super
+      end
+
 
       def static_ability_buffs
         game.battlefield.static_abilities.of_type(Abilities::Static::CreaturesGetBuffed).applies_to(self)

@@ -24,8 +24,12 @@ module Magic
           )
         end
 
-        def resolve!(targets:)
-          Effects::TapTarget.new(source: self, choices: battlefield.creatures, targets: targets).resolve
+        def single_target?
+          true
+        end
+
+        def resolve!(target:)
+          target.tap!
         end
       end
     end

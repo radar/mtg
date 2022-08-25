@@ -23,7 +23,7 @@ RSpec.describe Magic::Cards::EpicureOfBlood do
   end
 
   context "triggered by another card" do
-    let(:hill_giant_herdgorger) { Card("Hill Giant Herdgorger", controller: p1, game: game) }
+    let(:hill_giant_herdgorger) { Card("Hill Giant Herdgorger") }
 
     before do
       game.battlefield.add(subject)

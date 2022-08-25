@@ -1,11 +1,11 @@
 module Magic
   module Tokens
-    class Bird < CreatureToken
+    class Bird < Creature
       POWER = 1
       TOUGHNESS = 1
       NAME = "Bird"
       KEYWORDS = [Keywords::FLYING]
-      TYPE_LINE = "Bird"
+      TYPE_LINE = "Token Creature -- Bird"
 
       def colors
         [:white]

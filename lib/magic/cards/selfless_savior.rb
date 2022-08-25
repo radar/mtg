@@ -8,17 +8,25 @@ module Magic
     end
 
     class SelflessSavior < Creature
-      def activated_abilities
-        [
-          ActivatedAbility.new(
-            costs: [Costs::Sacrifice.new(self)],
-            ability: -> (targets:) {
-              targets.first.grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
-            },
+      class ActivatedAbility < Magic::ActivatedAbility
+        def costs
+          [Costs::Sacrifice.new(source)]
+        end
 
-          )
-        ]
+        def single_target?
+          true
+        end
+
+        def target_choices
+          source.controller.creatures
+        end
+
+        def resolve!(target:)
+          target.grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
+        end
       end
+
+      def activated_abilities = [ActivatedAbility]
     end
   end
 end

@@ -6,13 +6,14 @@ module Magic
     end
 
     class ExquisiteBlood < Card
-      def receive_notification(event)
-        case event
-        when Events::LifeLoss
-          return if event.player == controller
+      def event_handlers
+        {
+          Events::LifeLoss => -> (receiver, event) do
+            return if event.player == receiver.controller
 
-          controller.gain_life(event.life)
-        end
+            receiver.controller.gain_life(event.life)
+          end
+        }
       end
     end
   end

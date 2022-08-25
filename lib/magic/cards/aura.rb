@@ -5,7 +5,7 @@ module Magic
         true
       end
 
-      def resolve!(target:)
+      def resolve!(controller, target:)
         permanent = super(controller)
         permanent.attach_to!(target)
       end

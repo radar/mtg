@@ -9,7 +9,7 @@ module Magic
         battlefield.permanents
       end
 
-      def resolve!(target:)
+      def resolve!(controller, target:)
         controller.gain_life(4)
         super
       end

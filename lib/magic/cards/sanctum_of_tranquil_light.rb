@@ -5,25 +5,26 @@ module Magic
       TYPE_LINE = "Legendary Enchantment -- Shrine"
       COST = { white: 1 }
 
-      def activated_abilities
-        [
-          ActivatedAbility.new(
-            costs: [
-              Costs::Mana.new(generic: 5, white: 1)
-                .reduced_by(generic: -> { controller.permanents.by_any_type("Shrine").count })
-            ],
-            ability: -> (targets:) {
-              Effects::TapTarget.new(source: self, choices: tap_choices, targets: targets).resolve
-            }
-          )
-        ]
+      class ActivatedAbility < Magic::ActivatedAbility
+        def costs
+          [Costs::Mana.new(generic: 5, white: 1)
+            .reduced_by(generic: -> { source.controller.permanents.by_any_type("Shrine").count })]
+        end
+
+        def tap_choices
+          battlefield.creatures
+        end
+
+        def single_target?
+          true
+        end
+
+        def resolve!(target:)
+          target.tap!
+        end
       end
 
-      private
-
-      def tap_choices
-        battlefield.creatures
-      end
+      def activated_abilities = [ActivatedAbility]
     end
   end
 end

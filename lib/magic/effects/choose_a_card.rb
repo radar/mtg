@@ -1,6 +1,12 @@
 module Magic
   module Effects
     class ChooseACard < Effect
+      attr_reader :resolution
+
+      def initialize(resolution:, **args)
+        @resolution = resolution
+        super(**args)
+      end
 
       def requires_choices?
         true
@@ -11,10 +17,7 @@ module Magic
       end
 
       def resolve(card)
-        source.protections << Card::Protection.new(
-          protects_player: true,
-          condition: -> (c) { c.is_a?(card) }
-        )
+        resolution.call(card)
       end
     end
   end

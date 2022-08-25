@@ -3,20 +3,16 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::SecureTheScene do
   include_context "two player game"
 
-  subject(:secure_the_scene) { described_class.new(game: game, controller: p1) }
+  subject(:secure_the_scene) { described_class.new(game: game) }
 
   context "with a creature" do
-    let(:wood_elves) { Card("Wood Elves", game: game, controller: p2) }
-
-    before do
-      game.battlefield.add(wood_elves)
-    end
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
 
     it "exiles the wood elves, replaces them with a 1/1 White Soldier" do
       p1.add_mana(white: 5)
       action = Magic::Actions::Cast.new(player: p1, card: secure_the_scene)
-      action.pay_mana(generic: { white: 4 }, white: 1)
-      action.targeting(wood_elves)
+        .pay_mana(generic: { white: 4 }, white: 1)
+        .targeting(wood_elves)
       game.take_action(action)
       game.tick!
 

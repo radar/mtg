@@ -12,6 +12,10 @@ module Magic
         @loyalty += change
         destroy! if loyalty <= 0
       end
+
+      def loyalty_abilities
+        card.loyalty_abilities
+      end
     end
   end
 end

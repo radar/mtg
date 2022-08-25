@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::GolgariGuildgate do
   include_context "two player game"
 
-  let(:card) { described_class.new(game: game, controller: p1) }
+  let(:card) { described_class.new(game: game) }
 
   let!(:permanent) do
     action = Magic::Actions::PlayLand.new(player: p1, card: card)

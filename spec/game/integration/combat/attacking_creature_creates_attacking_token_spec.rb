@@ -3,11 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- attacking creature creates attacking token" do
   include_context "two player game"
 
-  let(:falconer_adept) { Card("Falconer Adept", controller: p1) }
-
-  before do
-    game.battlefield.add(falconer_adept)
-  end
+  let!(:falconer_adept) { ResolvePermanent("Falconer Adept", controller: p1) }
 
   context "when in combat" do
     before do

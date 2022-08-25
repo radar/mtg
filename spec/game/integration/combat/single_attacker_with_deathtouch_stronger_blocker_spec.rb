@@ -3,13 +3,8 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- single attacker with deathtouch, stronger blocker" do
   include_context "two player game"
 
-  let(:acidic_slime) { Card("Acidic Slime") }
-  let(:vastwood_gorger) { Card("Vastwood Gorger") }
-
-  before do
-    game.battlefield.add(acidic_slime)
-    game.battlefield.add(vastwood_gorger)
-  end
+  let!(:acidic_slime) { ResolvePermanent("Acidic Slime", controller: p1) }
+  let!(:vastwood_gorger) { ResolvePermanent("Vastwood Gorger", controller: p2) }
 
   context "when in combat" do
     before do
@@ -17,8 +12,6 @@ RSpec.describe Magic::Game, "combat -- single attacker with deathtouch, stronger
     end
 
     it "p2 blocks with a vastwood gorger" do
-      expect(game.battlefield.cards).to include(acidic_slime)
-      expect(game.battlefield.cards).to include(vastwood_gorger)
       p2_starting_life = p2.life
 
 

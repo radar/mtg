@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::FaithsFetters do
   include_context "two player game"
 
-  subject { Card("Faith's Fetters", controller: p1) }
+  subject { Card("Faith's Fetters") }
 
   def cast_faiths_fetters(target)
     p1.add_mana(white: 4)

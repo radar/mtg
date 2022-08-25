@@ -5,12 +5,19 @@ module Magic
       COST = { generic: 3, white: 1 }
 
 
-      def resolve!
-        add_effect(
-          "DestroyControllerGainsLife",
-          choices: battlefield.cards.select(&:creature?),
-        )
-        super
+      def target_choices
+        battlefield.creatures
+      end
+
+      def single_target?
+        true
+      end
+
+      def resolve!(controller, target:)
+        target.destroy!
+        target.controller.gain_life(4)
+
+        super(controller)
       end
     end
   end

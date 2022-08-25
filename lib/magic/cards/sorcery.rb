@@ -3,7 +3,7 @@ module Magic
     class Sorcery < Card
       TYPE_LINE = "Sorcery"
 
-      def resolve!
+      def resolve!(controller, **args)
         move_zone!(controller.graveyard)
       end
 

@@ -3,10 +3,19 @@ module Magic
     class Forest < Card
       NAME = "Forest"
       TYPE_LINE = "Basic Land -- Forest"
-      def tap!
-        controller.add_mana(green: 1)
-        super
+      class ManaAbility < Magic::ManaAbility
+        def initialize(source:)
+          @costs = [Costs::Tap.new(source)]
+
+          super
+        end
+
+        def resolve!
+          controller.add_mana(green: 1)
+        end
       end
+
+      def activated_abilities = [ManaAbility]
     end
   end
 end

@@ -10,7 +10,7 @@ module Magic
       end
 
       def inspect
-        "#<Events::AttackersDeclared turn: #{turn}, attacker: #{attack.attacker}, target: #{attack.target&.name}>"
+        "#<Events::AttackDeclared turn: #{turn}, attacker: #{attack.attacker}, target: #{attack.target&.name}>"
       end
     end
   end

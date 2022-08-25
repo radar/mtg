@@ -2,7 +2,7 @@ module Magic
   module Effects
     class TapTarget < TargetedEffect
       def resolve
-        targets.map(&:tap!)
+        target.map(&:tap!)
       end
     end
   end

@@ -8,17 +8,16 @@ module Magic
     end
 
     class FalconerAdept < Creature
-      def receive_notification(event)
-        case event
-        when Events::AttackDeclared
-          return unless event.attack.attacker == self
-          token = Tokens::Bird.new(game: game, controller: controller)
-          token.play!
-          token.tap!
-
-          game.current_turn.declare_attacker(token)
-        end
+      def event_handlers
+        {
+          Events::PreliminaryAttackersDeclared => -> (receiver, event) do
+            return if event.attacks.none? { |attack| attack.attacker == receiver }
+            token = Permanent.resolve(game: game, controller: receiver.controller, card: Tokens::Bird.new, enters_tapped: true)
+            game.current_turn.declare_attacker(token)
+          end
+        }
       end
+
     end
   end
 end

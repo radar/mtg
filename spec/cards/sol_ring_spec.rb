@@ -1,13 +1,14 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::SolRing do
-  let(:p1) { Magic::Player.new }
-  subject { described_class.new(controller: p1) }
+  include_context "two player game"
+  subject { ResolvePermanent("Sol Ring", controller: p1) }
 
   context "tap" do
     it "taps for two colorless mana" do
-      subject.tap!
-      expect(subject).to be_tapped
+      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: subject, ability: subject.activated_abilities.first)
+      action.pay_tap
+      game.take_action(action)
       expect(p1.mana_pool[:colorless]).to eq(2)
     end
   end

@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "until end of turn effect" do
   include_context "two player game"
 
-  let(:dranas_emissary) { Card("Drana's Emissary", controller: p1) }
+  let!(:dranas_emissary) { ResolvePermanent("Drana's Emissary", controller: p1) }
 
   before do
     game.battlefield.add(dranas_emissary)
@@ -24,7 +24,7 @@ RSpec.describe Magic::Game, "until end of turn effect" do
 
   context "granted keywords" do
     before do
-      dranas_emissary.grant_keyword(Magic::Card::Keywords::DEATHTOUCH, until_eot: true)
+      dranas_emissary.grant_keyword(Magic::Keywords::DEATHTOUCH, until_eot: true)
     end
 
     it "granted keywords are cleared at end of turn" do

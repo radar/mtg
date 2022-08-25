@@ -87,6 +87,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_2.beginning_of_combat!
     turn_2.declare_attackers!
 
+    raging_goblin = p2.permanents.by_name("Raging Goblin").first
     turn_2.declare_attacker(
       raging_goblin,
       target: p1,
@@ -94,6 +95,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
 
     turn_2.attackers_declared!
 
+    aegis_turtle = p1.permanents.by_name("Aegis Turtle").first
     turn_2.declare_blocker(
       aegis_turtle,
       attacker: raging_goblin,
@@ -113,7 +115,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
 
     turn_3 = game.next_turn
     turn_3.untap!
-    p1_island = game.battlefield.cards.controlled_by(p1).by_name("Island").first
+    p1_island = game.battlefield.permanents.controlled_by(p1).by_name("Island").first
     expect(p1_island).to be_untapped
 
     turn_3.upkeep!

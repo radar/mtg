@@ -9,14 +9,17 @@ module Magic
     end
 
     class RambunctiousMutt < Creature
-      def entered_the_battlefield!
-        add_effect(
-          "DestroyTarget",
-          choices: game.battlefield.cards.by_any_type("Artifact", "Enchantment").not_controlled_by(controller),
-        )
-
-        super
+      class ETB < TriggeredAbility::EnterTheBattlefield
+        def perform
+          effect = Effects::DestroyTarget.new(
+            source: permanent,
+            choices: game.battlefield.cards.by_any_type("Artifact", "Enchantment").not_controlled_by(controller)
+          )
+          game.add_effect(effect)
+        end
       end
+
+      def etb_triggers = [ETB]
     end
   end
 end

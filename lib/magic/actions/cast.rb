@@ -25,7 +25,7 @@ module Magic
       end
 
       def countered!
-        card.countered!
+        card.move_to_graveyard!(player)
       end
 
       def mana_cost
@@ -34,7 +34,7 @@ module Magic
           .of_type(Abilities::Static::ReduceManaCost)
           .applies_to(card)
 
-          reduce_mana_cost_abilities.each_with_object(card.cost) { |ability, cost| ability.apply(cost) }
+          reduce_mana_cost_abilities.each_with_object(card.cost.dup) { |ability, cost| ability.apply(cost) }
         end
       end
 
@@ -47,7 +47,9 @@ module Magic
       end
 
       def can_target?(target)
-        card.target_choices.include?(target)
+        choices = card.method(:target_choices)
+        choices = choices.arity == 1 ? card.target_choices(player) : card.target_choices
+        choices.include?(target)
       end
 
       def targeting(*targets)
@@ -77,9 +79,13 @@ module Magic
         end
 
         if card.single_target?
-          card.resolve!(target: targets.first)
+          card.resolve!(player, target: targets.first)
         else
-          card.resolve!(targets: target)
+          card.resolve!(player, targets: target)
+        end
+
+        if card.instant? || card.sorcery?
+          card.move_to_graveyard!(player)
         end
       end
     end

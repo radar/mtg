@@ -3,15 +3,9 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
   include_context "two player game"
 
-  let(:odric) { Card("Odric, Lunarch Marshal", controller: p1) }
-  let(:wood_elves) { Card("Wood Elves", controller: p2) }
-  let(:vastwood_gorger) { Card("Vastwood Gorger", controller: p2) }
-
-  before do
-    game.battlefield.add(odric)
-    game.battlefield.add(wood_elves)
-    game.battlefield.add(vastwood_gorger)
-  end
+  let!(:odric) { ResolvePermanent("Odric, Lunarch Marshal", controller: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves",controller: p2) }
+  let!(:vastwood_gorger) { ResolvePermanent("Vastwood Gorger", controller: p2) }
 
   context "when in combat" do
     before do
@@ -19,9 +13,6 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
     end
 
     it "p2 blocks with a wood elves and vastwood gorger" do
-      expect(game.battlefield.cards).to include(odric)
-      expect(game.battlefield.cards).to include(wood_elves)
-      expect(game.battlefield.cards).to include(vastwood_gorger)
       p2_starting_life = p2.life
 
       current_turn.declare_attackers!

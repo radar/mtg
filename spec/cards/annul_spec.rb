@@ -3,8 +3,13 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::Annul do
   include_context "two player game"
 
-  let(:sol_ring) { Magic::Cards::SolRing.new(game: game, controller: p2)}
-  subject(:annul) { described_class.new(game: game, controller: p1) }
+  let(:sol_ring) { Card("Sol Ring") }
+  subject(:annul) { described_class.new(game: game) }
+
+  before do
+    p1.hand.add(annul)
+    p2.hand.add(sol_ring)
+  end
 
   context "counters a Sol Ring" do
     it "sol ring never enters the battlefield" do

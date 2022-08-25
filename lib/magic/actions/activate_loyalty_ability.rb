@@ -1,7 +1,7 @@
 module Magic
   module Actions
     class ActivateLoyaltyAbility < Action
-      attr_reader :ability, :planeswalker, :targets
+      attr_reader :ability, :planeswalker, :targets, :x_value
 
       def initialize(planeswalker:, ability:, **args)
         @planeswalker = planeswalker
@@ -31,9 +31,14 @@ module Magic
         self
       end
 
-      def perform(value_for_x: 0)
+      def value_for_x(value)
+        @x_value = value
+        self
+      end
+
+      def perform
         loyalty_change = if ability.loyalty_change == :X
-          -(value_for_x)
+          -(x_value)
         else
           ability.loyalty_change
         end
@@ -44,9 +49,17 @@ module Magic
 
       def resolve!
         if targets.any?
-          ability.resolve!(targets: targets)
+          if ability.single_target?
+            ability.resolve!(target: targets.first)
+          else
+            ability.resolve!(targets: targets)
+          end
         else
-          ability.resolve!
+          if x_value
+            ability.resolve!(value_for_x: x_value)
+          else
+            ability.resolve!
+          end
         end
       end
     end

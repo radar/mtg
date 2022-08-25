@@ -10,7 +10,7 @@ module Magic
       end
 
       def death?
-        @from.battlefield? && @to.graveyard?
+        (@from && @from.battlefield?) && @to.graveyard?
       end
 
       def inspect

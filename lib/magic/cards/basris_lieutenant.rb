@@ -25,13 +25,12 @@ module Magic
 
       def event_handlers
         {
-          Events::LeavingZone => -> (receiver, event) do
-            return unless event.death?
-            return unless event.card.controller == receiver.controller
+          Events::PermanentWillDie => -> (receiver, event) do
+            return unless event.permanent.controller == receiver.controller
 
-            if event.card.counters.any? { |counter| counter.is_a?(Counters::Plus1Plus1) }
-              token = Tokens::Knight.new(game: game, controller: controller)
-              token.resolve!(controller)
+            if event.permanent.counters.any? { |counter| counter.is_a?(Counters::Plus1Plus1) }
+              token = Tokens::Knight.new(game: game)
+              token.resolve!(receiver.controller)
             end
           end
         }

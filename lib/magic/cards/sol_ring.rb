@@ -5,10 +5,19 @@ module Magic
       TYPE_LINE = "Artifact"
       COST = { generic: 1 }
 
-      def tap!
-        controller.add_mana(colorless: 2)
-        super
+      class ManaAbility < Magic::ManaAbility
+        def initialize(source:)
+          @costs = [Costs::Tap.new(source)]
+
+          super
+        end
+
+        def resolve!
+          controller.add_mana(colorless: 2)
+        end
       end
+
+      def activated_abilities = [ManaAbility]
     end
   end
 end

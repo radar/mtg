@@ -3,12 +3,8 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- single attacker, no blockers -- nine lives prevents damage" do
   include_context "two player game"
 
-  let(:nine_lives) { Card("Nine Lives", controller: p2) }
-  let(:loxodon_wayfarer) { Card("Loxodon Wayfarer", controller: p1) }
-
-  before do
-    game.battlefield.add(nine_lives)
-  end
+  let!(:nine_lives) { ResolvePermanent("Nine Lives", controller: p2) }
+  let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", controller: p1) }
 
   context "when in combat" do
     before do

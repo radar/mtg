@@ -9,12 +9,16 @@ module Magic
       def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks
 
       state_machine :step, initial: :beginning do
+
+        after_transition do |_turn, transition|
+          puts "STEP: #{transition.from} -> #{transition.to}"
+        end
         event :untap do
           transition beginning: :untap
         end
 
         after_transition to: :untap do |turn|
-          turn.battlefield.cards.controlled_by(turn.active_player).each(&:untap!)
+          turn.battlefield.permanents.controlled_by(turn.active_player).each(&:untap!)
         end
 
         after_transition to: :upkeep do |turn|
@@ -44,6 +48,10 @@ module Magic
 
         after_transition to: :combat_damage do |turn|
           turn.deal_combat_damage
+        end
+
+        after_transition from: :finalize_attackers do |turn|
+          turn.final_attackers_declared!
         end
 
         after_transition to: :end do |turn|
@@ -143,7 +151,7 @@ module Magic
           notify!(attack_declared)
         end
 
-        notify!(Events::AttackersDeclared.new(
+        notify!(Events::PreliminaryAttackersDeclared.new(
           active_player: active_player,
           turn: number,
           attacks: attacks,
@@ -155,6 +163,14 @@ module Magic
           attackers_finalized!
         end
       end
+
+      def final_attackers_declared!
+        notify!(Events::FinalAttackersDeclared.new(
+          active_player: active_player,
+          turn: number,
+          attacks: attacks,
+        ))
+        end
 
       def deal_combat_damage
         combat.deal_first_strike_damage

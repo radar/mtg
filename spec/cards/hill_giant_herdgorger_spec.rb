@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::HillGiantHerdgorger do
   include_context "two player game"
 
-  let(:card) { Card("Hill Giant Herdgorger", controller: p1) }
+  let(:card) { Card("Hill Giant Herdgorger") }
 
   it "has base power and toughness" do
     expect(card.base_power).to eq(7)

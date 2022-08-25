@@ -5,13 +5,17 @@ module Magic
       COST = { any: 1 }
       TYPE_LINE = "Artifact"
 
-      def receive_notification(event)
-        case event
-        when Events::EnteredZone
-          if event.to.graveyard? && !event.card.controller?(controller) && event.card.creature?
-            controller.gain_life(1)
+      def event_handlers
+        {
+          # Whenever a creature card is put into an opponent’s graveyard from anywhere, you gain 1 life.
+          Events::EnteredZone => -> (receiver, event) do
+            return unless event.to.graveyard?
+            return if event.card.controller?(receiver.controller)
+            return unless event.card.creature?
+
+              receiver.controller.gain_life(1)
           end
-        end
+        }
       end
     end
   end

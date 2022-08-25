@@ -3,18 +3,19 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "attackers declared" do
   include_context "two player game"
 
-  let(:wood_elves) { Card("Wood Elves", controller: p1) }
-  let(:basri_ket) { Card("Basri Ket", controller: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+  let!(:basri_ket) { ResolvePermanent("Basri Ket", controller: p1) }
 
   before do
     p1.library.add(Card("Forest"))
-    game.battlefield.add(wood_elves)
-    game.battlefield.add(basri_ket)
   end
 
   context "with basri ket's delayed trigger" do
     before do
-      basri_ket.loyalty_abilities[1].activate!
+      basri_ket.change_loyalty!(7)
+      action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: basri_ket, ability: basri_ket.loyalty_abilities[1])
+      game.take_action(action)
+      game.stack.resolve!
     end
 
     context "when in combat" do

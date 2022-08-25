@@ -1,10 +1,10 @@
 module Magic
   module Tokens
-    class Soldier < CreatureToken
+    class Soldier < Creature
       POWER = 1
       TOUGHNESS = 1
       NAME = "Soldier"
-      TYPE_LINE = "Soldier"
+      TYPE_LINE = "Token Creature -- Soldier"
 
       def colors
         [:white]

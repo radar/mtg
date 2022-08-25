@@ -12,10 +12,10 @@ module Magic
         true
       end
 
-      def resolve!(target:)
+      def resolve!(_controller, target:)
         Effects::CounterSpell.new(source: self).resolve(target)
 
-        super()
+        super
       end
     end
   end

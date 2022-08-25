@@ -4,8 +4,11 @@ module Magic
       NAME = "Rampant Growth"
       COST = { any: 1, green: 1 }
 
-      def resolve!
-        add_effect("SearchLibraryBasicLandEntersTapped", choices: controller.library.basic_lands)
+      def resolve!(controller)
+        game.add_effect(
+          Effects::SearchLibraryBasicLandEntersTapped.new(source: self, controller: controller)
+        )
+
         super
       end
     end

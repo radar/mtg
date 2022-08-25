@@ -3,24 +3,18 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::MangaraTheDiplomat do
   include_context "two player game"
 
-  subject(:mangara) { Card("Mangara, The Diplomat", controller: p2) }
-  subject(:ugin) { Card("Ugin, The Spirit Dragon", controller: p2) }
-  subject(:wood_elves_1) { Card("Wood Elves", controller: p1) }
-  subject(:wood_elves_2) { Card("Wood Elves", controller: p1) }
-
-  before do
-    game.battlefield.add(mangara)
-  end
+  let!(:mangara) { ResolvePermanent("Mangara, The Diplomat", controller: p2) }
 
   it "has lifelink" do
     expect(mangara.lifelink?).to eq(true)
   end
 
   context "whenever an opponent attacks... ability" do
+    let!(:wood_elves_1) { ResolvePermanent("Wood Elves", controller: p1) }
+    let!(:wood_elves_2) { ResolvePermanent("Wood Elves", controller: p1) }
+    let!(:ugin) { ResolvePermanent("Ugin, The Spirit Dragon", controller: p2) }
+
     before do
-      game.battlefield.add(ugin)
-      game.battlefield.add(wood_elves_1)
-      game.battlefield.add(wood_elves_2)
       skip_to_combat!
       current_turn.declare_attackers!
     end
@@ -57,13 +51,18 @@ RSpec.describe Magic::Cards::MangaraTheDiplomat do
   end
 
   context "when opponent casts spell" do
+    let!(:wood_elves_1) { Card("Wood Elves") }
+    let!(:wood_elves_2) { Card("Wood Elves") }
+
     it "p1 casts two wood elves, p2 draws" do
       expect(p2).to receive(:draw!)
       p1.add_mana({ green: 6 })
       action = Magic::Actions::Cast.new(player: p1, card: wood_elves_1)
+      p action.mana_cost
       action.pay_mana(generic: { green: 2 }, green: 1)
 
       action_2 = Magic::Actions::Cast.new(player: p1, card: wood_elves_2)
+      p action_2.mana_cost
       action_2.pay_mana(generic: { green: 2 }, green: 1)
 
       game.take_actions(action, action_2)

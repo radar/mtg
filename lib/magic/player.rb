@@ -111,14 +111,6 @@ module Magic
       card.move_to_hand!(self)
     end
 
-    def activate_ability(ability)
-      ActivateAbilityAction.new(
-        game: game,
-        player: self,
-        ability: ability
-      )
-    end
-
     def tap!(card)
       card.tap!
     end
@@ -128,20 +120,18 @@ module Magic
     end
 
     def permanents
-      game.battlefield.controlled_by(self).permanents
+      game.battlefield.permanents.controlled_by(self)
     end
 
     def creatures
       permanents.creatures
     end
 
-    def receive_event(event)
-      case event
-      when Events::DamageDealt
-        return unless event.target == self
+    def planeswalkers
+      permanents.planeswalkers
+    end
 
-        take_damage(event.damage)
-      end
+    def receive_event(event)
     end
 
     def protected_from?(card)
