@@ -97,8 +97,9 @@ module Magic
       trigger_delayed_response(event)
 
       case event
+      when Events::PermanentWillDie
+        died! if event.permanent == self
       when Events::PermanentLeavingZone
-        died! if event.permanent == self && event.death?
         left_the_battlefield! if event.permanent == self && event.from.battlefield?
       when Events::EnteredTheBattlefield
         entered_the_battlefield! if event.permanent == self
@@ -115,6 +116,7 @@ module Magic
       card.death_triggers.each do |trigger|
         trigger.new(game: game, permanent: self).perform
       end
+      left_the_battlefield!
     end
 
     def left_the_battlefield!

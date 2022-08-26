@@ -9,7 +9,7 @@ RSpec.describe Magic::Cards::ProfaneMemento do
     context "when creature enters controller's graveyard" do
       let(:p1_creature) { ResolvePermanent("Loxodon Wayfarer", controller: p1) }
       let(:event) do
-        Magic::Events::EnteredZone.new(
+        Magic::Events::PermanentEnteredZone.new(
           p1_creature,
           from: game.battlefield,
           to: p1.graveyard
@@ -24,7 +24,7 @@ RSpec.describe Magic::Cards::ProfaneMemento do
     context "when a creature enters opponent's graveyard" do
       let(:p2_creature) { ResolvePermanent("Loxodon Wayfarer", controller: p2) }
       let(:event) do
-        Magic::Events::EnteredZone.new(
+        Magic::Events::PermanentEnteredZone.new(
           p2_creature,
           from: game.battlefield,
           to: p2.graveyard,
@@ -39,7 +39,7 @@ RSpec.describe Magic::Cards::ProfaneMemento do
     context "when an artifact enters opponent's graveyard" do
       let(:p2_artifact) { ResolvePermanent("Profane Memento", controller: p2) }
       let(:event) do
-        Magic::Events::EnteredZone.new(
+        Magic::Events::PermanentEnteredZone.new(
           p2_artifact,
           from: game.battlefield,
           to: p2.graveyard,

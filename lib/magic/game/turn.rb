@@ -50,6 +50,10 @@ module Magic
           turn.deal_combat_damage
         end
 
+        after_transition from: :declare_attackers, to: :declare_blockers do |turn|
+          turn.final_attackers_declared!
+        end
+
         after_transition from: :finalize_attackers do |turn|
           turn.final_attackers_declared!
         end

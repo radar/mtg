@@ -8,10 +8,10 @@ module Magic
       def event_handlers
         {
           # Whenever a creature card is put into an opponent’s graveyard from anywhere, you gain 1 life.
-          Events::EnteredZone => -> (receiver, event) do
+          Events::PermanentEnteredZone => -> (receiver, event) do
             return unless event.to.graveyard?
-            return if event.card.controller?(receiver.controller)
-            return unless event.card.creature?
+            return if event.permanent.controller?(receiver.controller)
+            return unless event.permanent.creature?
 
               receiver.controller.gain_life(1)
           end
