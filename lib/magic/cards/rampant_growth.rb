@@ -1,9 +1,10 @@
 module Magic
   module Cards
-    class RampantGrowth < Sorcery
-      NAME = "Rampant Growth"
-      COST = { any: 1, green: 1 }
+    RampantGrowth = Sorcery("Rampant Growth") do
+      cost generic: 1, green: 1
+    end
 
+    class RampantGrowth < Sorcery
       def resolve!(controller)
         game.add_effect(
           Effects::SearchLibraryBasicLandEntersTapped.new(source: self, controller: controller)

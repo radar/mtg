@@ -8,9 +8,7 @@ module Magic
       toughness 2
     end
 
-
     class DranasEmissary < Creature
-
       def event_handlers
         {
           Events::BeginningOfUpkeep => -> (receiver, event) do
@@ -19,7 +17,6 @@ module Magic
 
             controller.gain_life(1)
             game.deal_damage_to_opponents(controller, 1)
-
           end
         }
       end

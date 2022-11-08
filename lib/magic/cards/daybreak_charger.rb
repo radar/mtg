@@ -3,7 +3,6 @@ module Magic
     DaybreakCharger = Creature("Daybreak Charger") do
       cost generic: 1, white: 1
       type "Creature -- Unicorn"
-
       power 3
       toughness 1
     end

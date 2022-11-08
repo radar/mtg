@@ -1,11 +1,10 @@
 module Magic
   module Cards
-    class VastwoodGorger < Creature
-      NAME = "Vastwood Gorger"
-      COST = { any: 5, green: 1 }
-      TYPE_LINE = "Creature -- Wurm"
-      POWER = 5
-      TOUGHNESS = 6
+    VastwoodGorger = Creature("Vastwood Gorger") do
+      type "Creature -- Wurm"
+      cost generic: 5, green: 1
+      power 5
+      toughness 6
     end
   end
 end

@@ -1,8 +1,9 @@
 module Magic
   module Cards
-    class Forest < Card
+    class Forest < BasicLand
       NAME = "Forest"
       TYPE_LINE = "Basic Land -- Forest"
+
       class ManaAbility < Magic::ManaAbility
         def initialize(source:)
           @costs = [Costs::Tap.new(source)]

@@ -5,7 +5,9 @@ module Magic
       type "Creature -- Human Soldier"
       power 3
       toughness 2
+    end
 
+    class MakeshiftBatallion < Creature
       def event_handlers
         {
           # Whenever Makeshift Battalion and at least two other creatures attack, put a +1/+1 counter on Makeshift Battalion.

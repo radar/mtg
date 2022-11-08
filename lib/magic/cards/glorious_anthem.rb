@@ -1,10 +1,11 @@
 module Magic
   module Cards
-    class GloriousAnthem < Card
-      NAME = "Glorious Anthem"
-      COST = { generic: 1, white: 2}
-      TYPE_LINE = "Enchantment"
+    GloriousAnthem = Enchantment("Glorious Anthem") do
+      type "Enchantment"
+      cost generic: 1, white: 2
+    end
 
+    class GloriousAnthem < Enchantment
       class CreaturesGetBuffed < Abilities::Static::CreaturesGetBuffed
         def initialize(source:)
           @source = source

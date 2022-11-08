@@ -1,15 +1,16 @@
 module Magic
   module Cards
+    ChargeThrough = Instant("Charge Through") do
+      cost green: 1
+    end
+
     class ChargeThrough < Instant
-      NAME = "Charge Through"
-      COST = { green: 1 }
+      def single_target?
+        true
+      end
 
       def target_choices
         game.battlefield.creatures
-      end
-
-      def single_target?
-        true
       end
 
       def resolve!(controller, target:)

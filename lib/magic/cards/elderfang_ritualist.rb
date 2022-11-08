@@ -1,11 +1,13 @@
 module Magic
   module Cards
-    class ElderfangRitualist < Creature
-      NAME = "Elderfang Ritualist"
-      TYPE_LINE = "Creature -- Elf Cleric"
-      POWER = 3
-      TOUGHNESS = 1
+    ElderfangRitualist = Creature("ElderfangRitualist") do
+      type "Creature -- Elf Cleric"
+      cost generic: 2, white: 2
+      power 3
+      toughness 1
+    end
 
+    class ElderfangRitualist < Creature
       class Death < TriggeredAbility::Death
         def perform
           game.add_effect(

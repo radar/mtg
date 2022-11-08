@@ -1,11 +1,13 @@
 module Magic
   module Cards
-    class EpicureOfBlood < Card
-      NAME = "Epicure of Blood"
-      COST = { any: 4, black: 1}
-      TYPE_LINE = "Creature -- Vampire"
+    EpicureOfBlood = Creature("Epicure of Blood") do
+      cost generic: 4, black: 1
+      type "Creature -- Vampire"
+      power 4
+      toughness 4
+    end
 
-
+    class EpicureOfBlood < Creature
       def event_handlers
         {
           # Whenever you gain life, each opponent loses 1 life.
@@ -16,7 +18,6 @@ module Magic
           end
         }
       end
-
     end
   end
 end

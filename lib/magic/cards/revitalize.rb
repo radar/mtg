@@ -1,9 +1,10 @@
 module Magic
   module Cards
-    class Revitalize < Instant
-      NAME = "Revitalize"
-      COST = { generic: 1, white: 1 }
+    Revitalize = Instant("Revitalize") do
+      cost generic: 1, white: 1
+    end
 
+    class Revitalize < Instant
       def resolve!(controller)
         controller.gain_life(3)
         controller.draw!

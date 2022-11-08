@@ -5,7 +5,9 @@ module Magic
       power 2
       toughness 2
       cost generic: 1, white: 1
+    end
 
+    class PackLeader < Creature
       class CreaturesGetBuffed < Abilities::Static::CreaturesGetBuffed
         def initialize(source:)
           @source = source

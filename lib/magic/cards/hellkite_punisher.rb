@@ -4,7 +4,6 @@ module Magic
       type "Creature -- Dragon"
       power 6
       toughness 6
-
       keywords :flying
     end
 

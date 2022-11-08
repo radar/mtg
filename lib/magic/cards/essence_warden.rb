@@ -5,11 +5,12 @@ module Magic
       type "Creature -- Elf Shaman"
       power 1
       toughness 1
+    end
 
-
+    class EssenceWarden < Creature
       def event_handlers
         {
-          # Whenever you gain life, each opponent loses 1 life.
+          # Whenever another creature eenters the battefield, you gain 1 life.
           Events::EnteredTheBattlefield => -> (receiver, event) do
             return if event.permanent == receiver
 

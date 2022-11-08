@@ -1,9 +1,10 @@
 module Magic
   module Cards
-    class GolgariGuildgate < Card
-      NAME = "Golgari Guildgate"
-      TYPE_LINE = "Land -- Gate"
+    GolgariGuildgate = Card("Golgari Guildgate") do
+      type "Land -- Gate"
+    end
 
+    class GolgariGuildgate < Card
       def enters_tapped?
         true
       end

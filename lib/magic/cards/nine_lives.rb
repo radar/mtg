@@ -1,11 +1,12 @@
 module Magic
   module Cards
-    class NineLives < Card
-      NAME = "Nine Lives"
-      TYPE_LINE = "Enchantment"
-      COST = { generic: 1, white: 2 }
-      KEYWORDS = [Keywords::HEXPROOF]
+    NineLives = Enchantment("Nine Lives") do
+      type "Legendary Enchantment -- Shrine"
+      cost generic: 1, white: 2
+      keywords :hexproof
+    end
 
+    class NineLives < Enchantment
       def prevent_damage!(event)
         puts "Nine Lives preventing damage: #{event}"
 

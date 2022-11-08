@@ -1,10 +1,11 @@
 module Magic
   module Cards
-    class GriffinAerie < Card
-      NAME = "Griffin Aerie"
-      TYPE_LINE = "Enchantment"
-      COST = { generic: 1, white: 1 }
+    GriffinAerie = Enchantment("Griffin Aerie") do
+      type "Enchantment"
+      cost generic: 1, white: 1
+    end
 
+    class GriffinAerie < Enchantment
       def event_handlers
         {
           Events::BeginningOfEndStep => -> (receiver, event) do

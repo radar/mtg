@@ -6,7 +6,9 @@ module Magic
       power 2
       toughness 4
       keywords :lifelink
+    end
 
+    class MangaraTheDiplomat < Creature
       def event_handlers
         {
           # Whenever an opponent attacks with creatures, if two or more of those creatures are

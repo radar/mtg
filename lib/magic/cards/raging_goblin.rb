@@ -1,13 +1,11 @@
 module Magic
   module Cards
-    class RagingGoblin < Creature
-      NAME = "Raging Goblin"
-      COST = { red: 1}
-      TYPE_LINE = "Creature -- Goblin Beserker"
-      POWER = 1
-      TOUGHNESS = 1
-
-      KEYWORDS = [Keywords::HASTE]
+    RagingGoblin = Creature("Raging Goblin") do
+      type "Creature -- Goblin Beserker"
+      cost red: 1
+      power 1
+      toughness 1
+      keywords :haste
     end
   end
 end

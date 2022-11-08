@@ -1,10 +1,11 @@
 module Magic
   module Cards
-    class SanctumOfTranquilLight < Card
-      NAME = "Sanctum of Tranquil Light"
-      TYPE_LINE = "Legendary Enchantment -- Shrine"
-      COST = { white: 1 }
+    SanctumOfTranquilLight = Enchantment("Sanctum of Tranquil Light") do
+      type "Legendary Enchantment -- Shrine"
+      cost white: 1
+    end
 
+    class SanctumOfTranquilLight < Enchantment
       class ActivatedAbility < Magic::ActivatedAbility
         def costs
           [Costs::Mana.new(generic: 5, white: 1)
