@@ -93,6 +93,14 @@ module Magic
       )
     end
 
+    def has_replacement_effect?(event)
+      !!card.replacement_effects[event.class]
+    end
+
+    def handle_replacement_effect(event)
+      card.replacement_effects[event.class].call(self, event)
+    end
+
     def receive_notification(event)
       trigger_delayed_response(event)
 
@@ -193,6 +201,18 @@ module Magic
     def cleanup!
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
+    end
+
+
+    def add_counter(counter_type, amount: 1)
+      @counters = Counters.new(@counters + [counter_type.new] * amount)
+      counter_added = Events::CounterAdded.new(
+        permanent: self,
+        counter_type: counter_type,
+        amount: amount
+      )
+
+      game.notify!(counter_added)
     end
 
     private

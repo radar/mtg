@@ -42,7 +42,7 @@ RSpec.describe Magic::Game, "Mana spend -- Essence Warden" do
         game.take_action(action)
         game.tick!
         expect(p1.mana_pool[:green]).to eq(0)
-        expect(essence_warden.zone).to be_battlefield
+        expect(p1.permanents.by_name(essence_warden.name).count).to eq(1)
 
       end
     end

@@ -11,21 +11,45 @@ module Magic
 
         self.counters << Counters::Incarnation.new
 
-        if counters.of_type(Counters::Incarnation).count >= 9
-          Effects::Exile.new(source: self).resolve(target: self)
-        end
+
 
         true
       end
 
-      def receive_notification(event)
-        case event
-        when Events::LeavingZone
-          return unless event.from.battlefield?
+      def replacement_effects
+        {
+          Events::LifeLoss => -> (receiver, event) do
+            effect = Effects::AddCounter.new(
+              source: receiver,
+              counter_type: Counters::Incarnation,
+              choices: [receiver],
+              targets: [receiver]
+            )
+            game.add_effect(effect)
+          end
+        }
+      end
 
-          controller.lose!
-        end
+      def event_handlers
+        {
+          # Whenever Makeshift Battalion and at least two other creatures attack, put a +1/+1 counter on Makeshift Battalion.
+          Events::LeavingZone => -> (receiver, event) do
+            return unless event.from.battlefield?
 
+            receiver.controller.lose!
+          end,
+          Events::CounterAdded => -> (receiver, event) do
+            if receiver.counters.of_type(Counters::Incarnation).count >= 9
+              Effects::Exile.new(source: receiver).resolve(target: receiver)
+
+              loss_event = Events::PlayerLoses.new(
+                player: receiver.controller,
+              )
+
+              game.notify!(loss_event)
+            end
+          end
+        }
       end
     end
   end

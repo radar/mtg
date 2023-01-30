@@ -34,16 +34,9 @@ module Magic
 
     def lose!
       @lost = true
-
-      game.notify!(
-        Events::PlayerLoses,
-        player: self,
-      )
     end
 
     def gain_life(life)
-      @life += life
-
       game.notify!(
         Events::LifeGain.new(
           player: self,
@@ -53,8 +46,6 @@ module Magic
     end
 
     def take_damage(damage)
-      @life -= damage
-
       game.notify!(
         Events::LifeLoss.new(
           player: self,
@@ -132,6 +123,15 @@ module Magic
     end
 
     def receive_event(event)
+      return if !event.respond_to?(:player) || event.player != self
+      case event
+      when Events::LifeLoss
+        @life -= event.life
+      when Events::LifeGain
+        @life += event.life
+      when Events::PlayerLoses
+        lose!
+      end
     end
 
     def protected_from?(card)

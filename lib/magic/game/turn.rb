@@ -185,13 +185,25 @@ module Magic
 
       def notify!(*events)
         events.each do |event|
-          track_event(event)
           logger.debug "EVENT: #{event.inspect}"
-          next if event.is_a?(Events::DamageDealt) && battlefield.any? { |permanent| permanent.respond_to?(:prevent_damage!) && permanent.prevent_damage!(event) }
-          emblems.each { |emblem| emblem.receive_event(event) }
-          battlefield.receive_event(event)
-          players.each { |player| player.receive_event(event) }
+          track_event(event)
+          replacement_sources = replacement_effect_sources(event)
+          binding.pry if event == Events::LifeLoss
+          # TODO: Handle multiple replacement effects -- player gets to choose which one to pick
+          if replacement_sources.any?
+            puts "  EVENT REPLACED! Replaced by: #{replacement_sources.first}"
+            replacement_sources.first.handle_replacement_effect(event)
+
+          else
+            emblems.each { |emblem| emblem.receive_event(event) }
+            battlefield.receive_event(event)
+            players.each { |player| player.receive_event(event) }
+          end
         end
+      end
+
+      def replacement_effect_sources(event)
+        battlefield.cards.select { |card| card.has_replacement_effect?(event) }
       end
 
       def spells_cast

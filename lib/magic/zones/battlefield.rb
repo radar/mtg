@@ -14,6 +14,7 @@ module Magic
       end
 
       def add(permanent)
+        binding.pry if permanent.is_a?(Magic::Card)
         super(permanent)
       end
 

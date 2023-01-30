@@ -23,8 +23,10 @@ RSpec.describe Magic::Game, "combat -- single attacker, no blockers -- nine live
 
       go_to_combat_damage!
       game.tick!
-      expect(p2.life).to eq(p2_starting_life)
-      expect(nine_lives.counters.count).to eq(1)
+      aggregate_failures do
+        expect(p2.life).to eq(p2_starting_life)
+        expect(nine_lives.counters.count).to eq(1)
+      end
     end
 
     context "when counters are 8" do
@@ -44,10 +46,12 @@ RSpec.describe Magic::Game, "combat -- single attacker, no blockers -- nine live
 
         go_to_combat_damage!
         game.tick!
-        expect(p2.life).to eq(p2_starting_life)
-        expect(nine_lives.counters.count).to eq(9)
-        expect(nine_lives.zone).to be_exile
-        expect(nine_lives.controller.lost?).to eq(true)
+        aggregate_failures do
+          expect(p2.life).to eq(p2_starting_life)
+          expect(nine_lives.counters.count).to eq(9)
+          expect(nine_lives.zone).to be_exile
+          expect(nine_lives.controller.lost?).to eq(true)
+        end
       end
     end
   end

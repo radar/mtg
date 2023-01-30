@@ -82,12 +82,6 @@ module Magic
         attachments.all?(&:can_block?)
       end
 
-      def add_counter(counter_type, amount: 1)
-        amount.times do
-          @counters << counter_type.new
-        end
-      end
-
       def cleanup!
         until_eot_modifiers = modifiers.select(&:until_eot?)
         until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }

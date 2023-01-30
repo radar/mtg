@@ -4,12 +4,7 @@ RSpec.describe Magic::Cards::SelflessSavior do
   include_context "two player game"
 
   subject { ResolvePermanent("Selfless Savior", controller: p1) }
-  let(:wood_elves) { Card("Wood Elves") }
-
-  before do
-    game.battlefield.add(wood_elves)
-    game.battlefield.add(subject)
-  end
+  let(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
 
   context "activated ability" do
     def ability

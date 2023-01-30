@@ -143,6 +143,10 @@ module Magic
       {}
     end
 
+    def replacement_effects
+      {}
+    end
+
     private
 
     def move_zone!(new_zone)
@@ -159,7 +163,7 @@ module Magic
         old_zone.remove(self)
       end
 
-      new_zone.add(self)
+      new_zone.add(self) unless new_zone.is_a?(Magic::Zones::Battlefield)
 
       game.notify!(
         Events::CardEnteredZoneTransition.new(

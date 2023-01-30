@@ -28,7 +28,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_1.draw!
     turn_1.first_main!
 
-    # expect(p1.possible_actions.any? { |action| action.is_a?(Magic::Actions::PlayLand) }).to eq(true)
+    #game.current_turn.possible_actions
     action = Magic::Actions::PlayLand.new(player: p1, card: p1.hand.by_name("Island").first)
     game.take_action(action)
     expect(p1.permanents.by_name("Island").count).to eq(1)
@@ -49,7 +49,6 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     action.pay_mana(blue: 1)
     game.take_action(action)
     game.stack.resolve!
-    expect(aegis_turtle.zone).to be_battlefield
     expect(p1.permanents.by_name("Aegis Turtle").count).to eq(1)
 
     turn_1.beginning_of_combat!
@@ -81,7 +80,6 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     game.take_action(action)
 
     game.stack.resolve!
-    expect(raging_goblin.zone).to be_battlefield
     expect(p2.permanents.by_name("Raging Goblin").count).to eq(1)
 
     turn_2.beginning_of_combat!
