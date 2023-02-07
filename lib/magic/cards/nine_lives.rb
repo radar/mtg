@@ -22,7 +22,6 @@ module Magic
 
       def event_handlers
         {
-          # Whenever Makeshift Battalion and at least two other creatures attack, put a +1/+1 counter on Makeshift Battalion.
           Events::LeavingZone => -> (receiver, event) do
             return unless event.from.battlefield?
 
