@@ -188,7 +188,6 @@ module Magic
           logger.debug "EVENT: #{event.inspect}"
           track_event(event)
           replacement_sources = replacement_effect_sources(event)
-          binding.pry if event == Events::LifeLoss
           # TODO: Handle multiple replacement effects -- player gets to choose which one to pick
           if replacement_sources.any?
             puts "  EVENT REPLACED! Replaced by: #{replacement_sources.first}"
