@@ -6,16 +6,6 @@ module Magic
       COST = { generic: 1, white: 2 }
       KEYWORDS = [Keywords::HEXPROOF]
 
-      def prevent_damage!(event)
-        puts "Nine Lives preventing damage: #{event}"
-
-        self.counters << Counters::Incarnation.new
-
-
-
-        true
-      end
-
       def replacement_effects
         {
           Events::LifeLoss => -> (receiver, event) do
