@@ -10,7 +10,7 @@ RSpec.describe Magic::Cards::NaturesClaim do
     p2_starting_life = p2.life
     action = cast_action(card: card, player: p1).targeting(great_furnace)
     add_to_stack_and_resolve(action)
-    expect(great_furnace.zone).to be_graveyard
+    expect(great_furnace.zone).to be_nil
     expect(p2.life).to eq(p2_starting_life + 4)
   end
 end

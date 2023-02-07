@@ -45,7 +45,14 @@ module Magic
       )
     end
 
-    def take_damage(damage)
+    def take_damage(source:, damage:)
+      game.notify!(
+        Events::DamageDealt,
+        source: source,
+        damage: damage,
+        target: self,
+      )
+
       game.notify!(
         Events::LifeLoss.new(
           player: self,

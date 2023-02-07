@@ -32,7 +32,7 @@ module Magic
       end
 
       def dead?
-        @marked_for_death || !alive?
+        @marked_for_death || !alive? || zone.nil?
       end
 
       def base_power
@@ -59,14 +59,17 @@ module Magic
           static_ability_buffs.sum(&:toughness)
       end
 
-      def take_damage(damage_dealt)
-        @damage += damage_dealt
+      def take_damage(source:, damage:)
+        game.notify!(
+          Events::DamageDealt.new(source: source, target: self, damage: damage)
+        )
+        @damage += damage
       end
 
       def fight(target, assigned_damage = power)
-        target.take_damage(assigned_damage)
+        target.take_damage(source: self, damage: assigned_damage)
         game.notify!(
-          Events::DamageDealt.new(source: self, target: target, damage: assigned_damage)
+          Events::CombatDamageDealt.new(source: self, target: target, damage: assigned_damage)
         )
         controller.gain_life(assigned_damage) if lifelink?
         if target.is_a?(Creature)

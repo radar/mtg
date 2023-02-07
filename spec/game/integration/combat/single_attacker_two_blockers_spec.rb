@@ -36,10 +36,12 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
 
       go_to_combat_damage!
 
-      expect(odric.zone).to be_graveyard
-      expect(wood_elves.zone).to be_graveyard
-      expect(vastwood_gorger.zone).to be_battlefield
-      expect(vastwood_gorger.damage).to eq(2)
+      aggregate_failures do
+        expect(odric).to be_dead
+        expect(wood_elves).to be_dead
+        expect(vastwood_gorger.zone).to be_battlefield
+        expect(vastwood_gorger.damage).to eq(2)
+      end
 
       expect(p2.life).to eq(p2_starting_life)
     end

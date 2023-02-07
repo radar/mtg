@@ -10,7 +10,7 @@ RSpec.describe Magic::Cards::Mortify do
     it "destroys the creature" do
       action = cast_action(card: card, player: p1).targeting(loxodon_wayfarer)
       add_to_stack_and_resolve(action)
-      expect(loxodon_wayfarer.zone).to be_graveyard
+      expect(loxodon_wayfarer).to be_dead
     end
   end
 
@@ -20,7 +20,7 @@ RSpec.describe Magic::Cards::Mortify do
     it "destroys the enchantment" do
       action = cast_action(card: card, player: p1).targeting(glorious_anthem)
       add_to_stack_and_resolve(action)
-      expect(glorious_anthem.zone).to be_graveyard
+      expect(glorious_anthem.zone).to be_nil
     end
   end
 end

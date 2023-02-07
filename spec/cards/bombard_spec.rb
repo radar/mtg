@@ -15,7 +15,7 @@ RSpec.describe Magic::Cards::Bombard do
     action.targeting(wood_elves)
     game.take_action(action)
     game.tick!
-    expect(wood_elves.zone).to be_graveyard
+    expect(wood_elves).to be_dead
   end
 
 

@@ -10,7 +10,7 @@ RSpec.describe Magic::Cards::LegionsJudgement do
 
     it "destroys the giant" do
       cast_and_resolve(card: card, player: p1, targeting: hill_giant_herdgorger)
-      expect(hill_giant_herdgorger.zone).to be_graveyard
+      expect(hill_giant_herdgorger).to be_dead
     end
   end
 

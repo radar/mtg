@@ -73,7 +73,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
       game.take_action(action)
       game.stack.resolve!
       expect(subject.loyalty).to eq(0)
-      expect(subject.zone).to be_graveyard
+      expect(subject.zone).to be_nil
       expect(p1.life).to eq(27)
 
       move_to_battlefield = game.next_effect

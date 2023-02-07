@@ -14,7 +14,8 @@ RSpec.describe Magic::Cards::FontOfFertility do
       action.pay(p1, :sacrifice)
       game.take_action(action)
       game.stack.resolve!
-      expect(subject.zone).to be_graveyard
+      expect(subject.zone).to be_nil
+      expect(p1.graveyard.by_name(subject.name).count).to eq(1)
 
       forest = game.battlefield.cards.by_name("Forest").first
       expect(forest.zone).to be_battlefield

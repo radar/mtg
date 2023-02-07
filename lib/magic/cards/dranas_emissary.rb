@@ -10,6 +10,9 @@ module Magic
 
 
     class DranasEmissary < Creature
+      def target_choices(permanent)
+        permanent.game.opponents(permanent.controller)
+      end
 
       def event_handlers
         {
@@ -18,7 +21,10 @@ module Magic
             return unless game.current_turn.active_player == controller
 
             controller.gain_life(1)
-            game.deal_damage_to_opponents(controller, 1)
+
+
+            effect = Effects::DealDamageToOpponents.new(source: receiver, damage: 1)
+            effect.resolve(game.opponents(receiver.controller))
 
           end
         }

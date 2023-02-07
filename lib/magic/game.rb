@@ -62,10 +62,10 @@ module Magic
       @players = players.rotate(1)
     end
 
-    def deal_damage_to_opponents(player, damage)
-      opponents = players - [player]
-      opponents.each { |opponent| opponent.take_damage(damage) }
+    def opponents(player)
+      players - [player]
     end
+
 
     def tick!
       stack.resolve!

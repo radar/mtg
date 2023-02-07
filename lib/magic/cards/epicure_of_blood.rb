@@ -5,6 +5,9 @@ module Magic
       COST = { any: 4, black: 1}
       TYPE_LINE = "Creature -- Vampire"
 
+      def target_choices(permanent)
+        permanent.game.opponents(permanent.controller)
+      end
 
       def event_handlers
         {
@@ -12,7 +15,8 @@ module Magic
           Events::LifeGain => -> (receiver, event) do
             return unless event.player == receiver.controller
 
-            game.deal_damage_to_opponents(event.player, 1)
+            effect = Effects::DealDamageToOpponents.new(source: receiver, damage: 1)
+            effect.resolve(game.opponents(receiver.controller))
           end
         }
       end

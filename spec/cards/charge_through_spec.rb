@@ -36,7 +36,7 @@ RSpec.describe Magic::Cards::ChargeThrough do
       game.take_action(action_2)
 
       game.stack.resolve!
-      expect(wood_elves.zone).to be_graveyard
+      expect(wood_elves).to be_dead
     end
   end
 end

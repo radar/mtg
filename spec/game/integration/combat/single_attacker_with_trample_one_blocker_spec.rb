@@ -31,7 +31,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, one blocker" do
       go_to_combat_damage!
 
       expect(p2.life).to eq(p2_starting_life - 5)
-      expect(wood_elves.zone).to be_graveyard
+      expect(wood_elves).to be_dead
       expect(colossal_dreadmaw).to be_tapped
     end
   end

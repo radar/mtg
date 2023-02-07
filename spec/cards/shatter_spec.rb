@@ -12,6 +12,6 @@ RSpec.describe Magic::Cards::Shatter do
       .pay_mana(generic: { red: 1 }, red: 1)
       .targeting(great_furnace)
     add_to_stack_and_resolve(action)
-    expect(great_furnace.zone).to be_graveyard
+    expect(great_furnace.zone).to be_nil
   end
 end

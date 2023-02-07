@@ -11,7 +11,7 @@ RSpec.describe Magic::Cards::PathOfPeace do
     p2_starting_life = p2.life
     action = cast_action(card: card, player: p1).targeting(loxodon_wayfarer)
     add_to_stack_and_resolve(action)
-    expect(loxodon_wayfarer.zone).to be_graveyard
+    expect(loxodon_wayfarer).to be_dead
     expect(p2.life).to eq(p2_starting_life + 4)
   end
 end

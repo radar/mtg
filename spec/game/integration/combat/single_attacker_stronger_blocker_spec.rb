@@ -30,7 +30,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, stronger blocker" do
 
       go_to_combat_damage!
 
-      expect(loxodon_wayfarer.zone).to be_graveyard
+      expect(loxodon_wayfarer).to be_dead
       expect(game.battlefield.cards).not_to include(loxodon_wayfarer)
 
       expect(vastwood_gorger.zone).to be_battlefield

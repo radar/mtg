@@ -32,7 +32,7 @@ module Magic
         def single_target? = true
 
         def resolve!(target:)
-          target.take_damage(3)
+          target.take_damage(source: planeswalker, damage: 3)
         end
       end
 

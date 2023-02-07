@@ -1,3 +1,4 @@
+
 require 'spec_helper'
 
 RSpec.describe Magic::Cards::BasrisLieutenant do

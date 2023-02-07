@@ -31,10 +31,10 @@ RSpec.describe Magic::Game, "combat -- single attacker with deathtouch, stronger
 
       go_to_combat_damage!
 
-      expect(acidic_slime.zone).to be_graveyard
+      expect(acidic_slime).to be_dead
       expect(game.battlefield.cards).not_to include(acidic_slime)
 
-      expect(vastwood_gorger.zone).to be_graveyard
+      expect(vastwood_gorger).to be_dead
       expect(game.battlefield.cards).not_to include(vastwood_gorger)
 
       expect(p2.life).to eq(p2_starting_life)

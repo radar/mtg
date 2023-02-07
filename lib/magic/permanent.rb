@@ -215,6 +215,10 @@ module Magic
       game.notify!(counter_added)
     end
 
+    def target_choices
+      card.target_choices(self)
+    end
+
     private
 
     def remove_until_eot_keyword_grants!
