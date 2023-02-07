@@ -17,5 +17,8 @@ RSpec.describe Magic::Cards::PackLeader do
     expect(wood_elves.toughness).to eq(1)
   end
 
-  it "Whenever Pack Leader attacks, prevent all combat damage that would be dealt this turn to Dogs you control."
+  it "does not buff itself" do
+    expect(pack_leader.power).to eq(2)
+    expect(pack_leader.toughness).to eq(2)
+  end
 end

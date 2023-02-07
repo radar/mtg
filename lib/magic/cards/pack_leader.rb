@@ -20,7 +20,7 @@ module Magic
         end
 
         def applicable_targets
-          source.controller.creatures.by_any_type("Dog")
+          source.controller.creatures.by_any_type("Dog") - [source]
         end
       end
 
