@@ -5,7 +5,7 @@ module Magic
     def_delegators :@game, :battlefield, :current_turn
 
     include Cards::Keywords
-    attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections, :delayed_responses, :counters
+    attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :protections, :delayed_responses, :counters
     attr_accessor :tapped
 
     attr_accessor :zone
@@ -48,7 +48,6 @@ module Magic
       cost = Costs::Mana.new(self.class::COST.dup)
       @cost = cost
       @tapped = tapped
-      @attachments = []
       @delayed_responses = []
       @keywords = self.class::KEYWORDS
       @protections = self.class::PROTECTIONS
@@ -56,7 +55,7 @@ module Magic
     end
 
     def types
-      type_line.scan(/\w+/) + attachments.flat_map(&:type_grants)
+      type_line.scan(/\w+/)
     end
 
     def inspect
