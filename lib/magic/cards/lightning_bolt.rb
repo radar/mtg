@@ -2,7 +2,7 @@ module Magic
   module Cards
     class LightningBolt < Instant
       NAME = "Lightning Bolt"
-      COST = { generic: 2, red: 1 }
+      COST = { red: 1 }
 
       def target_choices
         game.any_target
