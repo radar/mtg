@@ -58,7 +58,6 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
 
 
     before do
-      p1.library.add(forest)
       p1.library.add(glorious_anthem)
       p1.library.add(acidic_slime)
       p1.library.add(fencing_ace)
@@ -79,10 +78,11 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
       move_to_battlefield = game.next_effect
       expect(move_to_battlefield).to be_a(Magic::Effects::MoveToBattlefield)
       permanents = p1.hand.cards.permanents.last(7)
+      expect(permanents.count).to eq(7)
       game.resolve_pending_effect(permanents)
 
       permanents.each do |permanent|
-        expect(permanent.zone).to be_battlefield
+        expect(game.battlefield.cards.by_name(permanent.name).controlled_by(p1).count).to eq(1)
       end
     end
   end
