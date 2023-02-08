@@ -5,27 +5,6 @@ module Magic
       TYPE_LINE = "Legendary Planeswalker -- Ugin"
       BASE_LOYALTY = 7
 
-      def loyalty_abilities
-        [
-          LoyaltyAbility.new(loyalty_change: 2, ability: -> {
-            add_effect(
-              "DealDamage",
-              damage: 3,
-              choices: battlefield.cards + game.players,
-            )
-          }),
-
-          LoyaltyAbility.new(loyalty_change: :X, ability: -> (paid) {
-
-          }),
-
-          LoyaltyAbility.new(loyalty_change: -10, ability: -> {
-
-          })
-        ]
-      end
-
-
       class LoyaltyAbility1 < Magic::LoyaltyAbility
         def loyalty_change = 2
         def target_choices = battlefield.cards + game.players
