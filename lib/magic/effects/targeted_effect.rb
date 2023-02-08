@@ -1,6 +1,6 @@
 module Magic
   module Effects
-    class TargetedEffect
+    class TargetedEffect < Effect
       class InvalidTarget < StandardError; end;
 
       attr_reader :source, :targets, :choices

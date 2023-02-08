@@ -10,6 +10,7 @@ module Magic
 
       def resolve(target)
         target.take_damage(source: source, damage: damage)
+        super
       end
     end
   end
