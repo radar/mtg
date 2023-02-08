@@ -39,6 +39,7 @@ module Magic
             game.add_effect(
               Effects::MoveToBattlefield.new(
                 battlefield: game.battlefield,
+                controller: controller,
                 maximum_choices: 7,
                 choices: controller.hand.cards.permanent_types
               )

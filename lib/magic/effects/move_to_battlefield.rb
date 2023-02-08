@@ -1,12 +1,14 @@
 module Magic
   module Effects
-    class MoveToBattlefield
-      attr_reader :battlefield, :targets, :choices
+    class MoveToBattlefield < Effect
+      attr_reader :battlefield, :controller, :targets, :choices
 
-      def initialize(battlefield:, maximum_choices:, choices:)
+      def initialize(battlefield:, controller:, maximum_choices:, choices:)
         @battlefield = battlefield
+        @controller = controller
         @maximum_choices = maximum_choices
         @choices = choices
+        @targets = []
       end
 
       def requires_choices?
@@ -26,7 +28,8 @@ module Magic
           raise "Too many targets chosen for Effects::MoveToBattlefield"
         end
 
-        targets.each(&:resolve!)
+        targets.each { |target| target.resolve!(controller) }
+        super
       end
     end
   end
