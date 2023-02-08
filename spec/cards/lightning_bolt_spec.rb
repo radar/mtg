@@ -10,7 +10,7 @@ RSpec.describe Magic::Cards::LightningBolt do
   it "destroys the wood elves" do
     p1.add_mana(red: 3)
     action = cast_action(player: p1, card: lightning_bolt)
-    action.pay_mana(generic: { red: 2 }, red: 1)
+    action.pay_mana(red: 1)
     action.targeting(wood_elves)
     game.take_action(action)
     game.tick!
@@ -21,7 +21,7 @@ RSpec.describe Magic::Cards::LightningBolt do
     p2_starting_life = p2.life
     p1.add_mana(red: 3)
     action = cast_action(player: p1, card: lightning_bolt)
-    action.pay_mana(generic: { red: 2 }, red: 1)
+    action.pay_mana(red: 1)
     action.targeting(p2)
     game.take_action(action)
     game.tick!
