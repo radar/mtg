@@ -21,7 +21,13 @@ module Magic
     end
 
     def permanents
-      select { |card| card.is_a?(Magic::Permanent) }
+      by_any_type(
+        "Creature",
+        "Artifact",
+        "Enchantment",
+        "Land",
+        "Planeswalker"
+      )
     end
 
     def permanent_types
