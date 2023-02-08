@@ -46,10 +46,13 @@ module Magic
         mana_cost.can_pay?(player)
       end
 
-      def can_target?(target)
+      def target_choices
         choices = card.method(:target_choices)
         choices = choices.arity == 1 ? card.target_choices(player) : card.target_choices
-        choices.include?(target)
+      end
+
+      def can_target?(target)
+        target_choices.include?(target)
       end
 
       def targeting(*targets)
