@@ -66,6 +66,9 @@ module Magic
       players - [player]
     end
 
+    def any_target
+      battlefield.creatures + battlefield.planeswalkers + players
+    end
 
     def tick!
       stack.resolve!
