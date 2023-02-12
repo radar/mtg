@@ -2,7 +2,7 @@ module Magic
   class Game
     extend Forwardable
 
-    attr_reader :battlefield, :choices, :stack, :players, :emblems, :current_turn
+    attr_reader :battlefield, :exile, :choices, :stack, :players, :emblems, :current_turn
 
     def_delegators :@stack, :effects, :add_effect, :resolve_pending_effect, :next_effect
     def_delegators :@current_turn, :take_action, :take_actions
@@ -17,12 +17,14 @@ module Magic
 
     def initialize(
       battlefield: Zones::Battlefield.new(owner: self),
+      exile: Zones::Exile.new(owner: self),
       stack: Stack.new,
       choices: Choices.new([]),
       effects: [],
       players: []
     )
       @battlefield = battlefield
+      @exile = exile
       @stack = stack
       @choices = choices
       @effects = effects

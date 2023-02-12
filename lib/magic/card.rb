@@ -2,7 +2,7 @@ module Magic
   class Card
     include Types
     extend Forwardable
-    def_delegators :@game, :battlefield, :current_turn
+    def_delegators :@game, :battlefield, :exile, :current_turn
 
     include Cards::Keywords
     attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :protections, :delayed_responses, :counters
@@ -111,7 +111,7 @@ module Magic
     end
 
     def exile!
-      move_zone!(controller.exile)
+      move_zone!(exile)
     end
 
     def notify!(event)

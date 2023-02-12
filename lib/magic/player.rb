@@ -17,7 +17,6 @@ module Magic
       @lost = false
       @library = Zones::Library.new(owner: self, cards: library)
       @graveyard = graveyard
-      @exile = Zones::Exile.new(owner: self)
       @hand = hand
       @mana_pool = mana_pool
       @floating_mana = floating_mana
