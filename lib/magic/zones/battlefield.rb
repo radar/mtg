@@ -14,7 +14,7 @@ module Magic
       end
 
       def add(permanent)
-        binding.pry if permanent.is_a?(Magic::Card)
+        raise "Attempting to add a card to battlefield -- should be a permanent" if permanent.is_a?(Magic::Card)
         super(permanent)
       end
 

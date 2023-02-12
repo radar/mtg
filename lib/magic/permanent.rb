@@ -80,10 +80,19 @@ module Magic
           )
         )
 
-        from.remove(self)
+        if from.battlefield?
+          from.remove(self)
+        else
+          from.remove(card)
+        end
       end
 
-      to.add(self)
+      if to.battlefield?
+        to.add(self)
+      else
+        self.zone = nil
+        to.add(card)
+      end
 
       game.notify!(
         Events::PermanentEnteredZoneTransition.new(
@@ -130,6 +139,10 @@ module Magic
 
     def left_the_battlefield!
       @attachments.each(&:destroy!)
+
+      card.ltb_triggers.each do |trigger|
+        trigger.new(game: game, permanent: self).perform
+      end
     end
 
     def entered_the_battlefield!
@@ -175,13 +188,12 @@ module Magic
     end
 
     def destroy!
-      card.move_to_graveyard!(controller)
       move_zone!(to: controller.graveyard)
     end
     alias_method :sacrifice!, :destroy!
 
     def exile!
-      move_zone!(to: controller.exile)
+      move_zone!(to: game.exile)
     end
 
     def can_activate_ability?(ability)
@@ -218,6 +230,11 @@ module Magic
 
     def target_choices
       card.target_choices(self)
+    end
+
+    def remove_from_exile(card)
+      @exiled_cards -= [card]
+      game.exile.remove(card)
     end
 
     private

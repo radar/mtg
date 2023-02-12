@@ -40,7 +40,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
       game.stack.resolve!
       expect(subject.loyalty).to eq(4)
       # Wood elves has a color, so it goes
-      expect(wood_elves.zone).to be_exile
+      expect(wood_elves.card.zone).to be_exile
       # Meanwhile, Sol Ring is colorless, so it stays
       expect(sol_ring.zone).to be_battlefield
     end

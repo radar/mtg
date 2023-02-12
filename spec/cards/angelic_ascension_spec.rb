@@ -10,7 +10,7 @@ RSpec.describe Magic::Cards::AngelicAscension do
     action = cast_action(card: subject, player: p1, targeting: wood_elves)
     add_to_stack_and_resolve(action)
 
-    expect(wood_elves.zone).to be_exile
+    expect(wood_elves.card.zone).to be_exile
 
     expect(game.battlefield.creatures.count).to eq(1)
     angel = game.battlefield.creatures.first

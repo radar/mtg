@@ -16,6 +16,6 @@ RSpec.describe Magic::Cards::AltarsLight do
     action.targeting(sol_ring)
     add_to_stack_and_resolve(action)
 
-    expect(sol_ring.zone).to be_exile
+    expect(sol_ring.card.zone).to be_exile
   end
 end

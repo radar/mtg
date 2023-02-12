@@ -130,6 +130,10 @@ module Magic
       []
     end
 
+    def ltb_triggers
+     []
+    end
+
     def death_triggers
       []
     end

@@ -16,6 +16,7 @@ RSpec.describe Magic::Cards::AnointedChorister do
 
       action = Magic::Actions::ActivateAbility.new(player: p1, permanent: permanent, ability: permanent.activated_abilities.first)
       action.pay_mana({ generic: { white: 4 }, white: 1 })
+      action.finalize_costs!(p1)
       game.take_action(action)
       game.tick!
 

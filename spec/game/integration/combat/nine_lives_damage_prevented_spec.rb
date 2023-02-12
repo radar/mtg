@@ -49,7 +49,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, no blockers -- nine live
         aggregate_failures do
           expect(p2.life).to eq(p2_starting_life)
           expect(nine_lives.counters.count).to eq(9)
-          expect(nine_lives.zone).to be_exile
+          expect(nine_lives.card.zone).to be_exile
           expect(nine_lives.controller.lost?).to eq(true)
         end
       end

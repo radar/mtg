@@ -35,7 +35,8 @@ RSpec.describe Magic::Cards::ChargeThrough do
       action_2.targeting(wood_elves)
       game.take_action(action_2)
 
-      game.stack.resolve!
+      game.tick!
+
       expect(wood_elves).to be_dead
     end
   end
