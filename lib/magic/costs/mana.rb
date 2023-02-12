@@ -7,8 +7,9 @@ module Magic
 
       attr_reader :balance, :cost
       def initialize(cost)
-        @balance = cost.dup
-        @cost = cost
+        @cost = cost == 0 ? {} : cost
+        @balance = @cost.dup
+
         @payments = Hash.new(0)
         @payments[:generic] = Hash.new(0)
       end
@@ -48,6 +49,7 @@ module Magic
       end
 
       def pay(player, payment)
+
         raise CannotPay unless can_pay?(player)
 
         pay_generic(payment[:generic]) if payment[:generic]

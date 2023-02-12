@@ -16,6 +16,10 @@ module Magic
       Card(name, Magic::Cards::Creature, &block)
     end
 
+    def Artifact(name, &block)
+      Card(name, Magic::Cards::Artifact, &block)
+    end
+
     def Card(name, base_class = Magic::Card, &block)
       card = Class.new(base_class, &block)
       card.const_set(:NAME, name)

@@ -28,6 +28,10 @@ module Magic
         card.move_to_graveyard!(player)
       end
 
+      def mana_cost=(cost)
+        @mana_cost = Costs::Mana.new(cost)
+      end
+
       def mana_cost
         @mana_cost ||= begin
           reduce_mana_cost_abilities = game.battlefield.static_abilities

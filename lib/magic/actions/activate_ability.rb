@@ -70,9 +70,12 @@ module Magic
 
         cost = costs.find { |cost| cost.is_a?(cost_type) }
         cost.pay(player, payment)
-        costs.each { |cost| cost.finalize!(player) }
 
         self
+      end
+
+      def finalize_costs!(player)
+        costs.each { |cost| cost.finalize!(player) }
       end
     end
   end

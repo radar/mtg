@@ -4,7 +4,7 @@ module Magic
     include Types
 
     extend Forwardable
-    attr_reader :game, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :activated_abilities
+    attr_reader :game, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :activated_abilities, :exiled_cards
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?
 
@@ -52,6 +52,7 @@ module Magic
       @activated_abilities = card.activated_abilities
       @damage = 0
       @protections = Protections.new(card.protections.dup)
+      @exiled_cards = Magic::CardList.new([])
       super
     end
 
