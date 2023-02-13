@@ -209,6 +209,10 @@ module Magic
         events.select { |event| event.is_a?(Events::SpellCast) }
       end
 
+      def can_cast_sorcery?(player)
+        game.stack.empty? && active_player == player
+      end
+
       private
 
       attr_reader :game, :logger

@@ -1,6 +1,6 @@
 module Magic
   class Player
-    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life
+    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life
 
     class UnpayableMana < StandardError; end
 
@@ -20,6 +20,7 @@ module Magic
       @hand = hand
       @mana_pool = mana_pool
       @floating_mana = floating_mana
+      @starting_life = life
       @life = life
     end
 

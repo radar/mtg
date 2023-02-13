@@ -2,7 +2,7 @@ module Magic
   class Stack
     extend Forwardable
 
-    def_delegators :@stack, :first, :select, :count, :include?, :map
+    def_delegators :@stack, :first, :select, :count, :include?, :map, :empty?
 
     attr_reader :effects
 

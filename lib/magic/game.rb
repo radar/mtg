@@ -5,7 +5,7 @@ module Magic
     attr_reader :battlefield, :exile, :choices, :stack, :players, :emblems, :current_turn
 
     def_delegators :@stack, :effects, :add_effect, :resolve_pending_effect, :next_effect
-    def_delegators :@current_turn, :take_action, :take_actions
+    def_delegators :@current_turn, :take_action, :take_actions, :can_cast_sorcery?
 
     def self.start!(players: [])
       new.tap do |game|
