@@ -11,6 +11,22 @@ RSpec.describe Magic::Costs::Mana do
     end
   end
 
+  context "string argument" do
+    context "1 generic" do
+      subject { described_class.new("{1}") }
+      it "costs one generic mana" do
+        expect(subject.cost).to eq({ generic: 1 })
+      end
+    end
+
+    context "4 generic, 2 white" do
+      subject { described_class.new("{4}{W}{W}") }
+      it "costs 4 generic, 2 white" do
+        expect(subject.cost).to eq({ generic: 4, white: 2 })
+      end
+    end
+  end
+
   context "cost reduction" do
     subject { described_class.new({ generic: 3, red: 1 }).reduced_by(generic: -> { 2 }) }
 

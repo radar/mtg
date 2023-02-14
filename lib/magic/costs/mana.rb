@@ -7,7 +7,11 @@ module Magic
 
       attr_reader :balance, :cost
       def initialize(cost)
-        @cost = cost == 0 ? {} : cost
+        if cost.is_a?(String)
+          @cost = parse_cost(cost)
+        else
+          @cost = cost == 0 ? {} : cost
+        end
         @balance = @cost.dup
 
         @payments = Hash.new(0)
@@ -95,6 +99,29 @@ module Magic
         mana.each do |color, amount|
           pool[color] -= amount
         end
+      end
+
+      def parse_cost(cost)
+        symbols = {
+          "W" => :white,
+          "U" => :blue,
+          "B" => :black,
+          "R" => :red,
+          "G" => :green
+        }
+
+
+        cost
+          .scan(/{(.*?)}/)
+          .flatten
+          .group_by(&:itself)
+          .map do |key, values|
+            if key =~ /\d+/
+              [:generic, key.to_i]
+            else
+              [symbols[key], values.count]
+            end
+          end.to_h
       end
     end
   end
