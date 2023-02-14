@@ -4,7 +4,7 @@ RSpec.describe Magic::Cards::EssenceWarden do
   include_context "two player game"
 
   before do
-    ResolvePermanent("Essence Warden", controller: p1)
+    ResolvePermanent("Essence Warden", owner: p1)
   end
 
   context "when another creature controlled by the same controller enters the battlefield" do

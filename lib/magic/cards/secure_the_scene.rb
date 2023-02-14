@@ -16,7 +16,7 @@ module Magic
       def resolve!(controller, target:)
         target.exile!
 
-        Permanent.resolve(game: game, controller: target.controller, card: Tokens::Soldier.new)
+        Permanent.resolve(game: game, owner: target.controller, card: Tokens::Soldier.new)
 
         super
       end

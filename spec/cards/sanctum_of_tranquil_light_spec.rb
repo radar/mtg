@@ -2,8 +2,8 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::SanctumOfTranquilLight do
   include_context "two player game"
-  subject { ResolvePermanent("Sanctum Of Tranquil Light", controller: p1) }
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
+  subject { ResolvePermanent("Sanctum Of Tranquil Light", owner: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
   context "activated ability" do
     it "taps wood elves" do

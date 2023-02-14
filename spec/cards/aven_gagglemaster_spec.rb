@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::AvenGagglemaster do
   include_context "two player game"
 
-  subject { Permanent("Aven Gagglemaster", controller: p1) }
+  subject { Permanent("Aven Gagglemaster", owner: p1) }
 
   before do
     game.battlefield.add(subject)
@@ -17,7 +17,7 @@ RSpec.describe Magic::Cards::AvenGagglemaster do
 
     context "when another aven gagglemaster is on the field" do
       before do
-        game.battlefield.add(Permanent("Aven Gagglemaster", controller: p1))
+        game.battlefield.add(Permanent("Aven Gagglemaster", owner: p1))
       end
 
       it "gains life for itself and the other flying creature" do

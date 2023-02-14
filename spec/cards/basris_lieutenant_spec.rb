@@ -4,7 +4,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::BasrisLieutenant do
   include_context "two player game"
 
-  subject { ResolvePermanent("Basri's Lieutenant", controller: p1) }
+  subject { ResolvePermanent("Basri's Lieutenant", owner: p1) }
 
   it "has vigilance" do
     expect(subject).to be_vigilant
@@ -40,7 +40,7 @@ RSpec.describe Magic::Cards::BasrisLieutenant do
     end
 
     context "when the death is another creature and it had a counter" do
-      let(:elves) { ResolvePermanent("Wood Elves", controller: p1) }
+      let(:elves) { ResolvePermanent("Wood Elves", owner: p1) }
       before do
         subject
         elves.add_counter(Magic::Counters::Plus1Plus1)

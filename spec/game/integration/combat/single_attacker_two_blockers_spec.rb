@@ -3,9 +3,9 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
   include_context "two player game"
 
-  let!(:odric) { ResolvePermanent("Odric, Lunarch Marshal", controller: p1) }
-  let!(:wood_elves) { ResolvePermanent("Wood Elves",controller: p2) }
-  let!(:vastwood_gorger) { ResolvePermanent("Vastwood Gorger", controller: p2) }
+  let!(:odric) { ResolvePermanent("Odric, Lunarch Marshal", owner: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves",owner: p2) }
+  let!(:vastwood_gorger) { ResolvePermanent("Vastwood Gorger", owner: p2) }
 
   context "when in combat" do
     before do

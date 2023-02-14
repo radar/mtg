@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::SpeakerOfTheHeavens do
   include_context "two player game"
 
-  subject(:speaker_of_the_heavens) { ResolvePermanent("Speaker Of The Heavens", controller: p1) }
+  subject(:speaker_of_the_heavens) { ResolvePermanent("Speaker Of The Heavens", owner: p1) }
 
   it "has vigilance and lifelink" do
     expect(subject).to be_lifelink

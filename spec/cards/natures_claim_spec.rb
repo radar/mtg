@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::NaturesClaim do
   include_context "two player game"
 
-  let(:great_furnace) { ResolvePermanent("Great Furnace", controller: p2) }
+  let(:great_furnace) { ResolvePermanent("Great Furnace", owner: p2) }
   let(:card) { Card("Natures Claim") }
 
   it "destroys the great furnace" do

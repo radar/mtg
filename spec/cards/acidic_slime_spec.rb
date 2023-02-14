@@ -5,9 +5,9 @@ RSpec.describe Magic::Cards::AcidicSlime do
 
   subject { add_to_library("Acidic Slime", player: p1) }
 
-  let(:land) { Permanent("Island", controller: p1) }
-  let(:enchantment) { Permanent("Glorious Anthem", controller: p1) }
-  let(:artifact) { Permanent("Sol Ring", controller: p1) }
+  let(:land) { Permanent("Island", owner: p1) }
+  let(:enchantment) { Permanent("Glorious Anthem", owner: p1) }
+  let(:artifact) { Permanent("Sol Ring", owner: p1) }
 
   it "has deathtouch" do
     expect(subject).to be_deathtouch

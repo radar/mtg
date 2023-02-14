@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::SeasonedHallowblade do
   include_context "two player game"
 
-  subject { ResolvePermanent("Seasoned Hallowblade", controller: p1) }
+  subject { ResolvePermanent("Seasoned Hallowblade", owner: p1) }
 
   before do
     p1.draw!

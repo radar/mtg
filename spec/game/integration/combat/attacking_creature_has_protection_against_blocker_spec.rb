@@ -3,8 +3,8 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- attacking creature has protection against blocker" do
   include_context "two player game"
 
-  let!(:baneslayer_angel) { ResolvePermanent("Baneslayer Angel", controller: p1) }
-  let!(:hellkite_punisher) { ResolvePermanent("Hellkite Punisher", controller: p2) }
+  let!(:baneslayer_angel) { ResolvePermanent("Baneslayer Angel", owner: p1) }
+  let!(:hellkite_punisher) { ResolvePermanent("Hellkite Punisher", owner: p2) }
 
   context "when in combat" do
     before do

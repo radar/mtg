@@ -3,8 +3,8 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::Bombard do
   include_context "two player game"
 
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
-  let!(:alpine_watchdog) { ResolvePermanent("Alpine Watchdog", controller: p2) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
+  let!(:alpine_watchdog) { ResolvePermanent("Alpine Watchdog", owner: p2) }
 
   let(:bombard) { described_class.new(game: game) }
 

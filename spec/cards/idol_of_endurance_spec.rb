@@ -4,7 +4,7 @@ RSpec.describe Magic::Cards::IdolOfEndurance do
   include_context "two player game"
 
   let(:wood_elves) { Card("Wood Elves") }
-  subject(:idol_of_endurance) { Permanent("Idol Of Endurance", controller: p1) }
+  subject(:idol_of_endurance) { Permanent("Idol Of Endurance", owner: p1) }
 
   before do
     p1.graveyard.add(wood_elves)

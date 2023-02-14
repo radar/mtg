@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::SwiftResponse do
   include_context "two player game"
 
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
   let(:swift_response) { described_class.new(game: game) }
 

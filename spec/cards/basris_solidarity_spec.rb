@@ -5,8 +5,8 @@ RSpec.describe Magic::Cards::BasrisSolidarity do
 
   subject { Card("Basri's Solidarity") }
 
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
-  let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", controller: p2) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
+  let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", owner: p2) }
 
   it "adds a counter to each creature under p1's control" do
     cast_and_resolve(card: subject, player: p1)

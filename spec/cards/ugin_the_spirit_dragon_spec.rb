@@ -3,11 +3,11 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::UginTheSpiritDragon do
   include_context "two player game"
 
-  subject(:ugin) { ResolvePermanent("Ugin, The Spirit Dragon", controller: p1) }
+  subject(:ugin) { ResolvePermanent("Ugin, The Spirit Dragon", owner: p1) }
 
   context "+2 triggered ability" do
     let(:ability) { subject.loyalty_abilities.first }
-    let(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
+    let(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
     it "targets the wood elves" do
       action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: ugin, ability: ability)
@@ -30,8 +30,8 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
 
   context "-X triggered ability" do
     let(:ability) { subject.loyalty_abilities[1] }
-    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
-    let!(:sol_ring) { ResolvePermanent("Sol Ring", controller: p2) }
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
+    let!(:sol_ring) { ResolvePermanent("Sol Ring", owner: p2) }
 
     it "exiles wood elves, leaves the sol ring" do
       action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: ugin, ability: ability)

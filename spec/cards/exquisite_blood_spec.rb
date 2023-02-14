@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::ExquisiteBlood do
   include_context "two player game"
 
-  subject { ResolvePermanent("Exquisite Blood", controller: p1) }
+  subject { ResolvePermanent("Exquisite Blood", owner: p1) }
 
   context "receive notification" do
     it "controller gains life equal to life lost" do

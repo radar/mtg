@@ -3,9 +3,9 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::GloriousAnthem do
   include_context "two player game"
 
-  let!(:glorious_anthem) { ResolvePermanent("Glorious Anthem", controller: p1) }
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
-  let!(:wood_elves_2) { ResolvePermanent("Wood Elves", controller: p1) }
+  let!(:glorious_anthem) { ResolvePermanent("Glorious Anthem", owner: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
+  let!(:wood_elves_2) { ResolvePermanent("Wood Elves", owner: p1) }
 
   context "two creatures from the same controller are on the battlefield" do
     it "creature gets buffed" do

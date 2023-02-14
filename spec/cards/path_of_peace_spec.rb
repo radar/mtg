@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::PathOfPeace do
   include_context "two player game"
 
-  let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", controller: p2) }
+  let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", owner: p2) }
 
   let(:card) { described_class.new(game: game) }
 

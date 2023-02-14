@@ -4,12 +4,12 @@ RSpec.describe Magic::Cards::BasriKet do
   include_context "two player game"
 
   let(:card) { Card("Basri Ket") }
-  subject(:planeswalker) { Magic::Permanent.resolve(game: game, controller: p1, card: card) }
+  subject(:planeswalker) { Magic::Permanent.resolve(game: game, owner: p1, card: card) }
 
   context "+1 triggered ability" do
     let(:ability) { planeswalker.loyalty_abilities.first }
     let(:wood_elves_card) { Card("Wood Elves") }
-    let(:wood_elves) { Magic::Permanents::Creature.new(game: game, controller: p1, card: wood_elves_card) }
+    let(:wood_elves) { Magic::Permanents::Creature.new(game: game, owner: p1, card: wood_elves_card) }
 
     before do
       game.battlefield.add(wood_elves)

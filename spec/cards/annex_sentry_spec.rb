@@ -4,7 +4,7 @@ RSpec.describe Magic::Cards::AnnexSentry do
   include_context "two player game"
 
   let(:card) { Card("Annex Sentry") }
-  subject(:permanent) { Magic::Permanent.resolve(game: game, controller: p1, card: card) }
+  subject(:permanent) { Magic::Permanent.resolve(game: game, owner: p1, card: card) }
 
   before do
     game.battlefield.add(permanent)

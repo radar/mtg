@@ -4,7 +4,7 @@ RSpec.describe 'When creatures die, auras attached to them are sent to graveyard
   include_context "two player game"
 
   let(:faiths_fetters) { Card("Faith's Fetters") }
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
   it "wood elves is destroyed" do
     cast_and_resolve(card: faiths_fetters, player: p1, targeting: wood_elves)

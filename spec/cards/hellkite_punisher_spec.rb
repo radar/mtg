@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::HellkitePunisher do
   include_context "two player game"
 
-  subject { ResolvePermanent("Hellkite Punisher", controller: p1) }
+  subject { ResolvePermanent("Hellkite Punisher", owner: p1) }
 
   it { is_expected.to be_flying }
 

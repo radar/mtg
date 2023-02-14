@@ -4,7 +4,7 @@ RSpec.describe Magic::Cards::FeatOfResistance do
   include_context "two player game"
 
   subject { Card("Feat Of Resistance") }
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
   let(:green_card) { double(Magic::Card, colors: [:green] )}
 

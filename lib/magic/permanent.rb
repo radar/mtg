@@ -4,7 +4,7 @@ module Magic
     include Types
 
     extend Forwardable
-    attr_reader :game, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :activated_abilities, :exiled_cards
+    attr_reader :game, :owner, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :activated_abilities, :exiled_cards
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?
 
@@ -16,15 +16,15 @@ module Magic
 
     attr_accessor :zone
 
-    def self.resolve(game:, controller:, card:, from_zone: controller.library, enters_tapped: false)
+    def self.resolve(game:, owner:, card:, from_zone: owner.library, enters_tapped: false)
       if card.planeswalker?
-        permanent = Magic::Permanents::Planeswalker.new(game: game, controller: controller, card: card)
+        permanent = Magic::Permanents::Planeswalker.new(game: game, owner: owner, card: card)
       elsif card.creature?
-        permanent = Magic::Permanents::Creature.new(game: game, controller: controller, card: card)
+        permanent = Magic::Permanents::Creature.new(game: game, owner: owner, card: card)
       elsif card.enchantment?
-        permanent = Magic::Permanents::Enchantment.new(game: game, controller: controller, card: card)
+        permanent = Magic::Permanents::Enchantment.new(game: game, owner: owner, card: card)
       elsif card.permanent?
-        permanent = Magic::Permanent.new(game: game, controller: controller, card: card)
+        permanent = Magic::Permanent.new(game: game, owner: owner, card: card)
       end
 
       permanent.tap! if enters_tapped
@@ -32,9 +32,10 @@ module Magic
       permanent
     end
 
-    def initialize(game:, controller:, card:)
+    def initialize(game:, owner:, card:)
       @game = game
-      @controller = controller
+      @owner = owner
+      @controller = owner
       @card = card
       @base_types = card.types
       @delayed_responses = []

@@ -4,7 +4,7 @@ RSpec.describe Magic::Cards::HealerOfThePride do
   include_context "two player game"
 
   before do
-    ResolvePermanent("Healer Of The Pride", controller: p1)
+    ResolvePermanent("Healer Of The Pride", owner: p1)
   end
 
   context "when another creature controlled by this player enters the battlefield" do

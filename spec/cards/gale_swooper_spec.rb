@@ -4,7 +4,7 @@ RSpec.describe Magic::Cards::GaleSwooper do
   include_context "two player game"
 
   subject { Card("Gale Swooper") }
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
   it "grants wood elves flying" do
     cast_and_resolve(card: subject, player: p1)

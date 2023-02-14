@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::ElderfangRitualist do
   include_context "two player game"
 
-  let(:elderfang_ritualist) { ResolvePermanent("Elderfang Ritualist", controller: p1) }
+  let(:elderfang_ritualist) { ResolvePermanent("Elderfang Ritualist", owner: p1) }
 
   context "dies" do
     context "when p1 has wood elves in the graveyard" do

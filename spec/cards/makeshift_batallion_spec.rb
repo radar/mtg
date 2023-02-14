@@ -3,10 +3,10 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::MakeshiftBatallion do
   include_context "two player game"
 
-  subject(:makeshift_batallion) { ResolvePermanent("Makeshift Batallion", controller: p1) }
-  let(:wood_elves_1) { ResolvePermanent("Wood Elves", controller: p1) }
-  let(:wood_elves_2) { ResolvePermanent("Wood Elves", controller: p1) }
-  let(:falconer_adept) { ResolvePermanent("Falconer Adept", controller: p1) }
+  subject(:makeshift_batallion) { ResolvePermanent("Makeshift Batallion", owner: p1) }
+  let(:wood_elves_1) { ResolvePermanent("Wood Elves", owner: p1) }
+  let(:wood_elves_2) { ResolvePermanent("Wood Elves", owner: p1) }
+  let(:falconer_adept) { ResolvePermanent("Falconer Adept", owner: p1) }
 
   context "when attacking" do
     before do

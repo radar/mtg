@@ -3,11 +3,11 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::ProfaneMemento do
   include_context "two player game"
 
-  subject { ResolvePermanent("Profane Memento", controller: p1) }
+  subject { ResolvePermanent("Profane Memento", owner: p1) }
 
   context "receive notification" do
     context "when creature enters controller's graveyard" do
-      let(:p1_creature) { ResolvePermanent("Loxodon Wayfarer", controller: p1) }
+      let(:p1_creature) { ResolvePermanent("Loxodon Wayfarer", owner: p1) }
       let(:event) do
         Magic::Events::PermanentEnteredZone.new(
           p1_creature,
@@ -22,7 +22,7 @@ RSpec.describe Magic::Cards::ProfaneMemento do
     end
 
     context "when a creature enters opponent's graveyard" do
-      let(:p2_creature) { ResolvePermanent("Loxodon Wayfarer", controller: p2) }
+      let(:p2_creature) { ResolvePermanent("Loxodon Wayfarer", owner: p2) }
       let(:event) do
         Magic::Events::PermanentEnteredZone.new(
           p2_creature,
@@ -37,7 +37,7 @@ RSpec.describe Magic::Cards::ProfaneMemento do
     end
 
     context "when an artifact enters opponent's graveyard" do
-      let(:p2_artifact) { ResolvePermanent("Profane Memento", controller: p2) }
+      let(:p2_artifact) { ResolvePermanent("Profane Memento", owner: p2) }
       let(:event) do
         Magic::Events::PermanentEnteredZone.new(
           p2_artifact,

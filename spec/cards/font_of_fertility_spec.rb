@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::FontOfFertility do
   include_context "two player game"
 
-  subject { ResolvePermanent("Font Of Fertility", controller: p1) }
+  subject { ResolvePermanent("Font Of Fertility", owner: p1) }
 
   context "triggered ability" do
     it "searches for a basic land, puts it on the battlefield tapped" do

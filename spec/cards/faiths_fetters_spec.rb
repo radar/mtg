@@ -15,7 +15,7 @@ RSpec.describe Magic::Cards::FaithsFetters do
   end
 
   context "with wood elves" do
-    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
     it "makes the controller gain 4 life" do
       expect { cast_faiths_fetters(wood_elves) }.to change { p1.life }.by(4)
@@ -29,7 +29,7 @@ RSpec.describe Magic::Cards::FaithsFetters do
   end
 
   context "with llanowar elves" do
-    let!(:llanowar_elves) { ResolvePermanent("Llanowar Elves", controller: p2) }
+    let!(:llanowar_elves) { ResolvePermanent("Llanowar Elves", owner: p2) }
     let(:mana_ability) { llanowar_elves.activated_abilities.first }
 
     it "enchants the llanowar elves" do
@@ -41,7 +41,7 @@ RSpec.describe Magic::Cards::FaithsFetters do
   end
 
   context "with hellkite punisher" do
-    let!(:hellkite_punisher) { ResolvePermanent("Hellkite Punisher", controller: p2) }
+    let!(:hellkite_punisher) { ResolvePermanent("Hellkite Punisher", owner: p2) }
     let(:activated_ability) { hellkite_punisher.activated_abilities.first }
 
     it "enchants the hellkite punisher" do

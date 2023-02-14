@@ -4,9 +4,9 @@ RSpec.describe Magic::Game, "combat -- pack leader prevents damage to other dogs
   include_context "two player game"
 
   let!(:lightning_bolt) { Card("Lightning Bolt") }
-  let!(:pack_leader) { ResolvePermanent("Pack Leader", controller: p1) }
-  let!(:selfless_savior) { ResolvePermanent("Selfless Savior", controller: p1) }
-  let!(:vastwood_gorger) { ResolvePermanent("Vastwood Gorger", controller: p2) }
+  let!(:pack_leader) { ResolvePermanent("Pack Leader", owner: p1) }
+  let!(:selfless_savior) { ResolvePermanent("Selfless Savior", owner: p1) }
+  let!(:vastwood_gorger) { ResolvePermanent("Vastwood Gorger", owner: p2) }
 
   context "when in combat" do
     before do

@@ -4,9 +4,9 @@ RSpec.describe Magic::Cards::RambunctiousMutt do
   include_context "two player game"
 
   subject(:rambunctious_mutt) { Card("Rambunctious Mutt") }
-  let!(:enchantment) { ResolvePermanent("Glorious Anthem", controller: p2) }
-  let!(:artifact) { ResolvePermanent("Sol Ring", controller: p1) }
-  let!(:artifact_2) { ResolvePermanent("Sol Ring", controller: p2) }
+  let!(:enchantment) { ResolvePermanent("Glorious Anthem", owner: p2) }
+  let!(:artifact) { ResolvePermanent("Sol Ring", owner: p1) }
+  let!(:artifact_2) { ResolvePermanent("Sol Ring", owner: p2) }
 
   context "when rambunctious mutt enters the battlefield" do
     it "triggers a destroy effect" do

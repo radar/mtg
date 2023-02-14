@@ -6,7 +6,7 @@ RSpec.describe Magic::Cards::DefiantStrike do
   subject { Card("Defiant Strike") }
 
   context "resolution" do
-    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
     it "buffs a target + controller draws a card" do
       expect(p1).to receive(:draw!)

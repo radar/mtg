@@ -9,7 +9,7 @@ RSpec.describe Magic::Game, "beginning of your end step" do
 
   context "with griffin aerie" do
     before do
-      ResolvePermanent("Griffin Aerie", controller: p1)
+      ResolvePermanent("Griffin Aerie", owner: p1)
     end
 
     it "creates 2/2 white griffin creature token with flying" do

@@ -3,16 +3,16 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::MangaraTheDiplomat do
   include_context "two player game"
 
-  let!(:mangara) { ResolvePermanent("Mangara, The Diplomat", controller: p2) }
+  let!(:mangara) { ResolvePermanent("Mangara, The Diplomat", owner: p2) }
 
   it "has lifelink" do
     expect(mangara.lifelink?).to eq(true)
   end
 
   context "whenever an opponent attacks... ability" do
-    let!(:wood_elves_1) { ResolvePermanent("Wood Elves", controller: p1) }
-    let!(:wood_elves_2) { ResolvePermanent("Wood Elves", controller: p1) }
-    let!(:ugin) { ResolvePermanent("Ugin, The Spirit Dragon", controller: p2) }
+    let!(:wood_elves_1) { ResolvePermanent("Wood Elves", owner: p1) }
+    let!(:wood_elves_2) { ResolvePermanent("Wood Elves", owner: p1) }
+    let!(:ugin) { ResolvePermanent("Ugin, The Spirit Dragon", owner: p2) }
 
     before do
       skip_to_combat!

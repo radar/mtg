@@ -1,9 +1,9 @@
 module Magic
   class Emblem
-    attr_reader :controller
+    attr_reader :owner
 
-    def initialize(controller:)
-      @controller = controller
+    def initialize(owner:)
+      @owner = owner
     end
 
     def receive_event(event)

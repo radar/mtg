@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::AltarsLight do
   include_context "two player game"
-  let(:sol_ring) { Permanent("Sol Ring", game: game, controller: p2) }
+  let(:sol_ring) { Permanent("Sol Ring", game: game, owner: p2) }
 
   let(:card) { add_to_library("Altars Light", player: p1) }
 

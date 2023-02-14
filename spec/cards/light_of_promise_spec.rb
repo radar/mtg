@@ -6,7 +6,7 @@ RSpec.describe Magic::Cards::LightOfPromise do
   subject { Card("Light Of Promise") }
 
   context "resolution" do
-    let(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+    let(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
     it "enchants the wood elves" do
       p1.add_mana(white: 3)

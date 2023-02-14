@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::ChargeThrough do
   include_context "two player game"
 
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
   let(:eliminate) { Magic::Cards::Eliminate.new(game: game) }
   let(:charge_through) { described_class.new(game: game) }

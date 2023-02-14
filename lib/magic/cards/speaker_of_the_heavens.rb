@@ -23,7 +23,7 @@ module Magic
         end
 
         def resolve!
-          Permanent.resolve(game: game, controller: source.controller, card: Tokens::Angel.new)
+          Permanent.resolve(game: game, owner: source.controller, card: Tokens::Angel.new)
         end
       end
 

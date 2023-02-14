@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::EpicureOfBlood do
   include_context "two player game"
 
-  subject { Permanent("Epicure Of Blood", controller: p1, game: game) }
+  subject { Permanent("Epicure Of Blood", owner: p1, game: game) }
 
   context "receive notification" do
     let(:event) do

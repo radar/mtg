@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- single attacker with toxic" do
   include_context "two player game"
 
-  let!(:annex_sentry) { ResolvePermanent("Annex Sentry", controller: p1) }
+  let!(:annex_sentry) { ResolvePermanent("Annex Sentry", owner: p1) }
 
   context "when in combat" do
     before do

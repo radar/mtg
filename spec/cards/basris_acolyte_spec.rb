@@ -14,8 +14,8 @@ RSpec.describe Magic::Cards::BasrisAcolyte do
   end
 
   context "when there are other creatures on the battlefield" do
-    let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", controller: p1) }
-    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+    let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", owner: p1) }
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
     it "can add two +1/+1 counters to other creatures" do
       cast_and_resolve(card: subject, player: p1)
