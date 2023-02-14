@@ -1,6 +1,6 @@
 module Magic
   class Player
-    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life
+    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters
 
     class UnpayableMana < StandardError; end
 
@@ -22,6 +22,7 @@ module Magic
       @floating_mana = floating_mana
       @starting_life = life
       @life = life
+      @counters = Counters::Collection.new([])
     end
 
     def inspect
@@ -143,6 +144,17 @@ module Magic
 
     def protected_from?(card)
       permanents.flat_map { |card| card.protections.player }.any? { |protection| protection.protected_from?(card) }
+    end
+
+    def add_counter(counter_type, amount: 1)
+      @counters = Counters::Collection.new(@counters + [counter_type.new] * amount)
+      counter_added = Events::CounterAdded.new(
+        player: self,
+        counter_type: counter_type,
+        amount: amount
+      )
+
+      game.notify!(counter_added)
     end
   end
 end

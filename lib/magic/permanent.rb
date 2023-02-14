@@ -8,12 +8,6 @@ module Magic
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?
 
-    class Counters < SimpleDelegator
-      def of_type(type)
-        select { |counter| counter.is_a?(type) }
-      end
-    end
-
     class Protections < SimpleDelegator
       def player
         select { |protection| protection.protects_player? }
@@ -48,7 +42,7 @@ module Magic
       @modifiers = []
       @tapped = false
       @keywords = card.keywords
-      @counters = Counters.new([])
+      @counters = Counters::Collection.new([])
       @activated_abilities = card.activated_abilities
       @damage = 0
       @protections = Protections.new(card.protections.dup)
@@ -216,9 +210,8 @@ module Magic
       remove_until_eot_protections!
     end
 
-
     def add_counter(counter_type, amount: 1)
-      @counters = Counters.new(@counters + [counter_type.new] * amount)
+      @counters = Counters::Collection.new(@counters + [counter_type.new] * amount)
       counter_added = Events::CounterAdded.new(
         permanent: self,
         counter_type: counter_type,

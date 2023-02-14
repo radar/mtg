@@ -71,6 +71,16 @@ module Magic
         game.notify!(
           Events::CombatDamageDealt.new(source: self, target: target, damage: assigned_damage)
         )
+        if target.is_a?(Magic::Player) && has_keyword?(Magic::Keywords::Toxic)
+          effect = Effects::AddCounter.new(
+            source: self,
+            counter_type: Counters::Toxic,
+            choices: [target],
+            targets: [target]
+          )
+          game.add_effect(effect)
+        end
+
         controller.gain_life(assigned_damage) if lifelink?
         if target.is_a?(Creature)
           target.mark_for_death! if deathtouch?
