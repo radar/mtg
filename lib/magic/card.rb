@@ -15,6 +15,18 @@ module Magic
     PROTECTIONS = []
 
     class << self
+      def creature_types(types)
+        types.split(" ").map { T::Creatures[_1] }.join(" ")
+      end
+
+      def creature_type(types)
+        type("#{T::Creature} -- #{creature_types(types)}")
+      end
+
+      def artifact_creature_type(types)
+        type("#{T::Artifact} #{T::Creature} -- #{creature_types(types)}")
+      end
+
       def type(type)
         const_set(:TYPE_LINE, type)
       end

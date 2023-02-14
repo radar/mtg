@@ -2,7 +2,7 @@ module Magic
   module Cards
     GaleSwooper = Creature("Gale Swooper") do
       cost generic: 3, white: 1
-      type "Creature -- Griffin"
+      creature_type("Griffin")
       power 3
       toughness 2
     end

@@ -4,7 +4,7 @@ module Magic
       power 2
       toughness 3
       cost generic: 2, white: 1
-      type "Creature -- Human Cleric"
+      creature_type("Human Cleric")
     end
 
     class CelestialEnforcer < Creature

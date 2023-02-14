@@ -1,7 +1,7 @@
 module Magic
   module Cards
     HellkitePunisher = Creature("Hellkite Punisher") do
-      type "Creature -- Dragon"
+      creature_type("Dragon")
       power 6
       toughness 6
 

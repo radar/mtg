@@ -3,7 +3,7 @@ module Magic
     class HealerOfThePride < Creature
       NAME = "Healer of the Pride"
       COST = { any: 3, white: 1 }
-      TYPE_LINE = "Creature -- Cat Cleric"
+      TYPE_LINE = creature_type("Cat Cleric")
 
       def event_handlers
         {

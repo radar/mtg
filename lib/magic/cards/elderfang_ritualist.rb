@@ -2,7 +2,7 @@ module Magic
   module Cards
     class ElderfangRitualist < Creature
       NAME = "Elderfang Ritualist"
-      TYPE_LINE = "Creature -- Elf Cleric"
+      TYPE_LINE = creature_type("Elf Cleric")
       POWER = 3
       TOUGHNESS = 1
 

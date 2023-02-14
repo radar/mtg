@@ -4,7 +4,7 @@ module Magic
       power 1
       toughness 1
       cost white: 1
-      type "Creature -- Human Cleric"
+      creature_type("Human Cleric")
       keywords :vigilance, :lifelink
 
 

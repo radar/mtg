@@ -1,7 +1,7 @@
 module Magic
   module Cards
     DranasEmissary = Creature("Drana's Emissary") do
-      type "Creature -- Vampire Cleric Ally"
+      creature_type("Vampire Cleric Ally")
       cost generic: 1, white: 1, black: 1
       keywords :flying
       power 2

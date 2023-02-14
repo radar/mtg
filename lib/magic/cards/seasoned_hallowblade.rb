@@ -4,7 +4,7 @@ module Magic
       power 3
       toughness 1
       cost generic: 1, white: 1
-      type "Creature -- Human Warrior"
+      creature_type("Human Warrior")
     end
 
     class SeasonedHallowblade < Creature

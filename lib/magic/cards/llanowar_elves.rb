@@ -4,7 +4,7 @@ module Magic
       cost green: 1
       power 1
       toughness 1
-      type "Creature -- Elf Druid"
+      creature_type("Elf Druid")
     end
 
     class LlanowarElves < Creature

@@ -3,7 +3,7 @@ module Magic
     class RagingGoblin < Creature
       NAME = "Raging Goblin"
       COST = { red: 1}
-      TYPE_LINE = "Creature -- Goblin Beserker"
+      TYPE_LINE = creature_type("Goblin Berserker")
       POWER = 1
       TOUGHNESS = 1
 

@@ -2,7 +2,7 @@ module Magic
   module Cards
     ColossalDreadmaw = Creature("Colossal Dreadmaw") do
       cost generic: 4, green: 2
-      type "Creature -- Dinosaur"
+      creature_type "Dinosaur"
       power 6
       toughness 6
       keywords :trample

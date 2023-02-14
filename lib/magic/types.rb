@@ -1,5 +1,16 @@
 module Magic
+  DryTypes = Dry.Types()
+
   module Types
+    Artifact = "Artifact".freeze
+    Creature = "Creature".freeze
+    Enchantment = "Enchantment".freeze
+    Land = "Land".freeze
+    Planeswalker = "Planeswalker".freeze
+    Instant = "Instant".freeze
+    Sorcery = "Sorcery".freeze
+    Legendary = "Legendary".freeze
+
     def type?(type)
       types.include?(type)
     end
@@ -8,7 +19,7 @@ module Magic
     end
 
     def land?
-      type?("Land")
+      type?(T::Land)
     end
 
     def basic_land?
@@ -16,31 +27,33 @@ module Magic
     end
 
     def creature?
-      type?("Creature")
+      type?(T::Creature)
     end
 
     def planeswalker?
-      type?("Planeswalker")
+      type?(T::Planeswalker)
     end
 
     def artifact?
-      type?("Artifact")
+      type?(T::Artifact)
     end
 
     def enchantment?
-      type?("Enchantment")
+      type?(T::Enchantment)
     end
 
     def instant?
-      type?("Instant")
+      type?(T::Instant)
     end
 
     def sorcery?
-      type?("Sorcery")
+      type?(T::Sorcery)
     end
 
     def permanent?
       land? || creature? || planeswalker? || artifact? || enchantment?
     end
   end
+
+  T = Types
 end

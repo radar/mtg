@@ -1,7 +1,7 @@
 module Magic
   module Cards
     PackLeader = Creature("Pack Leader") do
-      type "Creature -- Dog"
+      creature_type("Dog")
       power 2
       toughness 2
       cost generic: 1, white: 1

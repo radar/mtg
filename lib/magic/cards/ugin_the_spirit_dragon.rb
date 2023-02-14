@@ -41,7 +41,7 @@ module Magic
                 battlefield: game.battlefield,
                 controller: controller,
                 maximum_choices: 7,
-                choices: controller.hand.cards.permanent_types
+                choices: controller.hand.cards.permanents
               )
             )
         end

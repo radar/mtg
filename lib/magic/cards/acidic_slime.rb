@@ -2,7 +2,7 @@ module Magic
   module Cards
     AcidicSlime = Creature("Acidic Slime") do
       cost generic: 3, green: 2
-      type "Creature -- Ooze"
+      creature_type("Ooze")
       keywords :deathtouch
       power 2
       toughness 2

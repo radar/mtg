@@ -2,7 +2,7 @@ module Magic
   module Cards
     class GeistHonoredMonk < Creature
       NAME = "Geist Honored Monk"
-      TYPE_LINE = "Creature -- Human Monk"
+      TYPE_LINE = creature_type("Human Monk")
 
       class DynamicPowerAndToughness < Abilities::Static::CreaturesGetBuffed
         def initialize(source:)

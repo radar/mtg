@@ -2,7 +2,7 @@ module Magic
   module Cards
     class BasriKet < Planeswalker
       NAME = "Basri Ket"
-      TYPE_LINE = "Legendary Planeswalker -- Basri"
+      TYPE_LINE = "#{T::Legendary} #{T::Planeswalker} -- Basri"
       BASE_LOYALTY = 3
 
       class Emblem < Magic::Emblem

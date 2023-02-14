@@ -2,7 +2,7 @@ module Magic
   module Cards
     DaybreakCharger = Creature("Daybreak Charger") do
       cost generic: 1, white: 1
-      type "Creature -- Unicorn"
+      creature_type("Unicorn")
 
       power 3
       toughness 1

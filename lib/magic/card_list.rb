@@ -21,17 +21,7 @@ module Magic
     end
 
     def permanents
-      by_any_type(
-        "Creature",
-        "Artifact",
-        "Enchantment",
-        "Land",
-        "Planeswalker"
-      )
-    end
-
-    def permanent_types
-      by_any_type(*%w(Artifact Creature Enchantment Land Planeswalker))
+      by_any_type(T::Artifact, T::Creature, T::Enchantment, T::Land, T::Planeswalker)
     end
 
     def dead

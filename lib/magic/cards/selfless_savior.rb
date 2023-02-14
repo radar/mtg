@@ -4,7 +4,7 @@ module Magic
       power 1
       toughness 1
       cost white: 1
-      type "Creature -- Dog"
+      creature_type("Dog")
     end
 
     class SelflessSavior < Creature

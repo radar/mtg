@@ -3,7 +3,7 @@ module Magic
     class CloudkinSeer < Creature
       NAME = "Cloudkin Seer"
       COST = { any: 2, blue: 1 }
-      TYPE_LINE = "Creature -- Elemental Wizard"
+      TYPE_LINE = creature_type("Elemental Wizard")
       POWER = 2
       TOUGHNESS = 1
       KEYWORDS = [Keywords::FLYING]

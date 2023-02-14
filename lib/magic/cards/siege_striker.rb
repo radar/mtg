@@ -4,7 +4,7 @@ module Magic
       power 1
       toughness 1
       cost white: 1, generic: 2
-      type "Creature -- Human Soldier"
+      creature_type("Human Soldier")
       keywords :indestructible
     end
 

@@ -1,7 +1,7 @@
 module Magic
   module Cards
     HillGiantHerdgorger = Creature("Hill Giant Herdgorger") do
-      type "Creature -- Giant"
+      creature_type("Giant")
       cost green: 2, any: 4
       power 7
       toughness 6

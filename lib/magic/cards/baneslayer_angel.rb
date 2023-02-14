@@ -1,7 +1,7 @@
 module Magic
   module Cards
     BaneslayerAngel = Creature("Baneslayer Angel") do
-      type "Creature -- Angel"
+      creature_type("Angel")
       cost generic: 3, white: 2
       power 5
       toughness 5

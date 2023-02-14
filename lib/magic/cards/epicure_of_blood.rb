@@ -3,7 +3,7 @@ module Magic
     class EpicureOfBlood < Card
       NAME = "Epicure of Blood"
       COST = { any: 4, black: 1}
-      TYPE_LINE = "Creature -- Vampire"
+      TYPE_LINE = creature_type("Vampire")
 
       def target_choices(permanent)
         permanent.game.opponents(permanent.controller)

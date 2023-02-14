@@ -2,7 +2,7 @@ module Magic
   module Cards
     MakeshiftBatallion = Creature("Makeshift Batallion") do
       cost generic: 2, white: 1
-      type "Creature -- Human Soldier"
+      creature_type("Human Soldier")
       power 3
       toughness 2
 

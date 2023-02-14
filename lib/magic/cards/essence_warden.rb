@@ -2,7 +2,7 @@ module Magic
   module Cards
     EssenceWarden = Creature("Essence Warden") do
       cost green: 1
-      type "Creature -- Elf Shaman"
+      creature_type("Elf Shaman")
       power 1
       toughness 1
 

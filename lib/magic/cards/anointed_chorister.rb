@@ -1,7 +1,7 @@
 module Magic
   module Cards
     AnointedChorister = Creature("Anointed Chorister") do
-      type "Creature -- Human Cleric"
+      creature_type("Human Cleric")
       cost white: 1
       power 1
       toughness 1
