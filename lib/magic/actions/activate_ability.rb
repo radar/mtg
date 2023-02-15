@@ -17,6 +17,8 @@ module Magic
       end
 
       def can_be_activated?(player)
+        can_be_activated = costs.all? { |cost| cost.can_pay?(player) } && requirements.all?(&:call)
+        binding.pry if !can_be_activated && permanent.card.is_a?(Magic::Cards::SpeakerOfTheHeavens)
         costs.all? { |cost| cost.can_pay?(player) } && requirements.all?(&:call)
       end
 
@@ -28,7 +30,12 @@ module Magic
         ability
       end
 
+      def valid_targets?(*targets)
+        ability.valid_targets?(*targets)
+      end
+
       def targeting(*targets)
+        raise "Invalid target specified for #{ability}: #{targets}" unless valid_targets?(*targets)
         @targets = targets
         self
       end

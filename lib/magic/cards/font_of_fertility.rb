@@ -8,11 +8,7 @@ module Magic
 
     class FontOfFertility < Enchantment
       class ActivatedAbility < Magic::ActivatedAbility
-
-        def initialize(source:)
-          @costs = [Costs::Mana.new(green: 1), Costs::Sacrifice.new(source)]
-          super
-        end
+        def costs = [Costs::Mana.new(green: 1), Costs::Sacrifice.new(source)]
 
         def resolve!
           game.add_effect(

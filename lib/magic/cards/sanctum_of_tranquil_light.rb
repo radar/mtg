@@ -11,12 +11,12 @@ module Magic
             .reduced_by(generic: -> { source.controller.permanents.by_any_type("Shrine").count })]
         end
 
-        def tap_choices
-          battlefield.creatures
-        end
-
         def single_target?
           true
+        end
+
+        def target_choices
+          battlefield.creatures
         end
 
         def resolve!(target:)

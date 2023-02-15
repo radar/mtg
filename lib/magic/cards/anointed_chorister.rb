@@ -9,7 +9,7 @@ module Magic
 
     class AnointedChorister < Creature
       class ActivatedAbility < Magic::ActivatedAbility
-        costs [Costs::Mana.new(generic: 4, white: 1)]
+        def costs = [Costs::Mana.new(generic: 4, white: 1)]
 
         def resolve!
           source.modifiers << Magic::Permanents::Creature::Buff.new(power: 3, toughness: 3, until_eot: true)

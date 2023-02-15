@@ -28,14 +28,14 @@ module Magic
       def ltb_triggers = [LTB]
 
       class ActivatedAbility < Magic::ActivatedAbility
-        def initialize(source:)
-          @costs = [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(source)]
-
-          super
-        end
+        def costs = [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(source)]
 
         def single_target?
           true
+        end
+
+        def target_choices
+          source.exiled_cards
         end
 
         def resolve!(target:)

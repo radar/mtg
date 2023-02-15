@@ -10,8 +10,6 @@ module Magic
 
       class ActivatedAbility < Magic::ActivatedAbility
         def initialize(source:)
-          @costs = [Costs::Tap.new(source)]
-
           super(source: source, requirements: [
             -> {
               source.controller.life >= source.controller.starting_life + 7
@@ -21,6 +19,8 @@ module Magic
             }
           ])
         end
+
+        def costs = [Costs::Tap.new(source)]
 
         def resolve!
           Permanent.resolve(game: game, owner: source.controller, card: Tokens::Angel.new)
