@@ -65,6 +65,10 @@ module Magic
       controller == other_controller
     end
 
+    def controller=(other_controller)
+      @controller = other_controller
+    end
+
     def move_zone!(from: zone, to:)
       if from
         game.notify!(

@@ -49,6 +49,10 @@ module Magic
       self.class.new(reject { |c| c == target })
     end
 
+    def tapped
+      select(&:tapped?)
+    end
+
     private
 
     def select(&condition)
