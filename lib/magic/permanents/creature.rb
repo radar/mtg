@@ -87,6 +87,10 @@ module Magic
         end
       end
 
+      def attacking?
+        game.current_turn.attacking?(self)
+      end
+
       def can_attack?
         attachments.all?(&:can_attack?)
       end

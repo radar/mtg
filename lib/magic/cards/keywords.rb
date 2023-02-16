@@ -5,6 +5,7 @@ module Magic
       end
 
       DEATHTOUCH = Class.new(Keyword)
+      DEFENDER = Class.new(Keyword)
       DOUBLE_STRIKE = Class.new(Keyword)
       FIRST_STRIKE = Class.new(Keyword)
       FLYING = Class.new(Keyword)
@@ -77,6 +78,10 @@ module Magic
 
       def deathtouch?
         has_keyword?(Keywords::DEATHTOUCH)
+      end
+
+      def defender?
+        has_keyword?(Keywords::DEFENDER)
       end
 
       def first_strike?

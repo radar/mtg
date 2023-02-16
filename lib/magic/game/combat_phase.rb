@@ -21,10 +21,6 @@ module Magic
           @blockers << blocker
         end
 
-        def blocked?
-          @blocked
-        end
-
         def resolve
           return if attacker.dead?
 
@@ -69,6 +65,10 @@ module Magic
 
       def attack_for_attacker(attacker)
         @attacks.find { |attack| attack.attacker == attacker }
+      end
+
+      def attacking?(permanent)
+        !!attack_for_attacker(permanent)
       end
 
       def attackers_without_targets?

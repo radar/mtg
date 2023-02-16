@@ -6,7 +6,7 @@ module Magic
       attr_reader :active_player, :number, :events, :combat, :actions
 
       def_delegators :@game, :battlefield, :emblems, :players
-      def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks
+      def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks, :attacking?
 
       state_machine :step, initial: :beginning do
 
@@ -212,6 +212,7 @@ module Magic
       def can_cast_sorcery?(player)
         game.stack.empty? && active_player == player
       end
+
 
       private
 
