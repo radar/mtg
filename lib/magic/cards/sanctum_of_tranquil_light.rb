@@ -8,7 +8,7 @@ module Magic
       class ActivatedAbility < Magic::ActivatedAbility
         def costs
           [Costs::Mana.new(generic: 5, white: 1)
-            .reduced_by(generic: -> { source.controller.permanents.by_any_type("Shrine").count })]
+            .adjusted_by(generic: -> { -source.controller.permanents.by_any_type("Shrine").count })]
         end
 
         def single_target?

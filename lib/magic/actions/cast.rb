@@ -34,11 +34,11 @@ module Magic
 
       def mana_cost
         @mana_cost ||= begin
-          reduce_mana_cost_abilities = game.battlefield.static_abilities
-          .of_type(Abilities::Static::ReduceManaCost)
+          mana_cost_adjustment_abilities = game.battlefield.static_abilities
+          .of_type(Abilities::Static::ManaCostAdjustment)
           .applies_to(card)
 
-          reduce_mana_cost_abilities.each_with_object(card.cost.dup) { |ability, cost| ability.apply(cost) }
+          mana_cost_adjustment_abilities.each_with_object(card.cost.dup) { |ability, cost| ability.apply(cost) }
         end
       end
 

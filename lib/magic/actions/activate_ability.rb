@@ -17,8 +17,6 @@ module Magic
       end
 
       def can_be_activated?(player)
-        can_be_activated = costs.all? { |cost| cost.can_pay?(player) } && requirements.all?(&:call)
-        binding.pry if !can_be_activated && permanent.card.is_a?(Magic::Cards::SpeakerOfTheHeavens)
         costs.all? { |cost| cost.can_pay?(player) } && requirements.all?(&:call)
       end
 

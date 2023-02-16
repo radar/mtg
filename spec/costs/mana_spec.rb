@@ -28,7 +28,7 @@ RSpec.describe Magic::Costs::Mana do
   end
 
   context "cost reduction" do
-    subject { described_class.new({ generic: 3, red: 1 }).reduced_by(generic: -> { 2 }) }
+    subject { described_class.new({ generic: 3, red: 1 }).adjusted_by(generic: -> { -2 }) }
 
     it "reduces generic cost by 2" do
       expect(subject.cost).to eq({ generic: 1, red: 1 })
