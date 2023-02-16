@@ -32,7 +32,10 @@ module Magic
       @players = players
       @emblems = []
       @turn_number = 0
-      @current_turn = nil
+    end
+
+    def add_players(*players)
+      players.each(&method(:add_player))
     end
 
     def add_player(player)
@@ -46,6 +49,7 @@ module Magic
     end
 
     def start!
+      @current_turn = Turn.new(number: 1, game: self, active_player: players.first)
       players.each do |player|
         7.times { player.draw! }
       end
@@ -57,6 +61,8 @@ module Magic
 
     def next_turn
       @turn_number += 1
+      puts "Starting Turn #{@turn_number}"
+      next_active_player
       @current_turn = Turn.new(number: @turn_number, game: self, active_player: @players.first)
     end
 

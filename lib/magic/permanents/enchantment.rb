@@ -2,7 +2,7 @@ module Magic
   module Permanents
     class Enchantment < Permanent
       extend Forwardable
-      def_delegators :@card, :power_buff, :toughness_buff, :can_attack?, :can_block?, :keyword_grants, :type_grants, :can_activate_ability?
+      def_delegators :@card, :power_buff, :toughness_buff, :can_attack?, :can_block?, :keyword_grants, :type_grants, :can_activate_ability?, :does_not_untap_during_untap_step?
 
       attr_reader :attached_to
 
@@ -10,7 +10,6 @@ module Magic
         permanent.attachments << self
         @attached_to = permanent
       end
-
     end
   end
 end

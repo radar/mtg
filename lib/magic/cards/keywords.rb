@@ -8,6 +8,7 @@ module Magic
       DEFENDER = Class.new(Keyword)
       DOUBLE_STRIKE = Class.new(Keyword)
       FIRST_STRIKE = Class.new(Keyword)
+      FLASH = Class.new(Keyword)
       FLYING = Class.new(Keyword)
       HASTE = Class.new(Keyword)
       HEXPROOF = Class.new(Keyword)

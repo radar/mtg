@@ -50,7 +50,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
     let(:ability) { subject.loyalty_abilities[2] }
     let(:forest) { Card("Forest") }
     let(:glorious_anthem) { Card("Glorious Anthem") }
-    let(:acidic_slime) { Card("Acidic Slime") }
+    let(:wood_elves) { Card("Wood Elves") }
     let(:fencing_ace) { Card("Fencing Ace") }
     let(:great_furnace) { Card("Great Furnace") }
     let(:island) { Card("Island") }
@@ -59,7 +59,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
 
     before do
       p1.library.add(glorious_anthem)
-      p1.library.add(acidic_slime)
+      p1.library.add(wood_elves)
       p1.library.add(fencing_ace)
       p1.library.add(great_furnace)
       p1.library.add(island)

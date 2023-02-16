@@ -162,6 +162,12 @@ module Magic
       @tapped = true
     end
 
+    def untap_during_untap_step
+      return if attachments.any?(&:does_not_untap_during_untap_step?)
+
+      untap!
+    end
+
     def untap!
       @tapped = false
     end
@@ -233,6 +239,10 @@ module Magic
     def remove_from_exile(card)
       @exiled_cards -= [card]
       game.exile.remove(card)
+    end
+
+    def can_untap_during_upkeep?
+      attachments.any?(&:can_untap_during_upkeep?)
     end
 
     private

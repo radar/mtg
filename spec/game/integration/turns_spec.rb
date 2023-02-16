@@ -17,7 +17,6 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
   end
 
   it "walks through two turns" do
-    game.start!
     expect(p1.hand.count).to eq(7)
     expect(p2.hand.count).to eq(7)
 
@@ -33,7 +32,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     game.take_action(action)
     expect(p1.permanents.by_name("Island").count).to eq(1)
     expect(p1.lands_played).to eq(1)
-    expect(p1.hand.by_name("Island").count).to eq(6)
+    expect(p1.hand.by_name("Island").count).to eq(5)
 
     island = p1.permanents.by_name("Island").first
     action = Magic::Actions::ActivateAbility.new(player: p1, permanent: island, ability: island.activated_abilities.first)

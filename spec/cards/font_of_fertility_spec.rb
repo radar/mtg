@@ -5,6 +5,10 @@ RSpec.describe Magic::Cards::FontOfFertility do
 
   subject { ResolvePermanent("Font Of Fertility", owner: p1) }
 
+  def p1_library
+    8.times.map { Card("Forest") }
+  end
+
   context "triggered ability" do
     it "searches for a basic land, puts it on the battlefield tapped" do
       expect(subject.activated_abilities.count).to eq(1)

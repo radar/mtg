@@ -18,7 +18,7 @@ module Magic
         end
 
         after_transition to: :untap do |turn|
-          turn.battlefield.permanents.controlled_by(turn.active_player).each(&:untap!)
+          turn.battlefield.permanents.controlled_by(turn.active_player).each(&:untap_during_untap_step)
         end
 
         after_transition to: :upkeep do |turn|
@@ -116,6 +116,7 @@ module Magic
 
         event :end do
           transition second_main: :end
+          transition all => :end
         end
 
         event :cleanup do

@@ -101,6 +101,8 @@ module Magic
     end
 
     def draw!
+      lose! and return if library.none?
+
       card = library.draw
       game.notify!(
         Events::CardDraw.new(

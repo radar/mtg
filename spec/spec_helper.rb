@@ -61,20 +61,16 @@ RSpec.configure do |config|
 end
 
 RSpec.shared_context "two player game" do
-  let(:game) { Magic::Game.start! }
+  let(:game) { Magic::Game.new }
   let(:p1) { Magic::Player.new(name: "P1") }
   let(:p2) { Magic::Player.new(name: "P2") }
 
   def p1_library
-    [
-      Card("Forest")
-    ]
+    7.times.map { Card("Forest") }
   end
 
   def p2_library
-    [
-      Card("Mountain")
-    ]
+    7.times.map { Card("Mountain") }
   end
 
   def current_turn
@@ -98,8 +94,8 @@ RSpec.shared_context "two player game" do
   before do
     p1_library.each { p1.library.add(_1) }
     p2_library.each { p2.library.add(_1) }
-    game.add_player(p1)
-    game.add_player(p2)
-    game.next_turn
+    game.add_players(p1, p2)
+
+    game.start!
   end
 end
