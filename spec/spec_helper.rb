@@ -89,6 +89,7 @@ RSpec.shared_context "two player game" do
     current_turn.beginning_of_combat!
   end
 
+
   def go_to_combat_damage!
     current_turn.attackers_declared! if current_turn.step?(:declare_attackers)
     current_turn.combat_damage! if current_turn.step?(:declare_blockers)

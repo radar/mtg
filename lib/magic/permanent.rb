@@ -191,6 +191,10 @@ module Magic
       move_zone!(to: game.exile)
     end
 
+    def return_to_hand(player)
+      move_zone!(to: player.hand)
+    end
+
     def can_activate_ability?(ability)
       attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
     end
