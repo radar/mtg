@@ -32,6 +32,10 @@ module Magic
       select { |creature| yield(creature.power) }
     end
 
+    def by_card(card)
+      select { |c| c.name == card.name }
+    end
+
     def by_name(name)
       select { |c| c.name == name }
     end
