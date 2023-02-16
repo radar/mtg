@@ -26,14 +26,15 @@ module Magic
         cost.keys.reject { |k| k == :generic || k == :colorless }
       end
 
-      def adjusted_by(change)
-        @cost.merge!(change) do |key, original_cost, reduction|
-          amount = reduction.respond_to?(:call) ? reduction.call : reduction
-          original_cost + amount
+      def adjusted_by(change, condition = nil)
+        if condition && condition.call
+          @cost.merge!(change) do |key, original_cost, reduction|
+            amount = reduction.respond_to?(:call) ? reduction.call : reduction
+            original_cost + amount
+          end
         end
 
         @balance = @cost.dup
-
         self
       end
 

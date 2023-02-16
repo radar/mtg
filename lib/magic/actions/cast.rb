@@ -6,9 +6,10 @@ module Magic
       def_delegators :@card, :enchantment?, :artifact?
       attr_reader :card, :targets
       def initialize(card:, **args)
+        super(**args)
         @card = card
         @targets = []
-        super(**args)
+        @card.controller = player
       end
 
       def inspect
@@ -26,6 +27,10 @@ module Magic
 
       def countered!
         card.move_to_graveyard!(player)
+      end
+
+      def exile!
+        card.move_to_exile!
       end
 
       def mana_cost=(cost)

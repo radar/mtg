@@ -38,6 +38,12 @@ module Magic
       @stack.unshift(item)
     end
 
+    def exile!
+      @stack.each(&:exile!)
+      @stack.clear
+    end
+
+
     def spells
       @stack.select { |item| item.is_a?(Magic::Actions::Cast) }
     end
@@ -90,7 +96,6 @@ module Magic
     def resolve!
       resolve_stack!
       resolve_effects!
-
     end
 
     def resolve_stack!

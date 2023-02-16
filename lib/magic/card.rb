@@ -5,7 +5,7 @@ module Magic
     def_delegators :@game, :battlefield, :exile, :current_turn
 
     include Cards::Keywords
-    attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :protections, :delayed_responses, :counters
+    attr_reader :game, :controller, :name, :cost, :type_line, :countered, :keywords, :protections, :delayed_responses, :counters
     attr_accessor :tapped
 
     attr_accessor :zone
@@ -63,6 +63,7 @@ module Magic
       @delayed_responses = []
       @keywords = self.class::KEYWORDS
       @protections = self.class::PROTECTIONS
+      @controller = nil
       super
     end
 
@@ -76,6 +77,10 @@ module Magic
 
     def to_s
       name
+    end
+
+    def controller=(controller)
+      @controller = controller
     end
 
     def mana_value
@@ -102,6 +107,10 @@ module Magic
 
     def move_to_graveyard!(target_controller)
       move_zone!(target_controller.graveyard)
+    end
+
+    def move_to_exile!
+      move_zone!(game.exile)
     end
 
     def countered?
