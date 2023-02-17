@@ -4,7 +4,7 @@ module Magic
     include Types
 
     extend Forwardable
-    attr_reader :game, :owner, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :activated_abilities, :exiled_cards
+    attr_reader :game, :owner, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :activated_abilities, :exiled_cards, :cannot_untap_next_turn
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?
 
@@ -163,16 +163,35 @@ module Magic
     end
 
     def tap!
+      tapped_event = Events::PermanentTapped.new(
+        permanent: self,
+      )
+      game.notify!(tapped_event)
+
       @tapped = true
     end
 
+    def cannot_untap_next_turn!
+      @cannot_untap_next_turn = true
+    end
+
     def untap_during_untap_step
+      if cannot_untap_next_turn
+        @cannot_untap_next_turn = false
+        return
+      end
+
       return if attachments.any?(&:does_not_untap_during_untap_step?)
 
       untap!
     end
 
     def untap!
+      untapped_event = Events::PermanentUntapped.new(
+        permanent: self,
+      )
+      game.notify!(untapped_event)
+
       @tapped = false
     end
 

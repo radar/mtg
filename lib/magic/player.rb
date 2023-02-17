@@ -28,6 +28,7 @@ module Magic
     def inspect
       "#<Player name:#{name.inspect}>"
     end
+    alias_method :to_s, :inspect
 
     def lost?
       @lost

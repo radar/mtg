@@ -93,7 +93,7 @@ module Magic
         if card.single_target?
           card.resolve!(player, target: targets.first)
         else
-          card.resolve!(player, targets: target)
+          card.resolve!(player, targets: targets)
         end
 
         if card.instant? || card.sorcery?

@@ -32,7 +32,10 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     game.take_action(action)
     expect(p1.permanents.by_name("Island").count).to eq(1)
     expect(p1.lands_played).to eq(1)
-    expect(p1.hand.by_name("Island").count).to eq(5)
+    # 6 islands on game start draw, + aegis turtle
+    # additional island on 1st turn draw - up to 7
+    # one island played, down to 6 in hand
+    expect(p1.hand.by_name("Island").count).to eq(6)
 
     island = p1.permanents.by_name("Island").first
     action = Magic::Actions::ActivateAbility.new(player: p1, permanent: island, ability: island.activated_abilities.first)
@@ -56,7 +59,6 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_1.second_main!
     turn_1.end!
 
-    game.next_active_player
     turn_2 = game.next_turn
 
     expect(turn_2.active_player).to eq(p2)

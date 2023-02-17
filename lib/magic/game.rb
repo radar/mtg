@@ -61,9 +61,10 @@ module Magic
 
     def next_turn
       @turn_number += 1
-      puts "Starting Turn #{@turn_number}"
-      next_active_player
+      puts "Starting Turn #{@turn_number} - Active Player: #{@players.first}"
       @current_turn = Turn.new(number: @turn_number, game: self, active_player: @players.first)
+      next_active_player
+      @current_turn
     end
 
     def next_active_player
