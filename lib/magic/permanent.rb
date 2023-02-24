@@ -95,7 +95,11 @@ module Magic
         to.add(self)
       else
         self.zone = nil
-        to.add(card)
+        if to.graveyard?
+          to.add(card) if !token?
+        else
+          to.add(card)
+        end
       end
 
       game.notify!(

@@ -48,7 +48,6 @@ module Magic
       end
 
       def can_perform?
-        return false if card.land? && player.can_play_lands?
         return false unless card.zone.hand?
         return true if mana_cost.zero?
 
