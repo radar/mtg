@@ -16,11 +16,11 @@ module Magic
 
     attr_accessor :zone
 
-    def self.resolve(game:, owner:, card:, from_zone: owner.library, enters_tapped: false)
+    def self.resolve(game:, owner:, card:, from_zone: owner.library, enters_tapped: false, token: false)
       if card.planeswalker?
         permanent = Magic::Permanents::Planeswalker.new(game: game, owner: owner, card: card)
       elsif card.creature?
-        permanent = Magic::Permanents::Creature.new(game: game, owner: owner, card: card)
+        permanent = Magic::Permanents::Creature.new(game: game, owner: owner, card: card, token: token)
       elsif card.enchantment?
         permanent = Magic::Permanents::Enchantment.new(game: game, owner: owner, card: card)
       elsif card.permanent?
@@ -32,11 +32,12 @@ module Magic
       permanent
     end
 
-    def initialize(game:, owner:, card:)
+    def initialize(game:, owner:, card:, token: false)
       @game = game
       @owner = owner
       @controller = owner
       @card = card
+      @token = token
       @base_types = card.types
       @delayed_responses = []
       @attachments = []
@@ -67,6 +68,10 @@ module Magic
 
     def controller=(other_controller)
       @controller = other_controller
+    end
+
+    def token?
+      @token
     end
 
     def move_zone!(from: zone, to:)
@@ -100,6 +105,14 @@ module Magic
           to: to
         )
       )
+
+      if land?
+        game.notify!(
+          Events::Landfall.new(
+            self,
+          )
+        )
+      end
     end
 
     def has_replacement_effect?(event)

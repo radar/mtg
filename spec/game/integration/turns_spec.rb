@@ -43,7 +43,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     expect(p1.mana_pool).to eq(blue: 1)
 
     island2 = p1.hand.by_name("Island").first
-    action = Magic::Actions::Cast.new(player: p1, card: island2)
+    action = Magic::Actions::PlayLand.new(player: p1, card: island2)
     expect(action.can_perform?).to eq(false)
 
     aegis_turtle = p1.hand.by_name("Aegis Turtle").first
