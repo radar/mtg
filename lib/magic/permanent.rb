@@ -76,9 +76,9 @@ module Magic
 
     def move_zone!(from: zone, to:)
       game.notify!(*leaving_zone_notifications(from: from, to: to))
-      left_zone! if from&.battlefield?
 
       if from&.battlefield?
+        self.zone = nil
         from.remove(self)
         to.add(card) unless token?
       elsif to.battlefield?
@@ -87,10 +87,6 @@ module Magic
       end
 
       game.notify!(*entering_zone_notifications(from: from, to: to))
-    end
-
-    def left_zone!
-      self.zone = nil
     end
 
     def has_replacement_effect?(event)
