@@ -6,7 +6,7 @@ RSpec.describe Magic::Cards::SecureTheScene do
   subject(:secure_the_scene) { described_class.new(game: game) }
 
   context "with a creature" do
-    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
     it "exiles the wood elves, replaces them with a 1/1 White Soldier" do
       p1.add_mana(white: 5)
@@ -16,7 +16,7 @@ RSpec.describe Magic::Cards::SecureTheScene do
       game.take_action(action)
       game.tick!
 
-      expect(wood_elves.zone).to be_exile
+      expect(wood_elves.card.zone).to be_exile
       soldier = game.battlefield.creatures.controlled_by(p2).first
       expect(soldier.name).to eq("Soldier")
       expect(soldier.power).to eq(1)

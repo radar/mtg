@@ -3,11 +3,11 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::UginTheSpiritDragon do
   include_context "two player game"
 
-  subject(:ugin) { ResolvePermanent("Ugin, The Spirit Dragon", controller: p1) }
+  subject(:ugin) { ResolvePermanent("Ugin, The Spirit Dragon", owner: p1) }
 
   context "+2 triggered ability" do
     let(:ability) { subject.loyalty_abilities.first }
-    let(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
+    let(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
     it "targets the wood elves" do
       action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: ugin, ability: ability)
@@ -30,8 +30,8 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
 
   context "-X triggered ability" do
     let(:ability) { subject.loyalty_abilities[1] }
-    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
-    let!(:sol_ring) { ResolvePermanent("Sol Ring", controller: p2) }
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
+    let!(:sol_ring) { ResolvePermanent("Sol Ring", owner: p2) }
 
     it "exiles wood elves, leaves the sol ring" do
       action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: ugin, ability: ability)
@@ -40,7 +40,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
       game.stack.resolve!
       expect(subject.loyalty).to eq(4)
       # Wood elves has a color, so it goes
-      expect(wood_elves.zone).to be_exile
+      expect(wood_elves.card.zone).to be_exile
       # Meanwhile, Sol Ring is colorless, so it stays
       expect(sol_ring.zone).to be_battlefield
     end
@@ -50,7 +50,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
     let(:ability) { subject.loyalty_abilities[2] }
     let(:forest) { Card("Forest") }
     let(:glorious_anthem) { Card("Glorious Anthem") }
-    let(:acidic_slime) { Card("Acidic Slime") }
+    let(:wood_elves) { Card("Wood Elves") }
     let(:fencing_ace) { Card("Fencing Ace") }
     let(:great_furnace) { Card("Great Furnace") }
     let(:island) { Card("Island") }
@@ -58,9 +58,8 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
 
 
     before do
-      p1.library.add(forest)
       p1.library.add(glorious_anthem)
-      p1.library.add(acidic_slime)
+      p1.library.add(wood_elves)
       p1.library.add(fencing_ace)
       p1.library.add(great_furnace)
       p1.library.add(island)
@@ -73,16 +72,17 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
       game.take_action(action)
       game.stack.resolve!
       expect(subject.loyalty).to eq(0)
-      expect(subject.zone).to be_graveyard
+      expect(subject.zone).to be_nil
       expect(p1.life).to eq(27)
 
       move_to_battlefield = game.next_effect
       expect(move_to_battlefield).to be_a(Magic::Effects::MoveToBattlefield)
       permanents = p1.hand.cards.permanents.last(7)
+      expect(permanents.count).to eq(7)
       game.resolve_pending_effect(permanents)
 
       permanents.each do |permanent|
-        expect(permanent.zone).to be_battlefield
+        expect(game.battlefield.cards.by_name(permanent.name).controlled_by(p1).count).to eq(1)
       end
     end
   end

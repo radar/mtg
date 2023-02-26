@@ -3,8 +3,8 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::CelestialEnforcer do
   include_context "two player game"
 
-  let(:permanent) { ResolvePermanent("Celestial Enforcer", controller: p1) }
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+  let(:permanent) { ResolvePermanent("Celestial Enforcer", owner: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
   context "activated ability" do
     def ability
@@ -19,7 +19,7 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
       context "when celestial enforcer is untapped" do
         context "and p1 controls a creature with flying" do
           before do
-            ResolvePermanent("Aven Gagglemaster", controller: p1)
+            ResolvePermanent("Aven Gagglemaster", owner: p1)
           end
 
           it "taps a target creature" do

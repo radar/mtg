@@ -5,6 +5,8 @@ require_relative "magic/version"
 require "state_machines"
 require "logger"
 require "zeitwerk"
+require "dry/types"
+
 loader = Zeitwerk::Loader.for_gem
 loader.setup # ready!
 

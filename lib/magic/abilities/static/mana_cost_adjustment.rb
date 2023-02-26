@@ -1,11 +1,11 @@
 module Magic
   module Abilities
     module Static
-      class ReduceManaCost
-        attr_reader :source, :reduction, :applies_to
-        def initialize(source:, reduction:, applies_to:)
+      class ManaCostAdjustment
+        attr_reader :source, :adjustment, :applies_to
+        def initialize(source:, adjustment:, applies_to:)
           @source = source
-          @reduction = reduction
+          @adjustment = adjustment
           @applies_to = applies_to
         end
 
@@ -18,9 +18,8 @@ module Magic
         end
 
         def apply(cost)
-          cost.reduced_by(@reduction)
+          cost.adjusted_by(adjustment)
         end
-
       end
     end
   end

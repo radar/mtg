@@ -3,8 +3,8 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "attackers declared" do
   include_context "two player game"
 
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
-  let!(:basri_ket) { ResolvePermanent("Basri Ket", controller: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
+  let!(:basri_ket) { ResolvePermanent("Basri Ket", owner: p1) }
 
   before do
     p1.library.add(Card("Forest"))

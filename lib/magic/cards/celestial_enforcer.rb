@@ -4,7 +4,7 @@ module Magic
       power 2
       toughness 3
       cost generic: 2, white: 1
-      type "Creature -- Human Cleric"
+      creature_type("Human Cleric")
     end
 
     class CelestialEnforcer < Creature
@@ -12,8 +12,6 @@ module Magic
         attr_reader :source
 
         def initialize(source:)
-          @source = source
-          @costs = [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(source)]
           super(
             source: source,
             requirements: [
@@ -24,8 +22,14 @@ module Magic
           )
         end
 
+        def costs = [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(source)]
+
         def single_target?
           true
+        end
+
+        def target_choices
+          game.battlefield.creatures
         end
 
         def resolve!(target:)

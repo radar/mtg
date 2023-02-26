@@ -1,7 +1,7 @@
 module Magic
   module Cards
     RenegadeDemon = Creature("Renegade Demon") do
-      type "Creature -- Demon"
+      creature_type("Demon")
       power 5
       toughness 3
     end

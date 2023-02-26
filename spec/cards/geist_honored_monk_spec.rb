@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::GeistHonoredMonk do
   include_context "two player game"
 
-  let!(:geist) { ResolvePermanent("Geist-Honored Monk", controller: p1) }
+  let!(:geist) { ResolvePermanent("Geist-Honored Monk", owner: p1) }
 
   context "power and toughness" do
     context "when it and its spirits are the only creature on the battlefield" do
@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::GeistHonoredMonk do
     end
 
     context "when there are other creatures on the battlefield as well" do
-      let!(:loxodon) { ResolvePermanent("Loxodon Wayfarer", controller: p1) }
+      let!(:loxodon) { ResolvePermanent("Loxodon Wayfarer", owner: p1) }
 
       it "has power and toughness equal to creatures" do
         expect(geist.power).to eq(4)
@@ -25,7 +25,7 @@ RSpec.describe Magic::Cards::GeistHonoredMonk do
     end
 
     context "when these another Geist-Honored Monk under this player's control" do
-      let!(:geist_2) { ResolvePermanent("Geist-Honored Monk", controller: p1) }
+      let!(:geist_2) { ResolvePermanent("Geist-Honored Monk", owner: p1) }
 
       it "has power and toughness equal to creatures" do
         expect(geist.power).to eq(6)

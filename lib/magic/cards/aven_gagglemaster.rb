@@ -2,7 +2,7 @@ module Magic
   module Cards
     AvenGagglemaster = Creature("Aven Gagglemaster") do
       cost generic: 3, white: 2
-      type "Creature -- Bird Warror"
+      creature_type("Bird Warrior")
       power 4
       toughness 3
       keywords :flying

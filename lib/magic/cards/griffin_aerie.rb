@@ -17,7 +17,7 @@ module Magic
             life_gained = life_gain_events.sum(&:life)
 
             if life_gained >= 3
-              Permanent.resolve(game: game, controller: controller, card: Tokens::Griffin.new)
+              Permanent.resolve(game: game, owner: controller, card: Tokens::Griffin.new)
             end
           end
         }

@@ -3,8 +3,8 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- single attacker, one blocker" do
   include_context "two player game"
 
-  let!(:colossal_dreadmaw) { ResolvePermanent("Colossal Dreadmaw", controller: p1) }
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
+  let!(:colossal_dreadmaw) { ResolvePermanent("Colossal Dreadmaw", owner: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
   context "when in combat" do
     before do
@@ -31,7 +31,7 @@ RSpec.describe Magic::Game, "combat -- single attacker, one blocker" do
       go_to_combat_damage!
 
       expect(p2.life).to eq(p2_starting_life - 5)
-      expect(wood_elves.zone).to be_graveyard
+      expect(wood_elves).to be_dead
       expect(colossal_dreadmaw).to be_tapped
     end
   end

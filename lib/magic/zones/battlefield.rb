@@ -3,7 +3,7 @@ module Magic
     class Battlefield < Zone
       extend Forwardable
 
-      def_delegators :permanents, :creatures
+      def_delegators :permanents, :creatures, :planeswalkers, :not_controlled_by, :controlled_by
 
       def initialize(**args)
         super(**args)
@@ -14,6 +14,7 @@ module Magic
       end
 
       def add(permanent)
+        raise "Attempting to add a card to battlefield -- should be a permanent" if permanent.is_a?(Magic::Card)
         super(permanent)
       end
 

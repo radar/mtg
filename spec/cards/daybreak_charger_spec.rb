@@ -5,7 +5,7 @@ RSpec.describe Magic::Cards::DaybreakCharger do
 
 
   context "ETB Event" do
-    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
     it "buffs a target" do
       cast_and_resolve(card: Card("Daybreak Charger"), player: p1)

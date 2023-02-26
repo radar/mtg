@@ -4,7 +4,7 @@ RSpec.describe Magic::Cards::AnointedChorister do
   include_context "two player game"
 
   let(:card) { Card("Anointed Chorister") }
-  subject(:permanent) { Magic::Permanent.resolve(game: game, controller: p1, card: card) }
+  subject(:permanent) { Magic::Permanent.resolve(game: game, owner: p1, card: card) }
 
   before do
     game.battlefield.add(permanent)
@@ -16,6 +16,7 @@ RSpec.describe Magic::Cards::AnointedChorister do
 
       action = Magic::Actions::ActivateAbility.new(player: p1, permanent: permanent, ability: permanent.activated_abilities.first)
       action.pay_mana({ generic: { white: 4 }, white: 1 })
+      action.finalize_costs!(p1)
       game.take_action(action)
       game.tick!
 

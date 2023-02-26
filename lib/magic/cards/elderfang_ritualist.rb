@@ -1,7 +1,7 @@
 module Magic
   module Cards
     ElderfangRitualist = Creature("ElderfangRitualist") do
-      type "Creature -- Elf Cleric"
+      creature_type("Elf Cleric")
       cost generic: 2, white: 2
       power 3
       toughness 1

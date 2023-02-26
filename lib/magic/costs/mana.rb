@@ -7,8 +7,13 @@ module Magic
 
       attr_reader :balance, :cost
       def initialize(cost)
-        @balance = cost.dup
-        @cost = cost
+        if cost.is_a?(String)
+          @cost = parse_cost(cost)
+        else
+          @cost = cost == 0 ? {} : cost
+        end
+        @balance = @cost.dup
+
         @payments = Hash.new(0)
         @payments[:generic] = Hash.new(0)
       end
@@ -21,14 +26,15 @@ module Magic
         cost.keys.reject { |k| k == :generic || k == :colorless }
       end
 
-      def reduced_by(change)
-        @cost.merge!(change) do |key, original_cost, reduction|
-          amount = reduction.respond_to?(:call) ? reduction.call : reduction
-          original_cost - amount
+      def adjusted_by(change, condition = nil)
+        if !condition || (condition && condition.call)
+          @cost.merge!(change) do |key, original_cost, reduction|
+            amount = reduction.respond_to?(:call) ? reduction.call : reduction
+            original_cost + amount
+          end
         end
 
         @balance = @cost.dup
-
         self
       end
 
@@ -48,6 +54,7 @@ module Magic
       end
 
       def pay(player, payment)
+
         raise CannotPay unless can_pay?(player)
 
         pay_generic(payment[:generic]) if payment[:generic]
@@ -61,6 +68,30 @@ module Magic
 
         player.pay_mana(@payments[:generic]) if @payments[:generic].any?
         player.pay_mana(color_costs) if color_costs.values.any?(&:positive?)
+      end
+
+      def white
+        cost[:white]
+      end
+
+      def blue
+        cost[:blue]
+      end
+
+      def black
+        cost[:black]
+      end
+
+      def red
+        cost[:red]
+      end
+
+      def green
+        cost[:green]
+      end
+
+      def generic
+        cost[:generic]
       end
 
       private
@@ -93,6 +124,28 @@ module Magic
         mana.each do |color, amount|
           pool[color] -= amount
         end
+      end
+
+      def parse_cost(cost)
+        symbols = {
+          "W" => :white,
+          "U" => :blue,
+          "B" => :black,
+          "R" => :red,
+          "G" => :green
+        }
+
+        cost
+          .scan(/{(.*?)}/)
+          .flatten
+          .group_by(&:itself)
+          .map do |key, values|
+            if key =~ /\d+/
+              [:generic, key.to_i]
+            else
+              [symbols[key], values.count]
+            end
+          end.to_h
       end
     end
   end

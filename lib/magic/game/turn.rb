@@ -6,7 +6,7 @@ module Magic
       attr_reader :active_player, :number, :events, :combat, :actions
 
       def_delegators :@game, :battlefield, :emblems, :players
-      def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks
+      def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks, :attacking?
 
       state_machine :step, initial: :beginning do
 
@@ -18,7 +18,7 @@ module Magic
         end
 
         after_transition to: :untap do |turn|
-          turn.battlefield.permanents.controlled_by(turn.active_player).each(&:untap!)
+          turn.battlefield.permanents.controlled_by(turn.active_player).each(&:untap_during_untap_step)
         end
 
         after_transition to: :upkeep do |turn|
@@ -116,6 +116,7 @@ module Magic
 
         event :end do
           transition second_main: :end
+          transition all => :end
         end
 
         event :cleanup do
@@ -185,18 +186,35 @@ module Magic
 
       def notify!(*events)
         events.each do |event|
-          track_event(event)
           logger.debug "EVENT: #{event.inspect}"
-          next if event.is_a?(Events::DamageDealt) && battlefield.any? { |permanent| permanent.respond_to?(:prevent_damage!) && permanent.prevent_damage!(event) }
-          emblems.each { |emblem| emblem.receive_event(event) }
-          battlefield.receive_event(event)
-          players.each { |player| player.receive_event(event) }
+          track_event(event)
+          replacement_sources = replacement_effect_sources(event)
+          # TODO: Handle multiple replacement effects -- player gets to choose which one to pick
+          if replacement_sources.any?
+            puts "  EVENT REPLACED! Replaced by: #{replacement_sources.first}"
+            event = replacement_sources.first.handle_replacement_effect(event)
+          end
+
+          if event
+            emblems.each { |emblem| emblem.receive_event(event) }
+            battlefield.receive_event(event)
+            players.each { |player| player.receive_event(event) }
+          end
         end
+      end
+
+      def replacement_effect_sources(event)
+        battlefield.cards.select { |card| card.has_replacement_effect?(event) }
       end
 
       def spells_cast
         events.select { |event| event.is_a?(Events::SpellCast) }
       end
+
+      def can_cast_sorcery?(player)
+        game.stack.empty? && active_player == player
+      end
+
 
       private
 

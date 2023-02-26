@@ -3,7 +3,11 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::FontOfFertility do
   include_context "two player game"
 
-  subject { ResolvePermanent("Font Of Fertility", controller: p1) }
+  subject { ResolvePermanent("Font Of Fertility", owner: p1) }
+
+  def p1_library
+    8.times.map { Card("Forest") }
+  end
 
   context "triggered ability" do
     it "searches for a basic land, puts it on the battlefield tapped" do
@@ -14,7 +18,8 @@ RSpec.describe Magic::Cards::FontOfFertility do
       action.pay(p1, :sacrifice)
       game.take_action(action)
       game.stack.resolve!
-      expect(subject.zone).to be_graveyard
+      expect(subject.zone).to be_nil
+      expect(p1.graveyard.by_name(subject.name).count).to eq(1)
 
       forest = game.battlefield.cards.by_name("Forest").first
       expect(forest.zone).to be_battlefield

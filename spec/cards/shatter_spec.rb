@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::Shatter do
   include_context "two player game"
 
-  let(:great_furnace) { ResolvePermanent("Great Furnace", controller: p1) }
+  let(:great_furnace) { ResolvePermanent("Great Furnace", owner: p1) }
   let(:card) { described_class.new(game: game) }
 
   it "destroys the great furnace" do
@@ -12,6 +12,6 @@ RSpec.describe Magic::Cards::Shatter do
       .pay_mana(generic: { red: 1 }, red: 1)
       .targeting(great_furnace)
     add_to_stack_and_resolve(action)
-    expect(great_furnace.zone).to be_graveyard
+    expect(great_furnace.zone).to be_nil
   end
 end

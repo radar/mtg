@@ -2,7 +2,7 @@ module Magic
   class Zone
     extend Forwardable
 
-    def_delegators :@cards, :include?, :any?, :select, :find, :count, :<<, :by_name, :creatures, :by_any_type, :basic_lands, :controlled_by
+    def_delegators :@cards, :include?, :any?, :none?, :select, :find, :count, :<<, :by_name, :creatures, :by_any_type, :basic_lands, :controlled_by, :cmc_lte, :by_card
 
     attr_reader :owner, :cards
 
@@ -14,6 +14,7 @@ module Magic
     def to_s
       "#{self.class.name.split("::").last}"
     end
+    alias_method :name, :to_s
 
     def add(card)
       card.zone = self

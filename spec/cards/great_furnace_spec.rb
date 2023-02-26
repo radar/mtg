@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::GreatFurnace do
   include_context "two player game"
 
-  subject { ResolvePermanent("Great Furnace", controller: p1) }
+  subject { ResolvePermanent("Great Furnace", owner: p1) }
 
   it "taps for red mana" do
     expect(p1).to receive(:add_mana).with(red: 1)

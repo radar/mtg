@@ -2,7 +2,7 @@ module Magic
   class Stack
     extend Forwardable
 
-    def_delegators :@stack, :first, :select, :count, :include?, :map
+    def_delegators :@stack, :first, :select, :count, :include?, :map, :empty?
 
     attr_reader :effects
 
@@ -31,12 +31,18 @@ module Magic
 
     def initialize(stack: [], effects: [])
       @stack = stack
-      @effects = effects
+      @effects = Effects.new(effects)
     end
 
     def add(item)
       @stack.unshift(item)
     end
+
+    def exile!
+      @stack.each(&:exile!)
+      @stack.clear
+    end
+
 
     def spells
       @stack.select { |item| item.is_a?(Magic::Actions::Cast) }
@@ -84,13 +90,12 @@ module Magic
     end
 
     def skip_effect(effect)
-
+      effect.skip!
     end
 
     def resolve!
       resolve_stack!
       resolve_effects!
-
     end
 
     def resolve_stack!
@@ -113,18 +118,24 @@ module Magic
       resolve_stack!
     end
 
+    def unresolved_effects
+      effects.reject { _1.resolved? }
+    end
+
+
     def resolve_effects!
-      resolvable_effects = effects.select { |effect| effect.single_choice? }
-      resolvable_effects.each do |effect|
-        resolve_single_target_effect(effect)
+      resolvable_effects_with_targets = effects.unresolved.targeted
+      resolvable_effects_with_targets.each do |effect|
+        effect.targets.each do |target|
+          effect.resolve(target)
+        end
       end
 
-      no_choice_effects = effects.select { |effect| effect.no_choice? }
+      no_choice_effects = unresolved_effects.select { |effect| effect.no_choice? }
 
       no_choice_effects.each do |effect|
         skip_effect(effect)
         puts "#{effect} has no valid choices, skipping."
-        effects.shift
       end
     end
   end

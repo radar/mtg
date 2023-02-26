@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "until end of turn effect" do
   include_context "two player game"
 
-  let!(:dranas_emissary) { ResolvePermanent("Drana's Emissary", controller: p1) }
+  let!(:dranas_emissary) { ResolvePermanent("Drana's Emissary", owner: p1) }
 
   before do
     game.battlefield.add(dranas_emissary)

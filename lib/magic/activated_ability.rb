@@ -2,13 +2,13 @@ module Magic
   class ActivatedAbility
     attr_reader :source, :requirements
 
-    def self.costs(costs)
-      const_set(:COSTS, costs)
-    end
-
     def initialize(source:, requirements: [])
       @source = source
       @requirements = requirements
+    end
+
+    def valid_targets?(*targets)
+      targets.all? { target_choices.include?(_1) }
     end
 
     def costs

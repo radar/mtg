@@ -17,7 +17,6 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
   end
 
   it "walks through two turns" do
-    game.start!
     expect(p1.hand.count).to eq(7)
     expect(p2.hand.count).to eq(7)
 
@@ -28,11 +27,14 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_1.draw!
     turn_1.first_main!
 
-    # expect(p1.possible_actions.any? { |action| action.is_a?(Magic::Actions::PlayLand) }).to eq(true)
+    #game.current_turn.possible_actions
     action = Magic::Actions::PlayLand.new(player: p1, card: p1.hand.by_name("Island").first)
     game.take_action(action)
     expect(p1.permanents.by_name("Island").count).to eq(1)
     expect(p1.lands_played).to eq(1)
+    # 6 islands on game start draw, + aegis turtle
+    # additional island on 1st turn draw - up to 7
+    # one island played, down to 6 in hand
     expect(p1.hand.by_name("Island").count).to eq(6)
 
     island = p1.permanents.by_name("Island").first
@@ -41,7 +43,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     expect(p1.mana_pool).to eq(blue: 1)
 
     island2 = p1.hand.by_name("Island").first
-    action = Magic::Actions::Cast.new(player: p1, card: island2)
+    action = Magic::Actions::PlayLand.new(player: p1, card: island2)
     expect(action.can_perform?).to eq(false)
 
     aegis_turtle = p1.hand.by_name("Aegis Turtle").first
@@ -49,7 +51,6 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     action.pay_mana(blue: 1)
     game.take_action(action)
     game.stack.resolve!
-    expect(aegis_turtle.zone).to be_battlefield
     expect(p1.permanents.by_name("Aegis Turtle").count).to eq(1)
 
     turn_1.beginning_of_combat!
@@ -58,7 +59,6 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_1.second_main!
     turn_1.end!
 
-    game.next_active_player
     turn_2 = game.next_turn
 
     expect(turn_2.active_player).to eq(p2)
@@ -81,7 +81,6 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     game.take_action(action)
 
     game.stack.resolve!
-    expect(raging_goblin.zone).to be_battlefield
     expect(p2.permanents.by_name("Raging Goblin").count).to eq(1)
 
     turn_2.beginning_of_combat!

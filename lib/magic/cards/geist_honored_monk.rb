@@ -2,7 +2,7 @@ module Magic
   module Cards
     GeistHonoredMonk = Creature("Geist Honored Monk") do
       cost generic: 3, white: 2
-      type "Creature -- Human Monk"
+      creature_type("Human Monk")
       keywords :vigilance
     end
 

@@ -20,12 +20,12 @@ module Magic
       select(&:planeswalker?)
     end
 
-    def permanents
-      select { |card| card.is_a?(Magic::Permanent) }
+    def lands
+      select(&:land?)
     end
 
-    def permanent_types
-      by_any_type(*%w(Artifact Creature Enchantment Land Planeswalker))
+    def permanents
+      by_any_type(T::Artifact, T::Creature, T::Enchantment, T::Land, T::Planeswalker)
     end
 
     def dead
@@ -34,6 +34,10 @@ module Magic
 
     def with_power(&block)
       select { |creature| yield(creature.power) }
+    end
+
+    def by_card(card)
+      select { |c| c.name == card.name }
     end
 
     def by_name(name)
@@ -51,6 +55,10 @@ module Magic
 
     def except(target)
       self.class.new(reject { |c| c == target })
+    end
+
+    def tapped
+      select(&:tapped?)
     end
 
     private

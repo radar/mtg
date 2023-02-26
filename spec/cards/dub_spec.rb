@@ -6,7 +6,7 @@ RSpec.describe Magic::Cards::Dub do
   subject { Card("Dub") }
 
   context "resolution" do
-    let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
     it "buffs wood elves, gives them first strike and makes them a knight" do
       p1.add_mana(white: 3)

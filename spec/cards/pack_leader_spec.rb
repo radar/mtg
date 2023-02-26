@@ -3,9 +3,9 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::PackLeader do
   include_context "two player game"
 
-  let!(:pack_leader) { ResolvePermanent("Pack Leader", controller: p1) }
-  let!(:alpine_watchdog) { ResolvePermanent("Alpine Watchdog", controller: p1) }
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+  let!(:pack_leader) { ResolvePermanent("Pack Leader", owner: p1) }
+  let!(:alpine_watchdog) { ResolvePermanent("Alpine Watchdog", owner: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
   it "buffs alpine watchdog" do
     expect(alpine_watchdog.power).to eq(3)
@@ -17,5 +17,8 @@ RSpec.describe Magic::Cards::PackLeader do
     expect(wood_elves.toughness).to eq(1)
   end
 
-  it "Whenever Pack Leader attacks, prevent all combat damage that would be dealt this turn to Dogs you control."
+  it "does not buff itself" do
+    expect(pack_leader.power).to eq(2)
+    expect(pack_leader.toughness).to eq(2)
+  end
 end

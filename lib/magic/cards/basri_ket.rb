@@ -2,19 +2,19 @@ module Magic
   module Cards
     class BasriKet < Planeswalker
       NAME = "Basri Ket"
-      TYPE_LINE = "Legendary Planeswalker -- Basri"
+      TYPE_LINE = "#{T::Legendary} #{T::Planeswalker} -- Basri"
       BASE_LOYALTY = 3
 
       class Emblem < Magic::Emblem
         def receive_event(event)
           case event
           when Events::BeginningOfCombat
-            return unless event.active_player == controller
-            game = controller.game
+            return unless event.active_player == owner
+            game = owner.game
 
-            Permanent.resolve(game: game, controller: controller, card: Tokens::Soldier.new)
+            Permanent.resolve(game: game, owner: owner, card: Tokens::Soldier.new)
 
-            controller.creatures.each do |creature|
+            owner.creatures.each do |creature|
               creature.add_counter(Counters::Plus1Plus1)
             end
           end
@@ -44,9 +44,8 @@ module Magic
             response: -> {
               attackers = game.current_turn.attacks.count
 
-              puts "ONE"
               attackers.times do
-                token = Permanent.resolve(game: game, controller: planeswalker.controller, card: Tokens::Soldier.new, enters_tapped: true)
+                token = Permanent.resolve(game: game, owner: planeswalker.controller, card: Tokens::Soldier.new, enters_tapped: true)
 
                 game.current_turn.declare_attacker(token)
               end
@@ -59,7 +58,7 @@ module Magic
         def loyalty_change = -6
 
         def resolve!
-          game.add_emblem(Emblem.new(controller: planeswalker.controller))
+          game.add_emblem(Emblem.new(owner: planeswalker.controller))
         end
       end
 

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::AltarsLight do
   include_context "two player game"
-  let(:sol_ring) { Permanent("Sol Ring", game: game, controller: p2) }
+  let(:sol_ring) { Permanent("Sol Ring", game: game, owner: p2) }
 
   let(:card) { add_to_library("Altars Light", player: p1) }
 
@@ -16,6 +16,6 @@ RSpec.describe Magic::Cards::AltarsLight do
     action.targeting(sol_ring)
     add_to_stack_and_resolve(action)
 
-    expect(sol_ring.zone).to be_exile
+    expect(sol_ring.card.zone).to be_exile
   end
 end

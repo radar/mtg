@@ -6,9 +6,10 @@ module Magic
       def_delegators :@card, :enchantment?, :artifact?
       attr_reader :card, :targets
       def initialize(card:, **args)
+        super(**args)
         @card = card
         @targets = []
-        super(**args)
+        @card.controller = player
       end
 
       def inspect
@@ -28,28 +29,38 @@ module Magic
         card.move_to_graveyard!(player)
       end
 
+      def exile!
+        card.move_to_exile!
+      end
+
+      def mana_cost=(cost)
+        @mana_cost = Costs::Mana.new(cost)
+      end
+
       def mana_cost
         @mana_cost ||= begin
-          reduce_mana_cost_abilities = game.battlefield.static_abilities
-          .of_type(Abilities::Static::ReduceManaCost)
+          mana_cost_adjustment_abilities = game.battlefield.static_abilities
+          .of_type(Abilities::Static::ManaCostAdjustment)
           .applies_to(card)
 
-          reduce_mana_cost_abilities.each_with_object(card.cost.dup) { |ability, cost| ability.apply(cost) }
+          mana_cost_adjustment_abilities.each_with_object(card.cost.dup) { |ability, cost| ability.apply(cost) }
         end
       end
 
       def can_perform?
-        return false if card.land? && player.can_play_lands?
         return false unless card.zone.hand?
         return true if mana_cost.zero?
 
         mana_cost.can_pay?(player)
       end
 
-      def can_target?(target)
+      def target_choices
         choices = card.method(:target_choices)
         choices = choices.arity == 1 ? card.target_choices(player) : card.target_choices
-        choices.include?(target)
+      end
+
+      def can_target?(target)
+        target_choices.include?(target)
       end
 
       def targeting(*targets)
@@ -81,7 +92,7 @@ module Magic
         if card.single_target?
           card.resolve!(player, target: targets.first)
         else
-          card.resolve!(player, targets: target)
+          card.resolve!(player, targets: targets)
         end
 
         if card.instant? || card.sorcery?

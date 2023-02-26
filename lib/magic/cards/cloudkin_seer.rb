@@ -2,7 +2,7 @@ module Magic
   module Cards
     CloudkinSeer = Creature("Cloudkin Seer") do
       cost generic: 2, blue: 1
-      type "Creature -- Elemental Wizard"
+      type creature_type("Elemental Wizard")
       power 2
       toughness 1
       keywords :flying

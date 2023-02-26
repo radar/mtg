@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- single attacker with vigilance, no blockers" do
   include_context "two player game"
 
-  let!(:alpine_watchdog) { ResolvePermanent("Alpine Watchdog", controller: p1) }
+  let!(:alpine_watchdog) { ResolvePermanent("Alpine Watchdog", owner: p1) }
 
   context "when in combat" do
     before do

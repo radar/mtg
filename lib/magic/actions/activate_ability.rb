@@ -28,7 +28,12 @@ module Magic
         ability
       end
 
+      def valid_targets?(*targets)
+        ability.valid_targets?(*targets)
+      end
+
       def targeting(*targets)
+        raise "Invalid target specified for #{ability}: #{targets}" unless valid_targets?(*targets)
         @targets = targets
         self
       end
@@ -70,9 +75,12 @@ module Magic
 
         cost = costs.find { |cost| cost.is_a?(cost_type) }
         cost.pay(player, payment)
-        costs.each { |cost| cost.finalize!(player) }
 
         self
+      end
+
+      def finalize_costs!(player)
+        costs.each { |cost| cost.finalize!(player) }
       end
     end
   end

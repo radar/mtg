@@ -1,6 +1,6 @@
 module Magic
   class Player
-    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life
+    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters
 
     class UnpayableMana < StandardError; end
 
@@ -17,16 +17,18 @@ module Magic
       @lost = false
       @library = Zones::Library.new(owner: self, cards: library)
       @graveyard = graveyard
-      @exile = Zones::Exile.new(owner: self)
       @hand = hand
       @mana_pool = mana_pool
       @floating_mana = floating_mana
+      @starting_life = life
       @life = life
+      @counters = Counters::Collection.new([])
     end
 
     def inspect
       "#<Player name:#{name.inspect}>"
     end
+    alias_method :to_s, :inspect
 
     def lost?
       @lost
@@ -34,16 +36,9 @@ module Magic
 
     def lose!
       @lost = true
-
-      game.notify!(
-        Events::PlayerLoses,
-        player: self,
-      )
     end
 
     def gain_life(life)
-      @life += life
-
       game.notify!(
         Events::LifeGain.new(
           player: self,
@@ -52,9 +47,7 @@ module Magic
       )
     end
 
-    def take_damage(damage)
-      @life -= damage
-
+    def take_damage(source:, damage:)
       game.notify!(
         Events::LifeLoss.new(
           player: self,
@@ -102,6 +95,8 @@ module Magic
     end
 
     def draw!
+      lose! and return if library.none?
+
       card = library.draw
       game.notify!(
         Events::CardDraw.new(
@@ -131,11 +126,38 @@ module Magic
       permanents.planeswalkers
     end
 
+    def event_targets_self?(event)
+      (event.respond_to?(:player) && event.player == self) ||
+        (event.respond_to?(:target) && event.target == self)
+    end
+
     def receive_event(event)
+      return unless event_targets_self?(event)
+      case event
+      when Events::LifeLoss
+        @life -= event.life
+      when Events::LifeGain
+        @life += event.life
+      when Events::PlayerLoses
+        lose!
+      when Events::DamageDealt, Events::CombatDamageDealt
+        take_damage(source: event.source, damage: event.damage)
+      end
     end
 
     def protected_from?(card)
       permanents.flat_map { |card| card.protections.player }.any? { |protection| protection.protected_from?(card) }
+    end
+
+    def add_counter(counter_type, amount: 1)
+      @counters = Counters::Collection.new(@counters + [counter_type.new] * amount)
+      counter_added = Events::CounterAdded.new(
+        player: self,
+        counter_type: counter_type,
+        amount: amount
+      )
+
+      game.notify!(counter_added)
     end
   end
 end

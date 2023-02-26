@@ -1,7 +1,7 @@
 module Magic
   module Cards
     VastwoodGorger = Creature("Vastwood Gorger") do
-      type "Creature -- Wurm"
+      type creature_type("Wurm")
       cost generic: 5, green: 1
       power 5
       toughness 6

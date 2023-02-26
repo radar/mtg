@@ -1,7 +1,7 @@
 module Magic
   module Cards
     BattlefieldRaptor = Creature("Battlefield Raptor") do
-      type "Creature -- Bird"
+      creature_type("Bird")
       cost white: 1
       power 1
       toughness 2

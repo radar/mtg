@@ -1,12 +1,12 @@
 module Magic
   module Effects
-    class TargetedEffect
+    class TargetedEffect < Effect
       class InvalidTarget < StandardError; end;
 
       attr_reader :source, :targets, :choices
 
       def initialize(source:, targets: [], choices: source.target_choices)
-        @targets = targets
+        @targets = [*targets]
         @source = source
         @choices = choices
       end

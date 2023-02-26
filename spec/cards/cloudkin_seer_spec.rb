@@ -9,13 +9,12 @@ RSpec.describe Magic::Cards::CloudkinSeer do
     p1.library.add(forest)
   end
 
-  subject { Card("Cloudkin Seer") }
+  subject { ResolvePermanent("Cloudkin Seer", owner: p1) }
 
   context "ETB effect" do
     it "controller draws a card" do
       expect(p1).to receive(:draw!)
-      subject.resolve!(p1)
-      game.stack.resolve!
+      subject
     end
   end
 

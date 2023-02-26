@@ -1,32 +1,35 @@
 module Magic
   module Cards
     module Keywords
-      DEATHTOUCH = "Deathtouch".freeze
-      DOUBLE_STRIKE = "Double strike".freeze
-      FIRST_STRIKE = "First strike".freeze
-      FLYING = "Flying".freeze
-      HASTE = "Haste".freeze
-      HEXPROOF = "Hexproof".freeze
-      INDESTRUCTIBLE = "Indestructible".freeze
-      LIFELINK = "Lifelink".freeze
-      REACH = "Reach".freeze
-      SKULK = "Skulk".freeze
-      TRAMPLE = "Trample".freeze
-      VIGILANCE = "Vigilance".freeze
+      class Keyword
+      end
+
+      DEATHTOUCH = Class.new(Keyword)
+      DEFENDER = Class.new(Keyword)
+      DOUBLE_STRIKE = Class.new(Keyword)
+      FIRST_STRIKE = Class.new(Keyword)
+      FLASH = Class.new(Keyword)
+      FLYING = Class.new(Keyword)
+      HASTE = Class.new(Keyword)
+      HEXPROOF = Class.new(Keyword)
+      INDESTRUCTIBLE = Class.new(Keyword)
+      LIFELINK = Class.new(Keyword)
+      REACH = Class.new(Keyword)
+      SKULK = Class.new(Keyword)
+      TRAMPLE = Class.new(Keyword)
+      VIGILANCE = Class.new(Keyword)
+
+      class Toxic < Keyword
+        attr_reader :amount
+        def initialize(amount)
+          @amount = amount
+        end
+      end
 
       def self.[](*keywords)
         keywords.map do |keyword|
           const_get(keyword.upcase)
         end
-      end
-
-      def self.included(base)
-        base.attr_reader :keyword_grants
-        base.prepend(self)
-      end
-
-      def initialize(...)
-        @keyword_grants = []
       end
 
       class KeywordGrant
@@ -51,6 +54,7 @@ module Magic
       end
 
       def has_keyword?(keyword)
+        keywords.any? { |kw| kw.is_a?(keyword) } ||
         keywords.include?(keyword) ||
           keyword_grants.map(&:keyword).include?(keyword) ||
           attachments.flat_map(&:keyword_grants).include?(keyword)
@@ -66,6 +70,10 @@ module Magic
 
       def deathtouch?
         has_keyword?(Keywords::DEATHTOUCH)
+      end
+
+      def defender?
+        has_keyword?(Keywords::DEFENDER)
       end
 
       def first_strike?

@@ -2,7 +2,7 @@ module Magic
   module Cards
     RambunctiousMutt = Creature("Rambunctious Mutt") do
       cost generic: 3, green: 2
-      type "Creature -- Dog"
+      creature_type("Dog")
       keywords :deathtouch
       power 2
       toughness 2

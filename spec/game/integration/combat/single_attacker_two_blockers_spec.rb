@@ -3,9 +3,9 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
   include_context "two player game"
 
-  let!(:odric) { ResolvePermanent("Odric, Lunarch Marshal", controller: p1) }
-  let!(:wood_elves) { ResolvePermanent("Wood Elves",controller: p2) }
-  let!(:vastwood_gorger) { ResolvePermanent("Vastwood Gorger", controller: p2) }
+  let!(:odric) { ResolvePermanent("Odric, Lunarch Marshal", owner: p1) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves",owner: p2) }
+  let!(:vastwood_gorger) { ResolvePermanent("Vastwood Gorger", owner: p2) }
 
   context "when in combat" do
     before do
@@ -36,10 +36,12 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
 
       go_to_combat_damage!
 
-      expect(odric.zone).to be_graveyard
-      expect(wood_elves.zone).to be_graveyard
-      expect(vastwood_gorger.zone).to be_battlefield
-      expect(vastwood_gorger.damage).to eq(2)
+      aggregate_failures do
+        expect(odric).to be_dead
+        expect(wood_elves).to be_dead
+        expect(vastwood_gorger.zone).to be_battlefield
+        expect(vastwood_gorger.damage).to eq(2)
+      end
 
       expect(p2.life).to eq(p2_starting_life)
     end

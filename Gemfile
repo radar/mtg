@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 source "https://rubygems.org"
-ruby "3.0.0"
+ruby "3.2.0"
 
 # Specify your gem's dependencies in magic.gemspec
 gemspec

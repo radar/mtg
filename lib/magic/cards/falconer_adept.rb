@@ -2,7 +2,7 @@ module Magic
   module Cards
     FalconerAdept = Creature("Falconer Adept") do
       cost generic: 3, white: 1
-      type "Creature -- Human Soldier"
+      creature_type("Human Soldier")
       power 2
       toughness 3
     end
@@ -12,7 +12,7 @@ module Magic
         {
           Events::PreliminaryAttackersDeclared => -> (receiver, event) do
             return if event.attacks.none? { |attack| attack.attacker == receiver }
-            token = Permanent.resolve(game: game, controller: receiver.controller, card: Tokens::Bird.new, enters_tapped: true)
+            token = Permanent.resolve(game: game, owner: receiver.controller, card: Tokens::Bird.new, enters_tapped: true)
             game.current_turn.declare_attacker(token)
           end
         }

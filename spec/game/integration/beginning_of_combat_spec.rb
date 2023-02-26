@@ -9,7 +9,7 @@ RSpec.describe Magic::Game, "beginning of combat on your turn" do
 
   context "with basri ket's emblem" do
     before do
-      game.emblems << Magic::Cards::BasriKet::Emblem.new(controller: p1)
+      game.emblems << Magic::Cards::BasriKet::Emblem.new(owner: p1)
     end
 
     it "creates a 1/1 white soldier creature token" do

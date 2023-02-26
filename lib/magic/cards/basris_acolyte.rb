@@ -1,7 +1,7 @@
 module Magic
   module Cards
     BasrisAcolyte = Creature("Basri's Acolyte") do
-      type "Creature -- Cat Cleric"
+      creature_type("Cat Cleric")
       cost generic: 2, white: 2
       power 2
       toughness 3

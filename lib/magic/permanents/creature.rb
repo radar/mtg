@@ -32,7 +32,7 @@ module Magic
       end
 
       def dead?
-        @marked_for_death || !alive?
+        @marked_for_death || !alive? || zone.nil?
       end
 
       def base_power
@@ -59,19 +59,49 @@ module Magic
           static_ability_buffs.sum(&:toughness)
       end
 
-      def take_damage(damage_dealt)
-        @damage += damage_dealt
+      def take_damage(source:, damage:)
+        game.notify!(
+          Events::DamageDealt.new(
+            source: source,
+            target: self,
+            damage: damage,
+          )
+        )
+      end
+
+      def receive_notification(event)
+        super
+
+        return if !event.respond_to?(:target) || event.target != self
+
+        case event
+        when Events::CombatDamageDealt, Events::DamageDealt
+          @damage += event.damage
+        end
       end
 
       def fight(target, assigned_damage = power)
-        target.take_damage(assigned_damage)
         game.notify!(
-          Events::DamageDealt.new(source: self, target: target, damage: assigned_damage)
+          Events::CombatDamageDealt.new(source: self, target: target, damage: assigned_damage)
         )
+        if target.is_a?(Magic::Player) && has_keyword?(Magic::Keywords::Toxic)
+          effect = Effects::AddCounter.new(
+            source: self,
+            counter_type: Counters::Toxic,
+            choices: [target],
+            targets: [target]
+          )
+          game.add_effect(effect)
+        end
+
         controller.gain_life(assigned_damage) if lifelink?
         if target.is_a?(Creature)
           target.mark_for_death! if deathtouch?
         end
+      end
+
+      def attacking?
+        game.current_turn.attacking?(self)
       end
 
       def can_attack?
@@ -82,19 +112,12 @@ module Magic
         attachments.all?(&:can_block?)
       end
 
-      def add_counter(counter_type, amount: 1)
-        amount.times do
-          @counters << counter_type.new
-        end
-      end
-
       def cleanup!
         until_eot_modifiers = modifiers.select(&:until_eot?)
         until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }
 
         super
       end
-
 
       def static_ability_buffs
         game.battlefield.static_abilities.of_type(Abilities::Static::CreaturesGetBuffed).applies_to(self)

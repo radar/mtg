@@ -7,26 +7,39 @@ module Magic
     end
 
     class NineLives < Enchantment
-      def prevent_damage!(event)
-        puts "Nine Lives preventing damage: #{event}"
-
-        self.counters << Counters::Incarnation.new
-
-        if counters.of_type(Counters::Incarnation).count >= 9
-          Effects::Exile.new(source: self).resolve(target: self)
-        end
-
-        true
+      def replacement_effects
+        {
+          Events::LifeLoss => -> (receiver, event) do
+            effect = Effects::AddCounter.new(
+              source: receiver,
+              counter_type: Counters::Incarnation,
+              choices: [receiver],
+              targets: [receiver]
+            )
+            game.add_effect(effect)
+          end
+        }
       end
 
-      def receive_notification(event)
-        case event
-        when Events::LeavingZone
-          return unless event.from.battlefield?
+      def event_handlers
+        {
+          Events::LeavingZone => -> (receiver, event) do
+            return unless event.from.battlefield?
 
-          controller.lose!
-        end
+            receiver.controller.lose!
+          end,
+          Events::CounterAdded => -> (receiver, event) do
+            if receiver.counters.of_type(Counters::Incarnation).count >= 9
+              Effects::Exile.new(source: receiver).resolve(target: receiver)
 
+              loss_event = Events::PlayerLoses.new(
+                player: receiver.controller,
+              )
+
+              game.notify!(loss_event)
+            end
+          end
+        }
       end
     end
   end

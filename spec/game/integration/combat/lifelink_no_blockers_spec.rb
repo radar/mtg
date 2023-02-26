@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Game, "combat -- life linker no blockers" do
   include_context "two player game"
 
-  let!(:basris_acolyte) { ResolvePermanent("Basri's Acolyte", controller: p1) }
+  let!(:basris_acolyte) { ResolvePermanent("Basri's Acolyte", owner: p1) }
 
   before do
     game.battlefield.add(basris_acolyte)

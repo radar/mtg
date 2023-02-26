@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::LlanowarElves do
   include_context "two player game"
 
-  subject { ResolvePermanent("Llanowar Elves", controller: p1) }
+  subject { ResolvePermanent("Llanowar Elves", owner: p1) }
 
   context "when on battlefield" do
     it "can be tapped for one green mana" do

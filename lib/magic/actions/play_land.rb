@@ -12,6 +12,11 @@ module Magic
         "#<Actions::PlayLand name: #{card.name}, player: #{player.inspect}>"
       end
 
+      def can_perform?
+        return false if player.can_play_lands?
+        true
+      end
+
       def perform
         card.resolve!(player)
       end

@@ -33,7 +33,7 @@ RSpec.describe Magic::Game, "Mana spend -- Foundry Inspector + Free Sol Ring" do
         game.take_action(action)
 
         game.tick!
-        expect(sol_ring.zone).to be_battlefield
+        expect(p1.permanents.by_name(sol_ring.name).count).to eq(1)
       end
     end
   end

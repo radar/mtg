@@ -2,10 +2,10 @@ module Magic
   class Card
     include Types
     extend Forwardable
-    def_delegators :@game, :battlefield, :current_turn
+    def_delegators :@game, :battlefield, :exile, :current_turn
 
     include Cards::Keywords
-    attr_reader :game, :name, :cost, :type_line, :countered, :keywords, :attachments, :protections, :delayed_responses, :counters
+    attr_reader :game, :controller, :name, :cost, :type_line, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :counters
     attr_accessor :tapped
 
     attr_accessor :zone
@@ -15,6 +15,18 @@ module Magic
     PROTECTIONS = []
 
     class << self
+      def creature_types(types)
+        types.split(" ").map { T::Creatures[_1] }.join(" ")
+      end
+
+      def creature_type(types)
+        type("#{T::Creature} -- #{creature_types(types)}")
+      end
+
+      def artifact_creature_type(types)
+        type("#{T::Artifact} #{T::Creature} -- #{creature_types(types)}")
+      end
+
       def type(type)
         const_set(:TYPE_LINE, type)
       end
@@ -48,15 +60,15 @@ module Magic
       cost = Costs::Mana.new(self.class::COST.dup)
       @cost = cost
       @tapped = tapped
-      @attachments = []
       @delayed_responses = []
       @keywords = self.class::KEYWORDS
+      @keyword_grants = []
       @protections = self.class::PROTECTIONS
-      super
+      @controller = nil
     end
 
     def types
-      type_line.scan(/\w+/) + attachments.flat_map(&:type_grants)
+      type_line.scan(/\w+/)
     end
 
     def inspect
@@ -65,6 +77,10 @@ module Magic
 
     def to_s
       name
+    end
+
+    def controller=(controller)
+      @controller = controller
     end
 
     def mana_value
@@ -93,13 +109,17 @@ module Magic
       move_zone!(target_controller.graveyard)
     end
 
+    def move_to_exile!
+      move_zone!(game.exile)
+    end
+
     def countered?
       countered
     end
 
-    def resolve!(controller = nil, enters_tapped: enters_tapped?)
+    def resolve!(owner = nil, enters_tapped: enters_tapped?)
       if permanent?
-        permanent = Magic::Permanent.resolve(game: game, controller: controller, card: self, from_zone: zone, enters_tapped: enters_tapped)
+        permanent = Magic::Permanent.resolve(game: game, owner: owner, card: self, from_zone: zone, enters_tapped: enters_tapped)
         move_zone!(game.battlefield)
         permanent
       end
@@ -112,7 +132,7 @@ module Magic
     end
 
     def exile!
-      move_zone!(controller.exile)
+      move_zone!(exile)
     end
 
     def notify!(event)
@@ -131,6 +151,10 @@ module Magic
       []
     end
 
+    def ltb_triggers
+     []
+    end
+
     def death_triggers
       []
     end
@@ -140,6 +164,10 @@ module Magic
     end
 
     def event_handlers
+      {}
+    end
+
+    def replacement_effects
       {}
     end
 
@@ -159,7 +187,7 @@ module Magic
         old_zone.remove(self)
       end
 
-      new_zone.add(self)
+      new_zone.add(self) unless new_zone.is_a?(Magic::Zones::Battlefield)
 
       game.notify!(
         Events::CardEnteredZoneTransition.new(

@@ -1,7 +1,7 @@
 module Magic
   module Cards
     DranasEmissary = Creature("Drana's Emissary") do
-      type "Creature -- Vampire Cleric Ally"
+      creature_type("Vampire Cleric Ally")
       cost generic: 1, white: 1, black: 1
       keywords :flying
       power 2
@@ -9,6 +9,10 @@ module Magic
     end
 
     class DranasEmissary < Creature
+      def target_choices(permanent)
+        permanent.game.opponents(permanent.controller)
+      end
+
       def event_handlers
         {
           Events::BeginningOfUpkeep => -> (receiver, event) do
@@ -16,7 +20,10 @@ module Magic
             return unless game.current_turn.active_player == controller
 
             controller.gain_life(1)
-            game.deal_damage_to_opponents(controller, 1)
+
+            effect = Effects::DealDamageToOpponents.new(source: receiver, damage: 1)
+            effect.resolve(game.opponents(receiver.controller))
+
           end
         }
       end

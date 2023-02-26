@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::SolRing do
   include_context "two player game"
-  subject { ResolvePermanent("Sol Ring", controller: p1) }
+  subject { ResolvePermanent("Sol Ring", owner: p1) }
 
   context "tap" do
     it "taps for two colorless mana" do

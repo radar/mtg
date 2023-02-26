@@ -4,7 +4,7 @@ module Magic
       power 1
       toughness 1
       cost white: 1, generic: 2
-      type "Creature -- Human Soldier"
+      creature_type("Human Soldier")
       keywords :indestructible
     end
 
@@ -12,6 +12,7 @@ module Magic
       def event_handlers
         {
           Events::PermanentTapped => -> (receiver, event) do
+            return if event.permanent == receiver
             # TODO: Only apply if within attack phase of controller's turn
             return unless game.current_turn.active_player == receiver.controller
             return unless game.current_turn.step?(:declare_attackers)

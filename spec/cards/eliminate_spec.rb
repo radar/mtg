@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::Eliminate do
   include_context "two player game"
 
-  let!(:wood_elves) { ResolvePermanent("Wood Elves", controller: p2) }
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
   let(:eliminate) { described_class.new(game: game) }
 
@@ -15,8 +15,6 @@ RSpec.describe Magic::Cards::Eliminate do
     action.targeting(wood_elves)
     game.take_action(action)
     game.tick!
-    expect(wood_elves.zone).to be_graveyard
+    expect(wood_elves).to be_dead
   end
-
-
 end

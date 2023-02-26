@@ -4,15 +4,9 @@ module Magic
     include Types
 
     extend Forwardable
-    attr_reader :game, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :activated_abilities
+    attr_reader :game, :owner, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :keyword_grants, :activated_abilities, :exiled_cards, :cannot_untap_next_turn
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?
-
-    class Counters < SimpleDelegator
-      def of_type(type)
-        select { |counter| counter.is_a?(type) }
-      end
-    end
 
     class Protections < SimpleDelegator
       def player
@@ -22,15 +16,15 @@ module Magic
 
     attr_accessor :zone
 
-    def self.resolve(game:, controller:, card:, from_zone: controller.library, enters_tapped: false)
+    def self.resolve(game:, owner:, card:, from_zone: owner.library, enters_tapped: false, token: false)
       if card.planeswalker?
-        permanent = Magic::Permanents::Planeswalker.new(game: game, controller: controller, card: card)
+        permanent = Magic::Permanents::Planeswalker.new(game: game, owner: owner, card: card)
       elsif card.creature?
-        permanent = Magic::Permanents::Creature.new(game: game, controller: controller, card: card)
+        permanent = Magic::Permanents::Creature.new(game: game, owner: owner, card: card, token: token)
       elsif card.enchantment?
-        permanent = Magic::Permanents::Enchantment.new(game: game, controller: controller, card: card)
+        permanent = Magic::Permanents::Enchantment.new(game: game, owner: owner, card: card)
       elsif card.permanent?
-        permanent = Magic::Permanent.new(game: game, controller: controller, card: card)
+        permanent = Magic::Permanent.new(game: game, owner: owner, card: card)
       end
 
       permanent.tap! if enters_tapped
@@ -38,21 +32,24 @@ module Magic
       permanent
     end
 
-    def initialize(game:, controller:, card:)
+    def initialize(game:, owner:, card:, token: false)
       @game = game
-      @controller = controller
+      @owner = owner
+      @controller = owner
       @card = card
+      @token = token
       @base_types = card.types
       @delayed_responses = []
       @attachments = []
       @modifiers = []
       @tapped = false
       @keywords = card.keywords
-      @counters = Counters.new([])
+      @keyword_grants = []
+      @counters = Counters::Collection.new([])
       @activated_abilities = card.activated_abilities
       @damage = 0
       @protections = Protections.new(card.protections.dup)
-      super
+      @exiled_cards = Magic::CardList.new([])
     end
 
     def types
@@ -69,28 +66,35 @@ module Magic
       controller == other_controller
     end
 
-    def move_zone!(from: zone, to:)
-      if from
-        game.notify!(
-          Events::PermanentLeavingZoneTransition.new(
-            self,
-            from: from,
-            to: to
-          )
-        )
+    def controller=(other_controller)
+      @controller = other_controller
+    end
 
+    def token?
+      @token
+    end
+
+    def move_zone!(from: zone, to:)
+      game.notify!(*leaving_zone_notifications(from: from, to: to))
+
+      if from&.battlefield?
+        self.zone = nil
         from.remove(self)
+        to.add(card) unless token?
+      elsif to.battlefield?
+        to.add(self)
+        from&.remove(card)
       end
 
-      to.add(self)
+      game.notify!(*entering_zone_notifications(from: from, to: to))
+    end
 
-      game.notify!(
-        Events::PermanentEnteredZoneTransition.new(
-          self,
-          from: from,
-          to: to
-        )
-      )
+    def has_replacement_effect?(event)
+      !!card.replacement_effects[event.class]
+    end
+
+    def handle_replacement_effect(event)
+      card.replacement_effects[event.class].call(self, event)
     end
 
     def receive_notification(event)
@@ -121,6 +125,10 @@ module Magic
 
     def left_the_battlefield!
       @attachments.each(&:destroy!)
+
+      card.ltb_triggers.each do |trigger|
+        trigger.new(game: game, permanent: self).perform
+      end
     end
 
     def entered_the_battlefield!
@@ -142,10 +150,35 @@ module Magic
     end
 
     def tap!
+      tapped_event = Events::PermanentTapped.new(
+        permanent: self,
+      )
+      game.notify!(tapped_event)
+
       @tapped = true
     end
 
+    def cannot_untap_next_turn!
+      @cannot_untap_next_turn = true
+    end
+
+    def untap_during_untap_step
+      if cannot_untap_next_turn
+        @cannot_untap_next_turn = false
+        return
+      end
+
+      return if attachments.any?(&:does_not_untap_during_untap_step?)
+
+      untap!
+    end
+
     def untap!
+      untapped_event = Events::PermanentUntapped.new(
+        permanent: self,
+      )
+      game.notify!(untapped_event)
+
       @tapped = false
     end
 
@@ -166,13 +199,16 @@ module Magic
     end
 
     def destroy!
-      card.move_to_graveyard!(controller)
       move_zone!(to: controller.graveyard)
     end
     alias_method :sacrifice!, :destroy!
 
     def exile!
-      move_zone!(to: controller.exile)
+      move_zone!(to: game.exile)
+    end
+
+    def return_to_hand(player)
+      move_zone!(to: player.hand)
     end
 
     def can_activate_ability?(ability)
@@ -195,6 +231,30 @@ module Magic
       remove_until_eot_protections!
     end
 
+    def add_counter(counter_type, amount: 1)
+      @counters = Counters::Collection.new(@counters + [counter_type.new] * amount)
+      counter_added = Events::CounterAdded.new(
+        permanent: self,
+        counter_type: counter_type,
+        amount: amount
+      )
+
+      game.notify!(counter_added)
+    end
+
+    def target_choices
+      card.target_choices(self)
+    end
+
+    def remove_from_exile(card)
+      @exiled_cards -= [card]
+      game.exile.remove(card)
+    end
+
+    def can_untap_during_upkeep?
+      attachments.any?(&:can_untap_during_upkeep?)
+    end
+
     private
 
     def remove_until_eot_keyword_grants!
@@ -209,6 +269,22 @@ module Magic
       until_eot_protections.each do |protection|
         protections.delete(protection)
       end
+    end
+
+    def leaving_zone_notifications(from:, to:)
+      Events::PermanentLeavingZoneTransition.new(
+        self,
+        from: from,
+        to: to
+      )
+    end
+
+    def entering_zone_notifications(from:, to:)
+      Events::PermanentEnteredZoneTransition.new(
+        self,
+        from: from,
+        to: to
+      )
     end
   end
 end

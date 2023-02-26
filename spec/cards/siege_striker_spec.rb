@@ -3,8 +3,8 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::SiegeStriker do
   include_context "two player game"
 
-  subject(:siege_striker) { ResolvePermanent("Siege Striker", controller: p1) }
-  let(:wood_elves) { ResolvePermanent("Wood Elves", controller: p1) }
+  subject(:siege_striker) { ResolvePermanent("Siege Striker", owner: p1) }
+  let(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
   before do
     skip_to_combat!

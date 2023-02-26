@@ -11,13 +11,13 @@ module Magic
       end
 
       def target_choices
-        battlefield.select { |c| c.creature? || c.planeswalker? }
+        battlefield.cards.by_any_type(T::Creature, T::Planeswalker)
       end
 
       def resolve!(_controller, target:)
         target.exile!
 
-        Permanent.resolve(game: game, controller: target.controller, card: Tokens::Angel.new)
+        Permanent.resolve(game: game, owner: target.controller, card: Tokens::Angel.new)
       end
     end
   end
