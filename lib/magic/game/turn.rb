@@ -192,9 +192,10 @@ module Magic
           # TODO: Handle multiple replacement effects -- player gets to choose which one to pick
           if replacement_sources.any?
             puts "  EVENT REPLACED! Replaced by: #{replacement_sources.first}"
-            replacement_sources.first.handle_replacement_effect(event)
+            event = replacement_sources.first.handle_replacement_effect(event)
+          end
 
-          else
+          if event
             emblems.each { |emblem| emblem.receive_event(event) }
             battlefield.receive_event(event)
             players.each { |player| player.receive_event(event) }

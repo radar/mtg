@@ -41,9 +41,7 @@ RSpec.describe Magic::Game, "combat -- pack leader prevents damage to other dogs
       # Pack leader deals 2 damage to P2
       expect(p2.life).to eq(p2_starting_life - 2)
       aggregate_failures do
-
         expect(pack_leader.zone).to be_battlefield
-        pending "Damage should be prevented by Pack Leader's ability -- Selfless savior should not die."
         expect(selfless_savior.zone).to be_battlefield
         expect(p1.graveyard).not_to(include(selfless_savior.card), "Selfless savior should be on the battlefield")
         expect(vastwood_gorger.zone).to be_battlefield

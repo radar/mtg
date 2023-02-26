@@ -49,13 +49,6 @@ module Magic
 
     def take_damage(source:, damage:)
       game.notify!(
-        Events::DamageDealt,
-        source: source,
-        damage: damage,
-        target: self,
-      )
-
-      game.notify!(
         Events::LifeLoss.new(
           player: self,
           life: damage,
@@ -133,8 +126,13 @@ module Magic
       permanents.planeswalkers
     end
 
+    def event_targets_self?(event)
+      (event.respond_to?(:player) && event.player == self) ||
+        (event.respond_to?(:target) && event.target == self)
+    end
+
     def receive_event(event)
-      return if !event.respond_to?(:player) || event.player != self
+      return unless event_targets_self?(event)
       case event
       when Events::LifeLoss
         @life -= event.life
@@ -142,6 +140,8 @@ module Magic
         @life += event.life
       when Events::PlayerLoses
         lose!
+      when Events::DamageDealt, Events::CombatDamageDealt
+        take_damage(source: event.source, damage: event.damage)
       end
     end
 

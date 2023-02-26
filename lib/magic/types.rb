@@ -14,6 +14,7 @@ module Magic
     def type?(type)
       types.include?(type)
     end
+
     def any_type?(*types)
       types.any? { |type| type?(type) }
     end

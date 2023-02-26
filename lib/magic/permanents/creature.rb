@@ -61,13 +61,26 @@ module Magic
 
       def take_damage(source:, damage:)
         game.notify!(
-          Events::DamageDealt.new(source: source, target: self, damage: damage)
+          Events::DamageDealt.new(
+            source: source,
+            target: self,
+            damage: damage,
+          )
         )
-        @damage += damage
+      end
+
+      def receive_notification(event)
+        super
+
+        return if !event.respond_to?(:target) || event.target != self
+
+        case event
+        when Events::CombatDamageDealt, Events::DamageDealt
+          @damage += event.damage
+        end
       end
 
       def fight(target, assigned_damage = power)
-        target.take_damage(source: self, damage: assigned_damage)
         game.notify!(
           Events::CombatDamageDealt.new(source: self, target: target, damage: assigned_damage)
         )
@@ -105,7 +118,6 @@ module Magic
 
         super
       end
-
 
       def static_ability_buffs
         game.battlefield.static_abilities.of_type(Abilities::Static::CreaturesGetBuffed).applies_to(self)
