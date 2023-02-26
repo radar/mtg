@@ -1,15 +1,16 @@
 module Magic
   module Cards
+    NaturesClaim = Instant("Nature's Claim") do
+      cost green: 1
+    end
+
     class NaturesClaim < Instant
-      NAME = "Nature's Claim"
-      COST = { green: 1 }
+      def single_target?
+        true
+      end
 
       def target_choices
         battlefield.permanents.by_any_type("Enchantment", "Artifact")
-      end
-
-      def single_target?
-        true
       end
 
       def resolve!(_controller, target:)

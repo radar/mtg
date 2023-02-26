@@ -1,9 +1,12 @@
 module Magic
   module Cards
-    class GeistHonoredMonk < Creature
-      NAME = "Geist Honored Monk"
-      TYPE_LINE = creature_type("Human Monk")
+    GeistHonoredMonk = Creature("Geist Honored Monk") do
+      cost generic: 3, white: 2
+      creature_type("Human Monk")
+      keywords :vigilance
+    end
 
+    class GeistHonoredMonk < Creature
       class DynamicPowerAndToughness < Abilities::Static::CreaturesGetBuffed
         def initialize(source:)
           @source = source

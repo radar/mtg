@@ -8,7 +8,6 @@ module Magic
       toughness 2
     end
 
-
     class DranasEmissary < Creature
       def target_choices(permanent)
         permanent.game.opponents(permanent.controller)
@@ -21,7 +20,6 @@ module Magic
             return unless game.current_turn.active_player == controller
 
             controller.gain_life(1)
-
 
             effect = Effects::DealDamageToOpponents.new(source: receiver, damage: 1)
             effect.resolve(game.opponents(receiver.controller))

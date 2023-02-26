@@ -1,10 +1,10 @@
 module Magic
   module Cards
+    PathOfPeace = Sorcery("Path of Peace") do
+      cost generic: 3, white: 1
+    end
+
     class PathOfPeace < Sorcery
-      NAME = "Path of Peace"
-      COST = { generic: 3, white: 1 }
-
-
       def target_choices
         battlefield.creatures
       end

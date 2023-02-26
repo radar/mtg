@@ -1,11 +1,11 @@
 module Magic
   module Cards
-    class FencingAce < Creature
-      NAME = "Fencing Ace"
-      TYPE_LINE = creature_type("Human Soldier")
-      KEYWORDS = [Keywords::DOUBLE_STRIKE]
-      POWER = 1
-      TOUGHNESS = 1
+    FencingAce = Creature("Fencing Ace") do
+      creature_type("Human Soldier")
+      cost generic: 1, white: 1
+      power 1
+      toughness 1
+      keywords :double_strike
     end
   end
 end

@@ -1,10 +1,11 @@
 module Magic
   module Cards
-    class SolRing < Card
-      NAME = "Sol Ring"
-      TYPE_LINE = "Artifact"
-      COST = { generic: 1 }
+    SolRing = Card("Sol Ring") do
+      type "Artifact"
+      cost generic: 1
+    end
 
+    class SolRing < Card
       class ManaAbility < Magic::ManaAbility
         def initialize(source:)
           @costs = [Costs::Tap.new(source)]

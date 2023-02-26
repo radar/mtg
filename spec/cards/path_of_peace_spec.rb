@@ -7,7 +7,7 @@ RSpec.describe Magic::Cards::PathOfPeace do
 
   let(:card) { described_class.new(game: game) }
 
-  it "destroys the great furnace" do
+  it "destroys Loxodon Wayfarer" do
     p2_starting_life = p2.life
     action = cast_action(card: card, player: p1).targeting(loxodon_wayfarer)
     add_to_stack_and_resolve(action)

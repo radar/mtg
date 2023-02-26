@@ -1,10 +1,13 @@
 module Magic
   module Cards
-    class HealerOfThePride < Creature
-      NAME = "Healer of the Pride"
-      COST = { any: 3, white: 1 }
-      TYPE_LINE = creature_type("Cat Cleric")
+    HealerOfThePride = Creature("Healer of the Pride") do
+      type creature_type("Cat Cleric")
+      cost generic: 3, white: 1
+      power 1
+      toughness 1
+    end
 
+    class HealerOfThePride < Creature
       def event_handlers
         {
           Events::EnteredTheBattlefield => -> (receiver, event) do

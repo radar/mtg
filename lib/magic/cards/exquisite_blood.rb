@@ -1,11 +1,10 @@
 module Magic
   module Cards
-    ExquisiteBlood = Card("Exquisite Blood") do
+    ExquisiteBlood = Enchantment("Exquisite Blood") do
       cost generic: 4, black: 1
-      type "Enchantment"
     end
 
-    class ExquisiteBlood < Card
+    class ExquisiteBlood < Enchantment
       def event_handlers
         {
           Events::LifeLoss => -> (receiver, event) do

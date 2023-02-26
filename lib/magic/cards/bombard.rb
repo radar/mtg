@@ -1,15 +1,16 @@
 module Magic
   module Cards
+    Bombard = Instant("Bombard") do
+      cost generic: 2, red: 1
+    end
+
     class Bombard < Instant
-      NAME = "Bombard"
-      COST = { generic: 2, red: 1 }
+      def single_target?
+        true
+      end
 
       def target_choices
         game.battlefield.creatures
-      end
-
-      def single_target?
-        true
       end
 
       def resolve!(_controller, target:)

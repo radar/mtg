@@ -1,15 +1,16 @@
 module Magic
   module Cards
+    Eliminate = Instant("Eliminate") do
+      cost generic: 1, black: 1
+    end
+
     class Eliminate < Instant
-      NAME = "Eliminate"
-      COST = { generic: 1, black: 1 }
+      def single_target?
+        true
+      end
 
       def target_choices
         game.battlefield.creatures.cmc_lte(3)
-      end
-
-      def single_target?
-        true
       end
 
       def resolve!(_controller, target:)

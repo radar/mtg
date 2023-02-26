@@ -1,12 +1,16 @@
 module Magic
   module Cards
-    class EpicureOfBlood < Card
-      NAME = "Epicure of Blood"
-      COST = { any: 4, black: 1}
-      TYPE_LINE = creature_type("Vampire")
+    EpicureOfBlood = Creature("Epicure of Blood") do
+      cost generic: 4, black: 1
+      type creature_type("Vampire")
+      power 4
+      toughness 4
+    end
 
-      def target_choices(permanent)
-        permanent.game.opponents(permanent.controller)
+    class EpicureOfBlood < Creature
+
+      def target_choices(receiver)
+        game.opponents(receiver.controller)
       end
 
       def event_handlers
@@ -16,11 +20,10 @@ module Magic
             return unless event.player == receiver.controller
 
             effect = Effects::DealDamageToOpponents.new(source: receiver, damage: 1)
-            effect.resolve(game.opponents(receiver.controller))
+            effect.resolve(target_choices(receiver))
           end
         }
       end
-
     end
   end
 end

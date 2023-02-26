@@ -1,15 +1,16 @@
 module Magic
   module Cards
+    Counterspell = Instant("Counterspell") do
+      cost blue: 2
+    end
+
     class Counterspell < Instant
-      NAME = "Counterspell"
-      COST = { blue: 2 }
+      def single_target?
+        true
+      end
 
       def target_choices
         game.stack.spells
-      end
-
-      def single_target?
-        true
       end
 
       def resolve!(_controller, target:)

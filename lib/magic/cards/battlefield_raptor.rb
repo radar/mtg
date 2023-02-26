@@ -1,12 +1,11 @@
 module Magic
   module Cards
-    class BattlefieldRaptor < Creature
-      NAME = "Battlefield Raptor"
-      KEYWORDS = [Keywords::FLYING, Keywords::FIRST_STRIKE]
-      TYPE_LINE = creature_type("Bird")
-      COST = { white: 1 }
-      POWER = 1
-      TOUGHNESS = 2
+    BattlefieldRaptor = Creature("Battlefield Raptor") do
+      creature_type("Bird")
+      cost white: 1
+      power 1
+      toughness 2
+      keywords :flying, :first_strike
     end
   end
 end

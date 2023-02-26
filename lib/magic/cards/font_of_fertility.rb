@@ -5,7 +5,6 @@ module Magic
       cost green: 1
     end
 
-
     class FontOfFertility < Enchantment
       class ActivatedAbility < Magic::ActivatedAbility
         def costs = [Costs::Mana.new(green: 1), Costs::Sacrifice.new(source)]

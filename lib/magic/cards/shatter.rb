@@ -1,9 +1,10 @@
 module Magic
   module Cards
-    class Shatter < Instant
-      NAME = "Shatter"
-      COST = { generic: 1, red: 1 }
+    Shatter = Instant("Shatter") do
+      cost generic: 1, red: 1
+    end
 
+    class Shatter < Instant
       def target_choices
         battlefield.permanents.by_any_type("Artifact")
       end
