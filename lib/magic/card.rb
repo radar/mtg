@@ -5,7 +5,7 @@ module Magic
     def_delegators :@game, :battlefield, :exile, :current_turn
 
     include Cards::Keywords
-    attr_reader :game, :controller, :name, :cost, :type_line, :countered, :keywords, :protections, :delayed_responses, :counters
+    attr_reader :game, :controller, :name, :cost, :type_line, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :counters
     attr_accessor :tapped
 
     attr_accessor :zone
@@ -62,9 +62,9 @@ module Magic
       @tapped = tapped
       @delayed_responses = []
       @keywords = self.class::KEYWORDS
+      @keyword_grants = []
       @protections = self.class::PROTECTIONS
       @controller = nil
-      super
     end
 
     def types

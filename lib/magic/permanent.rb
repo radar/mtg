@@ -4,7 +4,7 @@ module Magic
     include Types
 
     extend Forwardable
-    attr_reader :game, :owner, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :activated_abilities, :exiled_cards, :cannot_untap_next_turn
+    attr_reader :game, :owner, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :keyword_grants, :activated_abilities, :exiled_cards, :cannot_untap_next_turn
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?
 
@@ -44,12 +44,12 @@ module Magic
       @modifiers = []
       @tapped = false
       @keywords = card.keywords
+      @keyword_grants = []
       @counters = Counters::Collection.new([])
       @activated_abilities = card.activated_abilities
       @damage = 0
       @protections = Protections.new(card.protections.dup)
       @exiled_cards = Magic::CardList.new([])
-      super
     end
 
     def types

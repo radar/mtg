@@ -32,15 +32,6 @@ module Magic
         end
       end
 
-      def self.included(base)
-        base.attr_reader :keyword_grants
-        base.prepend(self)
-      end
-
-      def initialize(...)
-        @keyword_grants = []
-      end
-
       class KeywordGrant
         attr_reader :keyword, :until_eot
 
