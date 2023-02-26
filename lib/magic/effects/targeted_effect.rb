@@ -8,7 +8,7 @@ module Magic
       def initialize(source:, targets: [], choices: source.target_choices)
         @targets = [*targets]
         @source = source
-        @choices = choices
+        @choices = [*choices]
       end
 
       def requires_choices?
