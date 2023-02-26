@@ -6,12 +6,11 @@ module Magic
 
       attr_reader :game, :permanent, :from, :to
 
-
       def self.perform(...)
         new(...).perform
       end
 
-      def initialize(game:, permanent:, from: permanent.zone, to:)
+      def initialize(game:, permanent:, to:, from: permanent.zone)
         @game = game
         @permanent = permanent
         @from = from
@@ -37,13 +36,13 @@ module Magic
       private
 
       def from_battlefield
-        from.remove(permanent) if from
+        from.remove(permanent)
         to.add(card) unless token?
       end
 
       def to_battlefield
         to.add(permanent)
-        from.remove(card) if from
+        from&.remove(card)
       end
 
       def send_leaving_zone_notification
@@ -56,8 +55,7 @@ module Magic
             permanent,
             from: from,
             to: to
-          )
-        )
+          ))
       end
     end
   end
