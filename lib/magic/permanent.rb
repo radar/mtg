@@ -75,7 +75,18 @@ module Magic
     end
 
     def move_zone!(from: zone, to:)
-      ZoneTransitions::Permanent.perform(game: game, permanent: self, from: from, to: to)
+      game.notify!(*leaving_zone_notifications(from: from, to: to))
+      left_zone! if from&.battlefield?
+
+      if from&.battlefield?
+        from.remove(self)
+        to.add(card) unless token?
+      elsif to.battlefield?
+        to.add(self)
+        from&.remove(card)
+      end
+
+      game.notify!(*entering_zone_notifications(from: from, to: to))
     end
 
     def left_zone!
@@ -262,6 +273,22 @@ module Magic
       until_eot_protections.each do |protection|
         protections.delete(protection)
       end
+    end
+
+    def leaving_zone_notifications(from:, to:)
+      Events::PermanentLeavingZoneTransition.new(
+        self,
+        from: from,
+        to: to
+      )
+    end
+
+    def entering_zone_notifications(from:, to:)
+      Events::PermanentEnteredZoneTransition.new(
+        self,
+        from: from,
+        to: to
+      )
     end
   end
 end
