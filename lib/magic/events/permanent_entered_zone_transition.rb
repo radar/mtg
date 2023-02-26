@@ -2,11 +2,16 @@ module Magic
   module Events
     class PermanentEnteredZoneTransition
       def self.new(permanent, from:, to:)
+        events = []
+
         if to.battlefield?
-          Events::EnteredTheBattlefield.new(permanent)
+          events << Events::EnteredTheBattlefield.new(permanent)
+          events << Events::Landfall.new(permanent) if permanent.land?
         else
-          Events::PermanentEnteredZone.new(permanent, from: from, to: to)
+          events << Events::PermanentEnteredZone.new(permanent, from: from, to: to)
         end
+
+        events
       end
     end
   end

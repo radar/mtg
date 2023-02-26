@@ -6,6 +6,8 @@ RSpec.describe Magic::Cards::FaithsFetters do
   subject { Card("Faith's Fetters") }
 
   def cast_faiths_fetters(target)
+    p1.hand.add(subject)
+    subject.zone = p1.hand
     p1.add_mana(white: 4)
     action = cast_action(player: p1, card: subject)
       .pay_mana(white: 1, generic: { white: 3 })

@@ -75,48 +75,11 @@ module Magic
     end
 
     def move_zone!(from: zone, to:)
-      if from
-        game.notify!(
-          Events::PermanentLeavingZoneTransition.new(
-            self,
-            from: from,
-            to: to
-          )
-        )
+      ZoneTransitions::Permanent.perform(game: game, permanent: self, from: from, to: to)
+    end
 
-        if from.battlefield?
-          from.remove(self)
-        else
-          from.remove(card)
-        end
-      end
-
-      if to.battlefield?
-        to.add(self)
-      else
-        self.zone = nil
-        if to.graveyard?
-          to.add(card) if !token?
-        else
-          to.add(card)
-        end
-      end
-
-      game.notify!(
-        Events::PermanentEnteredZoneTransition.new(
-          self,
-          from: from,
-          to: to
-        )
-      )
-
-      if land?
-        game.notify!(
-          Events::Landfall.new(
-            self,
-          )
-        )
-      end
+    def left_zone!
+      self.zone = nil
     end
 
     def has_replacement_effect?(event)

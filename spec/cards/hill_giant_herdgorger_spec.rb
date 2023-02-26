@@ -12,8 +12,7 @@ RSpec.describe Magic::Cards::HillGiantHerdgorger do
 
   context "ETB Event" do
     it "adds a life to controller's life total" do
-      action = cast_action(card: card, player: p1)
-      expect { add_to_stack_and_resolve(action) }.to change { p1.life }.by(3)
+      expect { ResolvePermanent(card.name, owner: p1) }.to change { p1.life }.by(3)
     end
   end
 end

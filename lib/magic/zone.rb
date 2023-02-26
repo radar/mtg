@@ -14,6 +14,7 @@ module Magic
     def to_s
       "#{self.class.name.split("::").last}"
     end
+    alias_method :name, :to_s
 
     def add(card)
       card.zone = self

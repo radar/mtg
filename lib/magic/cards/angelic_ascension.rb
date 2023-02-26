@@ -11,7 +11,7 @@ module Magic
       end
 
       def target_choices
-        battlefield.select { |c| c.creature? || c.planeswalker? }
+        battlefield.cards.by_any_type(T::Creature, T::Planeswalker)
       end
 
       def resolve!(_controller, target:)

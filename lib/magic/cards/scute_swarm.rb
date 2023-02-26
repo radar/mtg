@@ -6,7 +6,6 @@ module Magic
       toughness 1
     end
 
-
     class ScuteSwarm < Creature
       def event_handlers
         {

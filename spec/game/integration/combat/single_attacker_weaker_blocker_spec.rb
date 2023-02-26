@@ -6,10 +6,6 @@ RSpec.describe Magic::Game, "combat -- single attacker, weaker blocker" do
   let!(:odric) { ResolvePermanent("Odric, Lunarch Marshal", owner: p1) }
   let!(:wood_elves) { ResolvePermanent("Wood Elves",owner: p2) }
 
-  before do
-    game.battlefield.add(odric)
-    game.battlefield.add(wood_elves)
-  end
 
   context "when in combat" do
     before do
