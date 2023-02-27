@@ -175,7 +175,8 @@ module Magic
           turn: number,
           attacks: attacks,
         ))
-        end
+          game.notify!(*attacks.map { Events::CreatureAttacked.new(attacker: _1.attacker, target: _1.target) })
+      end
 
       def deal_combat_damage
         combat.deal_first_strike_damage
