@@ -76,6 +76,11 @@ module Magic
         player.pay_mana(color_costs) if color_costs.values.any?(&:positive?)
       end
 
+      def pay!(player, payment)
+        pay(player, payment)
+        finalize!(player)
+      end
+
       def white
         cost[:white]
       end
@@ -98,6 +103,10 @@ module Magic
 
       def generic
         cost[:generic]
+      end
+
+      def paid?
+        balance.values.all?(&:zero?)
       end
 
       private
