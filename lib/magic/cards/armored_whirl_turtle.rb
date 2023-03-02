@@ -1,6 +1,6 @@
 module Magic
   module Cards
-    ArmoredWhirlTurtle = Creature("Ancient Grizzly") do
+    ArmoredWhirlTurtle = Creature("Armored Whirl Turtle") do
       cost generic: 2, blue: 1
       creature_type("Turtle")
       power 0
