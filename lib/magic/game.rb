@@ -90,5 +90,9 @@ module Magic
         creature.destroy!
       end
     end
+
+    def skip_choice!
+      choices.shift
+    end
   end
 end

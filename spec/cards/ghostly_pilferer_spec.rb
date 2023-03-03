@@ -26,9 +26,8 @@ RSpec.describe Magic::Cards::GhostlyPilferer do
     end
   end
 
-
   context "when it becomes untapped, does not pay" do
-    it "cost is paid, draws a card" do
+    it "cost is not paid, no card draw" do
       ghostly_pilferer.tap!
       ghostly_pilferer.untap!
 
@@ -36,8 +35,8 @@ RSpec.describe Magic::Cards::GhostlyPilferer do
       expect(p1).not_to receive(:draw!)
       choice = game.choices.last
       expect(choice).to be_a(Magic::Choice::Effect)
-
-      pending "how to skip a choice"
+      game.skip_choice!
+      expect(game.choices).to be_none
     end
   end
 end
