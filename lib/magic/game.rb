@@ -94,5 +94,9 @@ module Magic
     def move_dead_creatures_to_graveyard
       battlefield.creatures.dead.each(&:destroy!)
     end
+
+    def skip_choice!
+      choices.shift
+    end
   end
 end
