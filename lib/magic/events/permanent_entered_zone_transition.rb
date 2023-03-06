@@ -5,7 +5,7 @@ module Magic
         events = []
 
         if to.battlefield?
-          events << Events::EnteredTheBattlefield.new(permanent)
+          events << Events::EnteredTheBattlefield.new(permanent, from: from)
           events << Events::Landfall.new(permanent) if permanent.land?
         else
           events << Events::PermanentEnteredZone.new(permanent, from: from, to: to)
