@@ -3,6 +3,7 @@ module Magic
     module KeywordHandlers
       class Prowess
         def self.perform(game:, spell:, permanent:)
+          return if spell.controller != permanent.controller
           return if spell.creature?
 
           game.add_effect(Effects::ApplyBuff.new(
