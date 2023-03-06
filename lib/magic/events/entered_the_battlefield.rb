@@ -1,14 +1,15 @@
 module Magic
   module Events
     class EnteredTheBattlefield
-      attr_reader :permanent
+      attr_reader :permanent, :from
 
-      def initialize(permanent)
+      def initialize(permanent, from:)
+        @from = from
         @permanent = permanent
       end
 
       def inspect
-        "#<Events::EnteredTheBattlefield permanent: #{permanent.name}, controller: #{permanent.controller.name}>"
+        "#<Events::EnteredTheBattlefield permanent: #{permanent.name}, controller: #{permanent.controller.name}, from: #{from}>"
       end
     end
   end
