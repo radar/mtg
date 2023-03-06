@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::ColossalDreadmaw do
       expect(subject.trample?).to eq(true)
     end
 
-    it "has an unmodified power + toughness" do
+    it "has a power + toughness" do
       expect(subject.power).to eq(6)
       expect(subject.toughness).to eq(6)
     end
