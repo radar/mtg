@@ -1,7 +1,7 @@
 module Magic
   module Cards
     SureStrike = Instant("Sure Strike") do
-      cost white: 1
+      cost generic: 1, red: 1
     end
 
     class SureStrike < Instant
