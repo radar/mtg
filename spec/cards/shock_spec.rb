@@ -28,5 +28,13 @@ RSpec.describe Magic::Cards::Shock do
     expect(p2.life).to eq(p2_life_total - 2)
   end
 
-  
+  it "removes planeswalker loyalty" do
+    p1.add_mana(red: 1)
+    action = Magic::Actions::Cast.new(player: p1, card: shock)
+      .pay_mana(red: 1)
+      .targeting(basri_ket)
+    game.take_action(action)
+    game.tick!
+    expect(basri_ket.loyalty).to eq(1)
+  end 
 end
