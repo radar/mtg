@@ -12,6 +12,18 @@ module Magic
         @loyalty += change
         destroy! if loyalty <= 0
       end
+      
+      def take_damage(source:, damage:)
+        game.notify!(
+          Events::DamageDealt.new(
+            source: source,
+            target: self,
+            damage: damage
+          )
+        )
+        change_loyalty!(- damage)
+      end
+
 
       def loyalty_abilities
         card.loyalty_abilities
