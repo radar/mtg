@@ -1,7 +1,7 @@
 module Magic
   module Cards
     RagingGoblin = Creature("Raging Goblin") do
-      type creature_type("Goblin Berserker")
+      creature_type("Goblin Berserker")
       cost red: 1
       power 1
       toughness 1

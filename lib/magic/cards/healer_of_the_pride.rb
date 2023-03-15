@@ -1,7 +1,7 @@
 module Magic
   module Cards
     HealerOfThePride = Creature("Healer of the Pride") do
-      type creature_type("Cat Cleric")
+      creature_type("Cat Cleric")
       cost generic: 3, white: 1
       power 1
       toughness 1

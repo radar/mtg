@@ -2,7 +2,7 @@ module Magic
   module Cards
     EpicureOfBlood = Creature("Epicure of Blood") do
       cost generic: 4, black: 1
-      type creature_type("Vampire")
+      creature_type("Vampire")
       power 4
       toughness 4
     end

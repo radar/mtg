@@ -1,7 +1,7 @@
 module Magic
   module Cards
     AnnexSentry = Creature("Annex Sentry") do
-      type artifact_creature_type("Phyrexian Cleric")
+      artifact_creature_type("Phyrexian Cleric")
       cost white: 1, generic: 2
       power 1
       toughness 4
