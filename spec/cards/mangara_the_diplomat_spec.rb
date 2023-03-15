@@ -58,11 +58,9 @@ RSpec.describe Magic::Cards::MangaraTheDiplomat do
       expect(p2).to receive(:draw!)
       p1.add_mana({ green: 6 })
       action = Magic::Actions::Cast.new(player: p1, card: wood_elves_1)
-      p action.mana_cost
       action.pay_mana(generic: { green: 2 }, green: 1)
 
       action_2 = Magic::Actions::Cast.new(player: p1, card: wood_elves_2)
-      p action_2.mana_cost
       action_2.pay_mana(generic: { green: 2 }, green: 1)
 
       game.take_actions(action, action_2)
