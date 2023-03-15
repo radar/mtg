@@ -32,7 +32,7 @@ module Magic
 
               controller.creatures.each do |creature|
                 next if creature.has_keyword?(keyword)
-                puts "Granting #{keyword} to #{creature}"
+                logger.debug "Granting #{keyword} to #{creature}"
                 creature.grant_keyword(keyword, until_eot: true)
               end
             end

@@ -5,13 +5,13 @@ module Magic
 
       attr_reader :active_player, :number, :events, :combat, :actions
 
-      def_delegators :@game, :battlefield, :emblems, :players
+      def_delegators :@game, :logger, :battlefield, :emblems, :players
       def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks, :attacking?
 
       state_machine :step, initial: :beginning do
 
-        after_transition do |_turn, transition|
-          puts "STEP: #{transition.from} -> #{transition.to}"
+        after_transition do |turn, transition|
+          turn.logger.debug "STEP: #{transition.from} -> #{transition.to}"
         end
         event :untap do
           transition beginning: :untap
@@ -138,7 +138,7 @@ module Magic
 
       def take_action(action)
         @actions << action
-        puts "ACTION: #{action.inspect}"
+        logger.debug "ACTION: #{action.inspect}"
         action.perform
       end
 
@@ -192,7 +192,7 @@ module Magic
           replacement_sources = replacement_effect_sources(event)
           # TODO: Handle multiple replacement effects -- player gets to choose which one to pick
           if replacement_sources.any?
-            puts "  EVENT REPLACED! Replaced by: #{replacement_sources.first}"
+            logger.debug "  EVENT REPLACED! Replaced by: #{replacement_sources.first}"
             event = replacement_sources.first.handle_replacement_effect(event)
           end
 
@@ -219,7 +219,7 @@ module Magic
 
       private
 
-      attr_reader :game, :logger
+      attr_reader :game
 
       def track_event(event)
         @events << event

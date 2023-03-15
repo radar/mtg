@@ -1,6 +1,10 @@
 module Magic
   class Player
+    extend Forwardable
+
     attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters
+
+    def_delegators :@game, :logger
 
     class UnpayableMana < StandardError; end
 
@@ -84,7 +88,7 @@ module Magic
     end
 
     def pay_mana(mana)
-      puts "Paying mana: #{mana.inspect}"
+      logger.debug "Paying mana: #{mana.inspect}" if game
       if mana.any? { |color, count| mana_pool[color] - count < 0 }
         raise UnpayableMana, "Cannot pay mana #{mana.inspect}, there is only #{mana_pool.inspect} available"
       end

@@ -7,6 +7,7 @@ module Magic
     attr_reader :game, :owner, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :keyword_grants, :activated_abilities, :exiled_cards, :cannot_untap_next_turn
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?
+    def_delegators :@game, :logger
 
     class Protections < SimpleDelegator
       def player
@@ -111,7 +112,7 @@ module Magic
 
       handler = card.event_handlers[event.class]
       if handler
-        puts "EVENT HANDLER: #{self} handling #{event}"
+        logger.debug "EVENT HANDLER: #{self} handling #{event}"
         handler.call(self, event)
       end
     end

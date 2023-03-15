@@ -2,7 +2,7 @@ module Magic
   class Game
     extend Forwardable
 
-    attr_reader :battlefield, :exile, :choices, :stack, :players, :emblems, :current_turn
+    attr_reader :logger, :battlefield, :exile, :choices, :stack, :players, :emblems, :current_turn
 
     def_delegators :@stack, :effects, :add_effect, :resolve_pending_effect, :next_effect
     def_delegators :@current_turn, :take_action, :take_actions, :can_cast_sorcery?
@@ -18,20 +18,24 @@ module Magic
     def initialize(
       battlefield: Zones::Battlefield.new(owner: self),
       exile: Zones::Exile.new(owner: self),
-      stack: Stack.new,
       choices: Choices.new([]),
       effects: [],
-      players: []
+      players: [],
+      stack: nil,
+      logger: nil
     )
+      @logger = Logger.new(STDOUT)
       @battlefield = battlefield
       @exile = exile
-      @stack = stack
+      @stack = Stack.new(logger: @logger)
       @choices = choices
       @effects = effects
+      @logger.level = ENV['LOG_LEVEL'] || "INFO"
       @player_count = 0
       @players = players
       @emblems = []
       @turn_number = 0
+
     end
 
     def add_players(*players)
@@ -61,7 +65,7 @@ module Magic
 
     def next_turn
       @turn_number += 1
-      puts "Starting Turn #{@turn_number} - Active Player: #{@players.first}"
+      logger.debug "Starting Turn #{@turn_number} - Active Player: #{@players.first}"
       @current_turn = Turn.new(number: @turn_number, game: self, active_player: @players.first)
       next_active_player
       @current_turn
@@ -85,10 +89,7 @@ module Magic
     end
 
     def move_dead_creatures_to_graveyard
-      battlefield.creatures.dead.each do |creature|
-        puts "#{creature.name} died, moving to graveyard."
-        creature.destroy!
-      end
+      battlefield.creatures.dead.each(&:destroy!)
     end
   end
 end
