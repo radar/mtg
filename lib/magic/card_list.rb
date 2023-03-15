@@ -61,11 +61,8 @@ module Magic
       select(&:tapped?)
     end
 
-    private
-
     def select(&condition)
       self.class.new(super(&condition))
     end
-
   end
 end
