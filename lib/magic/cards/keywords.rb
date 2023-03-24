@@ -55,7 +55,7 @@ module Magic
 
       def has_keyword?(keyword)
         keywords.any? { |kw| kw.is_a?(keyword) } ||
-        keywords.include?(keyword) ||
+          keywords.include?(keyword) ||
           keyword_grants.map(&:keyword).include?(keyword) ||
           attachments.flat_map(&:keyword_grants).include?(keyword)
       end
@@ -98,6 +98,10 @@ module Magic
 
       def indestructible?
         has_keyword?(Keywords::INDESTRUCTIBLE)
+      end
+
+      def flash?
+        has_keyword?(Keywords::FLASH)
       end
     end
   end
