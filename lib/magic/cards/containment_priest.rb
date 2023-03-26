@@ -11,7 +11,8 @@ module Magic
         {
           Events::EnteredTheBattlefield => -> (receiver, event) do
             return if receiver == event.permanent
-            return if game.current_turn.events[-3].is_a? Magic::Events::SpellCast
+            last_action = game.current_turn.actions.last
+            return if event.permanent.card == last_action&.card && last_action&.is_a?(Actions::Cast)
             event.permanent.exile! unless event.permanent.token?
           end
         }
