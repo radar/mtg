@@ -5,10 +5,15 @@ module Magic
     end
 
     class GoblinWizardry < Instant
-      
+
       def resolve!(controller)
-        Permanent.resolve(game: game, owner: controller, card: Tokens::GoblinWizard.new)
-        Permanent.resolve(game: game, owner: controller, card: Tokens::GoblinWizard.new)
+        2.times do
+          Permanent.resolve(
+            game: game,
+            owner: controller,
+            card: Tokens::GoblinWizard.new
+          )
+        end
         super
       end
     end
