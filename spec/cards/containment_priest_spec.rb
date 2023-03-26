@@ -34,6 +34,12 @@ RSpec.describe Magic::Cards::ContainmentPriest do
         expect(game.battlefield.permanents.map(&:name)).to_not include('Story Seeker')
       end
     end
+
+    context "creature goes from graveyard to battlefield" do
+      # https://scryfall.com/card/m21/119/rise-again
+      pending "P2 casts Rise Again, targeting creature in their GY"
+    end
+
     context "the creature is cast" do
       it "does not exile the creature" do
         story_seeker = Card('Story Seeker')
