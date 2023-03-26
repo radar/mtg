@@ -35,9 +35,9 @@ RSpec.describe Magic::Cards::ContainmentPriest do
       end
     end
 
-    context "creature goes from graveyard to battlefield" do
+    context "P2 casts Rise Again, targeting creature in their GY" do
       # https://scryfall.com/card/m21/119/rise-again
-      pending "P2 casts Rise Again, targeting creature in their GY"
+      pending "card goes to exile instead"
     end
 
     context "the creature is cast" do
