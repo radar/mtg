@@ -1,6 +1,6 @@
 module Magic
   module Effects
-    class ApplyBuff < TargetedEffect
+    class ApplyPowerToughnessModification < TargetedEffect
       attr_reader :power, :toughness
 
       def initialize(power: 0, toughness: 0, **args)

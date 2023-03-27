@@ -6,7 +6,7 @@ module Magic
           return if spell.controller != permanent.controller
           return if spell.creature?
 
-          game.add_effect(Effects::ApplyBuff.new(
+          game.add_effect(Effects::ApplyPowerToughnessModification.new(
             choices: permanent,
             source: permanent,
             power: 1,

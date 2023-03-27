@@ -10,7 +10,7 @@ RSpec.describe Magic::Cards::DaybreakCharger do
     it "buffs a target" do
       cast_and_resolve(card: Card("Daybreak Charger"), player: p1)
       apply_buff_effect = game.next_effect
-      expect(apply_buff_effect).to be_a(Magic::Effects::ApplyBuff)
+      expect(apply_buff_effect).to be_a(Magic::Effects::ApplyPowerToughnessModification)
       game.resolve_pending_effect(wood_elves)
       expect(wood_elves.power).to eq(3)
     end
