@@ -9,7 +9,7 @@ module Magic
 
       keywords :defender
 
-      class PowerBoost < Abilities::Static::CreaturesGetBuffed
+      class PowerBoost < Abilities::Static::PowerAndToughnessModification
         def initialize(source:)
           @source = source
         end

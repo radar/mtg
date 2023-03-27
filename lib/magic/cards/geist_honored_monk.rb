@@ -7,7 +7,7 @@ module Magic
     end
 
     class GeistHonoredMonk < Creature
-      class DynamicPowerAndToughness < Abilities::Static::CreaturesGetBuffed
+      class DynamicPowerAndToughness < Abilities::Static::PowerAndToughnessModification
         def initialize(source:)
           @source = source
         end

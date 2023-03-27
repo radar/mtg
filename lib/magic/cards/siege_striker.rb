@@ -18,7 +18,7 @@ module Magic
             return unless game.current_turn.step?(:declare_attackers)
             return unless event.permanent.creature?
 
-            receiver.modifiers << Permanents::Creature::Buff.new(power: 1, toughness: 1, until_eot: true)
+            receiver.modifiers << Permanents::Creature::PowerToughnessModification.new(power: 1, toughness: 1, until_eot: true)
           end
         }
       end

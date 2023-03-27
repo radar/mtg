@@ -14,7 +14,7 @@ module Magic
         end
 
         def resolve!
-          source.modifiers << Magic::Permanents::Creature::Buff.new(power: 1, toughness: 0, until_eot: true)
+          source.modifiers << Magic::Permanents::Creature::PowerToughnessModification.new(power: 1, toughness: 0, until_eot: true)
         end
       end
 

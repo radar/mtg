@@ -10,11 +10,11 @@ module Magic
         permanent.attach_to!(target)
       end
 
-      def power_buff
+      def power_modification
         0
       end
 
-      def toughness_buff
+      def toughness_modification
         0
       end
 

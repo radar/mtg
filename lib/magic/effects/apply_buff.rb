@@ -13,7 +13,7 @@ module Magic
         raise InvalidTarget if targets.any? { |target| !choices.include?(target) }
 
         targets.each do |target|
-          target.modifiers << Permanents::Creature::Buff.new(power: power, toughness: toughness)
+          target.modifiers << Permanents::Creature::PowerToughnessModification.new(power: power, toughness: toughness)
         end
       end
     end

@@ -9,11 +9,11 @@ module Magic
         battlefield.creatures
       end
 
-      def power_buff
+      def power_modification
         2
       end
 
-      def toughness_buff
+      def toughness_modification
         2
       end
 

@@ -6,7 +6,7 @@ module Magic
     end
 
     class GloriousAnthem < Enchantment
-      class CreaturesGetBuffed < Abilities::Static::CreaturesGetBuffed
+      class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
         def initialize(source:)
           @source = source
         end
@@ -24,7 +24,7 @@ module Magic
         end
       end
 
-      def static_abilities = [CreaturesGetBuffed]
+      def static_abilities = [PowerAndToughnessModification]
     end
   end
 end

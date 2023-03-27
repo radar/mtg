@@ -1,7 +1,7 @@
 module Magic
   module Abilities
     module Static
-      class CreaturesGetBuffed
+      class PowerAndToughnessModification
         attr_reader :source, :power, :toughness, :applicable_targets
         def initialize(source:, power:, toughness:, applicable_targets:)
           @source = source

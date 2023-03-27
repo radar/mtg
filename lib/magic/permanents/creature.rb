@@ -3,7 +3,7 @@ module Magic
     class Creature < Permanent
       attr_reader :damage
 
-      class Buff
+      class PowerToughnessModification
         attr_reader :power, :toughness, :until_eot
 
         def initialize(power: 0, toughness: 0, until_eot: true, **args)
@@ -47,16 +47,16 @@ module Magic
         base_power +
           @modifiers.sum(&:power) +
           @counters.sum(&:power) +
-          @attachments.sum(&:power_buff) +
-          static_ability_buffs.sum(&:power)
+          @attachments.sum(&:power_modification) +
+          static_ability_mods.sum(&:power)
       end
 
       def toughness
         base_toughness +
           @modifiers.sum(&:toughness) +
           @counters.sum(&:toughness) +
-          @attachments.sum(&:toughness_buff) +
-          static_ability_buffs.sum(&:toughness)
+          @attachments.sum(&:toughness_modification) +
+          static_ability_mods.sum(&:toughness)
       end
 
       def take_damage(source:, damage:)
@@ -119,8 +119,8 @@ module Magic
         super
       end
 
-      def static_ability_buffs
-        game.battlefield.static_abilities.of_type(Abilities::Static::CreaturesGetBuffed).applies_to(self)
+      def static_ability_mods
+        game.battlefield.static_abilities.of_type(Abilities::Static::PowerAndToughnessModification).applies_to(self)
       end
     end
   end
