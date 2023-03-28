@@ -54,8 +54,13 @@ RSpec.describe Magic::Cards::ContainmentPriest do
     context "the creature returns from the graveyard via a sorcery" do
       it "exiles the creature" do
         p2.graveyard << Card('Story Seeker')
+        p2.add_mana(black: 5)
+        action = Magic::Actions::Cast.new(player: p2, card: Card("Rise Again"))
+        action.pay_mana(generic: { black: 4 }, black: 1)
+              .targeting(p2.graveyard.cards.first)
+        game.take_action(action)
         expect{
-          cast_and_resolve(card: Card("Rise Again"), player: p2, targeting: p2.graveyard.cards.first)
+          game.tick!
         }.to change { game.exile.cards.count }.by(1)
         expect(game.battlefield.permanents.count).to eq(1)
         expect(game.battlefield.permanents.map(&:name)).to_not include('Story Seeker')
