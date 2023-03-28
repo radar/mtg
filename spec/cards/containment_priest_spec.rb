@@ -50,6 +50,17 @@ RSpec.describe Magic::Cards::ContainmentPriest do
         expect(game.battlefield.permanents.map(&:name)).to include('Story Seeker')
       end
     end
+
+    context "the creature returns from the graveyard via a sorcery" do
+      it "exiles the creature" do
+        p2.graveyard << Card('Story Seeker')
+        expect{
+          cast_and_resolve(card: Card("Rise Again"), player: p2, targeting: p2.graveyard.cards.first)
+        }.to change { game.exile.cards.count }.by(1)
+        expect(game.battlefield.permanents.count).to eq(1)
+        expect(game.battlefield.permanents.map(&:name)).to_not include('Story Seeker')
+      end
+    end
   end
 
   context "when a token creature enters the battlefield" do
