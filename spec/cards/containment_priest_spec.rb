@@ -3,6 +3,7 @@ require "spec_helper"
 RSpec.describe Magic::Cards::ContainmentPriest do
   include_context "two player game"
 
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
   subject! { ResolvePermanent("Containment Priest", owner: p1) }
   # Containment Priest {1}{U}{1}{W}
   # Creature -- Human Cleric
@@ -60,10 +61,10 @@ RSpec.describe Magic::Cards::ContainmentPriest do
               .targeting(p2.graveyard.cards.first)
         game.take_action(action)
 
-        p1.add_mana(red: 1)
-        action = Magic::Actions::Cast.new(player: p1, card: Card("Shock"))
+        p2.add_mana(red: 1)
+        action = Magic::Actions::Cast.new(player: p2, card: Card("Shock"))
         .pay_mana(red: 1)
-        .targeting(subject)
+        .targeting(wood_elves)
         game.take_action(action)
         expect{
           game.tick!
