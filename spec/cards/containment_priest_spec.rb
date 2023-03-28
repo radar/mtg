@@ -59,6 +59,12 @@ RSpec.describe Magic::Cards::ContainmentPriest do
         action.pay_mana(generic: { black: 4 }, black: 1)
               .targeting(p2.graveyard.cards.first)
         game.take_action(action)
+
+        p1.add_mana(red: 1)
+        action = Magic::Actions::Cast.new(player: p1, card: Card("Shock"))
+        .pay_mana(red: 1)
+        .targeting(subject)
+        game.take_action(action)
         expect{
           game.tick!
         }.to change { game.exile.cards.count }.by(1)
