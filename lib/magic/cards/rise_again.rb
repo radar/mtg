@@ -1,7 +1,7 @@
 module Magic
   module Cards
     RiseAgain = Sorcery("Rise Again") do
-      cost black: 4, generic: 1
+      cost black: 1, generic: 4
     end
 
     class RiseAgain < Sorcery
