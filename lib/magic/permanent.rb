@@ -76,6 +76,7 @@ module Magic
     end
 
     def move_zone!(from: zone, to:)
+      card.zone = to
       game.notify!(*leaving_zone_notifications(from: from, to: to))
 
       if from&.battlefield?

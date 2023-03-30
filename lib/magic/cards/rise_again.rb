@@ -14,8 +14,8 @@ module Magic
       end
 
       def resolve!(controller, target:)
-        Permanent.resolve(game: game, owner: controller, card: target)
-
+        permanent = Magic::Permanents::Creature.new(game: game, owner: controller, card: target)
+        permanent.move_zone!(from: target.zone, to: game.battlefield)
         super
       end
     end
