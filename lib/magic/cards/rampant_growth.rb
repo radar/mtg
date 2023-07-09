@@ -5,19 +5,12 @@ module Magic
     end
 
     class RampantGrowth < Sorcery
-      def target_choices
-        controller.library.basic_lands
-      end
-
-      class Effect < Effects::TargetedEffect
-        def resolve(target)
-          land = target.resolve!(source.controller, enters_tapped: true)
-          source.controller.shuffle!
-        end
-      end
-
       def resolve!(controller)
-        game.add_effect(Effect.new(source: self))
+        effect = Effects::SearchLibraryForBasicLand.new(
+          source: self,
+          enters_tapped: true,
+        )
+        game.add_effect(effect)
 
         super
       end

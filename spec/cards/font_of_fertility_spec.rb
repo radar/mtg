@@ -19,7 +19,7 @@ RSpec.describe Magic::Cards::FontOfFertility do
       game.take_action(action)
       game.stack.resolve!
       effect = game.effects.first
-      expect(effect).to be_a(Magic::Cards::FontOfFertility::Effect)
+      expect(effect).to be_a(Magic::Effects::SearchLibraryForBasicLand)
       game.resolve_pending_effect(effect.choices.first) # A Forest
       expect(subject.zone).to be_nil
       expect(p1.graveyard.by_name(subject.name).count).to eq(1)

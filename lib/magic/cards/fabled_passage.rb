@@ -8,10 +8,9 @@ module Magic
         receiver.controller.library.basic_lands
       end
 
-      class Effect < Effects::TargetedEffect
+      class Effect < Effects::SearchLibraryForBasicLand
         def resolve(target)
-          land = target.resolve!(source.controller, enters_tapped: true)
-          source.controller.shuffle!
+          land = super
           if source.controller.lands.count >= 4
             land.untap!
           end
@@ -27,7 +26,7 @@ module Magic
         end
 
         def resolve!
-          game.add_effect(Effect.new(source: source))
+          game.add_effect(Effect.new(source: source, enters_tapped: true))
         end
       end
 

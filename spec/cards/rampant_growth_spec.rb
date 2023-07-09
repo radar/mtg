@@ -12,7 +12,7 @@ RSpec.describe Magic::Cards::RampantGrowth do
   it "search for land effect" do
     cast_and_resolve(card: card, player: p1)
     effect = game.effects.first
-    expect(effect).to be_a(Magic::Cards::RampantGrowth::Effect)
+    expect(effect).to be_a(Magic::Effects::SearchLibraryForBasicLand)
     game.resolve_pending_effect(effect.choices.first) # A Forest
     forest = game.battlefield.cards.by_name("Forest").first
     expect(forest).to be_tapped
