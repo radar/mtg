@@ -60,6 +60,7 @@ module Magic
 
       if effect.requires_choices?
         if effect.single_choice?
+          logger.debug "Only one choice for #{effect}: #{effect.choices.first}, resolving effect immediately."
           effect.resolve(effect.choices.first)
         else
           @effects << effect

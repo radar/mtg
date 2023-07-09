@@ -6,7 +6,7 @@ RSpec.describe Magic::Cards::FontOfFertility do
   subject { ResolvePermanent("Font Of Fertility", owner: p1) }
 
   def p1_library
-    8.times.map { Card("Forest") }
+    9.times.map { Card("Forest") }
   end
 
   context "triggered ability" do
@@ -18,6 +18,9 @@ RSpec.describe Magic::Cards::FontOfFertility do
       action.pay(p1, :sacrifice)
       game.take_action(action)
       game.stack.resolve!
+      effect = game.effects.first
+      expect(effect).to be_a(Magic::Effects::SearchLibrary)
+      game.resolve_pending_effect(effect.choices.first) # A Forest
       expect(subject.zone).to be_nil
       expect(p1.graveyard.by_name(subject.name).count).to eq(1)
 
