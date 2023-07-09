@@ -6,13 +6,22 @@ module Magic
     end
 
     class FontOfFertility < Enchantment
+      def target_choices(receiver)
+        receiver.controller.library.basic_lands
+      end
+
+      class Effect < Effects::TargetedEffect
+        def resolve(target)
+          target.resolve!(source.controller, enters_tapped: true)
+          source.controller.shuffle!
+        end
+      end
+
       class ActivatedAbility < Magic::ActivatedAbility
         def costs = [Costs::Mana.new(green: 1), Costs::Sacrifice.new(source)]
 
         def resolve!
-          game.add_effect(
-            Effects::SearchLibraryBasicLandEntersTapped.new(source: source, controller: source.controller)
-          )
+          game.add_effect(Effect.new(source: source))
         end
       end
 

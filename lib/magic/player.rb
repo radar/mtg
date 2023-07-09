@@ -110,6 +110,10 @@ module Magic
       card.move_to_hand!(self)
     end
 
+    def shuffle!
+      library.shuffle!
+    end
+
     def tap!(card)
       card.tap!
     end
@@ -120,6 +124,10 @@ module Magic
 
     def permanents
       game.battlefield.permanents.controlled_by(self)
+    end
+
+    def lands
+      permanents.lands
     end
 
     def creatures

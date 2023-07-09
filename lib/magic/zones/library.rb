@@ -13,6 +13,10 @@ module Magic
       def draw
         @cards.shift
       end
+
+      def shuffle!
+        @cards.shuffle!
+      end
     end
   end
 end

@@ -10,6 +10,7 @@ module Magic
 
       def resolve(target)
         resolve_action.call(target)
+        source.controller.library.shuffle!
       end
     end
   end

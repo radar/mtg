@@ -15,6 +15,10 @@ module CardHelper
     Magic::Permanent.resolve(game: game, card: Card(name), **args)
   end
 
+  def AddLand(name, **args)
+
+  end
+
   def add_to_library(name, player:)
     card = Card(name)
     player.library.add(card)

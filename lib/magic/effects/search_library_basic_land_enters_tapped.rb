@@ -5,7 +5,7 @@ module Magic
         Effects::SearchLibrary.new(
           choices: controller.library.basic_lands,
           source: source,
-          resolve_action: -> (c) { c.resolve!(controller, enters_tapped: true) }
+          resolve_action: -> (c) { c.resolve!(controller, enters_tapped: true) },
         )
       end
     end
