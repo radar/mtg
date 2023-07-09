@@ -14,6 +14,7 @@ module Magic
       HEXPROOF = Class.new(Keyword)
       INDESTRUCTIBLE = Class.new(Keyword)
       LIFELINK = Class.new(Keyword)
+      MENACE = Class.new(Keyword)
       REACH = Class.new(Keyword)
       SKULK = Class.new(Keyword)
       TRAMPLE = Class.new(Keyword)
