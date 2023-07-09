@@ -9,6 +9,7 @@ module Magic
 
       def resolve(target)
         target.resolve!(source.controller, enters_tapped: enters_tapped)
+        source.controller.shuffle!
       end
     end
   end
