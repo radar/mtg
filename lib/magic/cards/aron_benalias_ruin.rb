@@ -1,12 +1,14 @@
 module Magic
   module Cards
+    AronBenaliasRuin = Creature("Aron, Benalia's Ruin") do
+      type "Legendary Creature -- Phyrexian Human"
+      cost white: 2, black: 1
+      keywords :menace
+      power 3
+      toughness 3
+    end
+
     class AronBenaliasRuin < Creature
-      NAME = "Aron, Benalia's Ruin"
-      TYPE_LINE = "Legendary Creature -- Phyrexian Human"
-      COST = { white: 2, black: 1 }
-      KEYWORDS = [Keywords::MENACE]
-      POWER = 3
-      TOUGHNESS = 3
 
       class ActivatedAbility < Magic::ActivatedAbility
         def costs
