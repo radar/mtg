@@ -126,6 +126,19 @@ module Magic
       end
     end
 
+    def scry(amount:, top:, bottom:)
+      cards = library.shift(amount)
+      library.unshift(*top)
+      library.push(*bottom)
+      game.notify!(
+        Events::Scry.new(
+          player: self,
+          top: top.count,
+          bottom: bottom.count,
+        )
+      )
+    end
+
     def tap!(card)
       card.tap!
     end

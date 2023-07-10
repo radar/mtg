@@ -3,7 +3,7 @@ module Magic
     extend Forwardable
     include Enumerable
 
-    def_delegators :@cards, :each, :<<, :by_name, :creatures, :by_any_type, :basic_lands, :controlled_by, :cmc_lte, :by_card
+    def_delegators :@cards, :each, :last, :shift, :unshift, :push, :<<, :by_name, :creatures, :by_any_type, :basic_lands, :controlled_by, :cmc_lte, :by_card
 
     attr_reader :owner, :cards
 
