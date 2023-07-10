@@ -1,0 +1,45 @@
+module Magic
+  DryTypes: untyped
+
+  module Types
+    Artifact: "Artifact"
+
+    Creature: "Creature"
+
+    Enchantment: "Enchantment"
+
+    Land: "Land"
+
+    Planeswalker: "Planeswalker"
+
+    Instant: "Instant"
+
+    Sorcery: "Sorcery"
+
+    Legendary: "Legendary"
+
+    def type?: (untyped type) -> untyped
+
+    def any_type?: (*untyped types) -> untyped
+
+    def land?: () -> untyped
+
+    def basic_land?: () -> untyped
+
+    def creature?: () -> untyped
+
+    def planeswalker?: () -> untyped
+
+    def artifact?: () -> untyped
+
+    def enchantment?: () -> untyped
+
+    def instant?: () -> untyped
+
+    def sorcery?: () -> untyped
+
+    def permanent?: () -> untyped
+  end
+
+  T: untyped
+end

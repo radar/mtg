@@ -1,0 +1,119 @@
+module Magic
+  class Card
+    include Types
+
+    extend Forwardable
+
+    include Cards::Keywords
+
+    attr_reader game: untyped
+
+    attr_reader controller: untyped
+
+    attr_reader name: untyped
+
+    attr_reader cost: untyped
+
+    attr_reader type_line: untyped
+
+    attr_reader countered: untyped
+
+    attr_reader keyword_grants: untyped
+
+    attr_reader keywords: untyped
+
+    attr_reader protections: untyped
+
+    attr_reader delayed_responses: untyped
+
+    attr_reader counters: untyped
+
+    attr_accessor tapped: untyped
+
+    attr_accessor zone: untyped
+
+    COST: ::Hash[untyped, untyped]
+
+    KEYWORDS: ::Array[untyped]
+
+    PROTECTIONS: ::Array[untyped]
+
+    def self.creature_types: (untyped types) -> untyped
+
+    def self.creature_type: (untyped types) -> untyped
+
+    def self.artifact_creature_type: (untyped types) -> untyped
+
+    def self.type: (untyped type) -> untyped
+
+    def self.cost: (untyped cost) -> untyped
+
+    def self.power: (untyped power) -> untyped
+
+    def self.toughness: (untyped power) -> untyped
+
+    def self.keywords: (*untyped keywords) -> untyped
+
+    def self.protections: (*untyped protections) -> untyped
+
+    def initialize: (?game: untyped) -> void
+
+    def types: () -> untyped
+
+    def inspect: () -> ::String
+
+    def to_s: () -> untyped
+
+    def controller=: (untyped controller) -> untyped
+
+    def mana_value: () -> untyped
+
+    alias cmc mana_value
+
+    alias converted_mana_cost mana_value
+
+    def multi_colored?: () -> untyped
+
+    def colors: () -> untyped
+
+    def colorless?: () -> untyped
+
+    def move_to_hand!: (untyped target_controller) -> untyped
+
+    def move_to_graveyard!: (untyped target_controller) -> untyped
+
+    def move_to_exile!: () -> untyped
+
+    def countered?: () -> untyped
+
+    def resolve!: (?untyped? owner, ?enters_tapped: untyped) -> (untyped | nil)
+
+    alias play! resolve!
+
+    def discard!: () -> untyped
+
+    def exile!: () -> untyped
+
+    def notify!: (untyped event) -> untyped
+
+    def enters_tapped?: () -> false
+
+    def activated_abilities: () -> ::Array[untyped]
+
+    def etb_triggers: () -> ::Array[untyped]
+
+    def ltb_triggers: () -> ::Array[untyped]
+
+    def death_triggers: () -> ::Array[untyped]
+
+    def static_abilities: () -> ::Array[untyped]
+
+    def event_handlers: () -> ::Hash[untyped, untyped]
+
+    def replacement_effects: () -> ::Hash[untyped, untyped]
+
+    private
+
+    def move_zone!: (untyped new_zone) -> untyped
+  end
+end

@@ -1,0 +1,11 @@
+module Magic
+  module Effects
+    class SearchLibraryForBasicLand < Magic::Effects::TargetedEffect
+      attr_reader enters_tapped: bool
+
+      def initialize: (source: Magic::Permanent, ?enters_tapped: bool) -> void
+
+      def resolve: (Magic::Card target) -> Magic::Permanent
+    end
+  end
+end

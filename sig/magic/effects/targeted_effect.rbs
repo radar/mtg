@@ -1,0 +1,22 @@
+module Magic
+  module Effects
+    class TargetedEffect < Effect
+      class InvalidTarget < StandardError
+      end
+
+      attr_reader source: untyped
+
+      attr_reader targets: untyped
+
+      attr_reader choices: untyped
+
+      def initialize: (source: untyped, ?targets: untyped, ?choices: untyped) -> void
+
+      def requires_choices?: () -> true
+
+      def single_choice?: () -> untyped
+
+      def no_choice?: () -> untyped
+    end
+  end
+end

@@ -1,0 +1,131 @@
+module Magic
+  class Permanent
+    include Magic::Keywords
+
+    include Magic::Types
+
+    extend Forwardable
+
+    attr_reader game: untyped
+
+    attr_reader owner: untyped
+
+    attr_reader controller: untyped
+
+    attr_reader card: untyped
+
+    attr_reader types: untyped
+
+    attr_reader delayed_responses: untyped
+
+    attr_reader attachments: untyped
+
+    attr_reader protections: untyped
+
+    attr_reader modifiers: untyped
+
+    attr_reader counters: untyped
+
+    attr_reader keywords: untyped
+
+    attr_reader keyword_grants: untyped
+
+    attr_reader activated_abilities: untyped
+
+    attr_reader exiled_cards: untyped
+
+    attr_reader cannot_untap_next_turn: untyped
+
+    class Protections < SimpleDelegator
+      def player: () -> untyped
+    end
+
+    attr_accessor zone: untyped
+
+    def self.resolve: (game: untyped, owner: untyped, card: untyped, ?from_zone: untyped, ?enters_tapped: bool, ?token: bool) -> untyped
+
+    def initialize: (game: untyped, owner: untyped, card: untyped, ?token: bool) -> void
+
+    def types: () -> untyped
+
+    def inspect: () -> ::String
+
+    alias to_s inspect
+
+    def controller?: (untyped other_controller) -> untyped
+
+    def controller=: (untyped other_controller) -> untyped
+
+    def token?: () -> untyped
+
+    def move_zone!: (to: untyped, ?from: untyped) -> untyped
+
+    def has_replacement_effect?: (untyped event) -> untyped
+
+    def handle_replacement_effect: (untyped event) -> untyped
+
+    def receive_notification: (untyped event) -> untyped
+
+    def died!: () -> untyped
+
+    def left_the_battlefield!: () -> untyped
+
+    def entered_the_battlefield!: () -> untyped
+
+    def protected_from?: (untyped card) -> untyped
+
+    def gains_protection_from_color: (untyped color, until_eot: untyped) -> untyped
+
+    def permanent?: () -> true
+
+    def tap!: () -> untyped
+
+    def cannot_untap_next_turn!: () -> untyped
+
+    def untap_during_untap_step: () -> (nil | untyped)
+
+    def untap!: () -> untyped
+
+    def tapped?: () -> untyped
+
+    def untapped?: () -> untyped
+
+    def static_abilities: () -> untyped
+
+    def alive?: () -> untyped
+
+    def destroy!: () -> untyped
+
+    alias sacrifice! destroy!
+
+    def exile!: () -> untyped
+
+    def return_to_hand: (untyped player) -> untyped
+
+    def can_activate_ability?: (untyped ability) -> untyped
+
+    def delayed_response: (turn: untyped, event_type: untyped, response: untyped) -> untyped
+
+    def trigger_delayed_response: (untyped event) -> untyped
+
+    def cleanup!: () -> untyped
+
+    def add_counter: (untyped counter_type, ?amount: ::Integer) -> untyped
+
+    def target_choices: () -> untyped
+
+    def remove_from_exile: (untyped card) -> untyped
+
+    def can_untap_during_upkeep?: () -> untyped
+
+    private
+
+    def remove_until_eot_keyword_grants!: () -> untyped
+
+    def remove_until_eot_protections!: () -> untyped
+
+    def leaving_zone_notifications: (from: untyped, to: untyped) -> untyped
+
+    def entering_zone_notifications: (from: untyped, to: untyped) -> untyped
+  end
+end

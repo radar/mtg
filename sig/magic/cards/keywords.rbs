@@ -1,0 +1,84 @@
+module Magic
+  module Cards
+    module Keywords
+      class Keyword
+      end
+
+      DEATHTOUCH: "deathtouch"
+
+      DEFENDER: untyped
+
+      DOUBLE_STRIKE: untyped
+
+      FIRST_STRIKE: untyped
+
+      FLASH: untyped
+
+      FLYING: untyped
+
+      HASTE: untyped
+
+      HEXPROOF: untyped
+
+      INDESTRUCTIBLE: untyped
+
+      LIFELINK: untyped
+
+      MENACE: untyped
+
+      REACH: untyped
+
+      SKULK: untyped
+
+      TRAMPLE: untyped
+
+      VIGILANCE: untyped
+
+      class Toxic < Keyword
+        attr_reader amount: untyped
+
+        def initialize: (untyped amount) -> void
+      end
+
+      def self.[]: (*untyped keywords) -> untyped
+
+      class KeywordGrant
+        attr_reader keyword: untyped
+
+        attr_reader until_eot: untyped
+
+        def initialize: (keyword: untyped, until_eot: untyped) -> void
+
+        def until_eot?: () -> untyped
+      end
+
+      def grant_keyword: (untyped keyword, ?until_eot: bool) -> untyped
+
+      def remove_keyword_grant: (untyped grant) -> untyped
+
+      def has_keyword?: (untyped keyword) -> untyped
+
+      def hexproof?: () -> untyped
+
+      def flying?: () -> untyped
+
+      def deathtouch?: () -> untyped
+
+      def defender?: () -> untyped
+
+      def first_strike?: () -> untyped
+
+      def double_strike?: () -> untyped
+
+      def vigilant?: () -> untyped
+
+      def lifelink?: () -> untyped
+
+      def trample?: () -> untyped
+
+      def indestructible?: () -> untyped
+
+      def flash?: () -> untyped
+    end
+  end
+end
