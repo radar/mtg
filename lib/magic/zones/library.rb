@@ -17,6 +17,11 @@ module Magic
       def shuffle!
         @cards.shuffle!
       end
+
+      def mill
+        @cards.shift
+      end
+
     end
   end
 end

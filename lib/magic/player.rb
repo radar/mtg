@@ -114,6 +114,18 @@ module Magic
       library.shuffle!
     end
 
+    def mill(amount)
+      amount.times do
+        card = library.mill
+        game.notify!(
+          Events::CardMilled.new(
+            player: self,
+            card: card,
+          )
+        )
+      end
+    end
+
     def tap!(card)
       card.tap!
     end
