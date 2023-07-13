@@ -25,7 +25,14 @@ module Magic
         end
 
         def target_choices
-          game.battlefield.creatures.by_any_type("Bird", "Cat", "Dog", "Goat", "Ox", "Snake")
+          game.battlefield.creatures.by_any_type(
+            Types::Creatures["Bird"],
+            Types::Creatures["Cat"],
+            Types::Creatures["Dog"],
+            Types::Creatures["Goat"],
+            Types::Creatures["Ox"],
+            Types::Creatures["Snake"],
+          )
         end
 
         def resolve!
