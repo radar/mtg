@@ -3,7 +3,7 @@ module Magic
     class SingleTargetAndResolve < TargetedEffect
       attr_reader :choices, :resolution
 
-      def initialize(resolution:, **args)
+      def initialize(**args)
         @resolution = resolution
         super(**args)
       end

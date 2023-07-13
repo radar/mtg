@@ -30,7 +30,7 @@ module Magic
           end,
           Events::CounterAdded => -> (receiver, event) do
             if receiver.counters.of_type(Counters::Incarnation).count >= 9
-              Effects::Exile.new(source: receiver).resolve(target: receiver)
+              Effects::Exile.new(source: receiver).resolve(receiver)
 
               loss_event = Events::PlayerLoses.new(
                 player: receiver.controller,

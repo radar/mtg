@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!(_controller, target:)
-        Effects::Exile.new(source: self).resolve(target: target)
+        Effects::Exile.new(source: self).resolve(target)
       end
     end
   end

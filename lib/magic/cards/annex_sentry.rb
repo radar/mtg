@@ -10,19 +10,19 @@ module Magic
     class AnnexSentry < Creature
       KEYWORDS = [Keywords::Toxic.new(1)]
 
-      class ETB < TriggeredAbility::EnterTheBattlefield
-        def target_choices
-          game.battlefield.not_controlled_by(controller).cmc_lte(3).by_any_type(T::Creature, T::Artifact)
+      class Effect < Effects::Exile
+        def resolve(target)
+          super
+          source.exiled_cards << target.card
         end
+      end
+
+      class ETB < TriggeredAbility::EnterTheBattlefield
 
         def perform
-          effect = Effects::SingleTargetAndResolve.new(
+          effect = Effect.new(
             source: permanent,
-            choices: target_choices,
-            resolution: -> (target) {
-              exile_effect = Effects::Exile.new(source: permanent).resolve(target: target)
-              permanent.exiled_cards << target.card
-            }
+            choices: game.battlefield.not_controlled_by(controller).cmc_lte(3).by_any_type(T::Creature, T::Artifact)
           )
           game.add_effect(effect)
         end

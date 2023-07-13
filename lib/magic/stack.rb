@@ -92,6 +92,7 @@ module Magic
     end
 
     def skip_effect(effect)
+      effects.shift
       effect.skip!
     end
 

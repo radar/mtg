@@ -217,6 +217,10 @@ module Magic
       attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
     end
 
+    def can_be_targeted_by?(source)
+      true
+    end
+
     def delayed_response(turn:, event_type:, response:)
       @delayed_responses << { turn: turn.number, event_type: event_type, response: response }
     end

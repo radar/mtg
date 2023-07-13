@@ -9,7 +9,7 @@ module Magic
         def perform
           cards_to_exile = controller.graveyard.cmc_lte(3)
           cards_to_exile.each do |card|
-            exile_effect = Effects::Exile.new(source: permanent).resolve(target: card)
+            exile_effect = Effects::Exile.new(source: permanent).resolve(card)
             permanent.exiled_cards << card
           end
         end

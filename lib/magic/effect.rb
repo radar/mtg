@@ -12,6 +12,10 @@ module Magic
       @then_do = then_do
     end
 
+    def game
+      source.game
+    end
+
     def multiple_targets?
       targets > 1
     end

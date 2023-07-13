@@ -22,19 +22,12 @@ module Magic
         }
       end
 
-      class ETB < TriggeredAbility::EnterTheBattlefield
-        def target_choices
-          game.battlefield.by_any_type(T::Creature, T::Planeswalker)
-        end
+      class Effect < Effects::ReturnToOwnersHand
+      end
 
+      class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          effect = Effects::SingleTargetAndResolve.new(
-            source: permanent,
-            choices: target_choices,
-            resolution: -> (target) {
-              Effects::ReturnToOwnersHand.new(source: permanent).resolve(target: target)
-            }
-          )
+          effect = Effect.new(source: self, choices: game.battlefield.by_any_type(T::Creature, T::Planeswalker))
           game.add_effect(effect)
         end
       end

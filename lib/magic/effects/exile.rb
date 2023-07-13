@@ -6,7 +6,7 @@ module Magic
         true
       end
 
-      def resolve(target:)
+      def resolve(target)
         target.exile!
       end
     end
