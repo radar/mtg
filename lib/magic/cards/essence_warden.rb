@@ -15,9 +15,9 @@ module Magic
             return if event.permanent == receiver
 
             game.add_effect(
-              Effects::AnotherCreatureEntersYouGainLife.new(
+              Effects::GainLife.new(
                 source: receiver,
-                card: event.permanent,
+                target: receiver.controller,
                 life: 1
               )
             )
