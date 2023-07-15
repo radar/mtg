@@ -29,9 +29,9 @@ RSpec.describe Magic::Cards::ContainmentPriest do
     context "the creature is not cast" do
       it "exiles the creature" do
         expect{
-          ResolvePermanent('Story Seeker', owner: p2)
+          ResolvePermanent('Story Seeker', owner: p2, cast: false)
         }.to change { game.exile.cards.count }.by(1)
-        expect(game.battlefield.permanents.count).to eq(1)
+        expect(game.battlefield.permanents.count).to eq(2)
         expect(game.battlefield.permanents.map(&:name)).to_not include('Story Seeker')
       end
     end
@@ -47,7 +47,7 @@ RSpec.describe Magic::Cards::ContainmentPriest do
         game.take_action(action)
         game.tick!
 
-        expect(game.battlefield.permanents.count).to eq(2)
+        expect(game.battlefield.permanents.count).to eq(3)
         expect(game.battlefield.permanents.map(&:name)).to include('Story Seeker')
       end
     end
@@ -79,7 +79,7 @@ RSpec.describe Magic::Cards::ContainmentPriest do
     it "does not exile the creature" do
       scute = ResolvePermanent("Scute Swarm", owner: p1, token: true)
 
-      expect(game.battlefield.permanents.count).to eq(2)
+      expect(game.battlefield.permanents.count).to eq(3)
     end
   end
 end

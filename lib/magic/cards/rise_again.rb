@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!(controller, target:)
-        Permanent.resolve(game: game, owner: controller, card: target)
+        Permanent.resolve(game: game, owner: controller, card: target, cast: false)
 
         super
       end
