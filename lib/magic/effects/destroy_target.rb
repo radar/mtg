@@ -1,12 +1,8 @@
 module Magic
   module Effects
-    class DestroyTarget
-      def self.new(choices:, **args)
-        SingleTargetAndResolve.new(
-          choices: choices,
-          resolution: -> (target) { target.destroy! },
-          **args
-        )
+    class DestroyTarget < TargetedEffect
+      def resolve(*targets)
+        targets.each(&:destroy!)
       end
     end
   end
