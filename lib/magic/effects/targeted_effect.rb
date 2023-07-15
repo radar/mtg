@@ -3,13 +3,24 @@ module Magic
     class TargetedEffect < Effect
       class InvalidTarget < StandardError; end;
 
-      attr_reader :source, :targets, :choices
+      attr_reader :source, :targets
 
-      def initialize(source:, targets: [], choices: source.target_choices)
+      def initialize(source:, targets: [], choices: [])
         @targets = [*targets]
         @source = source
         @choices = [*choices]
       end
+
+      def choices
+        if @choices.count > 0
+          @choices
+        elsif source.respond_to?(:target_choices)
+          source.target_choices
+        else
+          []
+        end
+      end
+
 
       def requires_choices?
         true

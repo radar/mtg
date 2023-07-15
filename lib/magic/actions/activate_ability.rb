@@ -47,6 +47,10 @@ module Magic
         pay(player, :tap)
       end
 
+      def pay_multi_tap(targets)
+        pay(player, :multi_tap, targets)
+      end
+
       def perform
         if targets.any?
           if ability.single_target?
@@ -65,6 +69,8 @@ module Magic
           Costs::Mana
         when :tap
           Costs::Tap
+        when :multi_tap
+          Costs::MultiTap
         when :discard
           Costs::Discard
         when :sacrifice

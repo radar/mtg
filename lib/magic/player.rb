@@ -1,5 +1,6 @@
 module Magic
   class Player
+    include Targetable
     extend Forwardable
 
     attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters
@@ -42,22 +43,26 @@ module Magic
       @lost = true
     end
 
-    def gain_life(life)
+    def gain_life(gain)
       game.notify!(
         Events::LifeGain.new(
           player: self,
-          life: life,
+          life: gain,
+        )
+      )
+    end
+
+    def lose_life(loss)
+      game.notify!(
+        Events::LifeLoss.new(
+          player: self,
+          life: loss,
         )
       )
     end
 
     def take_damage(source:, damage:)
-      game.notify!(
-        Events::LifeLoss.new(
-          player: self,
-          life: damage,
-        )
-      )
+      lose_life(damage)
     end
 
     def lands_played
@@ -178,7 +183,7 @@ module Magic
       when Events::PlayerLoses
         lose!
       when Events::DamageDealt, Events::CombatDamageDealt
-        take_damage(source: event.source, damage: event.damage)
+        lose_life(event.damage)
       end
     end
 
