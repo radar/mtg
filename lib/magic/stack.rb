@@ -59,7 +59,9 @@ module Magic
       logger.debug "New effect added: #{effect}, choice required: #{effect.requires_choices?}"
 
       if effect.requires_choices?
-        if effect.single_choice?
+        if effect.requires_targets? && effect.targets_chosen?
+          effect.resolve(*effect.targets)
+        elsif effect.single_choice?
           logger.debug "Only one choice for #{effect}: #{effect.choices.first}, resolving effect immediately."
           effect.resolve(effect.choices.first)
         else

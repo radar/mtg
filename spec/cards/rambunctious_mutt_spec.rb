@@ -13,7 +13,7 @@ RSpec.describe Magic::Cards::RambunctiousMutt do
       cast_and_resolve(card: subject, player: p1)
       effect = game.effects.first
 
-      expect(effect).to be_a(Magic::Effects::SingleTargetAndResolve)
+      expect(effect).to be_a(Magic::Effects::DestroyTarget)
       expect(effect.choices).to match_array([enchantment, artifact_2])
     end
   end

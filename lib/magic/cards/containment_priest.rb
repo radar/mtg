@@ -6,14 +6,16 @@ module Magic
       keywords :flash
       power 2
       toughness 2
+    end
 
-      def event_handlers
+    class ContainmentPriest < Creature
+      def replacement_effects
         {
           Events::EnteredTheBattlefield => -> (receiver, event) do
             return if receiver == event.permanent
-            last_action = game.current_turn.actions.last
-            return if event.permanent.card == last_action&.card && last_action&.is_a?(Actions::Cast)
-            event.permanent.exile! unless event.permanent.token?
+            return if event.permanent.cast? || event.permanent.token?
+
+            Effects::Exile.new(source: receiver).resolve(event.permanent)
           end
         }
       end

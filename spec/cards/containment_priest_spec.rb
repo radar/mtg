@@ -3,6 +3,7 @@ require "spec_helper"
 RSpec.describe Magic::Cards::ContainmentPriest do
   include_context "two player game"
 
+  let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
   subject! { ResolvePermanent("Containment Priest", owner: p1) }
   # Containment Priest {1}{U}{1}{W}
   # Creature -- Human Cleric
@@ -28,9 +29,9 @@ RSpec.describe Magic::Cards::ContainmentPriest do
     context "the creature is not cast" do
       it "exiles the creature" do
         expect{
-          ResolvePermanent('Story Seeker', owner: p2)
+          ResolvePermanent('Story Seeker', owner: p2, cast: false)
         }.to change { game.exile.cards.count }.by(1)
-        expect(game.battlefield.permanents.count).to eq(1)
+        expect(game.battlefield.permanents.count).to eq(2)
         expect(game.battlefield.permanents.map(&:name)).to_not include('Story Seeker')
       end
     end
@@ -46,8 +47,30 @@ RSpec.describe Magic::Cards::ContainmentPriest do
         game.take_action(action)
         game.tick!
 
-        expect(game.battlefield.permanents.count).to eq(2)
+        expect(game.battlefield.permanents.count).to eq(3)
         expect(game.battlefield.permanents.map(&:name)).to include('Story Seeker')
+      end
+    end
+
+    context "the creature returns from the graveyard via a sorcery" do
+      it "exiles the creature" do
+        p2.graveyard << Card('Story Seeker')
+        p2.add_mana(black: 5)
+        action = Magic::Actions::Cast.new(player: p2, card: Card("Rise Again"))
+        action.pay_mana(generic: { black: 4 }, black: 1)
+              .targeting(p2.graveyard.cards.first)
+        game.take_action(action)
+
+        p2.add_mana(red: 1)
+        action = Magic::Actions::Cast.new(player: p2, card: Card("Shock"))
+        .pay_mana(red: 1)
+        .targeting(wood_elves)
+        game.take_action(action)
+        expect{
+          game.tick!
+        }.to change { game.exile.cards.count }.by(1)
+        expect(game.battlefield.permanents.count).to eq(1)
+        expect(game.battlefield.permanents.map(&:name)).to_not include('Story Seeker')
       end
     end
   end
@@ -56,7 +79,7 @@ RSpec.describe Magic::Cards::ContainmentPriest do
     it "does not exile the creature" do
       scute = ResolvePermanent("Scute Swarm", owner: p1, token: true)
 
-      expect(game.battlefield.permanents.count).to eq(2)
+      expect(game.battlefield.permanents.count).to eq(3)
     end
   end
 end

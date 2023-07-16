@@ -14,7 +14,9 @@ module Magic
       end
 
       def resolve!(_controller, target:)
-        game.add_effect(Effects::DestroyTarget.new(choices: target_choices, source: self, targets: [target]))
+        game.add_effect(
+          Effects::DestroyTarget.new(choices: target_choices, source: self, targets: [target])
+        )
       end
     end
   end

@@ -14,6 +14,7 @@ module Magic
         super(**args)
       end
 
+
       def requires_choices?
         true
       end

@@ -21,9 +21,16 @@ module Magic
         end
       end
 
+      def requires_targets?
+        true
+      end
 
       def requires_choices?
         true
+      end
+
+      def targets_chosen?
+        targets.any?
       end
 
       def single_choice?

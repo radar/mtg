@@ -9,12 +9,15 @@ module Magic
     end
 
     class AcidicSlime < Creature
+      def target_choices(_)
+        game.battlefield.cards.by_any_type("Artifact", "Enchantment", "Land")
+      end
+
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
 
           effect = Effects::DestroyTarget.new(
             source: permanent,
-            choices: game.battlefield.cards.by_any_type("Artifact", "Enchantment", "Land")
           )
           game.add_effect(effect)
         end

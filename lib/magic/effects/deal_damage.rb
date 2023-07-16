@@ -8,8 +8,11 @@ module Magic
         super(**args)
       end
 
-      def resolve(target)
-        target.take_damage(source: source, damage: damage)
+      def resolve(*targets)
+        targets.each do |target|
+          target.take_damage(source: source, damage: damage)
+        end
+
         super
       end
     end

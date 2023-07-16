@@ -25,7 +25,7 @@ RSpec.describe Magic::Cards::AcidicSlime do
       cast_and_resolve(card: subject, player: p1)
       effect = game.effects.first
 
-      expect(effect).to be_a(Magic::Effects::SingleTargetAndResolve)
+      expect(effect).to be_a(Magic::Effects::DestroyTarget)
       expect(effect.choices).to match_array([land, enchantment, artifact])
     end
   end

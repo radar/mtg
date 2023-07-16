@@ -16,6 +16,10 @@ module Magic
       source.game
     end
 
+    def requires_targets?
+      false
+    end
+
     def multiple_targets?
       targets > 1
     end
@@ -30,10 +34,6 @@ module Magic
 
     def no_choice?
       false
-    end
-
-    def multiple_targets?
-      targets > 1
     end
 
     def resolve(*)

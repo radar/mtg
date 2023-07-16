@@ -17,11 +17,11 @@ module Magic
 
     attr_accessor :zone
 
-    def self.resolve(game:, owner:, card:, from_zone: owner.library, enters_tapped: false, token: false)
+    def self.resolve(game:, owner:, card:, from_zone: owner.library, enters_tapped: false, token: false, cast: true)
       if card.planeswalker?
         permanent = Magic::Permanents::Planeswalker.new(game: game, owner: owner, card: card)
       elsif card.creature?
-        permanent = Magic::Permanents::Creature.new(game: game, owner: owner, card: card, token: token)
+        permanent = Magic::Permanents::Creature.new(game: game, owner: owner, card: card, token: token, cast: cast)
       elsif card.enchantment?
         permanent = Magic::Permanents::Enchantment.new(game: game, owner: owner, card: card)
       elsif card.permanent?
@@ -33,12 +33,13 @@ module Magic
       permanent
     end
 
-    def initialize(game:, owner:, card:, token: false)
+    def initialize(game:, owner:, card:, token: false, cast: true)
       @game = game
       @owner = owner
       @controller = owner
       @card = card
       @token = token
+      @cast = cast
       @base_types = card.types
       @delayed_responses = []
       @attachments = []
@@ -73,6 +74,10 @@ module Magic
 
     def token?
       @token
+    end
+
+    def cast?
+      @cast
     end
 
     def move_zone!(from: zone, to:)

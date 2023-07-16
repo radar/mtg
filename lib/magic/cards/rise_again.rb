@@ -1,7 +1,7 @@
 module Magic
   module Cards
     RiseAgain = Sorcery("Rise Again") do
-      cost black: 4, generic: 1
+      cost black: 1, generic: 4
     end
 
     class RiseAgain < Sorcery
@@ -14,8 +14,8 @@ module Magic
       end
 
       def resolve!(controller, target:)
-        permanent = Magic::Permanents::Creature.new(game: game, owner: controller, card: target)
-        permanent.move_zone!(from: target.zone, to: game.battlefield)
+        Permanent.resolve(game: game, owner: controller, from_zone: controller.graveyard, card: target, cast: false)
+
         super
       end
     end

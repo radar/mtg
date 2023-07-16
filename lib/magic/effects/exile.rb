@@ -6,8 +6,8 @@ module Magic
         true
       end
 
-      def resolve(target)
-        target.exile!
+      def resolve(*targets)
+        targets.each(&:exile!)
       end
     end
   end
