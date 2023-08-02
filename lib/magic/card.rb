@@ -5,12 +5,13 @@ module Magic
     def_delegators :@game, :logger, :battlefield, :exile, :current_turn
 
     include Cards::Keywords
-    attr_reader :game, :controller, :name, :cost, :type_line, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :counters
+    attr_reader :game, :controller, :name, :cost, :kicker_cost, :type_line, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :counters
     attr_accessor :tapped
 
     attr_accessor :zone
 
     COST = {}
+    KICKER_COST = {}
     KEYWORDS = []
     PROTECTIONS = []
 
@@ -35,6 +36,10 @@ module Magic
         const_set(:COST, cost)
       end
 
+      def kicker_cost(cost)
+        const_set(:KICKER_COST, cost)
+      end
+
       def power(power)
         const_set(:POWER, power)
       end
@@ -57,8 +62,8 @@ module Magic
       @name = self.class::NAME
       @type_line = self.class::TYPE_LINE
       @game = game
-      cost = Costs::Mana.new(self.class::COST.dup)
-      @cost = cost
+      @cost = Costs::Mana.new(self.class::COST.dup)
+      @kicker_cost = Costs::Kicker.new(self.class::KICKER_COST.dup)
       @tapped = tapped
       @delayed_responses = []
       @keywords = self.class::KEYWORDS
@@ -117,9 +122,16 @@ module Magic
       countered
     end
 
-    def resolve!(owner = nil, enters_tapped: enters_tapped?)
+    def resolve!(owner = nil, enters_tapped: enters_tapped?, kicked: false)
       if permanent?
-        permanent = Magic::Permanent.resolve(game: game, owner: owner, card: self, from_zone: zone, enters_tapped: enters_tapped)
+        permanent = Magic::Permanent.resolve(
+          game: game,
+          owner: owner,
+          card: self,
+          from_zone: zone,
+          enters_tapped: enters_tapped,
+          kicked: kicked
+        )
         move_zone!(game.battlefield)
         permanent
       end

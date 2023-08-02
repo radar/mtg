@@ -47,6 +47,10 @@ module Magic
         end
       end
 
+      def kicker_cost
+        card.kicker_cost
+      end
+
       def can_perform?
         return false unless card.zone.hand?
         return true if mana_cost.zero?
@@ -76,6 +80,10 @@ module Magic
         self
       end
 
+      def pay_kicker(payment)
+        kicker_cost.pay(player, payment)
+      end
+
       def perform
         mana_cost.finalize!(player)
         game.stack.add(self)
@@ -84,16 +92,13 @@ module Magic
       end
 
       def resolve!
-        if targets.none?
-          card.resolve!(player)
-          return
-        end
+        resolve_method = card.method(:resolve!)
+        args = {}
+        args[:target] = targets.first if resolve_method.parameters.include?([:keyreq, :target])
+        args[:targets] = targets if resolve_method.parameters.include?([:keyreq, :targets])
+        args[:kicked] = kicker_cost.paid? if resolve_method.parameters.include?([:key, :kicked])
 
-        if card.single_target?
-          card.resolve!(player, target: targets.first)
-        else
-          card.resolve!(player, targets: targets)
-        end
+        resolve_method.call(player, **args)
 
         if card.instant? || card.sorcery?
           card.move_to_graveyard!(player)

@@ -36,7 +36,6 @@ RSpec.describe Magic::Cards::ScuteSwarm do
 
         expect(scutes.count).to eq(2)
         expect(scutes.count(&:token?)).to eq(1)
-
       end
     end
 

@@ -17,15 +17,15 @@ module Magic
 
     attr_accessor :zone
 
-    def self.resolve(game:, owner:, card:, from_zone: owner.library, enters_tapped: false, token: false, cast: true)
+    def self.resolve(game:, owner:, card:, from_zone: owner.library, enters_tapped: false, token: false, cast: true, kicked: false)
       if card.planeswalker?
-        permanent = Magic::Permanents::Planeswalker.new(game: game, owner: owner, card: card)
+        permanent = Magic::Permanents::Planeswalker.new(game: game, owner: owner, card: card, kicked: kicked)
       elsif card.creature?
-        permanent = Magic::Permanents::Creature.new(game: game, owner: owner, card: card, token: token, cast: cast)
+        permanent = Magic::Permanents::Creature.new(game: game, owner: owner, card: card, token: token, cast: cast, kicked: kicked)
       elsif card.enchantment?
-        permanent = Magic::Permanents::Enchantment.new(game: game, owner: owner, card: card)
+        permanent = Magic::Permanents::Enchantment.new(game: game, owner: owner, card: card, kicked: kicked)
       elsif card.permanent?
-        permanent = Magic::Permanent.new(game: game, owner: owner, card: card)
+        permanent = Magic::Permanent.new(game: game, owner: owner, card: card, kicked: kicked)
       end
 
       permanent.tap! if enters_tapped
@@ -33,13 +33,14 @@ module Magic
       permanent
     end
 
-    def initialize(game:, owner:, card:, token: false, cast: true)
+    def initialize(game:, owner:, card:, token: false, cast: true, kicked: false)
       @game = game
       @owner = owner
       @controller = owner
       @card = card
       @token = token
       @cast = cast
+      @kicked = kicked
       @base_types = card.types
       @delayed_responses = []
       @attachments = []
@@ -52,6 +53,10 @@ module Magic
       @damage = 0
       @protections = Protections.new(card.protections.dup)
       @exiled_cards = Magic::CardList.new([])
+    end
+
+    def kicked?
+      @kicked
     end
 
     def types
