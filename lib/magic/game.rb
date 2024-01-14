@@ -35,7 +35,6 @@ module Magic
       @players = players
       @emblems = []
       @turn_number = 0
-
     end
 
     def add_players(*players)
@@ -86,6 +85,10 @@ module Magic
     def tick!
       stack.resolve!
       move_dead_creatures_to_graveyard
+    end
+
+    def graveyard_cards
+      CardList.new(players.flat_map { _1.graveyard.cards })
     end
 
     def move_dead_creatures_to_graveyard
