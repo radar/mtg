@@ -39,8 +39,10 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
 
     island = p1.permanents.by_name("Island").first
     action = Magic::Actions::ActivateAbility.new(player: p1, permanent: island, ability: island.activated_abilities.first)
+    action.pay_tap
     game.take_action(action)
     expect(p1.mana_pool).to eq(blue: 1)
+    expect(island).to be_tapped
 
     island2 = p1.hand.by_name("Island").first
     action = Magic::Actions::PlayLand.new(player: p1, card: island2)
@@ -109,8 +111,6 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
 
     turn_2.second_main!
     turn_2.end!
-
-    game.next_active_player
 
     turn_3 = game.next_turn
     turn_3.untap!
