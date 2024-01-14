@@ -41,6 +41,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     action = Magic::Actions::ActivateAbility.new(player: p1, permanent: island, ability: island.activated_abilities.first)
     game.take_action(action)
     expect(p1.mana_pool).to eq(blue: 1)
+    expect(island).to be_tapped
 
     island2 = p1.hand.by_name("Island").first
     action = Magic::Actions::PlayLand.new(player: p1, card: island2)
