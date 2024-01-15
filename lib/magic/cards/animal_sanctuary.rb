@@ -12,14 +12,14 @@ module Magic
         end
 
         def resolve!
-          controller.add_mana(colorless: 1)
+          controller.add_mana(generic: 1)
         end
       end
 
       class ActivatedAbility < Magic::ActivatedAbility
         def costs
           [
-            Costs::Mana.new(colorless: 2),
+            Costs::Mana.new(generic: 2),
             Costs::Tap.new(source),
           ]
         end

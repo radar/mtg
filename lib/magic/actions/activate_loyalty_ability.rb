@@ -3,9 +3,9 @@ module Magic
     class ActivateLoyaltyAbility < Action
       attr_reader :ability, :planeswalker, :targets, :x_value
 
-      def initialize(planeswalker:, ability:, **args)
-        @planeswalker = planeswalker
-        @ability = ability.new(planeswalker: planeswalker)
+      def initialize(ability:, **args)
+        @planeswalker = ability.planeswalker
+        @ability = ability
         @targets = []
         super(**args)
       end

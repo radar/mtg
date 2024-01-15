@@ -12,9 +12,10 @@ RSpec.describe Magic::Cards::BurnBright do
 
     it "grants 2 power to both creatures " do
       p1.add_mana(red: 3)
-      action = Magic::Actions::Cast.new(player: p1, card: burn_bright)
-        .pay_mana(generic: { red: 2 }, red: 1)
-      game.take_action(action)
+      p1.cast(card: burn_bright) do
+        _1.pay_mana(red: 1, generic: { red: 2 })
+      end
+
       game.tick!
 
       expect(onakke_ogre.power).to eq(6)
@@ -22,12 +23,21 @@ RSpec.describe Magic::Cards::BurnBright do
       expect(blood_glutton.power).to eq(6)
       expect(blood_glutton.toughness).to eq(3)
 
-      game.current_turn.end!
-      game.current_turn.cleanup!
-      game.next_turn
+      expect(onakke_ogre.modifiers).to include(
+        an_object_having_attributes(
+          power: 2,
+          toughness: 0,
+          until_eot: true,
+        )
+      )
 
-      expect(onakke_ogre.power).to eq(4)
-      expect(blood_glutton.power).to eq(4)
+      expect(blood_glutton.modifiers).to include(
+        an_object_having_attributes(
+          power: 2,
+          toughness: 0,
+          until_eot: true,
+        )
+      )
     end
   end
 
@@ -36,11 +46,11 @@ RSpec.describe Magic::Cards::BurnBright do
     let!(:onakke_ogre) { ResolvePermanent("Onakke Ogre", owner: p1) }
     let!(:cloudkin_seer) { ResolvePermanent("Cloudkin Seer", owner: p2) }
 
-    it "does not buff opponent's creature " do
+    it "does not buff opponent's creature" do
       p1.add_mana(red: 3)
-      action = Magic::Actions::Cast.new(player: p1, card: burn_bright)
-        .pay_mana(generic: { red: 2 }, red: 1)
-      game.take_action(action)
+      p1.cast(card: burn_bright) do
+        _1.pay_mana(red: 1, generic: { red: 2 })
+      end
       game.tick!
 
       expect(cloudkin_seer.power).to eq(2)

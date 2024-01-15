@@ -1,11 +1,10 @@
 module Magic
   module Actions
     class ActivateAbility < Action
-      attr_reader :permanent, :ability, :costs, :requirements, :targets
+      attr_reader :ability, :costs, :requirements, :targets
 
-      def initialize(permanent:, ability:, **args)
-        @permanent = permanent
-        @ability = ability.new(source: permanent)
+      def initialize(ability:, **args)
+        @ability = ability
         @costs = @ability.costs
         @requirements = @ability.requirements
         @targets = []
@@ -13,7 +12,7 @@ module Magic
       end
 
       def inspect
-        "#<Actions::Actions::ActivateAbility permanent: #{permanent.name}, ability: #{ability.class}>"
+        "#<Actions::Actions::ActivateAbility source: #{ability.source.name}, ability: #{ability.class}>"
       end
 
       def can_be_activated?(player)
@@ -51,6 +50,10 @@ module Magic
         pay(player, :multi_tap, targets)
       end
 
+      def pay_sacrifice(targets)
+        pay(player, :sacrifice, targets)
+      end
+
       def perform
         if targets.any?
           if ability.single_target?
@@ -83,6 +86,10 @@ module Magic
         cost.pay(player, payment)
 
         self
+      end
+
+      def has_cost?(cost_type)
+        costs.any? { |cost| cost.is_a?(cost_type) }
       end
 
       def finalize_costs!(player)

@@ -4,7 +4,7 @@ module Magic
     include Types
 
     extend Forwardable
-    attr_reader :game, :owner, :controller, :card,:types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :keyword_grants, :activated_abilities, :exiled_cards, :cannot_untap_next_turn
+    attr_reader :game, :owner, :controller, :card, :types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :keyword_grants, :activated_abilities, :exiled_cards, :cannot_untap_next_turn
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?
     def_delegators :@game, :logger
@@ -49,7 +49,6 @@ module Magic
       @keywords = card.keywords
       @keyword_grants = []
       @counters = Counters::Collection.new([])
-      @activated_abilities = card.activated_abilities
       @damage = 0
       @protections = Protections.new(card.protections.dup)
       @exiled_cards = Magic::CardList.new([])
@@ -65,6 +64,10 @@ module Magic
 
     def inspect
       "#<Magic::Permanent name:#{card.name} controller:#{controller.name}>"
+    end
+
+    def activated_abilities
+      @activated_abilities ||= card.activated_abilities.map { |ability| ability.new(source: self) }
     end
 
     alias_method :to_s, :inspect

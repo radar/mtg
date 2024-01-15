@@ -13,8 +13,7 @@ module Magic
       end
 
       def can_perform?
-        return false if player.can_play_lands?
-        true
+        player.can_play_lands?
       end
 
       def perform

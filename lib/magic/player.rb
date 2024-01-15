@@ -35,6 +35,47 @@ module Magic
     end
     alias_method :to_s, :inspect
 
+    def prepare_action(action, **args, &block)
+      action = action.new(player: self, game: game, **args)
+      yield action if block_given?
+      action
+    end
+
+    def take_action(action, **args)
+      if action.is_a?(Class)
+        action = prepare_action(action, **args)
+      end
+
+      game.take_action(action)
+    end
+
+    def play_land(land:, **args)
+      action = prepare_action(Magic::Actions::PlayLand, card: land, **args)
+      game.take_action(action)
+    end
+
+    def activate_ability(ability:, auto_tap: true, **args)
+      action = prepare_action(Magic::Actions::ActivateAbility, ability: ability, **args)
+      action.pay_tap if action.has_cost?(Magic::Costs::Tap) && auto_tap
+      yield action if block_given?
+      action.finalize_costs!(self)
+      game.take_action(action)
+    end
+
+    def activate_loyalty_ability(ability:, auto_tap: true, **args)
+      action = prepare_action(Magic::Actions::ActivateLoyaltyAbility, ability: ability, **args)
+      yield action if block_given?
+      game.take_action(action)
+    end
+
+    def cast(card:, **args)
+      action = prepare_action(Magic::Actions::Cast, card: card, **args)
+      yield action if block_given?
+      game.take_action(action)
+      action
+    end
+
+
     def lost?
       @lost
     end
@@ -74,7 +115,7 @@ module Magic
     end
 
     def can_play_lands?
-      lands_played >= max_lands_per_turn
+      lands_played < max_lands_per_turn
     end
 
     def can_be_targeted_by?(source)

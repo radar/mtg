@@ -67,6 +67,23 @@ RSpec.describe Magic::Costs::Mana do
   context "pay" do
     let(:player) { Magic::Player.new }
 
+
+    context "when cost is 1 red" do
+      subject { described_class.new({ red: 1 }) }
+      context "can pay a card's cost" do
+        let(:card) { Magic::Cards::LightningBolt.new }
+
+        before do
+          player.add_mana(red: 1)
+        end
+
+        it "can pay and finalize" do
+          subject.pay(player, card.cost)
+          subject.finalize!(player)
+        end
+      end
+    end
+
     context "when cost is 1 generic, 1 red" do
       subject { described_class.new({ generic: 1, red: 1 }) }
 

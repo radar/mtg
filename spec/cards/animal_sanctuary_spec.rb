@@ -8,13 +8,12 @@ RSpec.describe Magic::Cards::AnimalSanctuary do
 
   context "mana ability" do
     def activate_ability
-      action = Magic::Actions::ActivateAbility.new(permanent: subject, ability: subject.activated_abilities.first, player: p1)
-      game.take_action(action)
+      p1.activate_ability(ability: subject.activated_abilities.first)
     end
 
     it "adds one colorless mana" do
       activate_ability
-      expect(p1.mana_pool[:colorless]).to eq(1)
+      expect(p1.mana_pool[:generic]).to eq(1)
     end
   end
 
@@ -26,9 +25,9 @@ RSpec.describe Magic::Cards::AnimalSanctuary do
 
     def activate_ability
       p1.add_mana(green: 2)
-      action = Magic::Actions::ActivateAbility.new(permanent: subject, ability: subject.activated_abilities.last, player: p1)
-      action.pay_mana(colorless: { green: 2 })
-      game.take_action(action)
+      p1.activate_ability(ability: subject.activated_abilities.last) do
+        _1.pay_mana(generic: { green: 2 })
+      end
       game.stack.resolve!
     end
 

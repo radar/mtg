@@ -54,11 +54,17 @@ module Magic
       end
 
       def pay(player, payment)
-
         raise CannotPay unless can_pay?(player)
 
         pay_generic(payment[:generic]) if payment[:generic]
         pay_colors(payment.slice(*Magic::Mana::COLORS))
+      end
+
+      def auto_pay(player)
+        raise CannotPay unless can_pay?(player)
+
+        pay_colors(color_costs)
+        pay_generic(generic: cost[:generic]) if cost[:generic]
       end
 
       def finalize!(player)

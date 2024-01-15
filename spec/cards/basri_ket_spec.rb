@@ -16,9 +16,9 @@ RSpec.describe Magic::Cards::BasriKet do
     end
 
     it "targets the wood elves" do
-      action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: planeswalker, ability: ability)
-      action.targeting(wood_elves)
-      game.take_action(action)
+      p1.activate_loyalty_ability(ability: ability) do
+        _1.targeting(wood_elves)
+      end
       game.tick!
 
       expect(planeswalker.loyalty).to eq(4)
@@ -37,8 +37,7 @@ RSpec.describe Magic::Cards::BasriKet do
     end
 
     it "adds an after attackers declared step trigger" do
-      action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: planeswalker, ability: ability)
-      game.take_action(action)
+      p1.activate_loyalty_ability(ability: ability)
       game.tick!
 
       expect(subject.loyalty).to eq(1)
@@ -51,8 +50,7 @@ RSpec.describe Magic::Cards::BasriKet do
     let(:ability) { planeswalker.loyalty_abilities[2] }
 
     it "emblem for creating white soldier creature tokens and putting counters on all creatures" do
-      action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: planeswalker, ability: ability)
-      game.take_action(action)
+      p1.activate_loyalty_ability(ability: ability)
       game.tick!
 
       expect(game.emblems.count).to eq(1)
