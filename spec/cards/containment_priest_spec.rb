@@ -42,9 +42,9 @@ RSpec.describe Magic::Cards::ContainmentPriest do
         story_seeker.zone = p2.hand
 
         p2.add_mana(white: 2)
-        action = Magic::Actions::Cast.new(player: p2, card: story_seeker)
-        action.pay_mana(generic: { white: 1 }, white: 1)
-        game.take_action(action)
+        p2.cast(card: story_seeker) do
+          _1.pay_mana(generic: { white: 1 }, white: 1)
+        end
         game.tick!
 
         expect(game.battlefield.permanents.count).to eq(3)
@@ -56,16 +56,19 @@ RSpec.describe Magic::Cards::ContainmentPriest do
       it "exiles the creature" do
         p2.graveyard << Card('Story Seeker')
         p2.add_mana(black: 5)
-        action = Magic::Actions::Cast.new(player: p2, card: Card("Rise Again"))
-        action.pay_mana(generic: { black: 4 }, black: 1)
-              .targeting(p2.graveyard.cards.first)
-        game.take_action(action)
+        p2.cast(card: Card("Rise Again")) do
+          _1
+            .pay_mana(generic: { black: 4 }, black: 1)
+            .targeting(p2.graveyard.cards.first)
+        end
 
         p2.add_mana(red: 1)
-        action = Magic::Actions::Cast.new(player: p2, card: Card("Shock"))
-        .pay_mana(red: 1)
-        .targeting(wood_elves)
-        game.take_action(action)
+        p2.cast(card: Card("Shock")) do
+          _1
+            .pay_mana(red: 1)
+            .targeting(wood_elves)
+        end
+
         expect{
           game.tick!
         }.to change { game.exile.cards.count }.by(1)

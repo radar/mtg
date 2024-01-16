@@ -14,15 +14,15 @@ RSpec.describe Magic::Cards::Cancel do
   context "counters a Sol Ring" do
     it "sol ring never enters the battlefield" do
       p2.add_mana(red: 1)
-      action = Magic::Actions::Cast.new(player: p2, card: sol_ring)
-      action.pay_mana(generic: { red: 1 })
-      game.take_action(action)
+      action = p2.cast(card: sol_ring) do
+        _1.pay_mana(generic: { red: 1 })
+      end
 
       p1.add_mana(blue: 3)
-      action_2 = Magic::Actions::Cast.new(player: p1, card: cancel)
-      action_2.targeting(action)
-      action_2.pay_mana(blue: 2, generic: { blue: 1 })
-      game.take_action(action_2)
+      action_2 = p1.cast(card: cancel) do
+        _1.pay_mana(blue: 2, generic: { blue: 1 })
+        _1.targeting(action)
+      end
 
       game.stack.resolve!
       expect(cancel.zone).to be_graveyard

@@ -7,9 +7,8 @@ RSpec.describe Magic::Cards::GreatFurnace do
 
   it "taps for red mana" do
     expect(p1).to receive(:add_mana).with(red: 1)
-    action = Magic::Actions::ActivateAbility.new(player: p1, permanent: subject, ability: subject.activated_abilities.first)
-    action.pay_tap
-    game.take_action(action)
+
+    p1.activate_ability(ability: subject.activated_abilities.first)
     expect(subject).to be_tapped
   end
 

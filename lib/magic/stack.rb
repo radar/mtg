@@ -131,6 +131,7 @@ module Magic
     def resolve_effects!
       resolvable_effects_with_targets = effects.unresolved.targeted
       resolvable_effects_with_targets.each do |effect|
+        effects.delete(effect)
         effect.targets.each do |target|
           effect.resolve(target)
         end

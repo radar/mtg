@@ -40,9 +40,9 @@ module Magic
 
         def resolve!(target:)
           source.remove_from_exile(target)
-          cast_action = Magic::Actions::Cast.new(card: target, player: source.controller)
-          cast_action.mana_cost = 0
-          game.take_action(cast_action)
+          source.controller.cast(card: target) do
+            _1.mana_cost = 0
+          end
         end
       end
 

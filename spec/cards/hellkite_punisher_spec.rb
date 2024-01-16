@@ -14,15 +14,15 @@ RSpec.describe Magic::Cards::HellkitePunisher do
       p1.add_mana(red: 2)
 
       ability = subject.activated_abilities.first
-      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: subject, ability: ability)
-      action.pay_mana(red: 1)
-      game.take_action(action)
+      p1.activate_ability(ability: ability) do
+        _1.pay_mana(red: 1)
+      end
       game.stack.resolve!
       expect(subject.power).to eq(7)
 
-      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: subject, ability: ability)
-      action.pay_mana(red: 1)
-      game.take_action(action)
+      p1.activate_ability(ability: ability) do
+        _1.pay_mana(red: 1)
+      end
       game.stack.resolve!
 
       expect(subject.power).to eq(8)

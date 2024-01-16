@@ -22,17 +22,17 @@ RSpec.describe Magic::Game, "Mana spend -- Foundry Inspector + Free Sol Ring" do
 
       it "casts a foundry inspector and then a sol ring" do
         p1.add_mana(red: 3)
-        action = Magic::Actions::Cast.new(player: p1, card: foundry_inspector)
-        expect(action.can_perform?).to eq(true)
-        action.pay_mana(generic: { red: 3 } )
-        game.take_action(action)
-        game.tick!
-
-        action = Magic::Actions::Cast.new(player: p1, card: sol_ring)
-        expect(action.can_perform?).to eq(true)
-        game.take_action(action)
+        p1.cast(card: foundry_inspector) do
+          _1.pay_mana(generic: { red: 3 })
+        end
 
         game.tick!
+
+        # Sol Ring cost discounted by 1 by Foundry Inspector, so is free
+        p1.cast(card: sol_ring)
+
+        game.tick!
+
         expect(p1.permanents.by_name(sol_ring.name).count).to eq(1)
       end
     end

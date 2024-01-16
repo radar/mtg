@@ -13,8 +13,7 @@ RSpec.describe Magic::Game, "attackers declared" do
   context "with basri ket's delayed trigger" do
     before do
       basri_ket.change_loyalty!(7)
-      action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: basri_ket, ability: basri_ket.loyalty_abilities[1])
-      game.take_action(action)
+      p1.activate_loyalty_ability(ability: basri_ket.loyalty_abilities[1])
       game.stack.resolve!
     end
 

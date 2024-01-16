@@ -12,10 +12,9 @@ RSpec.describe Magic::Cards::SelflessSavior do
     end
 
     it "sacrifices selfless, applies indestructible to elves until eot" do
-      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: subject, ability: subject.activated_abilities.first)
-        .pay(p1, :sacrifice, subject)
-        .targeting(wood_elves)
-      game.take_action(action)
+      p1.activate_ability(ability: ability) do
+        _1.pay(:sacrifice, subject).targeting(wood_elves)
+      end
       expect(wood_elves).to be_indestructible
       expect(wood_elves.keyword_grants.first.until_eot?).to eq(true)
     end

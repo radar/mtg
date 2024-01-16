@@ -8,7 +8,7 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
 
   context "activated ability" do
     def ability
-      permanent.card.class::ActivatedAbility
+      permanent.activated_abilities.first
     end
 
     context "when p1 has two white mana" do
@@ -24,11 +24,12 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
 
           it "taps a target creature" do
             p1.add_mana(white: 2)
-            action = Magic::Actions::ActivateAbility.new(player: p1, permanent: permanent, ability: ability)
-            action.pay_mana(generic: { white: 1 }, white: 1)
-            action.pay_tap
-            action.targeting(wood_elves)
-            game.take_action(action)
+            p1.activate_ability(ability: ability) do
+              _1
+                .targeting(wood_elves)
+                .pay_mana(generic: { white: 1 }, white: 1)
+                .pay_tap
+            end
             game.stack.resolve!
             expect(permanent).to be_tapped
             expect(wood_elves).to be_tapped
@@ -37,7 +38,7 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
 
         context "when p1 does not control any creatures with flying" do
           it "cannot be activated" do
-            action = Magic::Actions::ActivateAbility.new(player: p1, permanent: permanent, ability: ability)
+            action = p1.prepare_activate_ability(ability: ability)
             expect(action.can_be_activated?(p1)).to eq(false)
           end
         end
@@ -47,7 +48,7 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
         before { permanent.tap! }
 
         it "cannot be activated" do
-          action = Magic::Actions::ActivateAbility.new(player: p1, permanent: permanent, ability: ability)
+          action = p1.prepare_activate_ability(ability: ability)
           expect(action.can_be_activated?(p1)).to eq(false)
         end
       end

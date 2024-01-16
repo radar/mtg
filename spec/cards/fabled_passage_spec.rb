@@ -10,9 +10,9 @@ RSpec.describe Magic::Cards::FabledPassage do
   end
 
   def activate_ability
-    action = Magic::Actions::ActivateAbility.new(permanent: subject, ability: subject.activated_abilities.first, player: p1)
-    action.pay(p1, :sacrifice)
-    game.take_action(action)
+    p1.activate_ability(ability: subject.activated_abilities.first) do
+      _1.pay(:sacrifice)
+    end
     game.stack.resolve!
     effect = game.effects.first
     expect(effect).to be_a(Magic::Cards::FabledPassage::Effect)

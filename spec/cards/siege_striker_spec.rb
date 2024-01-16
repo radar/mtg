@@ -22,7 +22,7 @@ RSpec.describe Magic::Cards::SiegeStriker do
       expect(siege_striker.power).to eq(1)
       expect(siege_striker.toughness).to eq(1)
 
-      action = Magic::Actions::TapPermanent.new(player: p1, permanent: wood_elves)
+      action = Magic::Actions::TapPermanent.new(game: game, player: p1, permanent: wood_elves)
       game.take_action(action)
 
       expect(siege_striker.power).to eq(2)
@@ -33,7 +33,7 @@ RSpec.describe Magic::Cards::SiegeStriker do
       expect(siege_striker.power).to eq(1)
       expect(siege_striker.toughness).to eq(1)
 
-      action = Magic::Actions::TapPermanent.new(player: p1, permanent: wood_elves)
+      action = Magic::Actions::TapPermanent.new(game: game, player: p1, permanent: wood_elves)
       game.take_action(action)
 
       expect(siege_striker.power).to eq(1)

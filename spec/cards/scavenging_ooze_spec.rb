@@ -20,10 +20,11 @@ RSpec.describe Magic::Cards::ScavengingOoze do
       it "exiles a card from a graveyard, adds +1/1 counter and p1 gains life" do
         p1.add_mana(green: 1)
         starting_life = p1.life
-        action = Magic::Actions::ActivateAbility.new(player: p1, permanent: scavenging_ooze, ability: ability)
-        action.pay_mana(green: 1)
-        action.targeting(wood_elves)
-        game.take_action(action)
+        p1.activate_ability(ability: ability) do
+          _1
+            .pay_mana(green: 1)
+            .targeting(wood_elves)
+        end
         game.stack.resolve!
 
         aggregate_failures do
@@ -47,10 +48,11 @@ RSpec.describe Magic::Cards::ScavengingOoze do
       it "exiles sol ring, does not add counter and p1 does not gain life" do
         p1.add_mana(green: 1)
         starting_life = p1.life
-        action = Magic::Actions::ActivateAbility.new(player: p1, permanent: scavenging_ooze, ability: ability)
-        action.pay_mana(green: 1)
-        action.targeting(sol_ring)
-        game.take_action(action)
+        p1.activate_ability(ability: ability) do
+          _1
+            .pay_mana(green: 1)
+            .targeting(sol_ring)
+        end
         game.stack.resolve!
 
         aggregate_failures do

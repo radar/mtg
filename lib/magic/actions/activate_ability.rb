@@ -38,20 +38,20 @@ module Magic
       end
 
       def pay_mana(payment)
-        pay(player, :mana, payment)
+        pay(:mana, payment)
         self
       end
 
       def pay_tap
-        pay(player, :tap)
+        pay(:tap)
       end
 
       def pay_multi_tap(targets)
-        pay(player, :multi_tap, targets)
+        pay(:multi_tap, targets)
       end
 
       def pay_sacrifice(targets)
-        pay(player, :sacrifice, targets)
+        pay(:sacrifice, targets)
       end
 
       def perform
@@ -66,7 +66,7 @@ module Magic
         end
       end
 
-      def pay(player, cost_type, payment = nil)
+      def pay(cost_type, payment = nil)
         cost_type = case cost_type
         when :mana
           Costs::Mana

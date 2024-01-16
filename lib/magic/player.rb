@@ -54,10 +54,15 @@ module Magic
       game.take_action(action)
     end
 
-    def activate_ability(ability:, auto_tap: true, **args)
+    def prepare_activate_ability(ability:, **args, &block)
       action = prepare_action(Magic::Actions::ActivateAbility, ability: ability, **args)
-      action.pay_tap if action.has_cost?(Magic::Costs::Tap) && auto_tap
       yield action if block_given?
+      action
+    end
+
+    def activate_ability(ability:, auto_tap: true, **args, &block)
+      action = prepare_activate_ability(ability: ability, **args, &block)
+      action.pay_tap if action.has_cost?(Magic::Costs::Tap) && auto_tap
       action.finalize_costs!(self)
       game.take_action(action)
     end
@@ -68,12 +73,24 @@ module Magic
       game.take_action(action)
     end
 
-    def cast(card:, **args)
+    def prepare_cast(card:, **args)
       action = prepare_action(Magic::Actions::Cast, card: card, **args)
       yield action if block_given?
+      action
+    end
+
+    def cast(card:, **args, &block)
+      action = prepare_cast(card: card, **args, &block)
       game.take_action(action)
       action
     end
+
+    def declare_attacker(attacker:, target:, **args)
+      action = prepare_action(Magic::Actions::DeclareAttacker, attacker: attacker, target: target, **args)
+      game.take_action(action)
+      action
+    end
+
 
 
     def lost?

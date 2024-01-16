@@ -36,6 +36,8 @@ module Magic
           target.tap!
         end
       end
+
+      def activated_abilities = [ActivatedAbility]
     end
   end
 end

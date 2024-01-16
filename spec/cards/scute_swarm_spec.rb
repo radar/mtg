@@ -13,8 +13,7 @@ RSpec.describe Magic::Cards::ScuteSwarm do
     context "when controller controls less than 6 lands" do
       it "creates an insect" do
         subject
-        action = Magic::Actions::PlayLand.new(player: p1, card: forest)
-        game.take_action(action)
+        p1.play_land(land: forest)
         game.tick!
 
         expect(game.battlefield.creatures.controlled_by(p1).by_name("Insect").count).to eq(1)
@@ -28,8 +27,7 @@ RSpec.describe Magic::Cards::ScuteSwarm do
 
       it "creates a token copy of Scute Swarm" do
         subject
-        action = Magic::Actions::PlayLand.new(player: p1, card: forest)
-        game.take_action(action)
+        p1.play_land(land: forest)
         game.tick!
 
         scutes = game.battlefield.creatures.controlled_by(p1).by_name("Scute Swarm")
@@ -47,8 +45,7 @@ RSpec.describe Magic::Cards::ScuteSwarm do
       it "creates a token copy of Scute Swarm" do
         subject
         ResolvePermanent("Scute Swarm", owner: p1)
-        action = Magic::Actions::PlayLand.new(player: p1, card: forest)
-        game.take_action(action)
+        p1.play_land(land: forest)
         game.tick!
 
         scutes = game.battlefield.creatures.controlled_by(p1).by_name("Scute Swarm")

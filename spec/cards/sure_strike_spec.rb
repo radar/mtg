@@ -6,14 +6,13 @@ RSpec.describe Magic::Cards::SureStrike do
   let!(:sure_strike) { described_class.new(game: game) }
   let!(:onakke_ogre) { ResolvePermanent("Onakke Ogre", owner: p1) }
   context "with a creature in play" do
-    
+
 
     it "grants first strike and 3 power" do
       p1.add_mana(red: 2)
-      action = Magic::Actions::Cast.new(player: p1, card: sure_strike)
-        .pay_mana(generic: { red: 1 }, red: 1)
-        .targeting(onakke_ogre)
-      game.take_action(action)
+      p1.cast(card: sure_strike) do
+        _1.pay_mana(generic: { red: 1 }, red: 1).targeting(onakke_ogre)
+      end
       game.tick!
 
       expect(onakke_ogre.power).to eq(7)
