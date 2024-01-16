@@ -37,7 +37,7 @@ module CardHelper
     game.stack.resolve!
   end
 
-  def cast_and_resolve(card:, player:, targeting: nil, &block)
+  def cast_and_resolve(card:, player: card.owner, targeting: nil, &block)
     action = cast_action(card: card, player: player, targeting: targeting, &block)
     game.stack.add(action)
     game.stack.resolve!
