@@ -23,7 +23,7 @@ module Magic
       end
 
       def can_activate_ability?(ability)
-        ability < ManaAbility
+        ability.is_a?(ManaAbility)
       end
     end
   end

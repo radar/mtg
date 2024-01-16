@@ -15,9 +15,9 @@ RSpec.describe Magic::Cards::LathrilBladeOfTheElves do
       token.resolve!(p1)
     end
 
-    action = Magic::Actions::ActivateAbility.new(permanent: subject, ability: subject.activated_abilities.first, player: p1)
-    action.pay_multi_tap(elves)
-    game.take_action(action)
+    p1.activate_ability(ability: subject.activated_abilities.first) do
+      _1.pay_multi_tap(elves)
+    end
     game.stack.resolve!
 
     expect(p1.life).to eq(p1.starting_life + 10)

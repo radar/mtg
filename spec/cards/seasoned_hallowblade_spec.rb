@@ -12,9 +12,9 @@ RSpec.describe Magic::Cards::SeasonedHallowblade do
   context "activated ability" do
     it "taps hallowblade, applies indestructible until eot" do
       expect(subject.activated_abilities.count).to eq(1)
-      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: subject, ability: subject.activated_abilities.first)
-        .pay(p1, :discard, p1.hand.cards.first)
-      game.take_action(action)
+      p1.activate_ability(ability: subject.activated_abilities.first) do
+        _1.pay(:discard, p1.hand.cards.first)
+      end
       expect(subject).to be_tapped
       expect(subject).to be_indestructible
       expect(subject.keyword_grants.count).to eq(1)

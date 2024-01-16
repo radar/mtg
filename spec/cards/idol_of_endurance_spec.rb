@@ -26,14 +26,12 @@ RSpec.describe Magic::Cards::IdolOfEndurance do
     end
 
     it "can play that card without incurring mana cost" do
-
       p1.add_mana(white: 2)
-      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: idol_of_endurance, ability: idol_of_endurance.activated_abilities.first)
-      action.pay_mana({ generic: { white: 1 }, white: 1 })
-      action.pay_tap
-      action.finalize_costs!(p1)
-      action.targeting(wood_elves)
-      game.take_action(action)
+      p1.activate_ability(ability: idol_of_endurance.activated_abilities.first) do
+        _1
+          .targeting(wood_elves)
+          .pay_mana(generic: { white: 1 }, white: 1)
+      end
       game.tick!
 
       expect(idol_of_endurance).to be_tapped

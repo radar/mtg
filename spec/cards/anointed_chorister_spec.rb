@@ -14,10 +14,10 @@ RSpec.describe Magic::Cards::AnointedChorister do
     it "applies a buff of +3/+3" do
       p1.add_mana(white: 5)
 
-      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: permanent, ability: permanent.activated_abilities.first)
-      action.pay_mana({ generic: { white: 4 }, white: 1 })
-      action.finalize_costs!(p1)
-      game.take_action(action)
+      p1.activate_ability(ability: permanent.activated_abilities.first) do
+        _1.pay_mana({ generic: { white: 4 }, white: 1 })
+      end
+
       game.tick!
 
       expect(p1.mana_pool[:white]).to eq(0)

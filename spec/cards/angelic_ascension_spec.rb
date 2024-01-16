@@ -7,8 +7,9 @@ RSpec.describe Magic::Cards::AngelicAscension do
   subject { add_to_library("Angelic Ascension", player: p1) }
 
   it "exiles the wood elves and creates a 4/4 white angel creature token with flying" do
-    action = cast_action(card: subject, player: p1, targeting: wood_elves)
-    add_to_stack_and_resolve(action)
+    action = cast_and_resolve(card: subject, player: p1) do |action|
+      action.targeting(wood_elves)
+    end
 
     expect(wood_elves.card.zone).to be_exile
     expect(wood_elves.zone).to be_nil

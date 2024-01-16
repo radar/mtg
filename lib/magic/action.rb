@@ -1,10 +1,10 @@
 module Magic
   class Action
-    attr_reader :player, :game
+    attr_reader :game, :player
 
-    def initialize(player:)
+    def initialize(game:, player:)
+      @game = game
       @player = player
-      @game = player.game
     end
   end
 end

@@ -14,15 +14,15 @@ RSpec.describe Magic::Cards::Annul do
   context "counters a Sol Ring" do
     it "sol ring never enters the battlefield" do
       p2.add_mana(red: 1)
-      action = Magic::Actions::Cast.new(player: p2, card: sol_ring)
-      action.pay_mana(generic: { red: 1 })
-      game.take_action(action)
+      action = p2.cast(card: sol_ring) do
+        _1.pay_mana(generic: { red: 1 })
+      end
 
       p1.add_mana(blue: 1)
-      action_2 = Magic::Actions::Cast.new(player: p1, card: annul)
-      action_2.targeting(action)
-      action_2.pay_mana(blue: 1)
-      game.take_action(action_2)
+      p1.cast(card: annul) do
+        _1.pay_mana(blue: 1)
+        _1.targeting(action)
+      end
 
       game.stack.resolve!
       expect(annul.zone).to be_graveyard
@@ -31,12 +31,14 @@ RSpec.describe Magic::Cards::Annul do
 
     it "cannot target a thing that is not an artifact or enchantment" do
       p2.add_mana(green: 3)
-      action = Magic::Actions::Cast.new(player: p2, card: Card("Wood Elves"))
-      action.pay_mana(generic: { green: 2 }, green: 1)
+      wood_elves_cast = p2.cast(card: Card("Wood Elves")) do
+        _1.pay_mana(generic: { green: 2 }, green: 1)
+      end
 
       p1.add_mana(blue: 1)
-      action_2 = Magic::Actions::Cast.new(player: p2, card: annul)
-      expect(action_2.can_target?(action)).to eq(false)
+      p1.prepare_action(Magic::Actions::Cast, card: annul) do |action|
+        expect { action.targeting(wood_elves_cast) }.to raise_error(Magic::Actions::Cast::InvalidTarget)
+      end
     end
   end
 end

@@ -8,9 +8,9 @@ RSpec.describe Magic::Cards::GoblinWizardry do
   context "casting Goblin Wizardry" do
     before do
       p1.add_mana(red: 4)
-      action = Magic::Actions::Cast.new(player: p1, card: goblin_wizardry)
-        .pay_mana(generic: { red: 3 }, red: 1)
-      game.take_action(action)
+      p1.cast(card: goblin_wizardry) do
+        _1.pay_mana(generic: { red: 3 }, red: 1)
+      end
       game.tick!
     end
 

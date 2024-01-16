@@ -40,7 +40,7 @@ module Magic
     def add_players(*players)
       players.each(&method(:add_player))
     end
-
+\
     def add_player(player)
       @player_count += 1
       @players << player

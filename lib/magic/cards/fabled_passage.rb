@@ -2,7 +2,6 @@ module Magic
   module Cards
     class FabledPassage < Land
       NAME = "Fabled Passage"
-      TYPE_LINE = "Land"
 
       def target_choices(receiver)
         receiver.controller.library.basic_lands
@@ -30,9 +29,7 @@ module Magic
         end
       end
 
-      def activated_abilities
-        [ActivatedAbility]
-      end
+      def activated_abilities = [ActivatedAbility]
     end
   end
 end

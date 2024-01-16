@@ -16,11 +16,20 @@ RSpec.describe Magic::Cards::MakeshiftBatallion do
     it "gets a +1/+1 counter when both elves attack" do
       current_turn.declare_attackers!
 
-      action_1 = Magic::Actions::DeclareAttacker.new(player: p1, attacker: makeshift_batallion, target: p2)
-      action_2 = Magic::Actions::DeclareAttacker.new(player: p1, attacker: wood_elves_1, target: p2)
-      action_3 = Magic::Actions::DeclareAttacker.new(player: p1, attacker: wood_elves_2, target: p2)
+      p1.declare_attacker(
+        attacker: makeshift_batallion,
+        target: p2,
+      )
 
-      game.take_actions(action_1, action_2, action_3)
+      p1.declare_attacker(
+        attacker: wood_elves_1,
+        target: p2,
+      )
+
+      p1.declare_attacker(
+        attacker: wood_elves_2,
+        target: p2,
+      )
 
       current_turn.attackers_declared!
 
@@ -31,13 +40,13 @@ RSpec.describe Magic::Cards::MakeshiftBatallion do
     it "gets no counters when only one elf attacks" do
       current_turn.declare_attackers!
 
-      current_turn.declare_attacker(
-        makeshift_batallion,
+      p1.declare_attacker(
+        attacker: makeshift_batallion,
         target: p2,
       )
 
-      current_turn.declare_attacker(
-        wood_elves_1,
+      p1.declare_attacker(
+        attacker: wood_elves_1,
         target: p2,
       )
 
@@ -51,13 +60,13 @@ RSpec.describe Magic::Cards::MakeshiftBatallion do
     it "gets no counters when falconer adept attacks" do
       current_turn.declare_attackers!
 
-      current_turn.declare_attacker(
-        makeshift_batallion,
+      p1.declare_attacker(
+        attacker: makeshift_batallion,
         target: p2,
       )
 
-      current_turn.declare_attacker(
-        falconer_adept,
+      p1.declare_attacker(
+        attacker: falconer_adept,
         target: p2,
       )
 

@@ -10,10 +10,10 @@ RSpec.describe Magic::Cards::SecureTheScene do
 
     it "exiles the wood elves, replaces them with a 1/1 White Soldier" do
       p1.add_mana(white: 5)
-      action = Magic::Actions::Cast.new(player: p1, card: secure_the_scene)
-        .pay_mana(generic: { white: 4 }, white: 1)
-        .targeting(wood_elves)
-      game.take_action(action)
+      p1.cast(card: secure_the_scene) do
+        _1.pay_mana(generic: { white: 4 }, white: 1)
+          .targeting(wood_elves)
+      end
       game.tick!
 
       expect(wood_elves.card.zone).to be_exile

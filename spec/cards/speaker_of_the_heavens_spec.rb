@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::SpeakerOfTheHeavens do
   it "activated ability" do
     p1.gain_life(7)
     ability = speaker_of_the_heavens.activated_abilities.first
-    action = Magic::Actions::ActivateAbility.new(player: p1, permanent: speaker_of_the_heavens, ability: ability)
+    action = p1.prepare_activate_ability(ability: ability)
     expect(action.can_be_activated?(p1)).to eq(true)
     action.pay_tap
     action.finalize_costs!(p1)

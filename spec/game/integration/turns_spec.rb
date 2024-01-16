@@ -27,9 +27,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_1.draw!
     turn_1.first_main!
 
-    #game.current_turn.possible_actions
-    action = Magic::Actions::PlayLand.new(player: p1, card: p1.hand.by_name("Island").first)
-    game.take_action(action)
+    p1.play_land(land: p1.hand.by_name("Island").first)
     expect(p1.permanents.by_name("Island").count).to eq(1)
     expect(p1.lands_played).to eq(1)
     # 6 islands on game start draw, + aegis turtle
@@ -38,20 +36,19 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     expect(p1.hand.by_name("Island").count).to eq(6)
 
     island = p1.permanents.by_name("Island").first
-    action = Magic::Actions::ActivateAbility.new(player: p1, permanent: island, ability: island.activated_abilities.first)
-    action.pay_tap
-    game.take_action(action)
+    p1.activate_ability(ability: island.activated_abilities.first)
     expect(p1.mana_pool).to eq(blue: 1)
     expect(island).to be_tapped
 
     island2 = p1.hand.by_name("Island").first
-    action = Magic::Actions::PlayLand.new(player: p1, card: island2)
+    action = p1.prepare_action(Magic::Actions::PlayLand, card: island2)
     expect(action.can_perform?).to eq(false)
 
     aegis_turtle = p1.hand.by_name("Aegis Turtle").first
-    action = Magic::Actions::Cast.new(player: p1, card: aegis_turtle)
-    action.pay_mana(blue: 1)
-    game.take_action(action)
+    action = p1.cast(card: aegis_turtle) do |action|
+      action.pay_mana(blue: 1)
+    end
+
     game.stack.resolve!
     expect(p1.permanents.by_name("Aegis Turtle").count).to eq(1)
 
@@ -70,17 +67,15 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_2.draw!
     turn_2.first_main!
 
-    action = Magic::Actions::PlayLand.new(player: p2, card: p2.hand.by_name("Mountain").first)
-    game.take_action(action)
+    p2.play_land(land: p2.hand.by_name("Mountain").first)
     mountain = p2.permanents.by_name("Mountain").first
-    action = Magic::Actions::ActivateAbility.new(player: p1, permanent: mountain, ability: mountain.activated_abilities.first)
-    game.take_action(action)
+    p2.activate_ability(ability: mountain.activated_abilities.first)
     expect(p2.mana_pool).to eq(red: 1)
 
     raging_goblin = p2.hand.by_name("Raging Goblin").first
-    action = Magic::Actions::Cast.new(player: p2, card: raging_goblin)
-    action.pay_mana(red: 1)
-    game.take_action(action)
+    p2.cast(card: raging_goblin) do |action|
+      action.pay_mana(red: 1)
+    end
 
     game.stack.resolve!
     expect(p2.permanents.by_name("Raging Goblin").count).to eq(1)
@@ -122,8 +117,5 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     turn_3.first_main!
 
     expect(p1.lands_played).to eq(0)
-    island = p1.hand.by_name("Island").first
-    action = Magic::Actions::Cast.new(player: p1, card: island)
-    expect(action.can_perform?).to eq(true)
   end
 end

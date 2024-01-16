@@ -10,9 +10,9 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
     let(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
     it "targets the wood elves" do
-      action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: ugin, ability: ability)
-        .targeting(wood_elves)
-      game.take_action(action)
+      p1.activate_loyalty_ability(ability: ability) do
+        _1.targeting(wood_elves)
+      end
       game.stack.resolve!
       expect(subject.loyalty).to eq(9)
       expect(wood_elves.damage).to eq(3)
@@ -20,9 +20,9 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
 
     it "targets the other player" do
       p2_starting_life = p2.life
-      action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: ugin, ability: ability)
-        .targeting(p2)
-      game.take_action(action)
+      p1.activate_loyalty_ability(ability: ability) do
+        _1.targeting(p2)
+      end
       game.stack.resolve!
       expect(p2.life).to eq(p2_starting_life - 3)
     end
@@ -34,9 +34,9 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
     let!(:sol_ring) { ResolvePermanent("Sol Ring", owner: p2) }
 
     it "exiles wood elves, leaves the sol ring" do
-      action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: ugin, ability: ability)
-        .value_for_x(3)
-      game.take_action(action)
+      p1.activate_loyalty_ability(ability: ability) do
+        _1.value_for_x(3)
+      end
       game.stack.resolve!
       expect(subject.loyalty).to eq(4)
       # Wood elves has a color, so it goes
@@ -68,8 +68,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
     end
 
     it "controller gains 7 life, draws 7 cards and moves 7 permanents to the battlefield" do
-      action = Magic::Actions::ActivateLoyaltyAbility.new(player: p1, planeswalker: ugin, ability: ability)
-      game.take_action(action)
+      p1.activate_loyalty_ability(ability: ability)
       game.stack.resolve!
       expect(subject.loyalty).to eq(0)
       expect(subject.zone).to be_nil

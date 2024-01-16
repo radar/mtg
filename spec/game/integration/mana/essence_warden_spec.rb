@@ -11,9 +11,8 @@ RSpec.describe Magic::Game, "Mana spend -- Essence Warden" do
       end
 
       it "cannot cast the essence warden" do
-        action = Magic::Actions::Cast.new(player: p1, card: essence_warden)
+        action = p1.prepare_cast(card: essence_warden)
         expect(action.can_perform?).to eq(false)
-
       end
     end
 
@@ -27,16 +26,14 @@ RSpec.describe Magic::Game, "Mana spend -- Essence Warden" do
       end
 
       it "casts a forest, then an essence warden" do
-        action = Magic::Actions::Cast.new(player: p1, card: forest)
-        expect(action.can_perform?).to eq(true)
-        game.take_action(action)
+        p1.play_land(land: forest)
         game.tick!
 
         forest = p1.permanents.by_name("Forest").first
-        action = Magic::Actions::ActivateAbility.new(player: p1, permanent: forest, ability: forest.activated_abilities.first)
-        game.take_action(action)
+        p1.activate_ability(ability: forest.activated_abilities.first)
         expect(p1.mana_pool[:green]).to eq(1)
-        action = Magic::Actions::Cast.new(player: p1, card: essence_warden)
+
+        action = p1.prepare_cast(card: essence_warden)
         expect(action.can_perform?).to eq(true)
         action.pay_mana(green: 1)
         game.take_action(action)

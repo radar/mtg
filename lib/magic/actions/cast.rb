@@ -3,6 +3,8 @@ module Magic
     class Cast < Action
       extend Forwardable
 
+      class InvalidTarget < StandardError; end
+
       def_delegators :@card, :enchantment?, :artifact?
       attr_reader :card, :targets
       def initialize(card:, **args)
@@ -47,6 +49,10 @@ module Magic
         end
       end
 
+      def auto_pay
+        mana_cost.auto_pay(player)
+      end
+
       def kicker_cost
         card.kicker_cost
       end
@@ -69,7 +75,7 @@ module Magic
 
       def targeting(*targets)
         targets.each do |target|
-          raise "Invalid target for #{card.name}: #{target}" unless can_target?(target)
+          raise InvalidTarget, "Invalid target for #{card.name}: #{target}" unless can_target?(target)
         end
         @targets = targets
         self

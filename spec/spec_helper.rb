@@ -25,9 +25,10 @@ module CardHelper
     card
   end
 
-  def cast_action(card:, player:, targeting: nil)
-    action = Magic::Actions::Cast.new(card: card, player: player)
+  def cast_action(card:, player:, targeting: nil, &block)
+    action = Magic::Actions::Cast.new(card: card, player: player, game: game)
     action.targeting(targeting) if targeting
+    yield action if block_given?
     action
   end
 
@@ -36,8 +37,8 @@ module CardHelper
     game.stack.resolve!
   end
 
-  def cast_and_resolve(card:, player:, targeting: nil)
-    action = cast_action(card: card, player: player, targeting: targeting)
+  def cast_and_resolve(card:, player:, targeting: nil, &block)
+    action = cast_action(card: card, player: player, targeting: targeting, &block)
     game.stack.add(action)
     game.stack.resolve!
   end

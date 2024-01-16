@@ -12,7 +12,7 @@ module Magic
         @loyalty += change
         destroy! if loyalty <= 0
       end
-      
+
       def take_damage(source:, damage:)
         game.notify!(
           Events::DamageDealt.new(
@@ -24,9 +24,8 @@ module Magic
         change_loyalty!(- damage)
       end
 
-
       def loyalty_abilities
-        card.loyalty_abilities
+        card.loyalty_abilities.map { |ability| ability.new(planeswalker: self) }
       end
     end
   end

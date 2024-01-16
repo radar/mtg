@@ -15,10 +15,11 @@ RSpec.describe Magic::Cards::AronBenaliasRuin do
     it "puts a +1/+1 counter on all creatures under p1's control" do
       expect(subject.activated_abilities.count).to eq(1)
       p1.add_mana(white: 1, black: 1)
-      action = Magic::Actions::ActivateAbility.new(permanent: subject, ability: subject.activated_abilities.first, player: p1)
-      action.pay_mana(white: 1, black: 1)
-      action.pay(p1, :sacrifice, wood_elves)
-      game.take_action(action)
+
+      p1.activate_ability(ability: subject.activated_abilities.first) do
+        _1.pay_mana(white: 1, black: 1)
+        _1.pay_sacrifice(wood_elves)
+      end
       game.stack.resolve!
 
       aggregate_failures do

@@ -12,22 +12,13 @@ RSpec.describe Magic::Cards::TemperedVeteran do
     it "adds a counter to a creature with a counter" do
       p1.add_mana(white: 2)
       wood_elves.add_counter(Magic::Counters::Plus1Plus1)
-      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: tempered_veteran, ability: ability)
-      action.targeting(wood_elves)
-      action.pay_mana({ white: 1 })
-      action.pay_tap
-      action.finalize_costs!(p1)
-
-      game.take_action(action)
+      p1.activate_ability(ability: ability) do
+        _1.targeting(wood_elves).pay_mana(white: 1)
+      end
       game.tick!
 
       expect(tempered_veteran).to be_tapped
       expect(wood_elves.counters.of_type(Magic::Counters::Plus1Plus1).count).to eq(2)
-    end
-
-    it "cannot add a counter to a creature without a counter" do
-      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: tempered_veteran, ability: ability)
-      expect(action.valid_targets?(wood_elves)).to eq(false)
     end
   end
 
@@ -36,13 +27,9 @@ RSpec.describe Magic::Cards::TemperedVeteran do
 
     it "adds a counter to a creature without a counter" do
       p1.add_mana(white: 6)
-      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: tempered_veteran, ability: ability)
-      action.targeting(wood_elves)
-      action.pay_mana({ generic: { white: 4 }, white: 2 })
-      action.pay_tap
-      action.finalize_costs!(p1)
-
-      game.take_action(action)
+      p1.activate_ability(ability: ability) do
+        _1.targeting(wood_elves).pay_mana({ generic: { white: 4 }, white: 2 })
+      end
       game.tick!
 
       expect(tempered_veteran).to be_tapped

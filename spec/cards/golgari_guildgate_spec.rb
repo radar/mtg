@@ -6,8 +6,7 @@ RSpec.describe Magic::Cards::GolgariGuildgate do
   let(:card) { described_class.new(game: game) }
 
   let!(:permanent) do
-    action = Magic::Actions::PlayLand.new(player: p1, card: card)
-    game.take_action(action)
+    p1.play_land(land: card)
     p1.permanents.by_name("Golgari Guildgate").first
   end
 
@@ -17,9 +16,9 @@ RSpec.describe Magic::Cards::GolgariGuildgate do
   end
 
   it "taps for either black or green" do
-    action = Magic::Actions::ActivateAbility.new(player: p1, permanent: permanent, ability: card.activated_abilities.first)
-    action.pay_tap
-    game.take_action(action)
+    p1.activate_ability(ability: permanent.activated_abilities.first) do
+      _1.pay_tap
+    end
     game.resolve_pending_effect(black: 1)
     expect(game.effects).to be_empty
     expect(p1.mana_pool[:black]).to eq(1)

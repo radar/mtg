@@ -9,10 +9,11 @@ RSpec.describe Magic::Cards::SanctumOfTranquilLight do
     it "taps wood elves" do
       expect(subject.activated_abilities.count).to eq(1)
       p1.add_mana(white: 5)
-      action = Magic::Actions::ActivateAbility.new(player: p1, permanent: subject, ability: subject.activated_abilities.first)
-        .pay_mana(generic: { white: 4 }, white: 1)
-        .targeting(wood_elves)
-      game.take_action(action)
+      p1.activate_ability(ability: subject.activated_abilities.first) do
+        _1
+          .pay_mana(generic: { white: 4 }, white: 1)
+          .targeting(wood_elves)
+      end
       game.stack.resolve!
       expect(wood_elves).to be_tapped
     end
