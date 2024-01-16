@@ -98,5 +98,9 @@ module Magic
     def skip_choice!
       choices.shift
     end
+
+    def skip_choice!
+      choices.shift
+    end
   end
 end
