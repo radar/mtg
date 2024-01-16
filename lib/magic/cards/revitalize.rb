@@ -5,7 +5,7 @@ module Magic
     end
 
     class Revitalize < Instant
-      def resolve!(controller)
+      def resolve!
         controller.gain_life(3)
         controller.draw!
 

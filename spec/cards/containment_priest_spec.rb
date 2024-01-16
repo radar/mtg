@@ -56,7 +56,7 @@ RSpec.describe Magic::Cards::ContainmentPriest do
       it "exiles the creature" do
         p2.graveyard << Card('Story Seeker')
         p2.add_mana(black: 5)
-        p2.cast(card: Card("Rise Again")) do
+        p2.cast(card: Card("Rise Again", owner: p2)) do
           _1
             .pay_mana(generic: { black: 4 }, black: 1)
             .targeting(p2.graveyard.cards.first)

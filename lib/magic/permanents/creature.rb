@@ -59,6 +59,14 @@ module Magic
           static_ability_mods.sum(&:toughness)
       end
 
+      def modify_power!(amount)
+        modify_power_toughness!(power: amount)
+      end
+
+      def modify_power_toughness!(power: 0, toughness: 0)
+        @modifiers << PowerToughnessModification.new(power:, toughness:)
+      end
+
       def take_damage(source:, damage:)
         game.notify!(
           Events::DamageDealt.new(

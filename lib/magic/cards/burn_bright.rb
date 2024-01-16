@@ -5,9 +5,9 @@ module Magic
     end
 
     class BurnBright < Instant
-      def resolve!(controller)
-        controller.creatures.each do |creature|
-           creature.modifiers << Magic::Permanents::Creature::PowerToughnessModification.new(power: 2, toughness: 0, until_eot: true)
+      def resolve!
+        controller.creatures.each do
+          _1.modify_power!(2)
         end
 
         super

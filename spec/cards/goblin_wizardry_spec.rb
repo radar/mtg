@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::GoblinWizardry do
   include_context "two player game"
 
-  subject(:goblin_wizardry) { described_class.new(game: game) }
+  subject(:goblin_wizardry) { Card("Goblin Wizardry") }
 
   context "casting Goblin Wizardry" do
     before do

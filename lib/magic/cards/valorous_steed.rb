@@ -10,7 +10,7 @@ module Magic
 
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          Permanent.resolve(game: game, owner: controller, card: Tokens::Knight.new)
+          controller.create_token(token: Tokens::Knight)
         end
       end
 

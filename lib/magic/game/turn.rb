@@ -162,6 +162,7 @@ module Magic
           attacks: attacks,
         ))
 
+
         if combat.attackers_without_targets?
           finalize_attackers!
         else

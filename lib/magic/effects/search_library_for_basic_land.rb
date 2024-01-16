@@ -8,7 +8,7 @@ module Magic
       end
 
       def resolve(target)
-        permanent = target.resolve!(source.controller, enters_tapped: enters_tapped)
+        permanent = target.resolve!(enters_tapped: enters_tapped)
         source.controller.shuffle!
         permanent
       end

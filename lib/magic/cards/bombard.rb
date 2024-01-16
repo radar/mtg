@@ -13,7 +13,7 @@ module Magic
         game.battlefield.creatures
       end
 
-      def resolve!(_controller, target:)
+      def resolve!(target:)
         game.add_effect(Effects::DealDamage.new(source: self, targets: [target], damage: 4))
       end
     end

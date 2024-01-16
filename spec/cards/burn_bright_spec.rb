@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::BurnBright do
   include_context "two player game"
 
-  let!(:burn_bright) { described_class.new(game: game) }
+  let!(:burn_bright) { Card("Burn Bright") }
 
   context "with 2 creature in play" do
 

@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::RampantGrowth do
   include_context "two player game"
 
-  let(:card) { described_class.new(game: game) }
+  let(:card) { Card("Rampant Growth") }
 
   def p1_library
     9.times.map { Card("Forest") }

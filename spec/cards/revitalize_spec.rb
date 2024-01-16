@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::Revitalize do
   include_context "two player game"
 
-  subject { described_class.new(game: game) }
+  subject { Card("Revitalize") }
 
   context "cast" do
     it "adds a life to controller's life total, and draws a single card" do

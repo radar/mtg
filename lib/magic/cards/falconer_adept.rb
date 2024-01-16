@@ -12,7 +12,7 @@ module Magic
         {
           Events::PreliminaryAttackersDeclared => -> (receiver, event) do
             return if event.attacks.none? { |attack| attack.attacker == receiver }
-            token = Permanent.resolve(game: game, owner: receiver.controller, card: Tokens::Bird.new, enters_tapped: true)
+            token = controller.create_token(token: Tokens::Bird, enters_tapped: true)
             game.current_turn.declare_attacker(token)
           end
         }

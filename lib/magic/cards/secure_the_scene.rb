@@ -13,10 +13,10 @@ module Magic
         true
       end
 
-      def resolve!(controller, target:)
+      def resolve!(target:)
         target.exile!
 
-        Permanent.resolve(game: game, owner: target.controller, card: Tokens::Soldier.new)
+        target.controller.create_token(token: Tokens::Soldier)
 
         super
       end

@@ -10,10 +10,7 @@ RSpec.describe Magic::Cards::LathrilBladeOfTheElves do
   end
 
   it "activated ability" do
-    elves = 10.times.map do
-      token = Magic::Tokens::ElfWarrior.new(game: game)
-      token.resolve!(p1)
-    end
+    elves = p1.create_tokens(token: Magic::Tokens::ElfWarrior, amount: 10)
 
     p1.activate_ability(ability: subject.activated_abilities.first) do
       _1.pay_multi_tap(elves)

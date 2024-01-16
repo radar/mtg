@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::Opt do
   include_context "two player game"
 
-  let(:opt) { described_class.new(game: game) }
+  let(:opt) { Card("Opt") }
 
   def p1_library
     [

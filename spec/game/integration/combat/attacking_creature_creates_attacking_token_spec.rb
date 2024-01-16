@@ -16,16 +16,16 @@ RSpec.describe Magic::Game, "combat -- attacking creature creates attacking toke
 
       current_turn.declare_attackers!
 
-      current_turn.declare_attacker(
-        falconer_adept,
-        target: p2,
+      p1.declare_attacker(
+        attacker: falconer_adept,
+        target: p2
       )
 
       current_turn.attackers_declared!
       bird = current_turn.battlefield.creatures.find { |creature| creature.name == "Bird" }
-      expect(current_turn.step?(:finalize_attackers)).to eq(true)
-
       expect(bird).not_to be_nil
+
+      expect(current_turn.step?(:finalize_attackers)).to eq(true)
       current_turn.choose_attacker_target(
         bird,
         target: p2,

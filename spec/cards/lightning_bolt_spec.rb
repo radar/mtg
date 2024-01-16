@@ -5,7 +5,7 @@ RSpec.describe Magic::Cards::LightningBolt do
 
   let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
-  let(:lightning_bolt) { described_class.new(game: game) }
+  let(:lightning_bolt) { Card("Lightning Bolt") }
 
   it "destroys the wood elves" do
     p1.add_mana(red: 3)

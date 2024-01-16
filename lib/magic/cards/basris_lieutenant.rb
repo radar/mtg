@@ -29,8 +29,7 @@ module Magic
             return unless event.permanent.controller == receiver.controller
 
             if event.permanent.counters.any? { |counter| counter.is_a?(Counters::Plus1Plus1) }
-              token = Tokens::Knight.new(game: game)
-              token.resolve!(receiver.controller)
+              receiver.controller.create_token(token: Tokens::Knight)
             end
           end
         }

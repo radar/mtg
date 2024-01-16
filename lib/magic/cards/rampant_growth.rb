@@ -5,7 +5,7 @@ module Magic
     end
 
     class RampantGrowth < Sorcery
-      def resolve!(controller)
+      def resolve!
         effect = Effects::SearchLibraryForBasicLand.new(
           source: self,
           enters_tapped: true,

@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::SecureTheScene do
   include_context "two player game"
 
-  subject(:secure_the_scene) { described_class.new(game: game) }
+  subject(:secure_the_scene) { Card("Secure The Scene") }
 
   context "with a creature" do
     let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }

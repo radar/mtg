@@ -14,10 +14,12 @@ module Magic
         battlefield.cards.by_any_type(T::Creature, T::Planeswalker)
       end
 
-      def resolve!(_controller, target:)
+      def resolve!(target:)
         target.exile!
 
-        Permanent.resolve(game: game, owner: target.controller, card: Tokens::Angel.new)
+        controller = target.controller
+
+        Permanent.resolve(game: game, owner: controller, card: Tokens::Angel.new(owner: controller))
       end
     end
   end

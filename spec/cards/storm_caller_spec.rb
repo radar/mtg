@@ -7,7 +7,7 @@ RSpec.describe Magic::Cards::StormCaller do
 
   it "deals 2 damage to each opponent" do
     p2_starting_life = p2.life
-    card.resolve!(p1)
+    card.resolve!
 
     expect(p2.life).to eq(p2_starting_life - 2)
   end

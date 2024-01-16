@@ -13,7 +13,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
   end
 
   let(:p2_library) do
-    6.times.map { mountain.dup } + [raging_goblin, mountain.dup]
+    6.times.map { Card("Mountain", owner: p2) } + [Card("Raging Goblin", owner: p2), Card("Mountain", owner: p2)]
   end
 
   it "walks through two turns" do

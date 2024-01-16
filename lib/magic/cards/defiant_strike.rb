@@ -13,7 +13,7 @@ module Magic
         true
       end
 
-      def resolve!(controller, target:)
+      def resolve!(target:)
         if target.zone == battlefield
           game.add_effect(
             Effects::ApplyPowerToughnessModification.new(

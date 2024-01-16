@@ -5,7 +5,7 @@ RSpec.describe Magic::Cards::Eliminate do
 
   let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
-  let(:eliminate) { described_class.new(game: game) }
+  let(:eliminate) { Card("Eliminate") }
 
   it "destroys the wood elves" do
     p2_starting_life = p2.life

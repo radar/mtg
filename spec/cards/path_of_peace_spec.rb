@@ -5,7 +5,7 @@ RSpec.describe Magic::Cards::PathOfPeace do
 
   let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", owner: p2) }
 
-  let(:card) { described_class.new(game: game) }
+  let(:card) { Card("Path Of Peace") }
 
   it "destroys Loxodon Wayfarer" do
     p2_starting_life = p2.life

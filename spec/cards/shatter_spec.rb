@@ -4,7 +4,7 @@ RSpec.describe Magic::Cards::Shatter do
   include_context "two player game"
 
   let(:great_furnace) { ResolvePermanent("Great Furnace", owner: p1) }
-  let(:card) { described_class.new(game: game) }
+  let(:card) { Card("Shatter") }
 
   it "destroys the great furnace" do
     p1.add_mana(red: 2)

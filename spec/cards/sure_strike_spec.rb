@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::SureStrike do
   include_context "two player game"
 
-  let!(:sure_strike) { described_class.new(game: game) }
+  let!(:sure_strike) { Card("Sure Strike") }
   let!(:onakke_ogre) { ResolvePermanent("Onakke Ogre", owner: p1) }
   context "with a creature in play" do
 

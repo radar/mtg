@@ -13,11 +13,11 @@ module Magic
         true
       end
 
-      def resolve!(controller, target:)
+      def resolve!(target:)
         target.destroy!
         target.controller.gain_life(4)
 
-        super(controller)
+        super
       end
     end
   end

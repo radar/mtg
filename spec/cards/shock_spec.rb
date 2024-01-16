@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::Shock do
   include_context "two player game"
 
-  let!(:shock) { described_class.new(game: game) }
+  let!(:shock) { Card("Shock") }
   let!(:cloudkin_seer) { ResolvePermanent("Cloudkin Seer", owner: p2) }
   let(:basri_ket) { ResolvePermanent("Basri Ket", owner: p2) }
 

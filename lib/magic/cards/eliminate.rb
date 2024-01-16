@@ -13,7 +13,7 @@ module Magic
         game.battlefield.creatures.cmc_lte(3)
       end
 
-      def resolve!(_controller, target:)
+      def resolve!(target:)
         game.add_effect(
           Effects::DestroyTarget.new(choices: target_choices, source: self, targets: [target])
         )

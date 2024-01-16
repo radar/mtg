@@ -13,7 +13,7 @@ module Magic
         battlefield.cards.by_any_type("Artifact", "Enchantment")
       end
 
-      def resolve!(_controller, target:)
+      def resolve!(target:)
         Effects::Exile.new(source: self).resolve(target)
       end
     end

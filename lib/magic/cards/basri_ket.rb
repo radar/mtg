@@ -12,7 +12,7 @@ module Magic
             return unless event.active_player == owner
             game = owner.game
 
-            Permanent.resolve(game: game, owner: owner, card: Tokens::Soldier.new)
+            owner.create_token(token: Tokens::Soldier)
 
             owner.creatures.each do |creature|
               creature.add_counter(Counters::Plus1Plus1)
@@ -45,7 +45,7 @@ module Magic
               attackers = game.current_turn.attacks.count
 
               attackers.times do
-                token = Permanent.resolve(game: game, owner: planeswalker.controller, card: Tokens::Soldier.new, enters_tapped: true)
+                token = planeswalker.controller.create_token(token: Tokens::Soldier, enters_tapped: true)
 
                 game.current_turn.declare_attacker(token)
               end

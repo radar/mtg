@@ -4,7 +4,7 @@ RSpec.describe Magic::Cards::Annul do
   include_context "two player game"
 
   let(:sol_ring) { Card("Sol Ring") }
-  subject(:annul) { described_class.new(game: game) }
+  subject(:annul) { Card("Annul") }
 
   before do
     p1.hand.add(annul)

@@ -5,7 +5,7 @@ module Magic
     end
 
     class Opt < Instant
-      def resolve!(_controller)
+      def resolve!
         game.add_effect(
           Effects::Scry.new(source: self, amount: 1, then_do: -> do
             game.add_effect(Effects::DrawCards.new(source: self, player: controller))

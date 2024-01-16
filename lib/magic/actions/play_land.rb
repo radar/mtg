@@ -17,7 +17,7 @@ module Magic
       end
 
       def perform
-        card.resolve!(player)
+        card.resolve!
       end
     end
   end

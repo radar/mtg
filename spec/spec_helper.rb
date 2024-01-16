@@ -3,8 +3,8 @@ require "pry"
 require "magic"
 
 module CardHelper
-  def Card(name, **args)
-    Magic::Cards.const_get(name.gsub(/[^a-z]/i, "").gsub(/\s(a-z)/) { $1.upcase }).new(game: game, **args)
+  def Card(name, owner: p1, **args)
+    Magic::Cards.const_get(name.gsub(/[^a-z]/i, "").gsub(/\s(a-z)/) { $1.upcase }).new(game: game, owner:, **args)
   end
 
   def Permanent(name, **args)
@@ -20,12 +20,12 @@ module CardHelper
   end
 
   def add_to_library(name, player:)
-    card = Card(name)
+    card = Card(name, owner: player)
     player.library.add(card)
     card
   end
 
-  def cast_action(card:, player:, targeting: nil, &block)
+  def cast_action(card:, player: card.owner, targeting: nil, &block)
     action = Magic::Actions::Cast.new(card: card, player: player, game: game)
     action.targeting(targeting) if targeting
     yield action if block_given?

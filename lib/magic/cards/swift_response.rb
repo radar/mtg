@@ -13,7 +13,7 @@ module Magic
         battlefield.select { |c| c.tapped? && c.creature? }
       end
 
-      def resolve!(_controller, target:)
+      def resolve!(target:)
         game.add_effect(Effects::DestroyTarget.new(choices: target_choices, source: self, targets: [target]))
       end
     end

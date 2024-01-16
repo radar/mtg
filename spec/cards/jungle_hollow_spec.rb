@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::JungleHollow do
   include_context "two player game"
 
-  let(:card) { described_class.new(game: game) }
+  let(:card) { Card("Jungle Hollow") }
 
   let!(:permanent) do
     p1.play_land(land: card)

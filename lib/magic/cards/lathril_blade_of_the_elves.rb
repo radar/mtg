@@ -36,10 +36,7 @@ module Magic
           Events::CombatDamageDealt => -> (receiver, event) do
             return unless event.target.player?
 
-            event.damage.times do
-              token = Tokens::ElfWarrior.new(game: game)
-              token.resolve!(receiver.controller)
-            end
+            controller.create_tokens(token: Tokens::ElfWarrior, amount: event.damage)
           end
         }
       end

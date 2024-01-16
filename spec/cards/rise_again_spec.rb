@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::RiseAgain do
   include_context "two player game"
 
-  let(:card) { described_class.new(game: game) }
+  let(:card) { Card("Rise Again") }
   let(:wood_elves) { Card("Wood Elves") }
 
   context "brings back creature from player's graveyard" do

@@ -13,7 +13,7 @@ module Magic
         true
       end
 
-      def resolve!(_controller, target:)
+      def resolve!(target:)
         target.destroy!
         super
       end

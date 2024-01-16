@@ -5,11 +5,11 @@ RSpec.describe Magic::Cards::MistralSinger do
 
   subject! { ResolvePermanent("Mistral Singer", owner: p2) }
 
-  context 'base card atrributes' do 
+  context 'base card atrributes' do
     it "is a siren" do
       expect(subject.card.type_line).to eq("Creature -- Siren")
     end
-  
+
     it "Has flying" do
       expect(subject.flying?).to eq(true)
     end
@@ -23,7 +23,7 @@ RSpec.describe Magic::Cards::MistralSinger do
   context "when a non-creature spell has been cast" do
     before do
       p2.add_mana(white: 1, blue: 1)
-      action = cast_action(player: p2, card: Card("Revitalize"))
+      action = cast_action(player: p2, card: Card("Revitalize", owner: p2))
         .pay_mana(white: 1, generic: { blue: 1 })
         .perform
       game.tick!

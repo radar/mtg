@@ -7,10 +7,10 @@ module Magic
     FranticInventory = Instant("Frantic Inventory") do
       cost generic: 1, blue: 1
 
-      def resolve!(player)
-        player.draw!
-        player.graveyard.by_card(self).each do |card|
-          player.draw!
+      def resolve!
+        owner.draw!
+        owner.graveyard.by_card(self).each do |card|
+          owner.draw!
         end
       end
     end

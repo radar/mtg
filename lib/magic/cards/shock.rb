@@ -11,7 +11,7 @@ module Magic
         true
       end
 
-      def resolve!(_controller, target:)
+      def resolve!(target:)
         game.add_effect(Effects::DealDamage.new(source: self, targets: [target], damage: 2))
       end
     end

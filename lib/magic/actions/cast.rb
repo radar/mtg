@@ -11,7 +11,6 @@ module Magic
         super(**args)
         @card = card
         @targets = []
-        @card.controller = player
       end
 
       def inspect
@@ -104,7 +103,7 @@ module Magic
         args[:targets] = targets if resolve_method.parameters.include?([:keyreq, :targets])
         args[:kicked] = kicker_cost.paid? if resolve_method.parameters.include?([:key, :kicked])
 
-        resolve_method.call(player, **args)
+        resolve_method.call(**args)
 
         if card.instant? || card.sorcery?
           card.move_to_graveyard!(player)

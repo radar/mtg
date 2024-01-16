@@ -13,7 +13,7 @@ module Magic
         true
       end
 
-      def resolve!(controller, target:)
+      def resolve!(target:)
         effect = Effects::ApplyPowerToughnessModification.new(
           source: self,
           power: -4,

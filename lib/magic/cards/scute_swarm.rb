@@ -10,13 +10,10 @@ module Magic
       def event_handlers
         {
           Events::Landfall => -> (receiver, event) do
-            lands = battlefield.controlled_by(receiver.controller).lands.count
+            controller = receiver.controller
+            lands = battlefield.controlled_by(controller).lands.count
             if lands < 6
-              token = Permanent.resolve(
-                game: game,
-                owner: receiver.controller,
-                card: Tokens::Insect.new
-              )
+              controller.create_token(token: Tokens::Insect)
             else
               token = Permanent.resolve(
                 game: game,

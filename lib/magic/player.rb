@@ -85,13 +85,25 @@ module Magic
       action
     end
 
-    def declare_attacker(attacker:, target:, **args)
+    def prepare_declare_attacker(attacker:, target: nil, **args)
+      prepare_action(Magic::Actions::DeclareAttacker, attacker: attacker, target: target, **args)
+    end
+
+    def declare_attacker(attacker:, target: nil, **args)
       action = prepare_action(Magic::Actions::DeclareAttacker, attacker: attacker, target: target, **args)
       game.take_action(action)
       action
     end
 
+    def create_tokens(token:, amount: 1, enters_tapped: false)
+      tokens = amount.times.map do
+        token.new(game: game, owner: self).resolve!(enters_tapped: enters_tapped)
+      end
+    end
 
+    def create_token(token:, **args)
+      create_tokens(token: token, amount: 1, **args).first
+    end
 
     def lost?
       @lost

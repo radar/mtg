@@ -5,7 +5,7 @@ RSpec.describe Magic::Cards::SwiftResponse do
 
   let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
-  let(:swift_response) { described_class.new(game: game) }
+  let(:swift_response) { Card("Swift Response") }
 
   it "destroys the wood elves" do
     wood_elves.tap!

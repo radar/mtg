@@ -13,7 +13,7 @@ module Magic
         game.battlefield.creatures
       end
 
-      def resolve!(controller, target:)
+      def resolve!(target:)
         if target.zone == battlefield
           target.grant_keyword(Keywords::TRAMPLE, until_eot: true)
           controller.draw!

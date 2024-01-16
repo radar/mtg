@@ -13,7 +13,7 @@ module Magic
         true
       end
 
-      def resolve!(controller, target:)
+      def resolve!(target:)
         Permanent.resolve(game: game, owner: controller, from_zone: controller.graveyard, card: target, cast: false)
 
         super

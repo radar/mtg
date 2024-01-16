@@ -11,7 +11,7 @@ module Magic
         battlefield.creatures
       end
 
-      def resolve!(controller, target:)
+      def resolve!(target:)
         game.add_effect(Effects::ApplyPowerToughnessModification.new(source: self, power: 3, targets: target))
         target.grant_keyword(Keywords::FIRST_STRIKE, until_eot: true)
       end

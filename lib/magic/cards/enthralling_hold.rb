@@ -15,8 +15,8 @@ module Magic
         battlefield.creatures.tapped
       end
 
-      def resolve!(player, target:)
-        target.controller = player
+      def resolve!(target:)
+        target.controller = owner
 
         super
       end

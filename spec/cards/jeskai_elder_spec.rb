@@ -34,7 +34,7 @@ RSpec.describe Magic::Cards::JeskaiElder do
   context "when a non-creature spell has been cast by the other player" do
     before do
       p2.add_mana(green: 2)
-      action = cast_action(player: p2, card: Card("Rampant Growth"))
+      action = cast_action(card: Card("Rampant Growth", owner: p2))
         .pay_mana(green: 1, generic: { green: 1 })
         .perform
       game.tick!

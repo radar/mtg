@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Card do
   include_context "two player game"
-  subject { Magic::Cards::Forest.new(game: game) }
+  subject { Card("Forest") }
 
   before do
     p1.library.add(subject)

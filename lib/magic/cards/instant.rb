@@ -3,7 +3,7 @@ module Magic
     class Instant < Card
       TYPE_LINE = "Instant"
 
-      def resolve!(controller, **args)
+      def resolve!(**args)
         move_zone!(controller.graveyard)
       end
     end

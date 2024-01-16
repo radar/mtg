@@ -5,7 +5,7 @@ module Magic
     def_delegators :@game, :logger, :battlefield, :exile, :current_turn
 
     include Cards::Keywords
-    attr_reader :game, :controller, :name, :cost, :kicker_cost, :type_line, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :counters
+    attr_reader :game, :controller, :owner, :name, :cost, :kicker_cost, :type_line, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :counters
     attr_accessor :tapped
 
     attr_accessor :zone
@@ -57,7 +57,7 @@ module Magic
       end
     end
 
-    def initialize(game: Game.new)
+    def initialize(game: Game.new, owner:)
       @countered = false
       @name = self.class::NAME
       @type_line = self.class::TYPE_LINE
@@ -69,7 +69,7 @@ module Magic
       @keywords = self.class::KEYWORDS
       @keyword_grants = []
       @protections = self.class::PROTECTIONS
-      @controller = nil
+      @controller = @owner = owner
     end
 
     def types
@@ -82,10 +82,6 @@ module Magic
 
     def to_s
       name
-    end
-
-    def controller=(controller)
-      @controller = controller
     end
 
     def mana_value
@@ -110,7 +106,7 @@ module Magic
       move_zone!(target_controller.hand)
     end
 
-    def move_to_graveyard!(target_controller)
+    def move_to_graveyard!(target_controller = controller)
       move_zone!(target_controller.graveyard)
     end
 
@@ -122,7 +118,7 @@ module Magic
       countered
     end
 
-    def resolve!(owner = nil, enters_tapped: enters_tapped?, kicked: false)
+    def resolve!(enters_tapped: enters_tapped?, kicked: false)
       if permanent?
         permanent = Magic::Permanent.resolve(
           game: game,

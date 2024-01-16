@@ -11,7 +11,7 @@ module Magic
         battlefield.creatures
       end
 
-      def resolve!(player, targets:)
+      def resolve!(targets:)
         targets.each(&:tap!)
         targets.each(&:cannot_untap_next_turn!)
       end

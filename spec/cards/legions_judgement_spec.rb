@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::LegionsJudgement do
   include_context "two player game"
 
-  let(:card) { described_class.new(game: game) }
+  let(:card) { Card("Legion's Judgement") }
 
   context "with a creature with power over 4" do
     let!(:hill_giant_herdgorger) { ResolvePermanent("Hill Giant Herdgorger", game: game, owner: p2) }

@@ -6,14 +6,9 @@ module Magic
 
     class GoblinWizardry < Instant
 
-      def resolve!(controller)
-        2.times do
-          Permanent.resolve(
-            game: game,
-            owner: controller,
-            card: Tokens::GoblinWizard.new
-          )
-        end
+      def resolve!
+        controller.create_token(token: Tokens::GoblinWizard, amount: 2)
+
         super
       end
     end

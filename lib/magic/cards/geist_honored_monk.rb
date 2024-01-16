@@ -31,10 +31,7 @@ module Magic
 
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          2.times do
-            token = Tokens::Spirit.new(game: game)
-            token.resolve!(controller)
-          end
+          controller.create_token(token: Tokens::Spirit, amount: 2)
         end
       end
 

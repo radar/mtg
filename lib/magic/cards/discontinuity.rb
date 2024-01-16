@@ -8,8 +8,7 @@ module Magic
     end
 
     class Discontinuity < Instant
-      def resolve!(controller)
-
+      def resolve!
         game.stack.exile!
         move_to_exile!
 

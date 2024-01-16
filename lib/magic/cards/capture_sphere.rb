@@ -10,7 +10,7 @@ module Magic
         battlefield.creatures
       end
 
-      def resolve!(player, target:)
+      def resolve!(target:)
         target.tap!
 
         super

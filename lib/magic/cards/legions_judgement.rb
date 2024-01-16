@@ -13,7 +13,7 @@ module Magic
         true
       end
 
-      def resolve!(controller, target:)
+      def resolve!(target:)
         game.add_effect(Effects::DestroyTarget.new(source: self,  targets: [target], choices: target_choices))
 
         super

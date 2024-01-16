@@ -28,7 +28,7 @@ module Magic
           raise "Too many targets chosen for Effects::MoveToBattlefield"
         end
 
-        targets.each { |target| target.resolve!(controller) }
+        targets.each { |target| target.resolve! }
         super
       end
     end

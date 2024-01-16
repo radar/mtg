@@ -23,7 +23,7 @@ module Magic
         def costs = [Costs::Tap.new(source)]
 
         def resolve!
-          Permanent.resolve(game: game, owner: source.controller, card: Tokens::Angel.new)
+          source.controller.create_token(token: Tokens::Angel)
         end
       end
 

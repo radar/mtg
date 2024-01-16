@@ -1,8 +1,9 @@
 require 'spec_helper'
 
 RSpec.describe Magic::Zones::Library do
+  let(:game) { Magic::Game.new }
   let(:player) { Magic::Player.new }
-  let(:island) { Magic::Cards::Island.new }
+  let(:island) { Card("Island", owner: player) }
   subject { described_class.new(owner: player, cards: [island]) }
 
   context "#draw" do

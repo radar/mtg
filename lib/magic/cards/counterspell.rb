@@ -13,7 +13,7 @@ module Magic
         game.stack.spells
       end
 
-      def resolve!(_controller, target:)
+      def resolve!(target:)
         Effects::CounterSpell.new(source: self).resolve(target)
 
         super

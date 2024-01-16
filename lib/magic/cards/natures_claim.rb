@@ -13,7 +13,7 @@ module Magic
         battlefield.permanents.by_any_type("Enchantment", "Artifact")
       end
 
-      def resolve!(_controller, target:)
+      def resolve!(target:)
         target.destroy!
         target.controller.gain_life(4)
 
