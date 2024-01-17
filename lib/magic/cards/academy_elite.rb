@@ -16,7 +16,23 @@ module Magic
       end
 
       def etb_triggers = [ETB]
-    end
 
+      class ActivatedAbility < ActivatedAbility
+        def costs
+          [
+            Costs::Mana.new(generic: 2, blue: 1),
+            Costs::RemoveCounter.new(source, Counters::Plus1Plus1),
+          ]
+        end
+
+        def resolve!
+          game.add_effect(Effects::DrawCards.new(source: source, player: source.controller))
+
+          game.choices.add(Magic::Choice::Discard.new(player: source.controller))
+        end
+      end
+
+      def activated_abilities = [ActivatedAbility]
+    end
   end
 end

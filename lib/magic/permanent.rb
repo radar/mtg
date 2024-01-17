@@ -261,6 +261,25 @@ module Magic
       game.notify!(counter_added)
     end
 
+    def remove_counter(counter_type, amount: 1)
+      removable_counters = @counters.select { |counter| counter.is_a?(counter_type) }.first(amount)
+      if removable_counters.count < amount
+        raise "Not enough #{counter_type} counters to remove"
+      end
+
+      events = []
+      removable_counters.each do |counter|
+        @counters.delete(counter)
+        events << Events::CounterRemoved.new(
+          permanent: self,
+          counter_type: counter_type,
+          amount: amount
+        )
+      end
+
+      game.notify!(events)
+    end
+
     def target_choices
       card.target_choices(self)
     end
