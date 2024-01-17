@@ -53,6 +53,10 @@ module Magic
     end
     alias_method :by_type, :by_any_type
 
+    def excluding_type(*types)
+      reject { |c| c.any_type?(*types) }
+    end
+
     def except(target)
       self.class.new(reject { |c| c == target })
     end

@@ -55,6 +55,15 @@ module Magic
       def protections(*protections)
         const_set(:PROTECTIONS, *protections)
       end
+
+      def enters_the_battlefield(&block)
+        etb = Class.new(TriggeredAbility::EnterTheBattlefield)
+        etb.define_method(:perform, &block)
+
+        define_method(:etb_triggers) do
+          [etb]
+        end
+      end
     end
 
     def initialize(game: Game.new, owner:)
