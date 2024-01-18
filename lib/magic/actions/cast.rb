@@ -6,8 +6,9 @@ module Magic
       class InvalidTarget < StandardError; end
 
       def_delegators :@card, :enchantment?, :artifact?, :multi_target?
-      attr_reader :card, :targets, :value_for_x
-      def initialize(card:, value_for_x: nil, **args)
+      attr_reader :card, :targets, :value_for_x, :controller
+
+      def initialize(card:, value_for_x: nil, controller: card.controller, **args)
         super(**args)
         @card = card
         @targets = []

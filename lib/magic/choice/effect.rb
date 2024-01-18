@@ -5,6 +5,11 @@ module Magic
       def initialize(player)
         @player = player
       end
+
+      def game = player.game
+
+      def to_s = inspect
+
     end
   end
 end

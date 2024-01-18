@@ -4,7 +4,7 @@ module Magic
 
     def_delegators :@stack, :first, :select, :count, :include?, :map, :empty?
 
-    attr_reader :logger, :effects
+    attr_reader :logger, :effects, :choices
 
     class TargetedCast
       class InvalidTarget < StandardError; end
@@ -29,10 +29,11 @@ module Magic
       end
     end
 
-    def initialize(logger: Logger.new($stdout), stack: [], effects: [])
+    def initialize(logger: Logger.new($stdout), stack: [], effects: [], choices: [])
       @logger = logger
       @stack = stack
       @effects = Effects.new(effects)
+      @choices = Choices.new(choices)
     end
 
     def add(item)
@@ -77,6 +78,10 @@ module Magic
       @effects.any?
     end
 
+    def pending_choices?
+      @choices.any?
+    end
+
     def next_effect
       @effects.first
     end
@@ -99,6 +104,7 @@ module Magic
     end
 
     def resolve!
+      logger.debug "Resolving stack."
       resolve_stack!
       resolve_effects!
     end
@@ -107,6 +113,11 @@ module Magic
       return if @stack.empty?
       if pending_effects?
         logger.debug "Pending effects, pausing stack resolution."
+        return
+      end
+
+      if pending_choices?
+        logger.debug "Pending choices, pausing stack resolution."
         return
       end
 
@@ -127,7 +138,6 @@ module Magic
       effects.reject { _1.resolved? }
     end
 
-
     def resolve_effects!
       resolvable_effects_with_targets = effects.unresolved.targeted
       resolvable_effects_with_targets.each do |effect|
@@ -143,6 +153,16 @@ module Magic
         skip_effect(effect)
         logger.debug "#{effect} has no valid choices, skipping."
       end
+    end
+
+    def skip_choice!
+      logger.debug "Skipping Choice: #{@choices.first}"
+      choices.shift
+    end
+
+    def resolve_choice!
+      choice = choices.shift
+      choice.resolve!
     end
   end
 end

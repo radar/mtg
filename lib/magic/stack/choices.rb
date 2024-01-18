@@ -1,5 +1,5 @@
 module Magic
-  class Game
+  class Stack
     class Choices < SimpleDelegator
       def add(choice)
         self << choice
