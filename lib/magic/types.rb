@@ -54,6 +54,10 @@ module Magic
     def permanent?
       land? || creature? || planeswalker? || artifact? || enchantment?
     end
+
+    def legendary?
+      type?(T::Legendary)
+    end
   end
 
   T = Types

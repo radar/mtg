@@ -7,7 +7,7 @@ module Magic
       end
 
       def resolve(target)
-        target.return_to_hand(target.owner)
+        target.return_to_hand
       end
     end
   end

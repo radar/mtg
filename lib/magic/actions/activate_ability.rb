@@ -54,6 +54,10 @@ module Magic
         pay(:sacrifice, targets)
       end
 
+      def pay_discard(targets)
+        pay(:discard, targets)
+      end
+
       def perform
         if targets.any?
           if ability.single_target?

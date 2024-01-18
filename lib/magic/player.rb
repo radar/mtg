@@ -105,6 +105,10 @@ module Magic
       create_tokens(token: token, amount: 1, **args).first
     end
 
+    def skip_choice(choice)
+      game.skip_choice!
+    end
+
     def lost?
       @lost
     end

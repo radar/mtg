@@ -16,6 +16,7 @@ module Magic
 
         @payments = Hash.new(0)
         @payments[:generic] = Hash.new(0)
+        @payments[:x] = Hash.new(0)
       end
 
       def mana_value
@@ -56,6 +57,7 @@ module Magic
       def pay(player, payment)
         raise CannotPay unless can_pay?(player)
 
+        pay_x(payment[:x]) if payment[:x]
         pay_generic(payment[:generic]) if payment[:generic]
         pay_colors(payment.slice(*Magic::Mana::COLORS))
       end
@@ -105,11 +107,25 @@ module Magic
         cost[:generic]
       end
 
+      def x=(value)
+        cost[:x] = value
+        balance[:x] = value
+      end
+
+      def x
+        cost[:x]
+      end
+
       def paid?
         balance.values.all?(&:zero?)
       end
 
       private
+
+      def pay_x(payment)
+        balance[:x] -= payment.values.sum
+        @payments[:x].merge!(payment) { |key, old_value, new_value| old_value + new_value }
+      end
 
       def pay_generic(payment)
         balance[:generic] -= payment.values.sum

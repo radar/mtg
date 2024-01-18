@@ -222,8 +222,8 @@ module Magic
       move_zone!(to: game.exile)
     end
 
-    def return_to_hand(player)
-      move_zone!(to: player.hand)
+    def return_to_hand
+      move_zone!(to: owner.hand)
     end
 
     def can_activate_ability?(ability)

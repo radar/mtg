@@ -40,7 +40,7 @@ module Magic
     def add_players(*players)
       players.each(&method(:add_player))
     end
-\
+
     def add_player(player)
       @player_count += 1
       @players << player
@@ -93,10 +93,6 @@ module Magic
 
     def move_dead_creatures_to_graveyard
       battlefield.creatures.dead.each(&:destroy!)
-    end
-
-    def skip_choice!
-      choices.shift
     end
 
     def skip_choice!

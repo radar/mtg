@@ -5,12 +5,13 @@ module Magic
 
       class InvalidTarget < StandardError; end
 
-      def_delegators :@card, :enchantment?, :artifact?
-      attr_reader :card, :targets
-      def initialize(card:, **args)
+      def_delegators :@card, :enchantment?, :artifact?, :multi_target?
+      attr_reader :card, :targets, :value_for_x
+      def initialize(card:, value_for_x: nil, **args)
         super(**args)
         @card = card
         @targets = []
+        @value_for_x = value_for_x
       end
 
       def inspect
@@ -44,7 +45,9 @@ module Magic
           .of_type(Abilities::Static::ManaCostAdjustment)
           .applies_to(card)
 
-          mana_cost_adjustment_abilities.each_with_object(card.cost.dup) { |ability, cost| ability.apply(cost) }
+          cost = mana_cost_adjustment_abilities.each_with_object(card.cost.dup) { |ability, cost| ability.apply(cost) }
+          cost.x = value_for_x if value_for_x
+          cost
         end
       end
 
@@ -68,13 +71,29 @@ module Magic
         choices = choices.arity == 1 ? card.target_choices(player) : card.target_choices
       end
 
-      def can_target?(target)
-        target_choices.include?(target)
+      def can_target?(target, index = nil)
+        if index
+          target_choices[index].include?(target)
+        else
+          target_choices.include?(target)
+        end
       end
 
       def targeting(*targets)
+        if card.respond_to?(:multi_target?) && card.multi_target?
+          return multi_target(*targets)
+        end
+
         targets.each do |target|
           raise InvalidTarget, "Invalid target for #{card.name}: #{target}" unless can_target?(target)
+        end
+        @targets = targets
+        self
+      end
+
+      def multi_target(*targets)
+        targets.each_with_index do |target, index|
+          raise InvalidTarget, "Invalid target for #{card.name}: #{target}" unless can_target?(target, index)
         end
         @targets = targets
         self
@@ -102,6 +121,7 @@ module Magic
         args[:target] = targets.first if resolve_method.parameters.include?([:keyreq, :target])
         args[:targets] = targets if resolve_method.parameters.include?([:keyreq, :targets])
         args[:kicked] = kicker_cost.paid? if resolve_method.parameters.include?([:key, :kicked])
+        args[:value_for_x] = mana_cost.x if resolve_method.parameters.include?([:keyreq, :value_for_x])
 
         resolve_method.call(**args)
 
