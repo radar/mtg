@@ -6,10 +6,9 @@ module Magic
 
     class LoftyDenial < Instant
       class Choice < Magic::Choice::Effect
-        attr_reader :source, :target
+        attr_reader :target
         def initialize(source:, target:)
-          super(target.player)
-          @source = source
+          super(source:)
           @target = target
         end
 
@@ -45,6 +44,7 @@ module Magic
 
       def resolve!(target:)
         game.choices.add(Choice.new(source: self, target:))
+        super
       end
     end
   end

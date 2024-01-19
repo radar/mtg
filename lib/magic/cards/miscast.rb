@@ -8,7 +8,7 @@ module Magic
       class Choice < Magic::Choice::Effect
         attr_reader :source, :target
         def initialize(source:, target:)
-          super(target.player)
+          super(source:)
           @source = source
           @target = target
         end

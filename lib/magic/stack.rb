@@ -45,6 +45,10 @@ module Magic
       @stack.clear
     end
 
+    def counter!(target)
+      @stack.delete(target)
+      target.countered!
+    end
 
     def spells
       @stack.select { |item| item.is_a?(Magic::Actions::Cast) }
@@ -122,12 +126,8 @@ module Magic
       end
 
       item = @stack.shift
-      if item.countered?
-        item.countered!
-      else
-        logger.debug "Resolving #{item.name}"
-        item.resolve!
-      end
+      logger.debug "Resolving #{item.name}"
+      item.resolve!
 
       resolve_effects!
 
@@ -160,9 +160,9 @@ module Magic
       choices.shift
     end
 
-    def resolve_choice!
+    def resolve_choice!(**args)
       choice = choices.shift
-      choice.resolve!
+      choice.resolve!(**args)
     end
   end
 end

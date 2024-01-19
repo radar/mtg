@@ -19,10 +19,6 @@ module Magic
         costs.all? { |cost| cost.can_pay?(player) } && requirements.all?(&:call)
       end
 
-      def countered?
-        false
-      end
-
       def name
         ability
       end

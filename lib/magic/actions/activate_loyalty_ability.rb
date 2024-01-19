@@ -18,10 +18,6 @@ module Magic
         ability.can_be_activated?(player)
       end
 
-      def countered?
-        false
-      end
-
       def name
         ability
       end

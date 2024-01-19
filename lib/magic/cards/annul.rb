@@ -15,6 +15,7 @@ module Magic
 
       def resolve!(target:)
         Effects::CounterSpell.new(source: self).resolve(target)
+        super
       end
     end
   end
