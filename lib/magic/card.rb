@@ -5,7 +5,7 @@ module Magic
     def_delegators :@game, :logger, :battlefield, :exile, :current_turn
 
     include Cards::Keywords
-    attr_reader :game, :controller, :owner, :name, :cost, :kicker_cost, :type_line, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :counters
+    attr_reader :game, :controller, :owner, :name, :cost, :kicker_cost, :type_line, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :counters, :modes
     attr_accessor :tapped
 
     attr_accessor :zone
@@ -14,6 +14,7 @@ module Magic
     KICKER_COST = {}
     KEYWORDS = []
     PROTECTIONS = []
+    MODES = []
 
     class << self
       def creature_types(types)
@@ -56,6 +57,10 @@ module Magic
         const_set(:PROTECTIONS, *protections)
       end
 
+      def modes(*modes)
+        const_set(:MODES, modes)
+      end
+
       def enters_the_battlefield(&block)
         etb = Class.new(TriggeredAbility::EnterTheBattlefield)
         etb.define_method(:perform, &block)
@@ -78,6 +83,7 @@ module Magic
       @keywords = self.class::KEYWORDS
       @keyword_grants = []
       @protections = self.class::PROTECTIONS
+      @modes = self.class::MODES
       @controller = @owner = owner
     end
 
@@ -186,6 +192,10 @@ module Magic
 
     def replacement_effects
       {}
+    end
+
+    def choose_mode(mode)
+      mode.new(source: self)
     end
 
     private

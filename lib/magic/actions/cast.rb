@@ -6,17 +6,18 @@ module Magic
       class InvalidTarget < StandardError; end
 
       def_delegators :@card, :enchantment?, :artifact?, :multi_target?
-      attr_reader :card, :targets, :value_for_x, :controller
+      attr_reader :card, :targets, :value_for_x, :controller, :mode
 
-      def initialize(card:, value_for_x: nil, controller: card.controller, **args)
+      def initialize(card:, value_for_x: nil, controller: card.controller, mode: nil, **args)
         super(**args)
         @card = card
         @targets = []
         @value_for_x = value_for_x
+        @mode = mode
       end
 
       def inspect
-        "#<Actions::Cast card: #{card.name}, player: #{player.inspect}>"
+        "#<Actions::Cast card: #{card.name}, player: #{player.inspect}, mode: #{mode.inspect}>"
       end
       alias_method :name, :inspect
 
@@ -117,14 +118,19 @@ module Magic
       end
 
       def resolve!
-        resolve_method = card.method(:resolve!)
-        args = {}
-        args[:target] = targets.first if resolve_method.parameters.include?([:keyreq, :target])
-        args[:targets] = targets if resolve_method.parameters.include?([:keyreq, :targets])
-        args[:kicked] = kicker_cost.paid? if resolve_method.parameters.include?([:key, :kicked])
-        args[:value_for_x] = mana_cost.x if resolve_method.parameters.include?([:keyreq, :value_for_x])
+        if mode
+          resolver = mode.method(:resolve)
+        else
+          resolver =card.method(:resolve!)
+        end
 
-        resolve_method.call(**args)
+        args = {}
+        args[:target] = targets.first if resolver.parameters.include?([:keyreq, :target])
+        args[:targets] = targets if resolver.parameters.include?([:keyreq, :targets])
+        args[:kicked] = kicker_cost.paid? if resolver.parameters.include?([:key, :kicked])
+        args[:value_for_x] = mana_cost.x if resolver.parameters.include?([:keyreq, :value_for_x])
+
+        resolver.call(**args)
 
         if card.instant? || card.sorcery?
           card.move_to_graveyard!(player)

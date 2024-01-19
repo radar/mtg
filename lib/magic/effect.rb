@@ -16,6 +16,10 @@ module Magic
       source.game
     end
 
+    def controller
+      source.controller
+    end
+
     def requires_targets?
       false
     end

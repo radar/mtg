@@ -35,7 +35,7 @@ RSpec.describe Magic::Cards::GhostlyPilferer do
       expect(p1).not_to receive(:draw!)
       choice = game.choices.last
       expect(choice).to be_a(Magic::Choice::Effect)
-      game.skip_choice!
+      game.resolve_choice!
       expect(game.choices).to be_none
     end
   end
