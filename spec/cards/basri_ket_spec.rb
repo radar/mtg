@@ -8,12 +8,7 @@ RSpec.describe Magic::Cards::BasriKet do
 
   context "+1 triggered ability" do
     let(:ability) { planeswalker.loyalty_abilities.first }
-    let(:wood_elves_card) { Card("Wood Elves") }
-    let(:wood_elves) { Magic::Permanents::Creature.new(game: game, owner: p1, card: wood_elves_card) }
-
-    before do
-      game.battlefield.add(wood_elves)
-    end
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
     it "targets the wood elves" do
       p1.activate_loyalty_ability(ability: ability) do

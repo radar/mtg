@@ -1,6 +1,6 @@
 module Magic
   module Permanents
-    class Creature < Permanent
+    module Creature
       attr_reader :damage
 
       class PowerToughnessModification
@@ -25,6 +25,10 @@ module Magic
 
       def inspect
         "#<Magic::Permanent::Creature name:#{card.name} controller:#{controller.name}>"
+      end
+
+      def creature?
+        true
       end
 
       def mark_for_death!

@@ -1,6 +1,6 @@
 module Magic
   module Permanents
-    class Enchantment < Permanent
+    module Enchantment
       extend Forwardable
       def_delegators :@card, :power_modification, :toughness_modification, :can_attack?, :can_block?, :keyword_grants, :type_grants, :can_activate_ability?, :does_not_untap_during_untap_step?
 

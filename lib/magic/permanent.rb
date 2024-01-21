@@ -18,22 +18,18 @@ module Magic
     attr_accessor :zone
 
     def self.resolve(game:, owner:, card:, from_zone: owner.library, enters_tapped: false, token: false, cast: true, kicked: false)
-      if card.planeswalker?
-        permanent = Magic::Permanents::Planeswalker.new(game: game, owner: owner, card: card, kicked: kicked)
-      elsif card.creature?
-        permanent = Magic::Permanents::Creature.new(game: game, owner: owner, card: card, token: token, cast: cast, kicked: kicked)
-      elsif card.enchantment?
-        permanent = Magic::Permanents::Enchantment.new(game: game, owner: owner, card: card, kicked: kicked)
-      elsif card.permanent?
-        permanent = Magic::Permanent.new(game: game, owner: owner, card: card, kicked: kicked)
-      end
+      permanent = Magic::Permanent.new(game: game, owner: owner, card: card, kicked: kicked, cast: cast, token: token)
+
+      permanent.extend Magic::Permanents::Creature if permanent.creature?
+      permanent.extend Magic::Permanents::Planeswalker if permanent.planeswalker?
+      permanent.extend Magic::Permanents::Enchantment if permanent.enchantment?
 
       permanent.tap! if enters_tapped
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       permanent
     end
 
-    def initialize(game:, owner:, card:, token: false, cast: true, kicked: false)
+    def initialize(game:, owner:, card:, token: false, cast: true, kicked: false, timestamp: Time.now)
       @game = game
       @owner = owner
       @controller = owner
@@ -52,6 +48,7 @@ module Magic
       @damage = 0
       @protections = Protections.new(card.protections.dup)
       @exiled_cards = Magic::CardList.new([])
+      @timestamp = timestamp
     end
 
     def kicked?
