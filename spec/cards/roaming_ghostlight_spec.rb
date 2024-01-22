@@ -4,7 +4,8 @@ RSpec.describe Magic::Cards::RoamingGhostlight do
   include_context "two player game"
 
   before do
-    ResolvePermanent("Wood Elves", owner: p2)
+    ResolvePermanent("Wood Elves", owner: p2) # Non-spirit creature
+    ResolvePermanent("Wandering Ones", owner: p2) # Spirit creature
   end
 
   context "when it enters the battlefield" do
@@ -12,6 +13,9 @@ RSpec.describe Magic::Cards::RoamingGhostlight do
       ResolvePermanent("Roaming Ghostlight", owner: p1)
 
       expect(p2.hand.by_name("Wood Elves").count).to eq(1)
+
+      expect(game.battlefield.creatures.by_name("Wandering Ones").count).to eq(1)
+      expect(p2.hand.by_name("Wandering Ones").count).to eq(0)
     end
   end
 end
