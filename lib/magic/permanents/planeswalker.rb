@@ -13,14 +13,9 @@ module Magic
       end
 
       def take_damage(source:, damage:)
-        game.notify!(
-          Events::DamageDealt.new(
-            source: source,
-            target: self,
-            damage: damage
-          )
-        )
-        change_loyalty!(- damage)
+        super
+
+        change_loyalty!(-damage) if planeswalker?
       end
 
       def loyalty_abilities

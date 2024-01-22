@@ -55,10 +55,11 @@ module Magic
       end
 
       def has_keyword?(keyword)
+
         keywords.any? { |kw| kw.is_a?(keyword) } ||
           keywords.include?(keyword) ||
           keyword_grants.map(&:keyword).include?(keyword) ||
-          attachments.flat_map(&:keyword_grants).include?(keyword)
+          (is_a?(Magic::Permanent) && attachments.flat_map(&:keyword_grants).include?(keyword))
       end
 
       def hexproof?

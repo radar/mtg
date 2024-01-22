@@ -129,10 +129,6 @@ module Magic
       move_zone!(game.exile)
     end
 
-    def countered?
-      countered
-    end
-
     def resolve!(enters_tapped: enters_tapped?, kicked: false)
       if permanent?
         permanent = Magic::Permanent.resolve(
@@ -197,6 +193,10 @@ module Magic
     def choose_mode(mode)
       mode.new(source: self)
     end
+
+    def can_attack? = !defender?
+    def can_block? = true
+    def can_activate_ability?(_) = true
 
     private
 

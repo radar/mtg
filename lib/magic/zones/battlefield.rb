@@ -27,7 +27,7 @@ module Magic
       end
 
       def receive_event(event)
-        permanents.each { |permanent| permanent.receive_notification(event) }
+        permanents.each { _1.receive_notification(event) }
       end
 
       def cleanup

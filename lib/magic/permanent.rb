@@ -1,5 +1,8 @@
 module Magic
   class Permanent
+    include Permanents::Creature
+    include Permanents::Planeswalker
+    include Permanents::Enchantment
     include Keywords
     include Types
 
@@ -18,11 +21,14 @@ module Magic
     attr_accessor :zone
 
     def self.resolve(game:, owner:, card:, from_zone: owner.library, enters_tapped: false, token: false, cast: true, kicked: false)
-      permanent = Magic::Permanent.new(game: game, owner: owner, card: card, kicked: kicked, cast: cast, token: token)
-
-      permanent.extend Magic::Permanents::Creature if permanent.creature?
-      permanent.extend Magic::Permanents::Planeswalker if permanent.planeswalker?
-      permanent.extend Magic::Permanents::Enchantment if permanent.enchantment?
+      permanent = Magic::Permanent.new(
+        game: game,
+        owner: owner,
+        card: card,
+        kicked: kicked,
+        cast: cast,
+        token: token
+      )
 
       permanent.tap! if enters_tapped
       permanent.move_zone!(from: from_zone, to: game.battlefield)
@@ -43,7 +49,7 @@ module Magic
       @modifiers = []
       @tapped = false
       @keywords = card.keywords
-      @keyword_grants = []
+      @keyword_grants = card.keyword_grants
       @counters = Counters::Collection.new([])
       @damage = 0
       @protections = Protections.new(card.protections.dup)
@@ -110,6 +116,8 @@ module Magic
     end
 
     def receive_notification(event)
+      super
+
       trigger_delayed_response(event)
 
       case event
@@ -207,6 +215,7 @@ module Magic
     end
 
     def alive?
+      return true unless creature?
       (toughness - damage).positive?
     end
 
@@ -224,12 +233,21 @@ module Magic
     end
 
     def can_activate_ability?(ability)
-      attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
+      card.can_activate_ability?(ability) && attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
     end
 
     def can_be_targeted_by?(source)
       true
     end
+
+    def can_attack?
+      card.can_attack? && attachments.all?(&:can_attack?)
+    end
+
+    def can_block?
+      card.can_block? && attachments.all?(&:can_block?)
+    end
+
 
     def delayed_response(turn:, event_type:, response:)
       @delayed_responses << { turn: turn.number, event_type: event_type, response: response }
@@ -245,6 +263,8 @@ module Magic
     def cleanup!
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
+      until_eot_modifiers = modifiers.select(&:until_eot?)
+      until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }
     end
 
     def add_counter(counter_type, amount: 1)
@@ -288,6 +308,10 @@ module Magic
 
     def can_untap_during_upkeep?
       attachments.any?(&:can_untap_during_upkeep?)
+    end
+
+    def becomes!(additional_types:, power:, toughness:)
+
     end
 
     private

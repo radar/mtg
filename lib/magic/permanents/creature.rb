@@ -18,17 +18,12 @@ module Magic
         end
       end
 
-      def initialize(**args)
-        super(**args)
-        @damage = 0
-      end
-
       def inspect
         "#<Magic::Permanent::Creature name:#{card.name} controller:#{controller.name}>"
       end
 
       def creature?
-        true
+        type?(T::Creature)
       end
 
       def mark_for_death!
@@ -82,8 +77,6 @@ module Magic
       end
 
       def receive_notification(event)
-        super
-
         return if !event.respond_to?(:target) || event.target != self
 
         case event
@@ -114,21 +107,6 @@ module Magic
 
       def attacking?
         game.current_turn.attacking?(self)
-      end
-
-      def can_attack?
-        attachments.all?(&:can_attack?)
-      end
-
-      def can_block?
-        attachments.all?(&:can_block?)
-      end
-
-      def cleanup!
-        until_eot_modifiers = modifiers.select(&:until_eot?)
-        until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }
-
-        super
       end
 
       def static_ability_mods
