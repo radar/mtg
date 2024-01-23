@@ -24,10 +24,7 @@ RSpec.describe Magic::Cards::JeskaiElder do
     it "has a boosted power + toughness" do
       expect(subject.power).to eq(2)
       expect(subject.toughness).to eq(3)
-      buff = subject.modifiers.first
-      expect(buff.power).to eq(1)
-      expect(buff.toughness).to eq(1)
-      expect(buff.until_eot?).to eq(true)
+      expect(subject.modifiers).to all(be_until_eot)
     end
   end
 

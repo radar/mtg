@@ -7,7 +7,7 @@ module Magic
     class BurnBright < Instant
       def resolve!
         controller.creatures.each do
-          _1.modify_power!(2)
+          _1.modify_power(2)
         end
 
         super

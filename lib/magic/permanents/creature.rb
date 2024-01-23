@@ -3,21 +3,6 @@ module Magic
     module Creature
       attr_reader :damage
 
-      class PowerToughnessModification
-        attr_reader :power, :toughness, :until_eot
-
-        def initialize(power: 0, toughness: 0, until_eot: true, **args)
-          super(**args)
-          @power = power
-          @toughness = toughness
-          @until_eot = until_eot
-        end
-
-        def until_eot?
-          @until_eot
-        end
-      end
-
       def inspect
         "#<Magic::Permanent::Creature name:#{card.name} controller:#{controller.name}>"
       end
@@ -35,11 +20,15 @@ module Magic
       end
 
       def base_power
-        @card.base_power
+        base_power = @card.respond_to?(:base_power) ? @card.base_power : 0
+        base_power_modifier = @modifiers.select { |mod| mod.is_a?(Modifications::BasePower) }.last
+        base_power_modifier ? base_power_modifier.base_power : base_power
       end
 
       def base_toughness
-        @card.base_toughness
+        base_toughness = @card.respond_to?(:base_toughness) ? @card.base_toughness : 0
+        base_toughness_modifier = @modifiers.select { |mod| mod.is_a?(Modifications::BaseToughness) }.last
+        base_toughness_modifier ? base_toughness_modifier.base_toughness : base_toughness
       end
 
       def power
@@ -58,12 +47,13 @@ module Magic
           static_ability_mods.sum(&:toughness)
       end
 
-      def modify_power!(amount)
-        modify_power_toughness!(power: amount)
-      end
-
-      def modify_power_toughness!(power: 0, toughness: 0)
-        @modifiers << PowerToughnessModification.new(power:, toughness:)
+      def modify_power_toughness!(source:, power: 0, toughness: 0)
+        game.add_effect(Effects::ApplyPowerToughnessModification.new(
+          choices: self,
+          source: source,
+          power: power,
+          toughness: toughness,
+        ))
       end
 
       def take_damage(source:, damage:)

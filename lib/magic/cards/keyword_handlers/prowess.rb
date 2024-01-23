@@ -1,12 +1,18 @@
 module Magic
   module Cards
     module KeywordHandlers
-      class Prowess
-        def self.perform(game:, spell:, permanent:)
+      module Prowess
+        def initialize(**args)
+          add_event_handler(Events::SpellCast, &method(:prowess_trigger))
+          super(**args)
+        end
+
+        def prowess_trigger(permanent, event)
+          spell = event.spell
           return if spell.controller != permanent.controller
           return if spell.creature?
 
-          game.add_effect(Effects::ApplyPowerToughnessModification.new(
+          spell.game.add_effect(Effects::ApplyPowerToughnessModification.new(
             choices: permanent,
             source: permanent,
             power: 1,

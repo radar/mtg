@@ -4,7 +4,7 @@ module Magic
       NAME = "Capture Sphere"
       TYPE_LINE = "Enchantment -- Aura"
       COST = { generic: 3, white: 1 }
-      KEYWORDS = Keywords::FLASH
+      keywords :flash
 
       def target_choices
         battlefield.creatures

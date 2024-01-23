@@ -51,6 +51,8 @@ module Magic
 
       def keywords(*keywords)
         const_set(:KEYWORDS, Keywords[*keywords])
+
+        include Cards::KeywordHandlers::Prowess if keywords.include?(:prowess)
       end
 
       def protections(*protections)
@@ -183,11 +185,22 @@ module Magic
     end
 
     def event_handlers
-      {}
+      @event_handlers ||= {}
+    end
+
+    def add_event_handler(event, &block)
+      event_handlers[event] ||= []
+      event_handlers[event] = block
     end
 
     def replacement_effects
       {}
+    end
+
+    def prowess_trigger
+      -> (permanent, event) do
+        Cards::KeywordHandlers::Prowess.trigger(permanent: permanent, event: event)
+      end
     end
 
     def choose_mode(mode)

@@ -3,6 +3,7 @@ module Magic
     include Permanents::Creature
     include Permanents::Planeswalker
     include Permanents::Enchantment
+    include Permanents::Modifications
     include Keywords
     include Types
 
@@ -62,7 +63,7 @@ module Magic
     end
 
     def types
-      @base_types + attachments.flat_map(&:type_grants)
+      @base_types + attachments.flat_map(&:type_grants) + modifiers.flat_map(&:type_grants)
     end
 
     def inspect
@@ -263,8 +264,7 @@ module Magic
     def cleanup!
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
-      until_eot_modifiers = modifiers.select(&:until_eot?)
-      until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }
+      remove_until_eot_modifiers!
     end
 
     def add_counter(counter_type, amount: 1)
@@ -310,9 +310,6 @@ module Magic
       attachments.any?(&:can_untap_during_upkeep?)
     end
 
-    def becomes!(additional_types:, power:, toughness:)
-
-    end
 
     private
 
@@ -328,6 +325,11 @@ module Magic
       until_eot_protections.each do |protection|
         protections.delete(protection)
       end
+    end
+
+    def remove_until_eot_modifiers!
+      until_eot_modifiers = modifiers.select(&:until_eot?)
+      until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }
     end
 
     def leaving_zone_notifications(from:, to:)

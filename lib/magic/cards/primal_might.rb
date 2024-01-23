@@ -15,7 +15,7 @@ module Magic
       def resolve!(targets:, value_for_x:)
         first_creature, second_creature = targets
 
-        first_creature.modify_power_toughness!(power: value_for_x, toughness: value_for_x)
+        first_creature.modify_power_toughness!(source: self, power: value_for_x, toughness: value_for_x)
         first_creature.fight(second_creature)
       end
     end

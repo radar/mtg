@@ -32,10 +32,7 @@ RSpec.describe Magic::Cards::MistralSinger do
     it "has a boosted power + toughness" do
       expect(subject.power).to eq(3)
       expect(subject.toughness).to eq(3)
-      buff = subject.modifiers.first
-      expect(buff.power).to eq(1)
-      expect(buff.toughness).to eq(1)
-      expect(buff.until_eot?).to eq(true)
+      expect(subject.modifiers).to all(be_until_eot)
     end
   end
 

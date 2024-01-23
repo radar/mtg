@@ -22,22 +22,6 @@ RSpec.describe Magic::Cards::BurnBright do
       expect(onakke_ogre.toughness).to eq(2)
       expect(blood_glutton.power).to eq(6)
       expect(blood_glutton.toughness).to eq(3)
-
-      expect(onakke_ogre.modifiers).to include(
-        an_object_having_attributes(
-          power: 2,
-          toughness: 0,
-          until_eot: true,
-        )
-      )
-
-      expect(blood_glutton.modifiers).to include(
-        an_object_having_attributes(
-          power: 2,
-          toughness: 0,
-          until_eot: true,
-        )
-      )
     end
   end
 

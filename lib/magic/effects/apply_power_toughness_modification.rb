@@ -13,7 +13,8 @@ module Magic
         raise InvalidTarget if targets.any? { |target| !choices.include?(target) }
 
         targets.each do |target|
-          target.modify_power_toughness!(power: power, toughness: toughness)
+          target.modify_power(power) if power
+          target.modify_toughness(toughness) if toughness
         end
       end
     end

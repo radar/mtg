@@ -15,6 +15,7 @@ module Magic
       INDESTRUCTIBLE = Class.new(Keyword)
       LIFELINK = Class.new(Keyword)
       MENACE = Class.new(Keyword)
+      PROWESS = Class.new(Keyword)
       REACH = Class.new(Keyword)
       SKULK = Class.new(Keyword)
       TRAMPLE = Class.new(Keyword)
@@ -46,7 +47,7 @@ module Magic
         end
       end
 
-      def grant_keyword(keyword, until_eot: false)
+      def grant_keyword(keyword, until_eot: true)
         @keyword_grants << KeywordGrant.new(keyword: keyword, until_eot: until_eot)
       end
 
@@ -55,7 +56,6 @@ module Magic
       end
 
       def has_keyword?(keyword)
-
         keywords.any? { |kw| kw.is_a?(keyword) } ||
           keywords.include?(keyword) ||
           keyword_grants.map(&:keyword).include?(keyword) ||
@@ -104,6 +104,10 @@ module Magic
 
       def flash?
         has_keyword?(Keywords::FLASH)
+      end
+
+      def prowess?
+        has_keyword?(Keywords::PROWESS)
       end
     end
   end

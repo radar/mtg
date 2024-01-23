@@ -12,7 +12,9 @@ module Magic
         def costs = [Costs::Mana.new(generic: 4, white: 1)]
 
         def resolve!
-          source.modifiers << Magic::Permanents::Creature::PowerToughnessModification.new(power: 3, toughness: 3, until_eot: true)
+          source.modify_power(3)
+          source.modify_toughness(3)
+
         end
       end
 
