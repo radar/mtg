@@ -211,6 +211,19 @@ module Magic
     def can_block? = true
     def can_activate_ability?(_) = true
 
+    def trigger(effect, source: self, **args)
+      case effect
+      when :draw_card
+        game.add_effect(Effects::DrawCards.new(source: source, **args))
+      when :discard
+        game.choices.add(Magic::Choice::Discard.new(player: controller, **args))
+      when :lose_life
+        game.add_effect(Effects::LoseLife.new(source: source, **args))
+      else
+        raise "Unknown trigger: #{effect.inspect}"
+      end
+    end
+
     private
 
     def move_zone!(new_zone)

@@ -21,7 +21,7 @@ module Magic
 
     attr_accessor :zone
 
-    def self.resolve(game:, owner:, card:, from_zone: owner.library, enters_tapped: false, token: false, cast: true, kicked: false)
+    def self.resolve(game:, card:, owner: card.owner, from_zone: owner.library, enters_tapped: false, token: false, cast: true, kicked: false)
       permanent = Magic::Permanent.new(
         game: game,
         owner: owner,
@@ -310,6 +310,9 @@ module Magic
       attachments.any?(&:can_untap_during_upkeep?)
     end
 
+    def trigger(effect, source: self, **args)
+      card.trigger(effect, source: source, **args)
+    end
 
     private
 

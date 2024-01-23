@@ -12,7 +12,8 @@ module CardHelper
   end
 
   def ResolvePermanent(name, **args)
-    Magic::Permanent.resolve(game: game, card: Card(name), **args)
+    card = Card(name)
+    Magic::Permanent.resolve(game: game, card: card, **args)
   end
 
   def AddLand(name, **args)

@@ -26,9 +26,8 @@ module Magic
         end
 
         def resolve!
-          game.add_effect(Effects::DrawCards.new(source: source, player: source.controller))
-
-          game.choices.add(Magic::Choice::Discard.new(player: source.controller))
+          trigger(:draw_card, source: source)
+          trigger(:discard)
         end
       end
 

@@ -22,5 +22,9 @@ module Magic
     def battlefield
       game.battlefield
     end
+
+    def trigger(event, **args)
+      source.trigger(event, source: self, **args)
+    end
   end
 end
