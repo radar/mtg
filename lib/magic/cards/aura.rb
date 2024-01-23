@@ -1,6 +1,8 @@
 module Magic
   module Cards
     class Aura < Card
+      TYPE_LINE = "Enchantment -- Aura"
+
       def single_target?
         true
       end

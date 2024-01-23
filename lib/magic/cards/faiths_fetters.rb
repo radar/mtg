@@ -2,7 +2,6 @@ module Magic
   module Cards
     class FaithsFetters < Aura
       NAME = "Faith's Fetters"
-      TYPE_LINE = "Enchantment -- Aura"
       COST = { generic: 3, white: 1 }
 
       def target_choices

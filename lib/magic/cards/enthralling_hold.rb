@@ -7,8 +7,7 @@ module Magic
       # You can't choose an untapped creature as this spell's target as you cast it.
       # You control enchanted creature.
 
-      NAME = "Capture Sphere"
-      TYPE_LINE = "Enchantment -- Aura"
+      NAME = "Enthralling Hold"
       COST = { generic: 3, blue: 2 }
 
       def target_choices

@@ -2,7 +2,6 @@ module Magic
   module Cards
     class LightOfPromise < Aura
       NAME = "Light of Promise"
-      TYPE_LINE = "Enchantment -- Aura"
       COST = { generic: 2, white: 1 }
 
       def target_choices

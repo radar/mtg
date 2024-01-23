@@ -2,7 +2,6 @@ module Magic
   module Cards
     class CaptureSphere < Aura
       NAME = "Capture Sphere"
-      TYPE_LINE = "Enchantment -- Aura"
       COST = { generic: 3, white: 1 }
       keywords :flash
 
