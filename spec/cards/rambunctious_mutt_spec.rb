@@ -14,7 +14,6 @@ RSpec.describe Magic::Cards::RambunctiousMutt do
       choice = game.choices.first
 
       expect(choice).to be_a(Magic::Choice::DestroyTarget)
-      binding.pry
       expect(choice.choices).to match_array([enchantment, artifact_2])
     end
   end
