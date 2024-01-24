@@ -11,7 +11,7 @@ module Magic
     class CloudkinSeer < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          permanent.trigger_effect(:draw_card)
+          permanent.trigger_effect(:draw_cards)
         end
       end
 

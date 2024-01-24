@@ -8,7 +8,7 @@ module Magic
       def resolve!
         game.add_effect(
           Effects::Scry.new(source: self, amount: 1, then_do: -> do
-            trigger_effect(:draw_card)
+            trigger_effect(:draw_cards)
           end)
         )
 

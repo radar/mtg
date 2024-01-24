@@ -228,7 +228,7 @@ module Magic
         game.add_effect(Effects::DealDamage.new(source: source, **args))
       when :destroy_target
         game.add_effect(Effects::DestroyTarget.new(source: source, **args))
-      when :draw_card
+      when :draw_cards
         game.add_effect(Effects::DrawCards.new(source: source, **args))
       when :gain_life
         game.add_effect(Effects::GainLife.new(source: source, target: source.controller, **args))

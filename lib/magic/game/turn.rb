@@ -36,7 +36,7 @@ module Magic
 
         after_transition to: :first_main do |turn|
           turn.notify!(
-            Events::FirstMainPhase.new
+            Events::FirstMainPhase.new(active_player: turn.active_player)
           )
         end
 

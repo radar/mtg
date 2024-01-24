@@ -12,6 +12,10 @@ module Magic
       @then_do = then_do
     end
 
+    def to_s
+      inspect
+    end
+
     def game
       source.game
     end

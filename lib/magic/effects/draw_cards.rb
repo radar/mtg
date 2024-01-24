@@ -9,6 +9,10 @@ module Magic
         @number_to_draw = number_to_draw
       end
 
+      def inspect
+        "#<Effects::DrawCards player:#{player.name} number_to_draw:#{number_to_draw}>"
+      end
+
       def resolve
         number_to_draw.times do
 

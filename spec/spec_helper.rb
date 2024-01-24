@@ -83,11 +83,15 @@ RSpec.shared_context "two player game" do
     game.current_turn
   end
 
-  def skip_to_combat!
+  def go_to_main_phase!
     current_turn.untap!
     current_turn.upkeep!
     current_turn.draw!
     current_turn.first_main!
+  end
+
+  def skip_to_combat!
+    go_to_main_phase!
     current_turn.beginning_of_combat!
   end
 

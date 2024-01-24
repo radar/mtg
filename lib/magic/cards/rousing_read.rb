@@ -5,7 +5,7 @@ module Magic
 
 
       enters_the_battlefield do
-        permanent.trigger_effect(:draw_card, number_to_draw: 2)
+        permanent.trigger_effect(:draw_cards, number_to_draw: 2)
         permanent.add_choice(:discard)
       end
 
