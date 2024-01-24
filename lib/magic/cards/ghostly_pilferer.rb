@@ -14,7 +14,7 @@ module Magic
     end
 
     class GhostlyPilferer < Creature
-      class Choice < Magic::Choice::Effect
+      class Choice < Magic::Choice
         def costs
           @costs ||= [Costs::Mana.new(generic: 2)]
         end

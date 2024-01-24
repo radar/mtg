@@ -20,7 +20,7 @@ RSpec.describe Magic::Cards::GhostlyPilferer do
       p1.add_mana(blue: 2)
       expect(p1).to receive(:draw!)
       choice = game.choices.last
-      expect(choice).to be_a(Magic::Choice::Effect)
+      expect(choice).to be_a(Magic::Choice)
       choice.pay(p1, generic: { blue: 2 })
       choice.resolve!
     end
@@ -34,7 +34,7 @@ RSpec.describe Magic::Cards::GhostlyPilferer do
       p1.add_mana(blue: 2)
       expect(p1).not_to receive(:draw!)
       choice = game.choices.last
-      expect(choice).to be_a(Magic::Choice::Effect)
+      expect(choice).to be_a(Magic::Choice)
       game.resolve_choice!
       expect(game.choices).to be_none
     end

@@ -1,6 +1,6 @@
 module Magic
-  module Choice
-    class Discard < Magic::Choice::Effect
+  class Choice
+    class Discard < Magic::Choice
       attr_reader :player, :cards
 
       def initialize(player:)

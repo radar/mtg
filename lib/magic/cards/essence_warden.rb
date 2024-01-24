@@ -14,13 +14,7 @@ module Magic
           Events::EnteredTheBattlefield => -> (receiver, event) do
             return if event.permanent == receiver
 
-            game.add_effect(
-              Effects::GainLife.new(
-                source: receiver,
-                target: receiver.controller,
-                life: 1
-              )
-            )
+            trigger_effect(:gain_life, source: receiver, life: 1)
           end
         }
       end

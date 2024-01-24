@@ -5,7 +5,7 @@ module Magic
     end
 
     class LoftyDenial < Instant
-      class Choice < Magic::Choice::Effect
+      class Choice < Magic::Choice
         attr_reader :target
         def initialize(source:, target:)
           super(source:)

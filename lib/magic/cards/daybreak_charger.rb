@@ -10,8 +10,7 @@ module Magic
     class DaybreakCharger < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          effect = Effects::ApplyPowerToughnessModification.new(source: self, power: 2, choices: battlefield.creatures)
-          game.add_effect(effect)
+          permanent.trigger_effect(:modify_power_toughness, power: 2, choices: battlefield.creatures)
         end
       end
 

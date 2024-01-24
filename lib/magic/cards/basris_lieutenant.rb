@@ -12,12 +12,7 @@ module Magic
     class BasrisLieutenant < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          effect = Effects::AddCounter.new(
-            source: permanent,
-            counter_type: Counters::Plus1Plus1,
-            choices: controller.creatures,
-          )
-          game.add_effect(effect)
+          permanent.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, choices: controller.creatures)
         end
       end
 

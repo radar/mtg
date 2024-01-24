@@ -23,8 +23,12 @@ module Magic
       game.battlefield
     end
 
-    def trigger(event, **args)
-      source.trigger(event, source: self, **args)
+    def trigger_effect(effect, **args)
+      source.trigger_effect(effect, source: self, **args)
+    end
+
+    def add_choice(choice, **args)
+      source.add_choice(choice, **args)
     end
   end
 end

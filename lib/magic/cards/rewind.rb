@@ -3,7 +3,7 @@ module Magic
     Rewind = Instant("Rewind") do
       cost generic: 2, blue: 2
 
-      class Choice < Magic::Choice::Effect
+      class Choice < Magic::Choice
         def target_choices
           game.battlefield.lands
         end

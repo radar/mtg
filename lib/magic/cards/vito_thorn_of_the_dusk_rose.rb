@@ -8,7 +8,7 @@ module Magic
     end
 
     class VitoThornOfTheDuskRose < Creature
-      class LifeLossChoice < Magic::Choice::Effect
+      class LifeLossChoice < Magic::Choice
         attr_reader :amount
 
         def initialize(amount:) = @amount = amount

@@ -22,13 +22,13 @@ module Magic
         }
       end
 
-      class Effect < Effects::ReturnToOwnersHand
-      end
-
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          effect = Effect.new(source: self, choices: game.battlefield.by_any_type(T::Creature, T::Planeswalker))
-          game.add_effect(effect)
+          permanent.trigger_effect(
+            :return_to_owners_hand,
+            source: permanent,
+            choices: game.battlefield.by_any_type(T::Creature, T::Planeswalker)
+          )
         end
       end
     end

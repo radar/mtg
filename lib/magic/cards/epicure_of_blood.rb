@@ -19,12 +19,12 @@ module Magic
           Events::LifeGain => -> (receiver, event) do
             return unless event.player == receiver.controller
 
-            effect = Effects::LoseLife.new(
+            trigger_effect(
+              :lose_life,
               source: receiver,
-              targets: game.opponents(receiver.controller),
-              life: 1
+              life: 1,
+              targets: game.opponents(receiver.controller)
             )
-            game.add_effect(effect)
           end
         }
       end

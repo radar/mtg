@@ -23,7 +23,7 @@ RSpec.describe Magic::Cards::FeatOfResistance do
     expect(wood_elves.toughness).to eq(2)
     choice = game.choices.last
     expect(choice).to be_a(Magic::Choice::Color)
-    choice.choose(:green)
+    game.resolve_choice!(color: :green)
     expect(wood_elves.protected_from?(green_card)).to eq(true)
   end
 end

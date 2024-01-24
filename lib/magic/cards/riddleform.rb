@@ -17,7 +17,7 @@ module Magic
     end
 
     class Riddleform < Enchantment
-      class Choice < Magic::Choice::Effect
+      class Choice < Magic::Choice
 
         def resolve!
           source.add_types(T::Creature, T::Creatures["Sphinx"])

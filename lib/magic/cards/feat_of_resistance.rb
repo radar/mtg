@@ -13,15 +13,21 @@ module Magic
         controller.creatures
       end
 
+      class Choice < Magic::Choice::Color
+        attr_reader :target
+        def initialize(source:, target:)
+          super(source: source)
+          @target = target
+        end
+
+        def resolve!(color:)
+          target.gains_protection_from_color(color, until_eot: true)
+        end
+      end
+
       def resolve!(target:)
         target.add_counter(Counters::Plus1Plus1)
-        game.choices.add(
-          Magic::Choice::Color.new(
-            callback: -> (choice)  {
-              target.gains_protection_from_color(choice, until_eot: true)
-            }
-          )
-        )
+        game.choices.add(Choice.new(source: self, target: target))
       end
     end
   end

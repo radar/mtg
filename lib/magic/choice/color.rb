@@ -1,14 +1,6 @@
 module Magic
-  module Choice
-    class Color
-      attr_reader :callback
-      def initialize(callback:)
-        @callback = callback
-      end
-
-      def choose(color)
-        @callback.call(color)
-      end
+  class Choice
+    class Color < Choice
     end
   end
 end

@@ -8,17 +8,13 @@ module Magic
       toughness 2
 
       enters_the_battlefield do
-        effect = Effects::DestroyTarget.new(
-            source: permanent,
-          )
-        game.add_effect(effect)
+        game.choices.add(AcidicSlime::Choice.new(source: self))
       end
-
     end
 
     class AcidicSlime < Creature
-      def target_choices(_)
-        game.battlefield.cards.by_any_type("Artifact", "Enchantment", "Land")
+      class Choice < Choice::DestroyTarget
+        def choices = game.battlefield.cards.by_any_type("Artifact", "Enchantment", "Land")
       end
     end
   end

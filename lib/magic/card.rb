@@ -211,14 +211,33 @@ module Magic
     def can_block? = true
     def can_activate_ability?(_) = true
 
-    def trigger(effect, source: self, **args)
-      case effect
-      when :draw_card
-        game.add_effect(Effects::DrawCards.new(source: source, **args))
+    def add_choice(choice, **args)
+      case choice
       when :discard
         game.choices.add(Magic::Choice::Discard.new(player: controller, **args))
+      else
+        raise "Unknown choice: #{choice.inspect}"
+      end
+    end
+
+    def trigger_effect(effect, source: self, **args)
+      case effect
+      when :add_counter
+        game.add_effect(Effects::AddCounter.new(source: source, **args))
+      when :deal_damage
+        game.add_effect(Effects::DealDamage.new(source: source, **args))
+      when :destroy_target
+        game.add_effect(Effects::DestroyTarget.new(source: source, **args))
+      when :draw_card
+        game.add_effect(Effects::DrawCards.new(source: source, **args))
+      when :gain_life
+        game.add_effect(Effects::GainLife.new(source: source, target: source.controller, **args))
       when :lose_life
         game.add_effect(Effects::LoseLife.new(source: source, **args))
+      when :modify_power_toughness
+        game.add_effect(Effects::ApplyPowerToughnessModification.new(source: source, **args))
+      when :return_to_owners_hand
+        game.add_effect(Effects::ReturnToOwnersHand.new(source: source, **args))
       else
         raise "Unknown trigger: #{effect.inspect}"
       end

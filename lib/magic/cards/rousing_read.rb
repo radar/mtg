@@ -5,8 +5,8 @@ module Magic
 
 
       enters_the_battlefield do
-        permanent.trigger(:draw_card, number_to_draw: 2)
-        permanent.trigger(:discard)
+        permanent.trigger_effect(:draw_card, number_to_draw: 2)
+        permanent.add_choice(:discard)
       end
 
       def target_choices
@@ -24,7 +24,6 @@ module Magic
       def toughness_modification
         1
       end
-
     end
   end
 end

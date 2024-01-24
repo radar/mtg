@@ -36,7 +36,7 @@ module Magic
         end
 
         def resolve!
-          game.add_effect(Effects::AddCounter.new(source: source, counter_type: Counters::Plus1Plus1, choices: target_choices))
+          trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, choices: target_choices)
         end
       end
 

@@ -14,7 +14,7 @@ module Magic
     end
 
     class NiambiEsteemedSpeaker < Creature
-      class Choice < Magic::Choice::Effect
+      class Choice < Magic::Choice
         attr_reader :source
 
         def initialize(source:, choices:)

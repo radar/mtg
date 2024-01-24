@@ -14,13 +14,7 @@ module Magic
       end
 
       def resolve!(target:)
-        effect = Effects::ApplyPowerToughnessModification.new(
-          source: self,
-          power: -4,
-          toughness: -4,
-          targets: target
-        )
-        game.add_effect(effect)
+        target.modify_power_toughness!(source: self, power: -4, toughness: -4)
 
         super
       end

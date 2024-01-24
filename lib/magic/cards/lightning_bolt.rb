@@ -8,12 +8,8 @@ module Magic
         game.any_target
       end
 
-      def single_target?
-        true
-      end
-
       def resolve!(target:)
-        game.add_effect(Effects::DealDamage.new(source: self, targets: [target], damage: 3))
+        trigger_effect(:deal_damage, targets: [target], choices: target_choices, damage: 3)
       end
     end
   end

@@ -15,14 +15,7 @@ module Magic
 
       def resolve!(target:)
         if target.zone == battlefield
-          game.add_effect(
-            Effects::ApplyPowerToughnessModification.new(
-              source: self,
-              choices: game.battlefield.creatures,
-              power: 1,
-              targets: [target]
-            )
-          )
+          target.modify_power_toughness!(source: self, power: 1, toughness: 0)
           controller.draw!
         end
 

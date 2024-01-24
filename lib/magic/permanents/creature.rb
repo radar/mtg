@@ -49,7 +49,8 @@ module Magic
 
       def modify_power_toughness!(source:, power: 0, toughness: 0)
         game.add_effect(Effects::ApplyPowerToughnessModification.new(
-          choices: self,
+          choices: [self],
+          targets: [self],
           source: source,
           power: power,
           toughness: toughness,

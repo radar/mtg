@@ -310,8 +310,12 @@ module Magic
       attachments.any?(&:can_untap_during_upkeep?)
     end
 
-    def trigger(effect, source: self, **args)
-      card.trigger(effect, source: source, **args)
+    def trigger_effect(effect, source: self, **args)
+      card.trigger_effect(effect, source: source, **args)
+    end
+
+    def add_choice(choice, **args)
+      card.add_choice(choice, **args)
     end
 
     private
