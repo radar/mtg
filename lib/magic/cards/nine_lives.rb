@@ -1,7 +1,6 @@
 module Magic
   module Cards
     NineLives = Enchantment("Nine Lives") do
-      type "Legendary Enchantment -- Shrine"
       cost generic: 1, white: 2
       keywords :hexproof
     end
