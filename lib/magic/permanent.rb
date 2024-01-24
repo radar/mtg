@@ -195,6 +195,7 @@ module Magic
     end
 
     def untap!
+      return if untapped?
       untapped_event = Events::PermanentUntapped.new(
         permanent: self,
       )
