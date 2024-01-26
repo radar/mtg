@@ -67,6 +67,21 @@ module Magic
       game.take_action(action)
     end
 
+    def prepare_activate_mana_ability(ability:, **args, &block)
+      action = prepare_action(Magic::Actions::ActivateManaAbility, ability: ability, **args)
+      yield action if block_given?
+      action
+    end
+
+
+    def activate_mana_ability(ability:, auto_tap: true, **args, &block)
+      action = prepare_activate_mana_ability(ability: ability, **args, &block)
+      action.pay_tap if action.has_cost?(Magic::Costs::Tap) && auto_tap
+      action.finalize_costs!(self)
+      game.take_action(action)
+    end
+
+
     def activate_loyalty_ability(ability:, auto_tap: true, **args)
       action = prepare_action(Magic::Actions::ActivateLoyaltyAbility, ability: ability, **args)
       yield action if block_given?

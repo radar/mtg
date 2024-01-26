@@ -20,9 +20,10 @@ RSpec.describe Magic::Cards::JungleHollow do
   end
 
   it "taps for either black or green" do
-    p1.activate_ability(ability: permanent.activated_abilities.first)
-    game.resolve_pending_effect(black: 1)
-    expect(game.effects).to be_empty
+    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+      _1.choose(:black)
+    end
+
     expect(p1.mana_pool[:black]).to eq(1)
   end
 end
