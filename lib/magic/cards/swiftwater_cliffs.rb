@@ -1,6 +1,6 @@
 module Magic
   module Cards
-    ThornwoodFalls = Card("Thornwood Falls") do
+    SwiftwaterCliffs = Card("Swiftwater Cliffs") do
       type "Land"
 
       enters_the_battlefield do
@@ -8,13 +8,13 @@ module Magic
       end
     end
 
-    class ThornwoodFalls < Card
+    class SwiftwaterCliffs < Card
       def enters_tapped?
         true
       end
 
       class ManaAbility < Magic::TapManaAbility
-        choices :green, :blue
+        choices :red, :blue
       end
 
       def activated_abilities = [ManaAbility]
