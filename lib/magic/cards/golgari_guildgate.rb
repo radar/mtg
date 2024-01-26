@@ -9,23 +9,8 @@ module Magic
         true
       end
 
-      class ManaAbility < Magic::ManaAbility
-        def initialize(source:)
-          @costs = [Costs::Tap.new(source)]
-
-          super
-        end
-
-        def resolve!
-          game.add_effect(
-            Effects::AddManaOrAbility.new(
-              source: source,
-              player: source.controller,
-              black: 1,
-              green: 1
-            )
-          )
-        end
+      class ManaAbility < Magic::TapManaAbility
+        choices :black, :green
       end
 
       def activated_abilities = [ManaAbility]
