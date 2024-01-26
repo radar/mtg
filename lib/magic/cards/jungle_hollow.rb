@@ -2,17 +2,12 @@ module Magic
   module Cards
     JungleHollow = Card("Jungle Hollow") do
       type "Land"
+      enters_the_battlefield do
+        permanent.trigger_effect(:gain_life, life: 1)
+      end
     end
 
     class JungleHollow < Card
-      class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
-          controller.gain_life(1)
-        end
-      end
-
-      def etb_triggers = [ETB]
-
       def enters_tapped?
         true
       end
