@@ -1,13 +1,13 @@
 require 'spec_helper'
 
-RSpec.describe Magic::Cards::JungleHollow do
+RSpec.describe Magic::Cards::TranquilCove do
   include_context "two player game"
 
-  let(:card) { Card("Jungle Hollow") }
+  let(:card) { Card("Tranquil Cove") }
 
   let!(:permanent) do
     p1.play_land(land: card)
-    p1.permanents.by_name("Jungle Hollow").first
+    p1.permanents.by_name("Tranquil Cove").first
   end
 
   it "enters the battlefield tapped" do
@@ -19,20 +19,20 @@ RSpec.describe Magic::Cards::JungleHollow do
     expect(p1.life).to eq(21)
   end
 
-  it "taps for black" do
+  it "taps for white" do
     p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
-      _1.choose(:black)
+      _1.choose(:white)
     end
 
-    expect(p1.mana_pool[:black]).to eq(1)
+    expect(p1.mana_pool[:white]).to eq(1)
   end
 
-  it "taps for green" do
+  it "taps for blue" do
     p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
-      _1.choose(:green)
+      _1.choose(:blue)
     end
 
-    expect(p1.mana_pool[:green]).to eq(1)
+    expect(p1.mana_pool[:blue]).to eq(1)
   end
 
   it "cannot tap for another color" do
