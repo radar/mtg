@@ -35,8 +35,12 @@ module Magic
           )
         end
 
-        def resolve!
-          trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, choices: target_choices)
+        def single_target?
+          true
+        end
+
+        def resolve!(target:)
+          trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, choices: target_choices, target: target)
         end
       end
 

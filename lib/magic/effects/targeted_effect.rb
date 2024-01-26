@@ -5,8 +5,13 @@ module Magic
 
       attr_reader :source, :targets
 
-      def initialize(source:, targets: [], choices: [])
-        @targets = [*targets]
+      def initialize(source:, targets: [], choices: [], target: nil)
+        if target
+          @targets = [target]
+        else
+          @targets = [*targets]
+        end
+
         @source = source
         @choices = [*choices]
       end
