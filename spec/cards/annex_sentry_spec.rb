@@ -18,7 +18,10 @@ RSpec.describe Magic::Cards::AnnexSentry do
 
   it "exiles a target creature or artifact an opponent controls with CMC 3 or less" do
     subject.entered_the_battlefield!
-    game.resolve_pending_effect(wood_elves)
+
+    choice = game.choices.last
+    expect(choice).to be_a(Magic::Cards::AnnexSentry::Choice)
+    game.resolve_choice!(target: wood_elves)
 
     expect(wood_elves.card.zone).to be_exile
     expect(subject.exiled_cards).to include(wood_elves.card)

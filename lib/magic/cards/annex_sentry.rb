@@ -17,14 +17,20 @@ module Magic
         end
       end
 
-      class ETB < TriggeredAbility::EnterTheBattlefield
-
-        def perform
+      class Choice < Magic::Choice
+        def resolve!(target:)
           effect = Effect.new(
-            source: permanent,
-            choices: game.battlefield.not_controlled_by(controller).cmc_lte(3).by_any_type(T::Creature, T::Artifact)
+            source: source,
+            choices: game.battlefield.not_controlled_by(source.controller).cmc_lte(3).by_any_type(T::Creature, T::Artifact)
           )
           game.add_effect(effect)
+        end
+      end
+
+
+      class ETB < TriggeredAbility::EnterTheBattlefield
+        def perform
+          game.choices.add(Choice.new(source: permanent))
         end
       end
 
