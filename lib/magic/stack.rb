@@ -95,12 +95,6 @@ module Magic
       effects.shift.resolve(...)
     end
 
-    def resolve_single_target_effect(effect)
-      logger.debug "Resolving single target effect: #{effect}"
-      effect.resolve(effect.choices.first)
-
-      effects.shift
-    end
 
     def skip_effect(effect)
       effects.shift
