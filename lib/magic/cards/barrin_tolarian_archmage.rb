@@ -1,11 +1,32 @@
 module Magic
   module Cards
     BarrinTolarianArchmage = Creature("Barrin, Tolarian Archmage") do
+      power 2
+      toughness 2
       cost "{1}{U}{U}"
       type "#{T::Legendary} #{T::Creature} -- #{creature_types("Human Wizard")}"
     end
 
     class BarrinTolarianArchmage < Creature
+      class Choice < Magic::Choice
+        def choices
+          Magic::Targets::Choices.new(
+            choices: game.battlefield.by_any_type(T::Creature, T::Planeswalker),
+            min: 0,
+            max: 1,
+          )
+        end
+
+        def resolve!(target:)
+          source.trigger_effect(
+            :return_to_owners_hand,
+            choices: choices,
+            source: source,
+            targets: [target],
+          )
+        end
+      end
+
       def etb_triggers = [ETB]
 
       def event_handlers
@@ -22,13 +43,11 @@ module Magic
         }
       end
 
+
+
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          permanent.trigger_effect(
-            :return_to_owners_hand,
-            source: permanent,
-            choices: game.battlefield.by_any_type(T::Creature, T::Planeswalker)
-          )
+          game.choices.add(Choice.new(source: permanent))
         end
       end
     end

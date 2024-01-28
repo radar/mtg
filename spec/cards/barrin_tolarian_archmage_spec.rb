@@ -10,7 +10,9 @@ RSpec.describe Magic::Cards::BarrinTolarianArchmage do
 
   it "returns a creature" do
     subject.entered_the_battlefield!
-    game.resolve_pending_effect(wood_elves)
+    expect(game.choices.last).to be_a(Magic::Cards::BarrinTolarianArchmage::Choice)
+    game.resolve_choice!(target: wood_elves)
+    game.tick!
 
     expect(wood_elves.zone).to be_nil
     expect(wood_elves.card.zone).to be_hand
@@ -30,9 +32,20 @@ RSpec.describe Magic::Cards::BarrinTolarianArchmage do
     turn.end!
   end
 
+  it "elects to skip the choice" do
+    subject.entered_the_battlefield!
+    expect(game.choices.last).to be_a(Magic::Cards::BarrinTolarianArchmage::Choice)
+    game.skip_choice!
+    game.tick!
+
+    expect(wood_elves.zone).to be_battlefield
+  end
+
   it "returns a planeswalker" do
     subject.entered_the_battlefield!
-    game.resolve_pending_effect(basri_ket)
+    expect(game.choices.last).to be_a(Magic::Cards::BarrinTolarianArchmage::Choice)
+    game.resolve_choice!(target: basri_ket)
+    game.tick!
 
     turn = game.current_turn
 
@@ -51,7 +64,9 @@ RSpec.describe Magic::Cards::BarrinTolarianArchmage do
 
   it "returns another player's creature, so does not draw a card" do
     subject.entered_the_battlefield!
-    game.resolve_pending_effect(wood_elves_2)
+    expect(game.choices.last).to be_a(Magic::Cards::BarrinTolarianArchmage::Choice)
+    game.resolve_choice!(target: wood_elves_2)
+    game.tick!
 
     expect(wood_elves_2.zone).to be_nil
     expect(wood_elves_2.card.zone).to be_hand
