@@ -5,10 +5,9 @@ module Magic
 
       attr_reader :choices, :min, :max
 
-      def_delegators :choices, :select
+      def_delegators :choices, :select, :include?, :first, :count, :-
 
-
-      def initialize(choices:, min:, max:)
+      def initialize(choices:, min: 1, max: 1)
         @choices = choices
         @min = min
         @max = max

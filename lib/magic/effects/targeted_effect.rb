@@ -13,7 +13,7 @@ module Magic
         end
 
         @source = source
-        @choices = [*choices]
+        @choices = choices
       end
 
       def choices

@@ -7,6 +7,7 @@ module Magic
 
     def player = source.controller
     def game = player.game
+    def battlefield = game.battlefield
 
     def to_s = inspect
   end

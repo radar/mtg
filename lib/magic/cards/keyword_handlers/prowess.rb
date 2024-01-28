@@ -12,12 +12,7 @@ module Magic
           return if spell.controller != permanent.controller
           return if spell.creature?
 
-          spell.game.add_effect(Effects::ApplyPowerToughnessModification.new(
-            choices: permanent,
-            source: permanent,
-            power: 1,
-            toughness: 1,
-          ))
+          permanent.trigger_effect(:modify_power_toughness, source: permanent, power: 1, toughness: 1, choices: [permanent])
         end
       end
     end
