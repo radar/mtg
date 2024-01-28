@@ -1,7 +1,7 @@
 module Magic
   module Effects
     class CounterSpell < TargetedEffect
-      def resolve(target = targets.first)
+      def resolve!
         game.stack.counter!(target)
       end
     end

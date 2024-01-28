@@ -2,9 +2,10 @@ module Magic
   class Game
     extend Forwardable
 
-    attr_reader :logger, :battlefield, :exile, :choices, :stack, :players, :emblems, :current_turn
+    attr_reader :logger, :battlefield, :exile, :stack, :players, :emblems, :current_turn
 
-    def_delegators :@stack, :choices, :skip_choice!, :resolve_choice!, :effects, :add_effect, :resolve_pending_effect, :next_effect
+    def_delegators :@stack, :choices, :add_choice, :skip_choice!, :resolve_choice!, :effects, :add_effect
+
     def_delegators :@current_turn, :take_action, :take_actions, :can_cast_sorcery?
 
     def self.start!(players: [])

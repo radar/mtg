@@ -9,9 +9,9 @@ RSpec.describe Magic::Cards::RunedHalo do
 
     it "triggers a 'choose a card' effect" do
       cast_and_resolve(card: subject, player: p1)
-      effect = game.effects.first
-      expect(effect).to be_a(Magic::Effects::ChooseACard)
-      game.resolve_pending_effect(Magic::Cards::WoodElves)
+      choice = game.choices.last
+      expect(choice).to be_a(Magic::Cards::RunedHalo::Choice)
+      game.resolve_choice!(choice: Magic::Cards::WoodElves)
 
       runed_halo = p1.permanents.by_name("Runed Halo").first
       expect(runed_halo.protections.count).to eq(1)

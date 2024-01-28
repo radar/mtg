@@ -47,16 +47,6 @@ module Magic
           static_ability_mods.sum(&:toughness)
       end
 
-      def modify_power_toughness!(source:, power: 0, toughness: 0)
-        game.add_effect(Effects::ApplyPowerToughnessModification.new(
-          choices: [self],
-          targets: [self],
-          source: source,
-          power: power,
-          toughness: toughness,
-        ))
-      end
-
       def take_damage(source:, damage:)
         game.notify!(
           Events::DamageDealt.new(
@@ -81,13 +71,11 @@ module Magic
           Events::CombatDamageDealt.new(source: self, target: target, damage: assigned_damage)
         )
         if target.is_a?(Magic::Player) && has_keyword?(Magic::Keywords::Toxic)
-          effect = Effects::AddCounter.new(
-            source: self,
+          trigger_effect(
+            :add_counter,
             counter_type: Counters::Toxic,
-            choices: [target],
-            targets: [target]
+            target: target,
           )
-          game.add_effect(effect)
         end
 
         controller.gain_life(assigned_damage) if lifelink?

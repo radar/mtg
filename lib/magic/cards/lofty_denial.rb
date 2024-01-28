@@ -28,8 +28,7 @@ module Magic
 
         def resolve!
           if costs.none?(&:paid?)
-            effect = Effects::CounterSpell.new(source: source, targets: [target], choices: [target])
-            game.add_effect(effect)
+            source.trigger_effect(:counter_spell, target: target)
           end
         end
       end

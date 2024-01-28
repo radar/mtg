@@ -11,17 +11,21 @@ module Magic
       KEYWORDS = [Keywords::Toxic.new(1)]
 
       class Effect < Effects::Exile
-        def resolve(target)
+        def resolve!
           super
           source.exiled_cards << target.card
         end
       end
 
       class Choice < Magic::Choice
+        def choices
+          game.battlefield.not_controlled_by(source.controller).cmc_lte(3).by_any_type(T::Creature, T::Artifact)
+        end
+
         def resolve!(target:)
-          effect = Effect.new(
+          effect = AnnexSentry::Effect.new(
             source: source,
-            choices: game.battlefield.not_controlled_by(source.controller).cmc_lte(3).by_any_type(T::Creature, T::Artifact)
+            target: target,
           )
           game.add_effect(effect)
         end

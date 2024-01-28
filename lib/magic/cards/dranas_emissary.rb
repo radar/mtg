@@ -21,9 +21,13 @@ module Magic
 
             controller.gain_life(1)
 
-            effect = Effects::DealDamageToOpponents.new(source: receiver, damage: 1)
-            effect.resolve(game.opponents(receiver.controller))
-
+            opponents.each do |opponent|
+              receiver.trigger_effect(
+                :deal_damage,
+                damage: 1,
+                target: opponent,
+              )
+            end
           end
         }
       end

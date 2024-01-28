@@ -15,7 +15,7 @@ module Magic
             return if receiver == event.permanent
             return if event.permanent.cast? || event.permanent.token?
 
-            Effects::Exile.new(source: receiver).resolve(event.permanent)
+            receiver.trigger_effect(:exile, target: event.permanent)
           end
         }
       end

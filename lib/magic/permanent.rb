@@ -10,7 +10,7 @@ module Magic
     extend Forwardable
     attr_reader :game, :owner, :controller, :card, :types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :keyword_grants, :activated_abilities, :exiled_cards, :cannot_untap_next_turn
 
-    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?
+    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents
     def_delegators :@game, :logger
 
     class Protections < SimpleDelegator
@@ -139,7 +139,7 @@ module Magic
 
     def died!
       card.death_triggers.each do |trigger|
-        trigger.new(game: game, permanent: self).perform
+        trigger.new(game: game, source: self).perform
       end
       left_the_battlefield!
     end
@@ -148,13 +148,13 @@ module Magic
       @attachments.each(&:destroy!)
 
       card.ltb_triggers.each do |trigger|
-        trigger.new(game: game, permanent: self).perform
+        trigger.new(game: game, source: self).perform
       end
     end
 
     def entered_the_battlefield!
       card.etb_triggers.each do |trigger|
-        trigger.new(game: game, permanent: self).perform
+        trigger.new(game: game, source: self).perform
       end
     end
 

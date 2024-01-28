@@ -55,15 +55,11 @@ module Magic
       end
 
       def perform
-        if targets.any?
-          if ability.single_target?
-            ability.resolve!(target: targets.first)
-          else
-            ability.resolve!(targets: targets)
-          end
-        else
-          ability.resolve!
-        end
+        resolver = ability.method(:resolve!)
+        args = {}
+        args[:target] = targets.first if resolver.parameters.include?([:keyreq, :target])
+        args[:targets] = targets if resolver.parameters.include?([:keyreq, :targets])
+        ability.resolve!(**args)
       end
 
       def pay(cost_type, payment = nil)

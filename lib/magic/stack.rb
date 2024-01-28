@@ -61,38 +61,27 @@ module Magic
     end
 
     def add_effect(effect)
-      logger.debug "New effect added: #{effect}, choice required: #{effect.requires_choices?}"
+      logger.debug "Effect added: #{effect}"
 
-      if effect.requires_choices?
-        if effect.requires_targets? && effect.targets_chosen?
-          effect.resolve(*effect.targets)
-        elsif effect.single_choice?
-          logger.debug "Only one choice for #{effect}: #{effect.choices.first}, resolving effect immediately."
-          effect.resolve(effect.choices.first)
-        else
-          @effects << effect
-          # wait for a choice to be made
+      effect.resolve!
+    end
+
+    def add_choice(choice)
+      logger.debug "Choice added: #{choice}"
+      @choices.add(choice)
+
+      if choice.is_a?(Magic::Choice::Targeted)
+        if choice.single_target? && choice.single_choice?
+          logger.debug "  Only one valid target for choice, resolving choice immediately."
+          resolve_choice!(target: choice.target_choices.first)
         end
-      else
-        effect.resolve
       end
     end
 
-    def pending_effects?
-      @effects.any?
-    end
+
 
     def pending_choices?
       @choices.any?
-    end
-
-    def next_effect
-      @effects.first
-    end
-
-    def resolve_pending_effect(...)
-      logger.debug "Resolving effect: #{effects.first}"
-      effects.shift.resolve(...)
     end
 
     def resolve!
@@ -103,11 +92,6 @@ module Magic
 
     def resolve_stack!
       return if @stack.empty?
-      if pending_effects?
-        logger.debug "Pending effects, pausing stack resolution."
-        return
-      end
-
       if pending_choices?
         logger.debug "Pending choices, pausing stack resolution."
         return

@@ -119,7 +119,7 @@ module Magic
       colors.count == 0
     end
 
-    def move_to_hand!(target_controller)
+    def move_to_hand!(target_controller = controller)
       move_zone!(target_controller.hand)
     end
 
@@ -214,7 +214,7 @@ module Magic
     def add_choice(choice, **args)
       case choice
       when :discard
-        game.choices.add(Magic::Choice::Discard.new(player: controller, **args))
+        game.add_choice(Magic::Choice::Discard.new(player: controller, **args))
       else
         raise "Unknown choice: #{choice.inspect}"
       end
@@ -224,12 +224,16 @@ module Magic
       case effect
       when :add_counter
         game.add_effect(Effects::AddCounter.new(source: source, **args))
+      when :counter_spell
+        game.add_effect(Effects::CounterSpell.new(source: source, **args))
       when :deal_damage
         game.add_effect(Effects::DealDamage.new(source: source, **args))
       when :destroy_target
         game.add_effect(Effects::DestroyTarget.new(source: source, **args))
       when :draw_cards
         game.add_effect(Effects::DrawCards.new(source: source, **args))
+      when :exile
+        game.add_effect(Effects::Exile.new(source: source, **args))
       when :gain_life
         game.add_effect(Effects::GainLife.new(source: source, target: source.controller, **args))
       when :lose_life
@@ -241,6 +245,10 @@ module Magic
       else
         raise "Unknown trigger: #{effect.inspect}"
       end
+    end
+
+    def opponents
+      game.opponents(controller)
     end
 
     private

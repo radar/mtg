@@ -9,15 +9,10 @@ module Magic
 
     class StormCaller < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
-
         def perform
-          effect = Effects::DealDamage.new(
-            source: permanent,
-            choices: game.opponents(controller),
-            targets: game.opponents(controller),
-            damage: 2,
-          )
-          game.add_effect(effect)
+          source.opponents.each do |opponent|
+            source.trigger_effect(:deal_damage, damage: 2, target: opponent)
+          end
         end
       end
 

@@ -9,10 +9,6 @@ module Magic
         super(source: source)
       end
 
-      def requires_choices?
-        true
-      end
-
       def resolve!(top: [], bottom: [])
         source.controller.scry(amount:, top:, bottom:)
       end

@@ -1,17 +1,13 @@
 module Magic
   module Effects
     class GainLife < TargetedEffect
-      attr_reader :life, :target
-      def initialize(life:, target:, **args)
+      attr_reader :life
+      def initialize(life:, **args)
         @life = life
-        @target = target
+        super(**args)
       end
 
-      def requires_choices?
-        false
-      end
-
-      def resolve
+      def resolve!
         target.gain_life(life)
       end
     end

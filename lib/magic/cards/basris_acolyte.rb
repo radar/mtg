@@ -18,7 +18,7 @@ module Magic
         end
 
         def resolve!(target:)
-          source.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, source: source, choices: choices, targets: [target])
+          source.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, source: source, target: target)
           choice = SecondChoice.new(source: source, choices: choices - [target])
           game.choices.add(choice)
         end
@@ -32,8 +32,8 @@ module Magic
           super(**args)
         end
 
-        def resolve!(target)
-          source.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, source: source, choices: choices, targets: [target])
+        def resolve!(target:)
+          source.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, source: source, target: target)
         end
       end
 

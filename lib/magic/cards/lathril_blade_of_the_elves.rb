@@ -13,7 +13,11 @@ module Magic
         def costs = [Costs::Tap.new(source), Costs::MultiTap.new(-> (c) { c.type?("Elf") }, 10)]
 
         def resolve!
-          source.trigger_effect(:lose_life, source: source, life: 10, targets: game.opponents(source.controller))
+          opponents = game.opponents(source.controller)
+          opponents.each do |opponent|
+            source.trigger_effect(:lose_life, source: source, life: 10, target: opponent)
+          end
+
           source.trigger_effect(:gain_life, source: source, life: 10, target: source.controller)
         end
       end

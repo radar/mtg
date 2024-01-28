@@ -7,16 +7,26 @@ module Magic
       toughness 4
       keywords :vigilance
       protections [Protection.new(condition: -> (card) { card.multi_colored? })]
+
+      enters_the_battlefield do
+        game.add_choice(BasrisLieutenant::Choice.new(source: permanent))
+      end
     end
 
     class BasrisLieutenant < Creature
-      class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
-          permanent.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, choices: controller.creatures)
+      class Choice < Magic::Choice::Targeted
+        def choices
+          game.battlefield.controlled_by(controller).creatures
+        end
+
+        def choice_amount
+          1
+        end
+
+        def resolve!(target:)
+          source.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, target: target)
         end
       end
-
-      def etb_triggers = [ETB]
 
       def event_handlers
         {

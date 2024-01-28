@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!(target:)
-        Effects::CounterSpell.new(source: self).resolve(target)
+        trigger_effect(:counter_spell, target: target)
         super
       end
     end

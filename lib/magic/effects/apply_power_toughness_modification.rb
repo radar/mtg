@@ -9,13 +9,9 @@ module Magic
         super(**args)
       end
 
-      def resolve(*targets)
-        raise InvalidTarget if targets.any? { |target| !choices.include?(target) }
-
-        targets.each do |target|
-          target.modify_power(power) if power
-          target.modify_toughness(toughness) if toughness
-        end
+      def resolve!
+        target.modify_power(power) if power
+        target.modify_toughness(toughness) if toughness
       end
     end
   end

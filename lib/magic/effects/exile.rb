@@ -1,13 +1,8 @@
 module Magic
   module Effects
-    class Exile < Effect
-
-      def requires_choices?
-        true
-      end
-
-      def resolve(*targets)
-        targets.each(&:exile!)
+    class Exile < TargetedEffect
+      def resolve!
+        target.exile!
       end
     end
   end

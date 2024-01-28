@@ -19,7 +19,6 @@ module Magic
         def resolve!(target:)
           source.trigger_effect(
             :return_to_owners_hand,
-            choices: choices,
             source: source,
             targets: [target],
           )

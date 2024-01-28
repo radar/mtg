@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!(target:)
-        target.modify_power_toughness!(source: self, power: -4, toughness: -4)
+        trigger_effect(:modify_power_toughness, source: self, target: target, power: -4, toughness: -4)
 
         super
       end

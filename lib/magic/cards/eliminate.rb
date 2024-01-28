@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:destroy_target, targets: [target])
+        trigger_effect(:destroy_target, target: target)
       end
     end
   end

@@ -4,12 +4,9 @@ module Magic
 
     class InvalidTarget < StandardError; end;
 
-    def initialize(source:, targets: [], choices: [], then_do: nil)
+    def initialize(source:, targets: [], target: nil)
       @source = source
-      @targets = targets
-      @choices = choices.select { |choice| choice.can_be_targeted_by?(source) }
-      @resolved = false
-      @then_do = then_do
+      @targets = [*targets] + [*target]
     end
 
     def to_s
@@ -28,36 +25,14 @@ module Magic
       false
     end
 
+    def target
+      raise "Ambigious target, as there is more than one" if targets.count > 1
+
+      targets.first
+    end
+
     def multiple_targets?
       targets > 1
-    end
-
-    def single_choice?
-      requires_choices? && choices.count == 1
-    end
-
-    def requires_choices?
-      false
-    end
-
-    def no_choice?
-      false
-    end
-
-    def resolve(*)
-      @resolved = true
-
-      if then_do
-        then_do.call
-      end
-    end
-
-    def skip!
-      @resolved = true
-    end
-
-    def resolved?
-      !!@resolved
     end
   end
 end

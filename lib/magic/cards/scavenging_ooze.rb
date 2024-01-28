@@ -18,7 +18,7 @@ module Magic
         end
 
         def resolve!(target:)
-          Effects::Exile.new(source: source).resolve(target)
+          trigger_effect(:exile, target: target)
           if target.creature?
             source.add_counter(Counters::Plus1Plus1)
             source.controller.gain_life(1)

@@ -1,18 +1,14 @@
 module Magic
   module Effects
     class LoseLife < TargetedEffect
-      attr_reader :life, :targets
-      def initialize(life:, targets:, **args)
+      attr_reader :life
+      def initialize(life:, **args)
         @life = life
-        @targets = targets
+        super(**args)
       end
 
-      def requires_choices?
-        false
-      end
-
-      def resolve
-        targets.each { _1.lose_life(life) }
+      def resolve!
+        target.lose_life(life)
       end
     end
   end

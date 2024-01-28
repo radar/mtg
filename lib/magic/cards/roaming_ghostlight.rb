@@ -8,8 +8,23 @@ module Magic
       keywords :flying
 
       enters_the_battlefield do
-        choices = game.battlefield.creatures.excluding_type(T::Creatures['Spirit'])
-        game.add_effect(Effects::ReturnToOwnersHand.new(source: self, choices: choices))
+        game.add_choice(RoamingGhostlight::Choice.new(source: source))
+      end
+    end
+
+    class RoamingGhostlight < Creature
+      class Choice < Magic::Choice::Targeted
+        def choices
+          game.battlefield.creatures.excluding_type(T::Creatures['Spirit'])
+        end
+
+        def choice_amount
+          1
+        end
+
+        def resolve!(target:)
+          game.add_effect(Effects::ReturnToOwnersHand.new(source: self, target: target))
+        end
       end
     end
   end

@@ -12,6 +12,7 @@ RSpec.describe Magic::Cards::RoamingGhostlight do
     it "returns non-Spirit creature to its owner's hand" do
       ResolvePermanent("Roaming Ghostlight", owner: p1)
 
+      # Choice is automatic given there's only one correct choice
       expect(p2.hand.by_name("Wood Elves").count).to eq(1)
 
       expect(game.battlefield.creatures.by_name("Wandering Ones").count).to eq(1)

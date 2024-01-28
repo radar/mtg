@@ -74,11 +74,11 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
       expect(subject.zone).to be_nil
       expect(p1.life).to eq(27)
 
-      move_to_battlefield = game.next_effect
-      expect(move_to_battlefield).to be_a(Magic::Effects::MoveToBattlefield)
+      choice = game.choices.last
+      expect(choice).to be_a(Magic::Cards::UginTheSpiritDragon::Choice)
       permanents = p1.hand.cards.permanents.last(7)
       expect(permanents.count).to eq(7)
-      game.resolve_pending_effect(permanents)
+      game.resolve_choice!(choices: permanents)
 
       permanents.each do |permanent|
         expect(game.battlefield.cards.by_name(permanent.name).controlled_by(p1).count).to eq(1)

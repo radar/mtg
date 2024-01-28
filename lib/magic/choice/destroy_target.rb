@@ -11,7 +11,7 @@ module Magic
         raise NotImplemented
       end
 
-      def resolve!(target:)
+      def resolve!
         source.trigger(:destroy_target, source: source, target: target)
       end
     end

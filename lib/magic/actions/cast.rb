@@ -113,7 +113,7 @@ module Magic
         if mode
           resolver = mode.method(:resolve)
         else
-          resolver =card.method(:resolve!)
+          resolver = card.method(:resolve!)
         end
 
         args = {}

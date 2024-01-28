@@ -13,7 +13,7 @@ module Magic
         "#<Effects::DrawCards player:#{player.name} number_to_draw:#{number_to_draw}>"
       end
 
-      def resolve
+      def resolve!
         number_to_draw.times do
 
           player.draw!

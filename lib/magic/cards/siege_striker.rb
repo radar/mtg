@@ -18,7 +18,14 @@ module Magic
             return unless game.current_turn.step?(:declare_attackers)
             return unless event.permanent.creature?
 
-            receiver.modify_power_toughness!(source: self, power: 1, toughness: 1)
+            receiver.trigger_effect(
+              :modify_power_toughness,
+              source: receiver,
+              target: receiver,
+              power: 1,
+              toughness: 1,
+            )
+
           end
         }
       end

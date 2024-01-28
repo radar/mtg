@@ -1,15 +1,17 @@
 module Magic
   module TriggeredAbility
     class Base
-      attr_reader :game, :permanent
+      attr_reader :game, :source
 
-      def initialize(game:, permanent:)
+      def initialize(game:, source:)
         @game = game
-        @permanent = permanent
+        @source = source
       end
 
+      alias_method :permanent, :source
+
       def controller
-        permanent.controller
+        source.controller
       end
 
       def battlefield

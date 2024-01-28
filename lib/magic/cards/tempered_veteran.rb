@@ -22,13 +22,11 @@ module Magic
         end
 
         def resolve!(target:)
-          effect = Effects::AddCounter.new(
-            choices: target_choices,
-            source: source,
+          trigger_effect(
+            :add_counter,
             counter_type: Counters::Plus1Plus1,
-            targets: target,
+            target: target,
           )
-          game.add_effect(effect)
         end
       end
 
@@ -48,13 +46,11 @@ module Magic
         end
 
         def resolve!(target:)
-          effect = Effects::AddCounter.new(
-            choices: target_choices,
-            source: source,
+          trigger_effect(
+            :add_counter,
             counter_type: Counters::Plus1Plus1,
-            targets: target,
+            target: target,
           )
-          game.add_effect(effect)
         end
       end
 

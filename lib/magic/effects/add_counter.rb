@@ -8,20 +8,8 @@ module Magic
         super(**args)
       end
 
-      def requires_choices?
-        true
-      end
-
-      def multiple_targets?
-        true
-      end
-
-      def resolve(*targets)
-        raise InvalidTarget if targets.any? { |target| !choices.include?(target) }
-
-        targets.each do |target|
-          target.add_counter(counter_type)
-        end
+      def resolve!
+        target.add_counter(counter_type)
       end
     end
   end

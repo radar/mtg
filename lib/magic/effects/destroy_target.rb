@@ -1,8 +1,8 @@
 module Magic
   module Effects
     class DestroyTarget < TargetedEffect
-      def resolve(*targets)
-        targets.each(&:destroy!)
+      def resolve!
+        target.destroy!
       end
     end
   end

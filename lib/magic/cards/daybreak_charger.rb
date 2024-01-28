@@ -21,7 +21,7 @@ module Magic
         end
 
         def resolve!(target:)
-          source.trigger_effect(:modify_power_toughness, power: 2, choices: choices, targets: [target])
+          source.trigger_effect(:modify_power_toughness, power: 2, target: target)
         end
       end
     end

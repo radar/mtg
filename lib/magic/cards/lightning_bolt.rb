@@ -9,7 +9,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:deal_damage, targets: [target], choices: target_choices, damage: 3)
+        trigger_effect(:deal_damage, target: target, damage: 3)
       end
     end
   end

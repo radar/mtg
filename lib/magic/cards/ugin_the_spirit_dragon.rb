@@ -34,16 +34,18 @@ module Magic
         def resolve!
           controller = planeswalker.controller
           controller.gain_life(7)
-            7.times { controller.draw! }
+          7.times { controller.draw! }
 
-            game.add_effect(
-              Effects::MoveToBattlefield.new(
-                battlefield: game.battlefield,
-                controller: controller,
-                maximum_choices: 7,
-                choices: controller.hand.cards.permanents
-              )
-            )
+          game.choices.add(UginTheSpiritDragon::Choice.new(source: planeswalker))
+        end
+      end
+
+      class Choice < Magic::Choice::MoveToBattlefield
+        def choices
+          Magic::Targets::Choices.new(
+            amount: 0..7,
+            choices: source.controller.hand,
+          )
         end
       end
 

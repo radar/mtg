@@ -8,15 +8,23 @@ module Magic
     end
 
     class ElderfangRitualist < Creature
+      class Choice < Choice::SearchGraveyard
+        def choices
+          source.controller.graveyard
+        end
+
+        def choice_amount
+          1
+        end
+
+        def resolve!(target:)
+          target.move_to_hand!
+        end
+      end
+
       class Death < TriggeredAbility::Death
         def perform
-          game.add_effect(
-            Effects::SearchGraveyard.new(
-              source: permanent,
-              choices: controller.graveyard.by_any_type("Elf") - [permanent.card],
-              resolve_action: -> (c) { c.move_to_hand!(controller) }
-            )
-          )
+          game.add_choice(ElderfangRitualist::Choice.new(source: source))
         end
       end
 
