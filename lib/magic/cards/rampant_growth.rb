@@ -5,13 +5,14 @@ module Magic
     end
 
     class RampantGrowth < Sorcery
-      def resolve!
-        effect = Effects::SearchLibraryForBasicLand.new(
-          source: self,
-          enters_tapped: true,
-        )
-        game.add_effect(effect)
+      class Choice < Magic::Choice::SearchLibraryForBasicLand
+        def initialize(source:)
+          super(source: source, enters_tapped: true)
+        end
+      end
 
+      def resolve!
+        game.choices.add(Choice.new(source: self))
         super
       end
     end

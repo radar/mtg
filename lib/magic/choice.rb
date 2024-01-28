@@ -5,8 +5,8 @@ module Magic
       @source = source
     end
 
-    def player = source.controller
-    def game = player.game
+    def controller = source.controller
+    def game = controller.game
     def battlefield = game.battlefield
 
     def to_s = inspect

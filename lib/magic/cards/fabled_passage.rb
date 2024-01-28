@@ -7,8 +7,16 @@ module Magic
         receiver.controller.library.basic_lands
       end
 
-      class Effect < Effects::SearchLibraryForBasicLand
-        def resolve(target)
+      class Choice < Magic::Choice::SearchLibraryForBasicLand
+        def initialize(source:)
+          super(source: source, enters_tapped: true)
+        end
+
+        def choices
+          controller.library.basic_lands
+        end
+
+        def resolve!(target:)
           land = super
           if source.controller.lands.count >= 4
             land.untap!
@@ -25,7 +33,7 @@ module Magic
         end
 
         def resolve!
-          game.add_effect(Effect.new(source: source, enters_tapped: true))
+          game.choices.add(Choice.new(source: source))
         end
       end
 

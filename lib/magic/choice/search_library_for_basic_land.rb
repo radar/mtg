@@ -1,13 +1,17 @@
 module Magic
-  module Effects
-    class SearchLibraryForBasicLand < TargetedEffect
+  class Choice
+    class SearchLibraryForBasicLand < Choice
       attr_reader :enters_tapped
       def initialize(source:, enters_tapped: false)
-        super(source: source, choices: source.controller.library.basic_lands)
+        super(source: source)
         @enters_tapped = enters_tapped
       end
 
-      def resolve(target)
+      def choices
+        controller.library.basic_lands
+      end
+
+      def resolve!(target:)
         permanent = target.resolve!(enters_tapped: enters_tapped)
         source.controller.shuffle!
         permanent

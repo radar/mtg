@@ -26,7 +26,7 @@ module Magic
 
         def resolve!
           if costs.all?(&:paid?)
-            player.draw!
+            controller.draw!
           end
 
         end

@@ -19,7 +19,7 @@ module Magic
       class Choice < Magic::Choice
 
         def resolve!
-          shrines = player.permanents.by_type("Shrine").count
+          shrines = controller.permanents.by_type("Shrine").count
           source.trigger_effect(:draw_cards, number_to_draw: shrines)
 
           source.add_choice(:discard)

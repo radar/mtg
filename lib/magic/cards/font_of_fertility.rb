@@ -6,15 +6,17 @@ module Magic
     end
 
     class FontOfFertility < Enchantment
+      class Choice < Magic::Choice::SearchLibraryForBasicLand
+        def initialize(source:)
+          super(source: source, enters_tapped: true)
+        end
+      end
+
       class ActivatedAbility < Magic::ActivatedAbility
         def costs = [Costs::Mana.new(green: 1), Costs::Sacrifice.new(source)]
 
         def resolve!
-          effect = Effects::SearchLibraryForBasicLand.new(
-            source: source,
-            enters_tapped: true,
-          )
-          game.add_effect(effect)
+          game.choices.add(Choice.new(source: source))
         end
       end
 
