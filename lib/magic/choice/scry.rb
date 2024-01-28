@@ -1,24 +1,20 @@
 module Magic
-  module Effects
-    class Scry < Effect
+  class Choice
+    class Scry < Choice
       attr_reader :player, :amount
 
-      def initialize(source:, amount:, then_do:)
+      def initialize(source:, amount:)
         @source = source
         @amount = amount
-        super(source: source, then_do: then_do)
-
+        super(source: source)
       end
 
       def requires_choices?
         true
       end
 
-      def resolve(top: [], bottom: [])
+      def resolve!(top: [], bottom: [])
         source.controller.scry(amount:, top:, bottom:)
-
-        super
-
       end
     end
   end

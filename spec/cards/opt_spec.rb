@@ -23,13 +23,15 @@ RSpec.describe Magic::Cards::Opt do
   it "scries to the top" do
     top_card = p1.library.first
     p1.add_mana(blue: 1)
-    action = cast_action(player: p1, card: opt)
-    action.pay_mana(blue: 1)
-    game.take_action(action)
+    p1.cast(card: opt) do
+      _1.pay_mana(blue: 1)
+    end
     game.tick!
-    effect = game.effects.first
-    expect(effect).to be_a(Magic::Effects::Scry)
-    game.resolve_pending_effect(top: [top_card])
+
+    choice = game.choices.last
+    expect(choice).to be_a(Magic::Cards::Opt::Choice)
+
+    game.resolve_choice!(top: [top_card])
 
     expect(opt.zone).to be_graveyard
     expect(p1.library.first.name).to eq("Forest")
@@ -39,14 +41,14 @@ RSpec.describe Magic::Cards::Opt do
   it "scries to the bottom" do
     top_card = p1.library.first
     p1.add_mana(blue: 1)
-    action = cast_action(player: p1, card: opt)
-    action.pay_mana(blue: 1)
-    game.take_action(action)
+    p1.cast(card: opt) do
+      _1.pay_mana(blue: 1)
+    end
     game.tick!
-    effect = game.effects.first
-    expect(effect).to be_a(Magic::Effects::Scry)
-    game.resolve_pending_effect(bottom: [top_card])
 
+    choice = game.choices.last
+    expect(choice).to be_a(Magic::Cards::Opt::Choice)
+    game.resolve_choice!(bottom: [top_card])
     expect(opt.zone).to be_graveyard
     expect(p1.library.last).to eq(top_card)
 
