@@ -246,8 +246,8 @@ module Magic
       card.can_attack? && attachments.all?(&:can_attack?)
     end
 
-    def can_block?
-      card.can_block? && attachments.all?(&:can_block?)
+    def can_block?(permanent)
+      card.can_block?(permanent) && attachments.all? { |attachment| attachment.can_block?(permanent) }
     end
 
 

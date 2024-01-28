@@ -17,7 +17,7 @@ module Magic
         false
       end
 
-      def can_block?
+      def can_block?(_)
         false
       end
 

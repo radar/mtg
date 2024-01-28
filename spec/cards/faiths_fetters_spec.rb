@@ -18,6 +18,7 @@ RSpec.describe Magic::Cards::FaithsFetters do
 
   context "with wood elves" do
     let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
+    let!(:llanowar_elves) { ResolvePermanent("Llanowar Elves", owner: p1) }
 
     it "makes the controller gain 4 life" do
       expect { cast_faiths_fetters(wood_elves) }.to change { p1.life }.by(4)
@@ -26,30 +27,32 @@ RSpec.describe Magic::Cards::FaithsFetters do
     it "enchants the wood elves" do
       cast_faiths_fetters(wood_elves)
       expect(wood_elves.can_attack?).to eq(false)
-      expect(wood_elves.can_block?).to eq(false)
+      expect(wood_elves.can_block?(llanowar_elves)).to eq(false)
     end
   end
 
   context "with llanowar elves" do
     let!(:llanowar_elves) { ResolvePermanent("Llanowar Elves", owner: p2) }
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
     let(:mana_ability) { llanowar_elves.activated_abilities.first }
 
-    it "enchants the llanowar elves" do
+    it "enchants the llanowar elves, allows for mana ability" do
       cast_faiths_fetters(llanowar_elves)
       expect(llanowar_elves.can_attack?).to eq(false)
-      expect(llanowar_elves.can_block?).to eq(false)
+      expect(llanowar_elves.can_block?(wood_elves)).to eq(false)
       expect(llanowar_elves.can_activate_ability?(mana_ability)).to eq(true)
     end
   end
 
   context "with hellkite punisher" do
     let!(:hellkite_punisher) { ResolvePermanent("Hellkite Punisher", owner: p2) }
+    let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
     let(:activated_ability) { hellkite_punisher.activated_abilities.first }
 
     it "enchants the hellkite punisher" do
       cast_faiths_fetters(hellkite_punisher)
       expect(hellkite_punisher.can_attack?).to eq(false)
-      expect(hellkite_punisher.can_block?).to eq(false)
+      expect(hellkite_punisher.can_block?(wood_elves)).to eq(false)
       expect(hellkite_punisher.can_activate_ability?(activated_ability)).to eq(false)
     end
   end

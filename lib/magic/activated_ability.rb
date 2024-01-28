@@ -23,6 +23,10 @@ module Magic
       game.battlefield
     end
 
+    def controller
+      source.controller
+    end
+
     def trigger_effect(effect, **args)
       source.trigger_effect(effect, source: self, **args)
     end

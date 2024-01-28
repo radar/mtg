@@ -208,7 +208,7 @@ module Magic
     end
 
     def can_attack? = !defender?
-    def can_block? = true
+    def can_block?(_) = true
     def can_activate_ability?(_) = true
 
     def add_choice(choice, **args)
@@ -242,6 +242,8 @@ module Magic
         game.add_effect(Effects::ApplyPowerToughnessModification.new(source: source, **args))
       when :return_to_owners_hand
         game.add_effect(Effects::ReturnToOwnersHand.new(source: source, **args))
+      when :tap
+        game.add_effect(Effects::Tap.new(source: source, **args))
       else
         raise "Unknown trigger: #{effect.inspect}"
       end
