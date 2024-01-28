@@ -7,10 +7,16 @@ module Magic
 
       def_delegators :choices, :select, :include?, :first, :count, :-
 
-      def initialize(choices:, min: 1, max: 1)
+      def initialize(choices:, amount:)
         @choices = choices
-        @min = min
-        @max = max
+        if amount.is_a?(Range)
+          @min = amount.first
+          @max = amount.last
+        else
+          @min = amount
+          @max = amount
+        end
+
       end
     end
   end

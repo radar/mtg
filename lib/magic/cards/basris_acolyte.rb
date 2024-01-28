@@ -12,7 +12,8 @@ module Magic
       class FirstChoice < Magic::Choice
         def choices
           Magic::Targets::Choices.new(
-            choices: battlefield.creatures - [source]
+            choices: battlefield.creatures - [source],
+            amount: 1,
           )
         end
 

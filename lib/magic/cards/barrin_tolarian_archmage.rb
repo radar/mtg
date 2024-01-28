@@ -12,8 +12,7 @@ module Magic
         def choices
           Magic::Targets::Choices.new(
             choices: game.battlefield.by_any_type(T::Creature, T::Planeswalker),
-            min: 0,
-            max: 1,
+            amount: 0..1
           )
         end
 
