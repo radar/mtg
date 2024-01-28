@@ -95,12 +95,6 @@ module Magic
       effects.shift.resolve(...)
     end
 
-
-    def skip_effect(effect)
-      effects.shift
-      effect.skip!
-    end
-
     def resolve!
       logger.debug "Resolving stack."
       resolve_stack!
@@ -139,13 +133,6 @@ module Magic
         effect.targets.each do |target|
           effect.resolve(target)
         end
-      end
-
-      no_choice_effects = unresolved_effects.select { |effect| effect.no_choice? }
-
-      no_choice_effects.each do |effect|
-        skip_effect(effect)
-        logger.debug "#{effect} has no valid choices, skipping."
       end
     end
 
