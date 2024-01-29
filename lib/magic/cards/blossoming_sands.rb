@@ -1,0 +1,23 @@
+module Magic
+  module Cards
+    BlossomingSands = Card("Blossoming Sands") do
+      type "Land"
+
+      enters_the_battlefield do
+        permanent.controller.gain_life(1)
+      end
+    end
+
+    class BlossomingSands < Card
+      def enters_tapped?
+        true
+      end
+
+      class ManaAbility < Magic::TapManaAbility
+        choices :green, :white
+      end
+
+      def activated_abilities = [ManaAbility]
+    end
+  end
+end
