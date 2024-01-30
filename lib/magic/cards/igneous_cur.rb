@@ -1,6 +1,7 @@
 module Magic
   module Cards
     IgneousCur = Creature("Igneous Cur") do
+      cost "{1}{R}"
       creature_type("Elemental Dog")
       power 1
       toughness 2

@@ -110,14 +110,14 @@ module Magic
       action
     end
 
-    def create_tokens(token:, amount: 1, enters_tapped: false)
+    def create_tokens(token_class:, amount: 1, enters_tapped: false)
       tokens = amount.times.map do
-        token.new(game: game, owner: self).resolve!(enters_tapped: enters_tapped)
+        token_class.new(game: game, owner: self).resolve!(enters_tapped: enters_tapped)
       end
     end
 
-    def create_token(token:, **args)
-      create_tokens(token: token, amount: 1, **args).first
+    def create_token(token_class:, **args)
+      create_tokens(token_class: token_class, amount: 1, **args).first
     end
 
     def skip_choice(choice)

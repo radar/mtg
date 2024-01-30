@@ -111,10 +111,6 @@ module Magic
       colors.count > 1
     end
 
-    def colors
-      cost.colors
-    end
-
     def colorless?
       colors.count == 0
     end

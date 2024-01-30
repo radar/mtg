@@ -1,9 +1,48 @@
 module Magic
   class Token
-    attr_reader :game, :name, :controller
-    def initialize(game:, controller:)
+    include Cards::Shared::Characteristics
+    attr_reader :game, :owner, :name, :type_line, :keywords, :keyword_grants, :protections
+
+    KEYWORDS = []
+    PROTECTIONS = []
+
+    class << self
+      def create(name, &block)
+        token = Class.new(Token, &block)
+        token.const_set(:NAME, name)
+        token
+      end
+
+      def type(type)
+        const_set(:TYPE_LINE, type)
+      end
+
+      def power(power)
+        const_set(:POWER, power)
+      end
+
+      def toughness(power)
+        const_set(:TOUGHNESS, power)
+      end
+
+      def colors(colors)
+        const_set(:COLORS, [*colors])
+      end
+
+      def keywords(*keywords)
+        const_set(:KEYWORDS, Keywords[*keywords])
+
+        include Cards::KeywordHandlers::Prowess if keywords.include?(:prowess)
+      end
+    end
+
+    def initialize(game:, owner:)
       @name = self.class::NAME
-      @controller = controller
+      @type_line = self.class::TYPE_LINE
+      @keywords = self.class::KEYWORDS
+      @keyword_grants = []
+      @protections = self.class::PROTECTIONS
+      @owner = owner
       @game = game
     end
 
@@ -11,9 +50,20 @@ module Magic
       @zone = zone
     end
 
-    def self.resolve(game:, controller:, card:)
-      token = new(game: game, controller: controller, card: card.dup)
-      token.resolve!(controller)
+    def resolve!(**args)
+      Permanent.resolve(game: game, card: self, **args)
+    end
+
+    def base_power
+      self.class::POWER
+    end
+
+    def base_toughness
+      self.class::TOUGHNESS
+    end
+
+    def colors
+      self.class::COLORS
     end
 
     def receive_notification(...)
@@ -21,6 +71,30 @@ module Magic
 
     def static_abilities
       []
+    end
+
+    def replacement_effects
+      {}
+    end
+
+    def etb_triggers
+      []
+    end
+
+    def ltb_triggers
+     []
+    end
+
+    def death_triggers
+      []
+    end
+
+    def event_handlers
+      @event_handlers ||= {}
+    end
+
+    def types
+      type_line.scan(/\w+/)
     end
 
     def permanent?

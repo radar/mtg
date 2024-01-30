@@ -92,6 +92,6 @@ module Magic
 
     def move_dead_creatures_to_graveyard
       battlefield.creatures.dead.each(&:destroy!)
-    end
+    end\
   end
 end
