@@ -14,6 +14,14 @@ module Magic
     end
 
     class BasrisLieutenant < Creature
+      KnightToken = Token.create "Knight" do
+        type "Creature —- Knight"
+        power 2
+        toughness 2
+        colors :white
+        keywords :vigilance
+      end
+
       class Choice < Magic::Choice::Targeted
         def choices
           game.battlefield.controlled_by(controller).creatures
@@ -34,7 +42,7 @@ module Magic
             return unless event.permanent.controller == receiver.controller
 
             if event.permanent.counters.any? { |counter| counter.is_a?(Counters::Plus1Plus1) }
-              receiver.controller.create_token(token: Tokens::Knight)
+              receiver.controller.create_token(token_class: KnightToken)
             end
           end
         }

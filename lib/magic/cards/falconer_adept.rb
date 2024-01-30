@@ -8,11 +8,19 @@ module Magic
     end
 
     class FalconerAdept < Creature
+      BirdToken = Token.create("Bird") do
+        type "Creature — Bird"
+        power 1
+        toughness 1
+        colors :white
+        keywords :flying
+      end
+
       def event_handlers
         {
           Events::PreliminaryAttackersDeclared => -> (receiver, event) do
             return if event.attacks.none? { |attack| attack.attacker == receiver }
-            token = controller.create_token(token: Tokens::Bird, enters_tapped: true)
+            token = controller.create_token(token_class: BirdToken, enters_tapped: true)
             game.current_turn.declare_attacker(token)
           end
         }

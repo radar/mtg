@@ -5,6 +5,13 @@ module Magic
     end
 
     class SecureTheScene < Sorcery
+      SoldierToken = Token.create("Soldier") do
+        creature_type "Soldier"
+        power 1
+        toughness 1
+        colors :white
+      end
+
       def target_choices
         battlefield.creatures
       end
@@ -16,7 +23,7 @@ module Magic
       def resolve!(target:)
         target.exile!
 
-        target.controller.create_token(token: Tokens::Soldier)
+        target.controller.create_token(token_class: SoldierToken)
 
         super
       end

@@ -5,6 +5,8 @@ module Magic
     def_delegators :@game, :logger, :battlefield, :exile, :current_turn
 
     include Cards::Keywords
+    include Cards::Shared::Events
+    include Cards::Shared::Types
     attr_reader :game, :controller, :owner, :name, :cost, :kicker_cost, :type_line, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :counters, :modes
     attr_accessor :tapped
 
@@ -17,18 +19,6 @@ module Magic
     MODES = []
 
     class << self
-      def creature_types(types)
-        types.split(" ").map { T::Creatures[_1] }.join(" ")
-      end
-
-      def creature_type(types)
-        type("#{T::Creature} -- #{creature_types(types)}")
-      end
-
-      def artifact_creature_type(types)
-        type("#{T::Artifact} #{T::Creature} -- #{creature_types(types)}")
-      end
-
       def type(type)
         const_set(:TYPE_LINE, type)
       end
@@ -107,6 +97,10 @@ module Magic
     alias_method :cmc, :mana_value
     alias_method :converted_mana_cost, :mana_value
 
+    def colors
+      cost.colors
+    end
+
     def multi_colored?
       colors.count > 1
     end
@@ -180,15 +174,6 @@ module Magic
       []
     end
 
-    def event_handlers
-      @event_handlers ||= {}
-    end
-
-    def add_event_handler(event, &block)
-      event_handlers[event] ||= []
-      event_handlers[event] = block
-    end
-
     def replacement_effects
       {}
     end
@@ -213,35 +198,6 @@ module Magic
         game.add_choice(Magic::Choice::Discard.new(player: controller, **args))
       else
         raise "Unknown choice: #{choice.inspect}"
-      end
-    end
-
-    def trigger_effect(effect, source: self, **args)
-      case effect
-      when :add_counter
-        game.add_effect(Effects::AddCounter.new(source: source, **args))
-      when :counter_spell
-        game.add_effect(Effects::CounterSpell.new(source: source, **args))
-      when :deal_damage
-        game.add_effect(Effects::DealDamage.new(source: source, **args))
-      when :destroy_target
-        game.add_effect(Effects::DestroyTarget.new(source: source, **args))
-      when :draw_cards
-        game.add_effect(Effects::DrawCards.new(source: source, **args))
-      when :exile
-        game.add_effect(Effects::Exile.new(source: source, **args))
-      when :gain_life
-        game.add_effect(Effects::GainLife.new(source: source, target: source.controller, **args))
-      when :lose_life
-        game.add_effect(Effects::LoseLife.new(source: source, **args))
-      when :modify_power_toughness
-        game.add_effect(Effects::ApplyPowerToughnessModification.new(source: source, **args))
-      when :return_to_owners_hand
-        game.add_effect(Effects::ReturnToOwnersHand.new(source: source, **args))
-      when :tap
-        game.add_effect(Effects::Tap.new(source: source, **args))
-      else
-        raise "Unknown trigger: #{effect.inspect}"
       end
     end
 

@@ -12,13 +12,20 @@ module Magic
             return unless event.active_player == owner
             game = owner.game
 
-            owner.create_token(token: Tokens::Soldier)
+            owner.create_token(token_class: SoldierToken)
 
             owner.creatures.each do |creature|
               creature.add_counter(Counters::Plus1Plus1)
             end
           end
         end
+      end
+
+      SoldierToken = Token.create("Soldier") do
+        creature_type "Soldier"
+        power 1
+        toughness 1
+        colors :white
       end
 
       class LoyaltyAbility1 < Magic::LoyaltyAbility
@@ -45,7 +52,7 @@ module Magic
               attackers = game.current_turn.attacks.count
 
               attackers.times do
-                token = planeswalker.controller.create_token(token: Tokens::Soldier, enters_tapped: true)
+                token = planeswalker.controller.create_token(token_class: SoldierToken, enters_tapped: true)
 
                 game.current_turn.declare_attacker(token)
               end

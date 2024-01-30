@@ -7,6 +7,14 @@ module Magic
     end
 
     class GeistHonoredMonk < Creature
+      SpiritToken = Token.create "Spirit" do
+        type "Creature —- Spirit"
+        power 1
+        toughness 1
+        colors :white
+        keywords :flying
+      end
+
       class DynamicPowerAndToughness < Abilities::Static::PowerAndToughnessModification
         def initialize(source:)
           @source = source
@@ -31,7 +39,7 @@ module Magic
 
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          controller.create_token(token: Tokens::Spirit, amount: 2)
+          controller.create_token(token_class: SpiritToken, amount: 2)
         end
       end
 

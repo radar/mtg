@@ -5,12 +5,19 @@ module Magic
       cost white: 1, generic: 4
       power 3
       toughness 3
-
       keywords :vigilance
+
+      KnightToken = Token.create("Knight") do
+        creature_type "Knight"
+        power 2
+        toughness 2
+        colors :white
+        keywords :vigilance
+      end
 
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          controller.create_token(token: Tokens::Knight)
+          controller.create_token(token_class: KnightToken)
         end
       end
 

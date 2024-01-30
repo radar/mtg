@@ -5,6 +5,13 @@ module Magic
     end
 
     class AngelicAscension
+      AngelToken = Token.create "Angel" do
+        type "Creature —- Angel"
+        power 4
+        toughness 4
+        colors :white
+        keywords :flying
+      end
 
       def single_target?
         true
@@ -19,7 +26,7 @@ module Magic
 
         controller = target.controller
 
-        Permanent.resolve(game: game, owner: controller, card: Tokens::Angel.new(owner: controller))
+        controller.create_token(token_class: AngelToken)
       end
     end
   end

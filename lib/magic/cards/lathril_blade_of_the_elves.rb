@@ -9,6 +9,13 @@ module Magic
     end
 
     class LathrilBladeOfTheElves < Creature
+      ElfWarriorToken = Token.create "Elf Warrior" do
+        type "Creature —- Elf Warror"
+        power 1
+        toughness 1
+        colors :green
+      end
+
       class ActivatedAbility < Magic::ActivatedAbility
         def costs = [Costs::Tap.new(source), Costs::MultiTap.new(-> (c) { c.type?("Elf") }, 10)]
 
@@ -29,7 +36,7 @@ module Magic
           Events::CombatDamageDealt => -> (receiver, event) do
             return unless event.target.player?
 
-            controller.create_tokens(token: Tokens::ElfWarrior, amount: event.damage)
+            controller.create_tokens(token_class: ElfWarriorToken, amount: event.damage)
           end
         }
       end

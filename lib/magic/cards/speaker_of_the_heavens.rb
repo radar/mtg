@@ -7,6 +7,13 @@ module Magic
       creature_type("Human Cleric")
       keywords :vigilance, :lifelink
 
+      AngelToken = Token.create("Angel") do
+        type "Creature -- Angel"
+        power 4
+        toughness 4
+        keywords :flying
+        colors :white
+      end
 
       class ActivatedAbility < Magic::ActivatedAbility
         def initialize(source:)
@@ -23,7 +30,7 @@ module Magic
         def costs = [Costs::Tap.new(source)]
 
         def resolve!
-          source.controller.create_token(token: Tokens::Angel)
+          source.controller.create_token(token_class: AngelToken)
         end
       end
 

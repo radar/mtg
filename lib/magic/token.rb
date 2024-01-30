@@ -1,6 +1,8 @@
 module Magic
   class Token
-    include Cards::Shared::Characteristics
+    include Cards::Shared::Events
+    include Cards::Shared::Types
+
     attr_reader :game, :owner, :name, :type_line, :keywords, :keyword_grants, :protections
 
     KEYWORDS = []
@@ -11,10 +13,6 @@ module Magic
         token = Class.new(Token, &block)
         token.const_set(:NAME, name)
         token
-      end
-
-      def type(type)
-        const_set(:TYPE_LINE, type)
       end
 
       def power(power)
@@ -87,10 +85,6 @@ module Magic
 
     def death_triggers
       []
-    end
-
-    def event_handlers
-      @event_handlers ||= {}
     end
 
     def types

@@ -6,6 +6,14 @@ module Magic
     end
 
     class GriffinAerie < Enchantment
+      GriffinToken = Token.create("Griffin") do
+        type "Creature -- Griffin"
+        power 2
+        toughness 2
+        colors :white
+        keywords :flying
+      end
+
       def event_handlers
         {
           Events::BeginningOfEndStep => -> (receiver, event) do
@@ -17,7 +25,7 @@ module Magic
             life_gained = life_gain_events.sum(&:life)
 
             if life_gained >= 3
-              controller.create_token(token: Tokens::Griffin)
+              controller.create_token(token_class: GriffinToken)
             end
           end
         }

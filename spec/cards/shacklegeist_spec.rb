@@ -13,14 +13,14 @@ RSpec.describe Magic::Cards::Shacklegeist do
 
   context "taps two untapped spirits, to tap another creature" do
     before do
-      p1.create_token(token: Magic::Tokens::Spirit)
+      ResolvePermanent("Ageless Guardian", owner: p1)
     end
 
     it "taps the creature" do
-      token_spirit = p1.creatures.by_name("Spirit").first
+      other_spirit = p1.creatures.by_name("Ageless Guardian").first
 
       p1.activate_ability(ability: shacklegeist.activated_abilities.first) do
-        _1.pay_multi_tap([shacklegeist, token_spirit])
+        _1.pay_multi_tap([shacklegeist, other_spirit])
         _1.targeting(wood_elves)
       end
 
