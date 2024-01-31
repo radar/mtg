@@ -24,6 +24,10 @@ module Magic
       Card(name, Magic::Cards::Artifact, &block)
     end
 
+    def Equipment(name, &block)
+      Card(name, Magic::Cards::Equipment, &block)
+    end
+
     def Card(name, base_class = Magic::Card, &block)
       card = Class.new(base_class, &block)
       card.const_set(:NAME, name)
