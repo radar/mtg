@@ -3,7 +3,11 @@ module Magic
     attr_reader :choice
 
     def self.choices(*choices)
-      define_method(:choices) { choices }
+      if choices == [:all]
+        define_method(:choices) { %i[white blue black red green] }
+      else
+        define_method(:choices) { choices }
+      end
     end
 
     def initialize(**args)
