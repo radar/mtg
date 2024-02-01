@@ -31,6 +31,8 @@ module Magic
             game.add_effect(Effects::LoseLife.new(source: source, **args))
           when :modify_power_toughness
             game.add_effect(Effects::ApplyPowerToughnessModification.new(source: source, **args))
+          when :phase_out
+            game.add_effect(Effects::PhaseOut.new(source: source, **args))
           when :return_to_owners_hand
             game.add_effect(Effects::ReturnToOwnersHand.new(source: source, **args))
           when :tap

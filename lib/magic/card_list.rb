@@ -1,5 +1,9 @@
 module Magic
   class CardList < SimpleDelegator
+    def phased_out
+      select(&:phased_out?)
+    end
+
     def controlled_by(player)
       select { |card| card.controller == player }
     end

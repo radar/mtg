@@ -9,8 +9,6 @@ RSpec.describe Magic::Cards::FrostBreath do
 
   context "resolution" do
     it "taps two target creatures" do
-      game.next_turn
-
       p1.add_mana(blue: 3)
       action = cast_action(card: subject, player: p1).targeting(wood_elves, loxodon_wayfarer)
       action.pay_mana(blue: 1, generic: { blue: 2 })

@@ -16,8 +16,6 @@ RSpec.describe Magic::Cards::CaptureSphere do
     # Enchanted creature doesn't untap during its controller's untap step.
 
     it "taps enchanted creature, equips aura" do
-      game.next_turn
-
       expect(game.current_turn.active_player).to eq(p1)
       p1.add_mana(white: 4)
       action = cast_action(player: p1, card: subject)

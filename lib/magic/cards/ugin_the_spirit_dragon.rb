@@ -11,7 +11,7 @@ module Magic
         def single_target? = true
 
         def resolve!(target:)
-          target.take_damage(source: planeswalker, damage: 3)
+          target.take_damage(source: source, damage: 3)
         end
       end
 
@@ -32,11 +32,11 @@ module Magic
         def loyalty_change = -7
 
         def resolve!
-          controller = planeswalker.controller
+          controller = source.controller
           controller.gain_life(7)
           7.times { controller.draw! }
 
-          game.choices.add(UginTheSpiritDragon::Choice.new(source: planeswalker))
+          game.choices.add(UginTheSpiritDragon::Choice.new(source: source))
         end
       end
 

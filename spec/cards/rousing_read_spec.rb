@@ -18,8 +18,7 @@ RSpec.describe Magic::Cards::RousingRead do
     game.tick!
 
     choice = game.choices.last
-    expect(choice).to be_a(Magic::Choice::Discard)
-    choice.choose(choice.cards.first)
+    game.resolve_choice!(card: choice.cards.first)
 
     expect(wood_elves.power).to eq(2)
     expect(wood_elves.toughness).to eq(2)

@@ -55,6 +55,7 @@ module Magic
       @damage = 0
       @protections = Protections.new(card.protections.dup)
       @exiled_cards = Magic::CardList.new([])
+      @phased_out = false
       @timestamp = timestamp
     end
 
@@ -317,6 +318,18 @@ module Magic
 
     def add_choice(choice, **args)
       card.add_choice(choice, **args)
+    end
+
+    def phased_out?
+      @phased_out
+    end
+
+    def phase_out!
+      @phased_out = true
+    end
+
+    def phase_in!
+      @phased_out = false
     end
 
     private

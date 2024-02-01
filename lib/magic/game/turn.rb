@@ -18,6 +18,7 @@ module Magic
         end
 
         after_transition to: :untap do |turn|
+          turn.battlefield.phased_out.permanents.controlled_by(turn.active_player).each(&:phase_in!)
           turn.battlefield.permanents.controlled_by(turn.active_player).each(&:untap_during_untap_step)
         end
 

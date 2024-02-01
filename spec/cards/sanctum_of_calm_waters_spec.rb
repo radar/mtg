@@ -18,7 +18,7 @@ RSpec.describe Magic::Cards::SanctumOfCalmWaters do
 
       choice = game.choices.first
       expect(choice).to be_a(Magic::Choice::Discard)
-      choice.choose(p1.hand.cards.first)
+      game.resolve_choice!(card: p1.hand.cards.first)
     end
   end
 end

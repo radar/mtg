@@ -45,14 +45,14 @@ module Magic
         def loyalty_change = -2
 
         def resolve!
-          planeswalker.delayed_response(
+          source.delayed_response(
             turn: game.current_turn,
             event_type: Events::PreliminaryAttackersDeclared,
             response: -> {
               attackers = game.current_turn.attacks.count
 
               attackers.times do
-                token = planeswalker.controller.create_token(token_class: SoldierToken, enters_tapped: true)
+                token = source.controller.create_token(token_class: SoldierToken, enters_tapped: true)
 
                 game.current_turn.declare_attacker(token)
               end
@@ -65,7 +65,7 @@ module Magic
         def loyalty_change = -6
 
         def resolve!
-          game.add_emblem(Emblem.new(owner: planeswalker.controller))
+          game.add_emblem(Emblem.new(owner: source.controller))
         end
       end
 

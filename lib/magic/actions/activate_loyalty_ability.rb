@@ -4,7 +4,7 @@ module Magic
       attr_reader :ability, :planeswalker, :targets, :x_value
 
       def initialize(ability:, **args)
-        @planeswalker = ability.planeswalker
+        @planeswalker = ability.source
         @ability = ability
         @targets = []
         super(**args)
@@ -44,19 +44,12 @@ module Magic
       end
 
       def resolve!
-        if targets.any?
-          if ability.single_target?
-            ability.resolve!(target: targets.first)
-          else
-            ability.resolve!(targets: targets)
-          end
-        else
-          if x_value
-            ability.resolve!(value_for_x: x_value)
-          else
-            ability.resolve!
-          end
-        end
+        resolver = ability.method(:resolve!)
+        args = {}
+        args[:target] = targets.first if resolver.parameters.include?([:keyreq, :target])
+        args[:targets] = targets if resolver.parameters.include?([:keyreq, :targets])
+        args[:value_for_x] = x_value if x_value && resolver.parameters.include?([:keyreq, :value_for_x])
+        ability.resolve!(**args)
       end
     end
   end

@@ -73,7 +73,7 @@ RSpec.describe Magic::Cards::AcademyElite do
 
       choice = game.choices.last
       expect(choice).to be_a(Magic::Choice::Discard)
-      choice.choose(p1.hand.cards.first)
+      game.resolve_choice!(card: p1.hand.cards.first)
       expect(p1.graveyard.cards.count).to eq(1)
     end
   end

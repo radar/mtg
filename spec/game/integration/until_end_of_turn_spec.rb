@@ -5,10 +5,6 @@ RSpec.describe Magic::Game, "until end of turn effect" do
 
   let!(:dranas_emissary) { ResolvePermanent("Drana's Emissary", owner: p1) }
 
-  before do
-    game.battlefield.add(dranas_emissary)
-  end
-
   def go_to_cleanup
     current_turn.untap!
     current_turn.upkeep!

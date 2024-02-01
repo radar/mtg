@@ -12,8 +12,8 @@ RSpec.describe Magic::Cards::RainOfRevelation do
 
       choice = game.choices.last
       expect(choice).to be_a(Magic::Choice::Discard)
-      card = choice.cards.first
-      choice.choose(card)
+      card = p1.hand.first
+      game.resolve_choice!(card: card)
 
       expect(card.zone).to be_graveyard
     end

@@ -8,7 +8,7 @@ module Magic
         @cards = player.hand
       end
 
-      def choose(card)
+      def resolve!(card:)
         card.move_to_graveyard!
       end
     end

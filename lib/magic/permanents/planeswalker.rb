@@ -19,7 +19,7 @@ module Magic
       end
 
       def loyalty_abilities
-        card.loyalty_abilities.map { |ability| ability.new(planeswalker: self) }
+        card.loyalty_abilities.map { |ability| ability.new(source: self) }
       end
     end
   end

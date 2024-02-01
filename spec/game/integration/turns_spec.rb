@@ -20,7 +20,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     expect(p1.hand.count).to eq(7)
     expect(p2.hand.count).to eq(7)
 
-    turn_1 = game.next_turn
+    turn_1 = game.current_turn
 
     turn_1.untap!
     turn_1.upkeep!
