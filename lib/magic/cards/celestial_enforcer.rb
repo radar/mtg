@@ -9,17 +9,8 @@ module Magic
 
     class CelestialEnforcer < Creature
       class ActivatedAbility < Magic::ActivatedAbility
-        attr_reader :source
-
-        def initialize(source:)
-          super(
-            source: source,
-            requirements: [
-              -> {
-                source.controller.creatures.any?(&:flying?)
-              }
-            ]
-          )
+        def requirements_met?
+          source.controller.creatures.any?(&:flying?)
         end
 
         def costs = [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(source)]

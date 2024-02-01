@@ -1,12 +1,11 @@
 module Magic
   module Actions
     class ActivateAbility < Action
-      attr_reader :ability, :costs, :requirements, :targets
+      attr_reader :ability, :costs, :targets
 
       def initialize(ability:, **args)
         @ability = ability
         @costs = @ability.costs
-        @requirements = @ability.requirements
         @targets = []
         super(**args)
       end
@@ -16,7 +15,7 @@ module Magic
       end
 
       def can_be_activated?(player)
-        costs.all? { |cost| cost.can_pay?(player) } && requirements.all?(&:call)
+        costs.all? { |cost| cost.can_pay?(player) } && @ability.requirements_met?
       end
 
       def name

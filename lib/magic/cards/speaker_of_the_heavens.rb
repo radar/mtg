@@ -16,15 +16,9 @@ module Magic
       end
 
       class ActivatedAbility < Magic::ActivatedAbility
-        def initialize(source:)
-          super(source: source, requirements: [
-            -> {
-              source.controller.life >= source.controller.starting_life + 7
-            },
-            -> {
-              game.can_cast_sorcery?(source.controller)
-            }
-          ])
+        def requirements_met?
+          source.controller.life >= source.controller.starting_life + 7 &&
+          game.can_cast_sorcery?(source.controller)
         end
 
         def costs = [Costs::Tap.new(source)]

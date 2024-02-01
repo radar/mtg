@@ -1,10 +1,9 @@
 module Magic
   class ActivatedAbility
-    attr_reader :source, :requirements
+    attr_reader :source
 
-    def initialize(source:, requirements: [])
+    def initialize(source:)
       @source = source
-      @requirements = requirements
     end
 
     def valid_targets?(*targets)
