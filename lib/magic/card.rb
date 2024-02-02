@@ -196,6 +196,8 @@ module Magic
       case choice
       when :discard
         game.add_choice(Magic::Choice::Discard.new(player: controller, **args))
+      when :scry
+        game.add_choice(Magic::Choice::Scry.new(**args))
       else
         raise "Unknown choice: #{choice.inspect}"
       end
