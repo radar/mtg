@@ -43,6 +43,6 @@ RSpec.describe Magic::Cards::TempleOfMystery do
       p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
         _1.choose(:black)
       end
-    }.to raise_error("Invalid choice made for mana ability:")
+    }.to raise_error(/Invalid choice made for mana ability/)
   end
 end

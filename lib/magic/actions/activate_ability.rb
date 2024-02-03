@@ -37,8 +37,12 @@ module Magic
         self
       end
 
-      def pay_tap
-        pay(:tap)
+      def pay_self_tap
+        pay(:self_tap)
+      end
+
+      def pay_tap(target)
+        pay(:tap, target)
       end
 
       def pay_multi_tap(targets)
@@ -47,6 +51,10 @@ module Magic
 
       def pay_sacrifice(targets)
         pay(:sacrifice, targets)
+      end
+
+      def pay_self_sacrifice
+        pay(:self_sacrifice)
       end
 
       def pay_discard(targets)
@@ -65,6 +73,8 @@ module Magic
         cost_type = case cost_type
         when :mana
           Costs::Mana
+        when :self_tap
+          Costs::SelfTap
         when :tap
           Costs::Tap
         when :multi_tap
@@ -73,12 +83,20 @@ module Magic
           Costs::Discard
         when :sacrifice
           Costs::Sacrifice
+        when :self_sacrifice
+          Costs::SelfSacrifice
         else
           raise "unknown cost type: #{cost_type}"
         end
 
         cost = costs.find { |cost| cost.is_a?(cost_type) }
-        cost.pay(player, payment)
+        raise "Unknown cost: #{cost_type}" if cost.nil?
+
+        pay_method = cost.method(:pay)
+        args = {}
+        args[:player] = player if pay_method.parameters.include?([:keyreq, :player])
+        args[:payment] = payment if pay_method.parameters.include?([:keyreq, :payment])
+        cost.pay(**args)
 
         self
       end

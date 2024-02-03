@@ -21,7 +21,7 @@ RSpec.describe Magic::Cards::GhostlyPilferer do
       expect(p1).to receive(:draw!)
       choice = game.choices.last
       expect(choice).to be_a(Magic::Choice)
-      choice.pay(p1, generic: { blue: 2 })
+      choice.pay(player: p1, payment: { generic: { blue: 2 }})
       choice.resolve!
     end
   end

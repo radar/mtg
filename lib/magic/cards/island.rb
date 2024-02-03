@@ -4,16 +4,8 @@ module Magic
       NAME = "Island"
       TYPE_LINE = "Basic Land -- Island"
 
-      class ManaAbility < Magic::ManaAbility
-        def initialize(source:)
-          @costs = [Costs::Tap.new(source)]
-
-          super
-        end
-
-        def resolve!
-          controller.add_mana(blue: 1)
-        end
+      class ManaAbility < Magic::TapManaAbility
+        choices :blue
       end
 
       def activated_abilities = [ManaAbility]

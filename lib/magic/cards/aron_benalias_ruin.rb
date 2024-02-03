@@ -11,9 +11,7 @@ module Magic
     class AronBenaliasRuin < Creature
 
       class ActivatedAbility < Magic::ActivatedAbility
-        def costs
-          [Costs::Mana.new(white: 1, black: 1), Costs::Tap.new(source), Costs::Sacrifice.new(&:creature?)]
-        end
+        costs "{W}{B}, {T}, Sacrifice a creature"
 
         def resolve!
           game.battlefield.creatures.controlled_by(source.controller).each do |creature|

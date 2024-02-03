@@ -32,7 +32,11 @@ module Magic
 
       class ActivatedAbility < Magic::ActivatedAbility
         def costs
-          [Costs::Mana.new(generic: 1, white: 1, blue: 1), Costs::Tap.new(source), Costs::Discard.new(source.controller, -> (c) { c.legendary? })]
+          [
+            Costs::Mana.new(generic: 1, white: 1, blue: 1),
+            Costs::SelfTap.new(source),
+            Costs::Discard.new(source.controller, -> (c) { c.legendary? })
+          ]
         end
 
         def resolve!

@@ -28,7 +28,6 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
               _1
                 .targeting(wood_elves)
                 .pay_mana(generic: { white: 1 }, white: 1)
-                .pay_tap
             end
             game.stack.resolve!
             expect(permanent).to be_tapped

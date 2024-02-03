@@ -23,12 +23,7 @@ module Magic
       end
 
       class ActivatedAbility < ActivatedAbility
-        def costs
-          [
-            Costs::Mana.new("{R}{G}{W}"),
-            Costs::Tap.new(source)
-          ]
-        end
+        costs "{R}{G}{W}, {T}"
 
         def target_choices
           game.any_target

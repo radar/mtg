@@ -7,11 +7,7 @@ module Magic
 
     class TemperedVeteran < Creature
       class ActivatedAbility < Magic::ActivatedAbility
-        def initialize(source:)
-          @costs = [Costs::Mana.new(white: 1), Costs::Tap.new(source)]
-
-          super
-        end
+        costs "{T}, {W}"
 
         def target_choices
           game.battlefield.creatures.select { _1.counters.of_type(Counters::Plus1Plus1).any? }
@@ -31,11 +27,7 @@ module Magic
       end
 
       class ActivatedAbility2 < Magic::ActivatedAbility
-        def initialize(source:)
-          @costs = [Costs::Mana.new(white: 2, generic: 4), Costs::Tap.new(source)]
-
-          super
-        end
+        costs "{4}{W}{W}, {T}"
 
         def target_choices
           game.battlefield.creatures

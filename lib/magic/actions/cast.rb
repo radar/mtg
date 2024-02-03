@@ -94,12 +94,12 @@ module Magic
       end
 
       def pay_mana(payment)
-        mana_cost.pay(player, payment)
+        mana_cost.pay(player:, payment:)
         self
       end
 
       def pay_kicker(payment)
-        kicker_cost.pay(player, payment)
+        kicker_cost.pay(player:, payment:)
       end
 
       def perform

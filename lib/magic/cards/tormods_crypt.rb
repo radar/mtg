@@ -6,12 +6,7 @@ module Magic
 
     class TormodsCrypt < Artifact
       class ActivatedAbility < Magic::ActivatedAbility
-        def costs
-          [
-            Costs::Tap.new(source),
-            Costs::Sacrifice.new(source: source),
-          ]
-        end
+        costs "{T}, Sacrifice {this}"
 
         def target_choices
           game.players

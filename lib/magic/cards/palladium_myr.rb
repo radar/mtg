@@ -7,13 +7,7 @@ module Magic
     end
 
     class PalladiumMyr < Creature
-      class ManaAbility < ManaAbility
-        def costs
-          [
-            Costs::Tap.new(source)
-          ]
-        end
-
+      class ManaAbility < TapManaAbility
         def resolve!
           source.controller.add_mana(generic: 2)
         end

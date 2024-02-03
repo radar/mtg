@@ -9,9 +9,7 @@ module Magic
 
     class SelflessSavior < Creature
       class ActivatedAbility < Magic::ActivatedAbility
-        def costs
-          [Costs::Sacrifice.new(source)]
-        end
+        costs "Sacrifice {this}"
 
         def single_target?
           true

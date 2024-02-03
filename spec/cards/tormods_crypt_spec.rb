@@ -12,7 +12,6 @@ RSpec.describe Magic::Cards::TormodsCrypt do
 
   it "taps and sacrifices to exile a player's graveyard" do
     p1.activate_ability(ability: permanent.activated_abilities.first) do
-      _1.pay_sacrifice(permanent)
       _1.targeting(p2)
     end
 

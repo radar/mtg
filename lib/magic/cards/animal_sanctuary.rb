@@ -5,11 +5,7 @@ module Magic
       TYPE_LINE = "Land"
 
       class ManaAbility < Magic::ManaAbility
-        def costs
-          [
-            Costs::Tap.new(source),
-          ]
-        end
+        costs "{T}"
 
         def resolve!
           controller.add_mana(generic: 1)
@@ -17,12 +13,7 @@ module Magic
       end
 
       class ActivatedAbility < Magic::ActivatedAbility
-        def costs
-          [
-            Costs::Mana.new(generic: 2),
-            Costs::Tap.new(source),
-          ]
-        end
+        costs "{2}, {T}"
 
         def target_choices
           game.battlefield.creatures.by_any_type(

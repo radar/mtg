@@ -1,14 +1,13 @@
 module Magic
   module Costs
-    class Sacrifice
+    class SelfSacrifice
       attr_reader :permanent
-      def initialize(permanent, choices)
+      def initialize(permanent)
         @permanent = permanent
-        @choices = choices
       end
 
-      def pay(payment:)
-        payment.sacrifice!
+      def pay
+        permanent.sacrifice!
       end
 
       def finalize!(_player)

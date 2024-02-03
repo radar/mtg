@@ -62,7 +62,8 @@ module Magic
 
     def activate_ability(ability:, auto_tap: true, **args, &block)
       action = prepare_activate_ability(ability: ability, **args, &block)
-      action.pay_tap if action.has_cost?(Magic::Costs::Tap) && auto_tap
+      action.pay_self_tap if action.has_cost?(Magic::Costs::SelfTap) && auto_tap
+      action.pay_self_sacrifice if action.has_cost?(Magic::Costs::SelfSacrifice)
       action.finalize_costs!(self)
       game.take_action(action)
     end
@@ -76,7 +77,7 @@ module Magic
 
     def activate_mana_ability(ability:, auto_tap: true, **args, &block)
       action = prepare_activate_mana_ability(ability: ability, **args, &block)
-      action.pay_tap if action.has_cost?(Magic::Costs::Tap) && auto_tap
+      action.pay_self_tap if action.has_cost?(Magic::Costs::SelfTap) && auto_tap
       action.finalize_costs!(self)
       game.take_action(action)
     end

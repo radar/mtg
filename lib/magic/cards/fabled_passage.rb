@@ -25,12 +25,7 @@ module Magic
       end
 
       class ActivatedAbility < Magic::ActivatedAbility
-        def costs
-          [
-            Costs::Tap.new(source),
-            Costs::Sacrifice.new(source),
-          ]
-        end
+        costs "{T}, Sacrifice {this}"
 
         def resolve!
           game.choices.add(Choice.new(source: source))

@@ -16,7 +16,7 @@ RSpec.describe Magic::Cards::FontOfFertility do
       p1.activate_ability(ability: subject.activated_abilities.first) do
         _1
           .pay_mana(green: 1)
-          .pay(:sacrifice)
+          .pay(:self_sacrifice)
       end
 
       game.stack.resolve!

@@ -13,7 +13,7 @@ module Magic
       end
 
       class ActivatedAbility < Magic::ActivatedAbility
-        def costs = [Costs::Mana.new(green: 1), Costs::Sacrifice.new(source)]
+        costs "{G}, Sacrifice {this}"
 
         def resolve!
           game.choices.add(Choice.new(source: source))

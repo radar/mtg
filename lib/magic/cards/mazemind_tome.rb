@@ -8,7 +8,7 @@ module Magic
       class ActivatedAbility < ActivatedAbility
         def costs
           [
-            Costs::Tap.new(source),
+            Costs::SelfTap.new(source),
             Costs::AddCounter.new(counter_type: Counters::Page, target: source)
           ]
         end
@@ -22,7 +22,7 @@ module Magic
         def costs
           [
             Costs::Mana.new(generic: 2),
-            Costs::Tap.new(source),
+            Costs::SelfTap.new(source),
             Costs::AddCounter.new(counter_type: Counters::Page, target: source)
           ]
         end

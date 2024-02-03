@@ -9,11 +9,10 @@ module Magic
 
     class CelestialEnforcer < Creature
       class ActivatedAbility < Magic::ActivatedAbility
+        costs "{1}{W}, {T}"
         def requirements_met?
           source.controller.creatures.any?(&:flying?)
         end
-
-        def costs = [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(source)]
 
         def single_target?
           true

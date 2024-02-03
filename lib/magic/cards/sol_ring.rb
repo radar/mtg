@@ -6,12 +6,7 @@ module Magic
     end
 
     class SolRing < Card
-      class ManaAbility < Magic::ManaAbility
-        def initialize(source:)
-          @costs = [Costs::Tap.new(source)]
-
-          super
-        end
+      class ManaAbility < Magic::TapManaAbility
 
         def resolve!
           controller.add_mana(colorless: 2)

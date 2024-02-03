@@ -5,15 +5,8 @@ module Magic
       TYPE_LINE = "Artifact Land"
 
       class ManaAbility < Magic::ManaAbility
-        def initialize(source:)
-          @costs = [Costs::Tap.new(source)]
-
-          super
-        end
-
-        def resolve!
-          controller.add_mana(red: 1)
-        end
+        costs "{T}"
+        choices :red
       end
 
       def activated_abilities = [ManaAbility]

@@ -19,9 +19,9 @@ module Magic
           @costs ||= [Costs::Mana.new(generic: 2)]
         end
 
-        def pay(player, payment)
+        def pay(player:, payment:)
           cost = costs.first
-          cost.pay!(player, payment)
+          cost.pay!(player:, payment:)
         end
 
         def resolve!

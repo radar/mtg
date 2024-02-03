@@ -23,7 +23,9 @@ module Magic
     end
 
     def resolve!
-      raise "Invalid choice made for mana ability:" unless choices.include?(choice)
+      @choice ||= choices.first if choices.length == 1
+
+      raise "Invalid choice made for mana ability. Choice: #{choice}, Choices: #{choices}" unless choices.include?(choice)
       source.controller.add_mana(choice => 1)
     end
   end

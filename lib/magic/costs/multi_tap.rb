@@ -7,8 +7,8 @@ module Magic
         @condition = condition
       end
 
-      def pay(_player, targets)
-        targets.each(&:tap!)
+      def pay(player:, payment:)
+        payment.each(&:tap!)
       end
 
       def can_pay?(_player)

@@ -10,9 +10,7 @@ module Magic
       class ManaAbility < ManaAbility
         choices :all
 
-        def costs
-          [Costs::Mana.new("{2}")]
-        end
+        costs "{2}"
       end
 
       def activated_abilities = [ManaAbility]

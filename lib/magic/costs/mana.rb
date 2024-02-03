@@ -8,7 +8,7 @@ module Magic
       attr_reader :balance, :cost
       def initialize(cost)
         if cost.is_a?(String)
-          @cost = parse_cost(cost)
+          @cost = Parsers::Mana.parse(cost)
         else
           @cost = cost == 0 ? {} : cost
         end
@@ -54,7 +54,7 @@ module Magic
         generic_mana_payable && (pool.values.all? { |v| v.zero? || v.positive? })
       end
 
-      def pay(player, payment)
+      def pay(player:, payment:)
         raise CannotPay unless can_pay?(player)
 
         pay_x(payment[:x]) if payment[:x]
@@ -78,8 +78,8 @@ module Magic
         player.pay_mana(color_costs) if color_costs.values.any?(&:positive?)
       end
 
-      def pay!(player, payment)
-        pay(player, payment)
+      def pay!(player:, payment:)
+        pay(player:, payment:)
         finalize!(player)
       end
 
@@ -155,28 +155,6 @@ module Magic
         mana.each do |color, amount|
           pool[color] -= amount
         end
-      end
-
-      def parse_cost(cost)
-        symbols = {
-          "W" => :white,
-          "U" => :blue,
-          "B" => :black,
-          "R" => :red,
-          "G" => :green
-        }
-
-        cost
-          .scan(/{(.*?)}/)
-          .flatten
-          .group_by(&:itself)
-          .map do |key, values|
-            if key =~ /\d+/
-              [:generic, key.to_i]
-            else
-              [symbols[key], values.count]
-            end
-          end.to_h
       end
     end
   end

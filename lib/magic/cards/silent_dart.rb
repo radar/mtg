@@ -6,12 +6,7 @@ module Magic
 
     class SilentDart < Artifact
       class ActivatedAbility < ActivatedAbility
-        def costs
-          [
-            Costs::Mana.new(generic: 4),
-            Costs::Sacrifice.new(source)
-          ]
-        end
+        costs "{4}, Sacrifice {this}"
 
         def target_choices
           game.battlefield.creatures

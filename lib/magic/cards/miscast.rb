@@ -23,7 +23,7 @@ module Magic
 
         def pay(player, payment)
           cost = costs.first
-          cost.pay!(player, payment)
+          cost.pay!(player:, payment:)
         end
 
         def resolve!

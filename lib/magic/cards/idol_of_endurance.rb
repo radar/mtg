@@ -28,7 +28,7 @@ module Magic
       def ltb_triggers = [LTB]
 
       class ActivatedAbility < Magic::ActivatedAbility
-        def costs = [Costs::Mana.new(generic: 1, white: 1), Costs::Tap.new(source)]
+        costs "{T}, {W}{1}"
 
         def single_target?
           true

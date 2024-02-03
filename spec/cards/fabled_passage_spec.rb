@@ -11,7 +11,7 @@ RSpec.describe Magic::Cards::FabledPassage do
 
   def activate_ability
     p1.activate_ability(ability: subject.activated_abilities.first) do
-      _1.pay(:sacrifice)
+      _1.pay(:self_sacrifice)
     end
 
     choice = game.choices.last
