@@ -4,7 +4,9 @@ This is an attempt to build a somewhat functional simulation of Magic: The Gathe
 
 It is incredibly rudimentary. I have little-to-no prior game programming experience. You have been warned.
 
-Parts of this have been inspired by [Grove](https://github.com/pinky39/grove) -- a C# implementation of MTG. Unlike Grove, this implementation does not have any UI. Use your imagination!
+Parts of this have been inspired by [Grove](https://github.com/pinky39/grove) -- a C# implementation of MTG. And other parts have been inspired by [Mage](https://github.com/magefree/mage). Kudos to them for sharing their code openly!
+
+Unlike Grove and Mage, this implementation does not have any UI. Use your imagination!
 
 ## Getting Started
 
