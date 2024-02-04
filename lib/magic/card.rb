@@ -131,6 +131,32 @@ module Magic
       move_zone!(game.exile)
     end
 
+    def move_zone!(new_zone)
+      old_zone = zone
+      if old_zone
+        game.notify!(
+          Events::CardLeavingZoneTransition.new(
+            self,
+            from: old_zone,
+            to: new_zone
+          )
+        )
+
+        old_zone.remove(self)
+      end
+
+      new_zone.add(self) unless new_zone.is_a?(Magic::Zones::Battlefield)
+
+      game.notify!(
+        Events::CardEnteredZoneTransition.new(
+          self,
+          from: old_zone,
+          to: new_zone
+        )
+      )
+
+    end
+
     def resolve!(enters_tapped: enters_tapped?, kicked: false)
       if permanent?
         permanent = Magic::Permanent.resolve(
@@ -215,34 +241,6 @@ module Magic
 
     def opponents
       game.opponents(controller)
-    end
-
-    private
-
-    def move_zone!(new_zone)
-      old_zone = zone
-      if old_zone
-        game.notify!(
-          Events::CardLeavingZoneTransition.new(
-            self,
-            from: old_zone,
-            to: new_zone
-          )
-        )
-
-        old_zone.remove(self)
-      end
-
-      new_zone.add(self) unless new_zone.is_a?(Magic::Zones::Battlefield)
-
-      game.notify!(
-        Events::CardEnteredZoneTransition.new(
-          self,
-          from: old_zone,
-          to: new_zone
-        )
-      )
-
     end
   end
 end
