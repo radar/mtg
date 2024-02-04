@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class EpitaphGolem < Creature
-      name "Epitaph Golem"
+      card_name "Epitaph Golem"
       artifact_creature_type "Golem"
       cost generic: 4
 

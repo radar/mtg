@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class ChromeReplicator < Creature
-      name "Chrome Replicator"
+      card_name "Chrome Replicator"
       artifact_creature_type "Construct"
       cost generic: 5
       power 4

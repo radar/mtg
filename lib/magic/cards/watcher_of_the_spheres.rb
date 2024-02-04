@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class WatcherOfTheSpheres < Creature
-      name "Watcher of the Spheres"
+      card_name "Watcher of the Spheres"
       creature_type "Bird Wizard"
       cost white: 1, blue: 1
       keywords :flying

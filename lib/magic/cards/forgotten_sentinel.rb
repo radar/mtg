@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class ForgottenSentinel < Creature
-      name "Forgotten Sentinel"
+      card_name "Forgotten Sentinel"
       cost generic: 4
       artifact_creature_type "Golem"
       enters_tapped
