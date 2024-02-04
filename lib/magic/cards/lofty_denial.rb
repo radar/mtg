@@ -43,7 +43,6 @@ module Magic
 
       def resolve!(target:)
         game.choices.add(Choice.new(source: self, target:))
-        super
       end
     end
   end

@@ -18,8 +18,6 @@ module Magic
           trigger_effect(:modify_power_toughness, power: 1, target: target)
           controller.draw!
         end
-
-        super
       end
     end
   end

@@ -15,8 +15,6 @@ module Magic
 
       def resolve!(target:)
         Permanent.resolve(game: game, owner: controller, from_zone: controller.graveyard, card: target, cast: false)
-
-        super
       end
     end
   end

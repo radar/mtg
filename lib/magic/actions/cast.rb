@@ -123,6 +123,10 @@ module Magic
         args[:value_for_x] = mana_cost.x if resolver.parameters.include?([:keyreq, :value_for_x])
 
         resolver.call(**args)
+
+        if card.sorcery? || card.instant?
+          card.move_to_graveyard!(player)
+        end
       end
     end
   end

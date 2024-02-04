@@ -24,8 +24,6 @@ module Magic
         target.exile!
 
         target.controller.create_token(token_class: SoldierToken)
-
-        super
       end
     end
   end

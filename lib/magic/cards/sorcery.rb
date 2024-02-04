@@ -1,11 +1,7 @@
 module Magic
   module Cards
     class Sorcery < Card
-      TYPE_LINE = "Sorcery"
-
-      def resolve!(**args)
-        move_zone!(controller.graveyard)
-      end
+      type "Sorcery"
 
       def permanent?
         false

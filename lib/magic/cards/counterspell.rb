@@ -15,8 +15,6 @@ module Magic
 
       def resolve!(target:)
         trigger_effect(:counter_spell, target: target)
-
-        super
       end
     end
   end

@@ -16,8 +16,6 @@ module Magic
 
       def resolve!(target:)
         target.destroy!
-
-        super
       end
     end
   end

@@ -16,8 +16,6 @@ module Magic
       def resolve!(target:)
         target.destroy!
         target.controller.gain_life(4)
-
-        super
       end
     end
   end
