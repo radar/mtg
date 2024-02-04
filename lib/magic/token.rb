@@ -61,7 +61,15 @@ module Magic
     end
 
     def colors
-      self.class::COLORS
+      self.class.const_defined?(:COLORS) ? self.class::COLORS : []
+    end
+
+    def multi_colored?
+      colors.count > 1
+    end
+
+    def colorless?
+      colors.count == 0
     end
 
     def receive_notification(...)

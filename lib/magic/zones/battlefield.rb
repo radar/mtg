@@ -3,7 +3,7 @@ module Magic
     class Battlefield < Zone
       extend Forwardable
 
-      def_delegators :permanents, :creatures, :planeswalkers, :not_controlled_by, :controlled_by, :phased_out
+      def_delegators :permanents, :creatures, :planeswalkers, :not_controlled_by, :controlled_by, :phased_out, :nonland, :nontoken
 
       def initialize(**args)
         super(**args)

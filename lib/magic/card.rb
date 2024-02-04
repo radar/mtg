@@ -214,6 +214,10 @@ module Magic
       {}
     end
 
+    def token?
+      false
+    end
+
     def prowess_trigger
       -> (permanent, event) do
         Cards::KeywordHandlers::Prowess.trigger(permanent: permanent, event: event)

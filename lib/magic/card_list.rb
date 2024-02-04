@@ -57,6 +57,14 @@ module Magic
     end
     alias_method :by_type, :by_any_type
 
+    def nonland
+      reject(&:land?)
+    end
+
+    def nontoken
+      reject(&:token?)
+    end
+
     def excluding_type(*types)
       reject { |c| c.any_type?(*types) }
     end
@@ -70,6 +78,10 @@ module Magic
     end
 
     def select(&condition)
+      self.class.new(super(&condition))
+    end
+
+    def reject(&condition)
       self.class.new(super(&condition))
     end
   end
