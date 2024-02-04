@@ -19,6 +19,10 @@ module Magic
     MODES = []
 
     class << self
+      def name(name)
+        const_set(:NAME, name)
+      end
+
       def type(type)
         const_set(:TYPE_LINE, type)
       end
@@ -59,6 +63,12 @@ module Magic
 
         define_method(:etb_triggers) do
           [etb]
+        end
+      end
+
+      def enters_tapped
+        define_method(:enters_tapped?) do
+          true
         end
       end
     end

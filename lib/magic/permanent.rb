@@ -21,7 +21,7 @@ module Magic
 
     attr_accessor :zone
 
-    def self.resolve(game:, card:, owner: card.owner, from_zone: owner.library, enters_tapped: false, token: false, cast: true, kicked: false)
+    def self.resolve(game:, card:, owner: card.owner, from_zone: owner.library, enters_tapped: card.enters_tapped?, token: false, cast: true, kicked: false)
       permanent = Magic::Permanent.new(
         game: game,
         owner: owner,
