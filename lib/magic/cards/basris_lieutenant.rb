@@ -38,7 +38,7 @@ module Magic
 
       def event_handlers
         {
-          Events::PermanentWillDie => -> (receiver, event) do
+          Events::CreatureDied => -> (receiver, event) do
             return unless event.permanent.controller == receiver.controller
 
             if event.permanent.counters.any? { |counter| counter.is_a?(Counters::Plus1Plus1) }

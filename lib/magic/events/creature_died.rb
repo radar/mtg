@@ -1,6 +1,6 @@
 module Magic
   module Events
-    class PermanentWillDie
+    class CreatureDied
       attr_reader :permanent
 
       def initialize(permanent)
@@ -8,7 +8,7 @@ module Magic
       end
 
       def inspect
-        "#<Events::PermanentWillDie permanent: #{permanent.name}, controller: #{permanent.controller.name}>"
+        "#<Events::CreatureDied permanent: #{permanent.name}, controller: #{permanent.controller.name}>"
       end
     end
   end

@@ -19,7 +19,7 @@ module Magic
     MODES = []
 
     class << self
-      def name(name)
+      def card_name(name)
         const_set(:NAME, name)
       end
 

@@ -123,7 +123,7 @@ module Magic
       trigger_delayed_response(event)
 
       case event
-      when Events::PermanentWillDie
+      when Events::CreatureDied
         died! if event.permanent == self
       when Events::PermanentLeavingZone
         left_the_battlefield! if event.permanent == self && event.from.battlefield?

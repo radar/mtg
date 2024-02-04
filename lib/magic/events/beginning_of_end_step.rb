@@ -8,7 +8,7 @@ module Magic
       end
 
       def inspect
-        "#<Events::BeginningOfEndStep player:#{active_player}>"
+        "#<Events::BeginningOfEndStep active_player:#{active_player}>"
       end
     end
   end
