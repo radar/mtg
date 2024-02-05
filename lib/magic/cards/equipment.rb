@@ -8,7 +8,7 @@ module Magic
           define_method(:costs) { equip_cost }
 
           def target_choices
-            creatures.controlled_by(controller)
+            creatures_you_control
           end
 
           def resolve!(target:)

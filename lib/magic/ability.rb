@@ -1,26 +1,12 @@
 module Magic
   class Ability
+    include BattlefieldFilters
+
     attr_reader :source
 
 
     def initialize(source:)
       @source = source
-    end
-
-    def game
-      source.game
-    end
-
-    def battlefield
-      game.battlefield
-    end
-
-    def creatures
-      battlefield.creatures
-    end
-
-    def controller
-      source.controller
     end
 
     def trigger_effect(effect, **args)

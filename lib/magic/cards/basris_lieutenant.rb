@@ -24,7 +24,7 @@ module Magic
 
       class Choice < Magic::Choice::Targeted
         def choices
-          game.battlefield.controlled_by(controller).creatures
+          creatures_you_control
         end
 
         def choice_amount

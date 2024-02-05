@@ -8,7 +8,7 @@ module Magic
       keywords :flash
 
       enters_the_battlefield do
-        valid_targets = creatures.controlled_by(controller).except(permanent)
+        valid_targets = creatures_you_control.except(permanent)
         game.choices.add(NiambiEsteemedSpeaker::Choice.new(source: permanent, choices: valid_targets))
       end
     end

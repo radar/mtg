@@ -1,6 +1,7 @@
 module Magic
   module TriggeredAbility
     class Base
+      include BattlefieldFilters
       attr_reader :game, :source
 
       def initialize(game:, source:)
@@ -9,18 +10,6 @@ module Magic
       end
 
       alias_method :permanent, :source
-
-      def controller
-        source.controller
-      end
-
-      def battlefield
-        game.battlefield
-      end
-
-      def creatures
-        battlefield.creatures
-      end
     end
   end
 end
