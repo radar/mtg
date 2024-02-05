@@ -14,8 +14,8 @@ RSpec.describe Magic::Cards::AngelicAscension do
     expect(wood_elves.card.zone).to be_exile
     expect(wood_elves.zone).to be_nil
 
-    expect(game.battlefield.creatures.count).to eq(1)
-    angel = game.battlefield.creatures.first
+    expect(creatures.count).to eq(1)
+    angel = creatures.first
     expect(angel.name).to eq("Angel")
     expect(angel.power).to eq(4)
     expect(angel.toughness).to eq(4)

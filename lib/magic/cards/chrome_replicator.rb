@@ -15,7 +15,7 @@ module Magic
 
       enters_the_battlefield do
         # if you control two or more nonland, nontoken permanents with the same name as one another...
-        names = game.battlefield.nonland.nontoken.creatures.map(&:name)
+        names = game.battlefield.nonland.nontoken.map(&:name)
         duplicate_names = names.group_by(&:itself).values.any? { |group| group.length > 1 }
         if duplicate_names
           controller.create_token(token_class: Construct)

@@ -16,7 +16,7 @@ RSpec.describe Magic::Cards::ValorousSteed do
   context "when it enters the battlefield" do
     it "creates a 2/2 white Knight with vigilance" do
       subject.entered_the_battlefield!
-      knight = game.battlefield.creatures.by_name("Knight").controlled_by(p1).first
+      knight = creatures.by_name("Knight").controlled_by(p1).first
       expect(knight).not_to be_nil
       expect(knight).to be_vigilant
     end

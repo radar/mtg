@@ -11,7 +11,7 @@ module Magic
 
       class ReturnUpToTwoTargetCreatures < Magic::Effect
         def choices
-          game.battlefield.creatures
+          creatures
         end
 
         def targeting(*targets)

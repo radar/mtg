@@ -15,7 +15,7 @@ module Magic
     class RoamingGhostlight < Creature
       class Choice < Magic::Choice::Targeted
         def choices
-          game.battlefield.creatures.excluding_type(T::Creatures['Spirit'])
+          creatures.excluding_type(T::Creatures['Spirit'])
         end
 
         def choice_amount

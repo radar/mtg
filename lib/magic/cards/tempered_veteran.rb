@@ -10,7 +10,7 @@ module Magic
         costs "{T}, {W}"
 
         def target_choices
-          game.battlefield.creatures.select { _1.counters.of_type(Counters::Plus1Plus1).any? }
+          creatures.select { _1.counters.of_type(Counters::Plus1Plus1).any? }
         end
 
         def single_target?
@@ -30,7 +30,7 @@ module Magic
         costs "{4}{W}{W}, {T}"
 
         def target_choices
-          game.battlefield.creatures
+          creatures
         end
 
         def single_target?

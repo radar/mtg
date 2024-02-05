@@ -26,7 +26,6 @@ RSpec.describe Magic::Game, "beginning of your end step" do
       turn.second_main!
       turn.end!
 
-      creatures = game.battlefield.creatures
       expect(creatures.count).to eq(1)
       griffin = creatures.first
       expect(griffin.colors).to eq([:white])

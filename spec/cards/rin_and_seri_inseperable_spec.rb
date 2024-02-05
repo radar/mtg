@@ -12,8 +12,8 @@ RSpec.describe Magic::Cards::RinAndSeriInseperable do
         _1.pay_mana(red: 1, generic: { red: 1 })
       end
 
-      expect(game.battlefield.creatures.count).to eq(2)
-      cat = game.battlefield.creatures.by_name("Cat").first
+      expect(creatures.count).to eq(2)
+      cat = creatures.by_name("Cat").first
       expect(cat.power).to eq(1)
       expect(cat.toughness).to eq(1)
       expect(cat.colors).to eq([:green])
@@ -27,8 +27,8 @@ RSpec.describe Magic::Cards::RinAndSeriInseperable do
         _1.pay_mana(white: 1, generic: { white: 3 })
       end
 
-      expect(game.battlefield.creatures.count).to eq(2)
-      dog = game.battlefield.creatures.by_name("Dog").first
+      expect(creatures.count).to eq(2)
+      dog = creatures.by_name("Dog").first
       expect(dog.power).to eq(1)
       expect(dog.toughness).to eq(1)
       expect(dog.colors).to eq([:white])

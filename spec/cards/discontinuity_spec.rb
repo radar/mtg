@@ -50,7 +50,7 @@ RSpec.describe Magic::Cards::Discontinuity do
       game.stack.resolve!
 
       expect(game.stack).to be_empty
-      expect(game.battlefield.creatures.by_name(wood_elves.name)).to be_empty
+      expect(creatures.by_name(wood_elves.name)).to be_empty
       expect(game.current_turn.step).to eq("end")
     end
   end

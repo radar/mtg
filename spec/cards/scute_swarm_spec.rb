@@ -16,7 +16,7 @@ RSpec.describe Magic::Cards::ScuteSwarm do
         p1.play_land(land: forest)
         game.tick!
 
-        expect(game.battlefield.creatures.controlled_by(p1).by_name("Insect").count).to eq(1)
+        expect(creatures.controlled_by(p1).by_name("Insect").count).to eq(1)
       end
     end
 
@@ -30,7 +30,7 @@ RSpec.describe Magic::Cards::ScuteSwarm do
         p1.play_land(land: forest)
         game.tick!
 
-        scutes = game.battlefield.creatures.controlled_by(p1).by_name("Scute Swarm")
+        scutes = creatures.controlled_by(p1).by_name("Scute Swarm")
 
         expect(scutes.count).to eq(2)
         expect(scutes.count(&:token?)).to eq(1)
@@ -48,7 +48,7 @@ RSpec.describe Magic::Cards::ScuteSwarm do
         p1.play_land(land: forest)
         game.tick!
 
-        scutes = game.battlefield.creatures.controlled_by(p1).by_name("Scute Swarm")
+        scutes = creatures.controlled_by(p1).by_name("Scute Swarm")
 
         expect(scutes.count).to eq(4)
         expect(scutes.count(&:token?)).to eq(2)

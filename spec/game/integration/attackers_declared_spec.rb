@@ -34,7 +34,6 @@ RSpec.describe Magic::Game, "attackers declared" do
         )
 
         turn.attackers_declared!
-        creatures = game.battlefield.creatures
         expect(creatures.count).to eq(2)
 
         soldier = creatures.find { |c| c.name == "Soldier" }

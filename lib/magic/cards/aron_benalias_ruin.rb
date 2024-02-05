@@ -14,7 +14,7 @@ module Magic
         costs "{W}{B}, {T}, Sacrifice a creature"
 
         def resolve!
-          game.battlefield.creatures.controlled_by(source.controller).each do |creature|
+          creatures.controlled_by(source.controller).each do |creature|
             creature.add_counter(Counters::Plus1Plus1)
           end
         end

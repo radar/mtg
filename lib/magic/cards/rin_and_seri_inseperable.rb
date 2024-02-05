@@ -30,8 +30,8 @@ module Magic
         end
 
         def resolve!(target:)
-          dogs = game.battlefield.creatures.by_type("Dog").controlled_by(controller)
-          cats = game.battlefield.creatures.by_type("Cat").controlled_by(controller)
+          dogs = creatures.by_type("Dog").controlled_by(controller)
+          cats = creatures.by_type("Cat").controlled_by(controller)
 
           trigger_effect(:deal_damage, damage: dogs.count, target: target)
           trigger_effect(:gain_life, life: cats.count, target: controller)

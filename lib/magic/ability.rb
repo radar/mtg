@@ -2,6 +2,7 @@ module Magic
   class Ability
     attr_reader :source
 
+
     def initialize(source:)
       @source = source
     end
@@ -12,6 +13,10 @@ module Magic
 
     def battlefield
       game.battlefield
+    end
+
+    def creatures
+      battlefield.creatures
     end
 
     def controller

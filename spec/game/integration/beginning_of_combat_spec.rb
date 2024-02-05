@@ -15,7 +15,6 @@ RSpec.describe Magic::Game, "beginning of combat on your turn" do
     it "creates a 1/1 white soldier creature token" do
       skip_to_combat!
 
-      creatures = game.battlefield.creatures
       expect(creatures.count).to eq(1)
       soldier = creatures.first
       expect(soldier.colors).to eq([:white])

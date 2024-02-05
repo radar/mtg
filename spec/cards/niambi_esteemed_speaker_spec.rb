@@ -19,7 +19,7 @@ RSpec.describe Magic::Cards::NiambiEsteemedSpeaker do
 
       choice = game.choices.first
       expect(choice).to be_a(Magic::Cards::NiambiEsteemedSpeaker::Choice)
-      choice.choose(target: game.battlefield.creatures.by_name("Wood Elves").first)
+      choice.choose(target: creatures.by_name("Wood Elves").first)
 
       expect(p1.life).to eq(23)
       expect(p2.hand.by_name("Wood Elves").count).to eq(1)
@@ -35,7 +35,7 @@ RSpec.describe Magic::Cards::NiambiEsteemedSpeaker do
       expect(game.choices).to be_empty
 
       expect(p1.life).to eq(20)
-      expect(game.battlefield.creatures.by_name("Wood Elves").count).to eq(1)
+      expect(creatures.by_name("Wood Elves").count).to eq(1)
     end
   end
 

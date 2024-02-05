@@ -17,7 +17,7 @@ RSpec.describe Magic::Cards::SecureTheScene do
       game.tick!
 
       expect(wood_elves.card.zone).to be_exile
-      soldier = game.battlefield.creatures.controlled_by(p2).first
+      soldier = creatures.controlled_by(p2).first
       expect(soldier.name).to eq("Soldier")
       expect(soldier.power).to eq(1)
       expect(soldier.toughness).to eq(1)

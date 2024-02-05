@@ -16,7 +16,7 @@ module Magic
         costs "{2}, {T}"
 
         def target_choices
-          game.battlefield.creatures.by_any_type(
+          creatures.by_any_type(
             Types::Creatures["Bird"],
             Types::Creatures["Cat"],
             Types::Creatures["Dog"],

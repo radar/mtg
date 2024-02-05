@@ -21,7 +21,7 @@ RSpec.describe Magic::Cards::SpeakerOfTheHeavens do
     game.take_action(action)
     game.tick!
 
-    angels = game.battlefield.creatures.by_name("Angel")
+    angels = creatures.by_name("Angel")
     expect(angels.count).to eq(1)
     angel = angels.first
     expect(angel.colors).to eq([:white])

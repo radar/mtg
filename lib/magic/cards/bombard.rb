@@ -10,7 +10,7 @@ module Magic
       end
 
       def target_choices
-        game.battlefield.creatures
+        creatures
       end
 
       def resolve!(target:)

@@ -17,6 +17,10 @@ module Magic
       def battlefield
         game.battlefield
       end
+
+      def creatures
+        battlefield.creatures
+      end
     end
   end
 end

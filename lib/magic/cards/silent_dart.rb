@@ -9,7 +9,7 @@ module Magic
         costs "{4}, Sacrifice {this}"
 
         def target_choices
-          game.battlefield.creatures
+          creatures
         end
 
         def resolve!(target:)

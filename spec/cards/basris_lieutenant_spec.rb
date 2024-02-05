@@ -30,8 +30,8 @@ RSpec.describe Magic::Cards::BasrisLieutenant do
 
       it "creates a 2/2 white knight creature token with vigilance" do
         subject.destroy!
-        expect(game.battlefield.creatures.count).to eq(1)
-        knight = game.battlefield.creatures.first
+        expect(creatures.count).to eq(1)
+        knight = creatures.first
         expect(knight.power).to eq(2)
         expect(knight.toughness).to eq(2)
         expect(knight.colors).to eq([:white])
@@ -48,8 +48,8 @@ RSpec.describe Magic::Cards::BasrisLieutenant do
 
       it "creates a 2/2 white knight creature token with vigilance" do
         elves.destroy!
-        expect(game.battlefield.creatures.count).to eq(2)
-        knight = game.battlefield.creatures.find { |creature| creature.name == "Knight" }
+        expect(creatures.count).to eq(2)
+        knight = creatures.find { |creature| creature.name == "Knight" }
         expect(knight.power).to eq(2)
         expect(knight.toughness).to eq(2)
         expect(knight.colors).to eq([:white])

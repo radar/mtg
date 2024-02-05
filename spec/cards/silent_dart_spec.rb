@@ -7,7 +7,7 @@ RSpec.describe Magic::Cards::SilentDart do
   let!(:wood_elves) { ResolvePermanent("Wood Elves") }
 
   it "deals 3 damage to any target" do
-    expect(game.battlefield.creatures.count).to eq(1)
+    expect(creatures.count).to eq(1)
 
     p1.add_mana(black: 4)
     p1.activate_ability(ability: permanent.activated_abilities.first) do

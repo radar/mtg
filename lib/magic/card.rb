@@ -2,7 +2,7 @@ module Magic
   class Card
     include Types
     extend Forwardable
-    def_delegators :@game, :logger, :battlefield, :exile, :current_turn
+    def_delegators :@game, :logger, :battlefield, :exile, :current_turn, :creatures
 
     include Cards::Keywords
     include Cards::Shared::Events

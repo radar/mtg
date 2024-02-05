@@ -36,7 +36,7 @@ RSpec.describe Magic::Cards::LathrilBladeOfTheElves do
 
       go_to_combat_damage!
 
-      expect(game.battlefield.creatures.controlled_by(p1).count).to eq(3)
+      expect(creatures.controlled_by(p1).count).to eq(3)
     end
   end
 end

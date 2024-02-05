@@ -15,7 +15,7 @@ RSpec.describe Magic::Cards::GoblinWizardry do
     end
 
     def goblin_wizards
-      game.battlefield.creatures
+      creatures
         .controlled_by(p1)
         .select { |creature| creature.name == "Goblin Wizard" }
     end
