@@ -12,7 +12,6 @@ module Magic
       end
 
       def pay(player:, payment:)
-
         raise "Invalid target chosen for discard" unless valid_targets.include?(payment)
         player.hand.discard(payment)
       end
