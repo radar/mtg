@@ -36,7 +36,7 @@ module Magic
 
       def event_handlers
         {
-          Events::CounterAdded => ->(receiver, event) {
+          Events::CounterAddedToPermanent => ->(receiver, event) {
             return unless event.permanent == receiver
 
             if receiver.counters.of_type(Magic::Counters::Page).count >= 4

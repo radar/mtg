@@ -130,6 +130,12 @@ module Magic
     end
 
     def lose!
+      game.notify!(
+        Events::PlayerLost.new(
+          player: self,
+        )
+      )
+
       @lost = true
     end
 
@@ -283,7 +289,7 @@ module Magic
 
     def add_counter(counter_type, amount: 1)
       @counters = Counters::Collection.new(@counters + [counter_type.new] * amount)
-      counter_added = Events::CounterAdded.new(
+      counter_added = Events::CounterAddedToPlayer.new(
         player: self,
         counter_type: counter_type,
         amount: amount

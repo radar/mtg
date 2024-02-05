@@ -271,7 +271,7 @@ module Magic
 
     def add_counter(counter_type, amount: 1)
       @counters = Counters::Collection.new(@counters + [counter_type.new] * amount)
-      counter_added = Events::CounterAdded.new(
+      counter_added = Events::CounterAddedToPermanent.new(
         permanent: self,
         counter_type: counter_type,
         amount: amount

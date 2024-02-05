@@ -26,7 +26,7 @@ module Magic
 
             receiver.controller.lose!
           end,
-          Events::CounterAdded => -> (receiver, event) do
+          Events::CounterAddedToPermanent => -> (receiver, event) do
             if receiver.counters.of_type(Counters::Incarnation).count >= 9
               receiver.trigger_effect(:exile, target: receiver)
 
