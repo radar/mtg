@@ -3,7 +3,7 @@ module Magic
     include Cards::Shared::Events
     include Cards::Shared::Types
 
-    attr_reader :game, :owner, :name, :type_line, :keywords, :keyword_grants, :protections
+    attr_reader :game, :owner, :name, :type_line, :keywords, :keyword_grants, :protections, :base_power, :base_toughness
 
     KEYWORDS = []
     PROTECTIONS = []
@@ -15,6 +15,10 @@ module Magic
         token
       end
 
+      def token_name(name)
+        const_set(:NAME, name)
+      end
+
       def power(power)
         const_set(:POWER, power)
       end
@@ -23,8 +27,8 @@ module Magic
         const_set(:TOUGHNESS, power)
       end
 
-      def colors(colors)
-        const_set(:COLORS, [*colors])
+      def colors(*colors)
+        const_set(:COLORS, colors)
       end
 
       def keywords(*keywords)
@@ -34,12 +38,14 @@ module Magic
       end
     end
 
-    def initialize(game:, owner:)
+    def initialize(game:, owner:, base_power: nil, base_toughness: nil)
       @name = self.class::NAME
       @type_line = self.class::TYPE_LINE
       @keywords = self.class::KEYWORDS
       @keyword_grants = []
       @protections = self.class::PROTECTIONS
+      @base_power = base_power || self.class::POWER
+      @base_toughness = base_toughness || self.class::TOUGHNESS
       @owner = owner
       @game = game
     end
@@ -50,14 +56,6 @@ module Magic
 
     def resolve!(**args)
       Permanent.resolve(game: game, card: self, **args)
-    end
-
-    def base_power
-      self.class::POWER
-    end
-
-    def base_toughness
-      self.class::TOUGHNESS
     end
 
     def colors
