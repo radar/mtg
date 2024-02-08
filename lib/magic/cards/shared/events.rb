@@ -27,6 +27,8 @@ module Magic
             game.add_effect(Effects::Exile.new(source: source, **args))
           when :gain_life
             game.add_effect(Effects::GainLife.new(source: source, target: source.controller, **args))
+          when :grant_keyword
+            game.add_effect(Effects::GrantKeyword.new(source: source, **args))
           when :lose_life
             game.add_effect(Effects::LoseLife.new(source: source, **args))
           when :modify_power_toughness
@@ -37,6 +39,8 @@ module Magic
             game.add_effect(Effects::PhaseOut.new(source: source, **args))
           when :return_to_owners_hand
             game.add_effect(Effects::ReturnToOwnersHand.new(source: source, **args))
+          when :sacrifice
+            game.add_effect(Effects::Sacrifice.new(source: source, **args))
           when :tap
             game.add_effect(Effects::Tap.new(source: source, **args))
           else

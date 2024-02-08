@@ -28,10 +28,14 @@ module Magic
         end
       end
 
-      def self.[](*keywords)
+      def self.list(*keywords)
         keywords.map do |keyword|
-          const_get(keyword.upcase)
+          one(keyword)
         end
+      end
+
+      def self.one(keyword)
+        const_get(keyword.upcase)
       end
 
       class KeywordGrant

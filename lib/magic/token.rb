@@ -32,7 +32,7 @@ module Magic
       end
 
       def keywords(*keywords)
-        const_set(:KEYWORDS, Keywords[*keywords])
+        const_set(:KEYWORDS, Keywords.list(*keywords))
 
         include Cards::KeywordHandlers::Prowess if keywords.include?(:prowess)
       end
@@ -91,10 +91,6 @@ module Magic
 
     def death_triggers
       []
-    end
-
-    def types
-      type_line.scan(/\w+/)
     end
 
     def permanent?

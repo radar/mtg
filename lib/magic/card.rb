@@ -44,7 +44,7 @@ module Magic
       end
 
       def keywords(*keywords)
-        const_set(:KEYWORDS, Keywords[*keywords])
+        const_set(:KEYWORDS, Keywords.list(*keywords))
 
         include Cards::KeywordHandlers::Prowess if keywords.include?(:prowess)
       end
@@ -87,10 +87,6 @@ module Magic
       @protections = self.class::PROTECTIONS
       @modes = self.class::MODES
       @controller = @owner = owner
-    end
-
-    def types
-      type_line.scan(/\w+/)
     end
 
     def inspect

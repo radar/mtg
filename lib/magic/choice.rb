@@ -7,6 +7,10 @@ module Magic
       @source = source
     end
 
+    def trigger_effect(effect, **args)
+      source.trigger_effect(effect, **args)
+    end
+
     def controller = source.controller
 
     def to_s = inspect

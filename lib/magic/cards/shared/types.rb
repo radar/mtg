@@ -21,6 +21,10 @@ module Magic
                 type("#{T::Artifact} #{T::Creature} -- #{creature_types(types)}")
               end
             end
+
+            def types
+              type_line.scan(/\w+/)
+            end
           end
         end
       end

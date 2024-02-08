@@ -13,7 +13,7 @@ module Magic
           Events::BeginningOfCombat => -> (receiver, event) do
             controller = receiver.controller
 
-            applicable_keywords = Keywords[
+            applicable_keywords = Keywords.list(
               :first_strike,
               :flying,
               :deathtouch,
@@ -25,7 +25,7 @@ module Magic
               :skulk,
               :trample,
               :vigilance,
-            ]
+            )
 
             applicable_keywords.each do |keyword|
               next unless controller.creatures.any? { |creature| creature.has_keyword?(keyword) }
