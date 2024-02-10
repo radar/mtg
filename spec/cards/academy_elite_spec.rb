@@ -58,7 +58,7 @@ RSpec.describe Magic::Cards::AcademyElite do
     let(:academy_elite) { ResolvePermanent("Academy Elite", owner: p1) }
 
     before do
-      academy_elite.add_counter(Magic::Counters::Plus1Plus1)
+      academy_elite.add_counter(counter_type: Magic::Counters::Plus1Plus1)
     end
 
     it "removes a +1/+1 counter, draws a card and discards a card" do

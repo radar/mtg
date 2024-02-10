@@ -9,7 +9,7 @@ module Magic
       end
 
       def finalize!(_player)
-        target.add_counter(counter_type)
+        target.add_counter(counter_type: counter_type)
       end
     end
   end

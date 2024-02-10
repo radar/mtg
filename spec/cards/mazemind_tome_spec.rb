@@ -36,7 +36,12 @@ RSpec.describe Magic::Cards::MazemindTome do
   end
 
   it "when there are four or more page counters, exile it. Gain 4 life." do
-    subject.add_counter(Magic::Counters::Page, amount: 4)
+    subject.trigger_effect(:add_counter, counter_type: Magic::Counters::Page, target: subject, amount: 4)
+
+    game.check_for_state_triggered_abilities
+    expect(game.stack).to include(subject.state_triggered_abilities.first)
+
+    game.stack.resolve!
 
     expect(subject.card.zone).to be_exile
     expect(p1.life).to eq(24)

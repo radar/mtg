@@ -25,7 +25,7 @@ RSpec.describe Magic::Cards::BasrisLieutenant do
   context "on death -- when basri's lieutenant is on the battlefield" do
     context "when the death is this card and it had a counter" do
       before do
-        subject.add_counter(Magic::Counters::Plus1Plus1)
+        subject.add_counter(counter_type: Magic::Counters::Plus1Plus1)
       end
 
       it "creates a 2/2 white knight creature token with vigilance" do
@@ -43,7 +43,7 @@ RSpec.describe Magic::Cards::BasrisLieutenant do
       let(:elves) { ResolvePermanent("Wood Elves", owner: p1) }
       before do
         subject
-        elves.add_counter(Magic::Counters::Plus1Plus1)
+        elves.add_counter(counter_type: Magic::Counters::Plus1Plus1)
       end
 
       it "creates a 2/2 white knight creature token with vigilance" do

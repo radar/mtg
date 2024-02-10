@@ -13,7 +13,7 @@ module Magic
 
         def resolve!
           creatures_you_control.each do |creature|
-            creature.add_counter(Counters::Plus1Plus1)
+            creature.add_counter(counter_type: Counters::Plus1Plus1)
           end
         end
       end

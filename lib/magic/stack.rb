@@ -37,6 +37,7 @@ module Magic
     end
 
     def add(item)
+      logger.debug "Item added to stack: #{item}"
       @stack.unshift(item)
     end
 

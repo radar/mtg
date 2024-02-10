@@ -292,7 +292,7 @@ module Magic
       permanents.flat_map { |card| card.protections.player }.any? { |protection| protection.protected_from?(card) }
     end
 
-    def add_counter(counter_type, amount: 1)
+    def add_counter(counter_type:, amount: 1)
       @counters = Counters::Collection.new(@counters + [counter_type.new] * amount)
       counter_added = Events::CounterAddedToPlayer.new(
         player: self,

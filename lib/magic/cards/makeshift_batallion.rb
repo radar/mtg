@@ -16,7 +16,7 @@ module Magic
             return if attacks.none? { |event| event.attacker == receiver }
             return if attacks.count < 3
 
-            receiver.add_counter(Counters::Plus1Plus1)
+            receiver.add_counter(counter_type: Counters::Plus1Plus1)
           end
         }
       end

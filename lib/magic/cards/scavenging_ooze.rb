@@ -20,7 +20,7 @@ module Magic
         def resolve!(target:)
           trigger_effect(:exile, target: target)
           if target.creature?
-            source.add_counter(Counters::Plus1Plus1)
+            source.add_counter(counter_type: Counters::Plus1Plus1)
             source.controller.gain_life(1)
           end
         end

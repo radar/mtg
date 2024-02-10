@@ -194,8 +194,9 @@ module Magic
           replacement_sources = replacement_effect_sources(event)
           # TODO: Handle multiple replacement effects -- player gets to choose which one to pick
           if replacement_sources.any?
-            logger.debug "  EVENT REPLACED! Replaced by: #{replacement_sources.first}"
             event = replacement_sources.first.handle_replacement_effect(event)
+            logger.debug "  EVENT REPLACED! Replaced by: #{replacement_sources.first}"
+            logger.debug "    New Event -> #{event}"
           end
 
           if event

@@ -101,12 +101,22 @@ module Magic
       move_dead_creatures_to_graveyard
     end
 
+    # Rule 603.8
+    def check_for_state_triggered_abilities
+      abilities = battlefield.flat_map(&:state_triggered_abilities).select(&:condition_met?)
+      # Sub rule: A state-triggered ability doesn't trigger again until the ability has resolved, has been countered, or has otherwise left the stack.
+      abilities = abilities.reject { |ability| stack.include?(ability) }
+      abilities.each do
+        stack.add(_1)
+      end
+    end
+
     def graveyard_cards
       CardList.new(players.flat_map { _1.graveyard.cards })
     end
 
     def move_dead_creatures_to_graveyard
       battlefield.creatures.dead.each(&:destroy!)
-    end\
+    end
   end
 end

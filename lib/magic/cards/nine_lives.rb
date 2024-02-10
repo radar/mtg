@@ -9,8 +9,7 @@ module Magic
       def replacement_effects
         {
           Events::LifeLoss => -> (receiver, event) do
-            receiver.trigger_effect(
-              :add_counter,
+            Events::CounterAddedToPermanent.new(
               source: receiver,
               counter_type: Counters::Incarnation,
               target: receiver,

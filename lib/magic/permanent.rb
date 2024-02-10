@@ -8,7 +8,22 @@ module Magic
     include Types
 
     extend Forwardable
-    attr_reader :game, :owner, :controller, :card, :types, :delayed_responses, :attachments, :protections, :modifiers, :counters, :keywords, :keyword_grants, :activated_abilities, :exiled_cards, :cannot_untap_next_turn
+    attr_reader :game,
+      :owner,
+      :controller,
+      :card,
+      :types,
+      :delayed_responses,
+      :attachments,
+      :protections,
+      :modifiers,
+      :counters,
+      :keywords,
+      :keyword_grants,
+      :activated_abilities,
+      :state_triggered_abilities,
+      :exiled_cards,
+      :cannot_untap_next_turn
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents
     def_delegators :@game, :logger
@@ -75,6 +90,10 @@ module Magic
       @activated_abilities ||= card.activated_abilities.map { |ability| ability.new(source: self) }
     end
 
+    def state_triggered_abilities
+      @state_triggered_abilities ||= card.state_triggered_abilities.map { |ability| ability.new(source: self) }
+    end
+
     alias_method :to_s, :inspect
 
     def controller?(other_controller)
@@ -123,6 +142,8 @@ module Magic
       trigger_delayed_response(event)
 
       case event
+      when Events::CounterAddedToPermanent
+        add_counter(counter_type: event.counter_type, amount: event.amount) if event.permanent == self
       when Events::CreatureDied
         died! if event.permanent == self
       when Events::PermanentLeavingZone
@@ -269,18 +290,11 @@ module Magic
       remove_until_eot_modifiers!
     end
 
-    def add_counter(counter_type, amount: 1)
+    def add_counter(counter_type:, amount: 1)
       @counters = Counters::Collection.new(@counters + [counter_type.new] * amount)
-      counter_added = Events::CounterAddedToPermanent.new(
-        permanent: self,
-        counter_type: counter_type,
-        amount: amount
-      )
-
-      game.notify!(counter_added)
     end
 
-    def remove_counter(counter_type, amount: 1)
+    def remove_counter(counter_type:, amount: 1)
       removable_counters = @counters.select { |counter| counter.is_a?(counter_type) }.first(amount)
       if removable_counters.count < amount
         raise "Not enough #{counter_type} counters to remove"

@@ -6,6 +6,10 @@ module Magic
       end
     end
 
+    def name
+      self.class.name
+    end
+
     def valid_targets?(*targets)
       targets.all? { target_choices.include?(_1) }
     end

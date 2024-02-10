@@ -13,7 +13,7 @@ module Magic
           # Whenever you gain life, put that many +1/+1 counters on this creature.”
           Events::LifeGain => -> (receiver, event) do
             return unless event.player == receiver.controller
-            receiver.attached_to.add_counter(Counters::Plus1Plus1, amount: event.life)
+            receiver.attached_to.add_counter(counter_type: Counters::Plus1Plus1, amount: event.life)
           end
         }
       end

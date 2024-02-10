@@ -1,16 +1,21 @@
 module Magic
   module Events
     class CounterAddedToPermanent
-      attr_reader :permanent, :counter_type, :amount
+      attr_reader :source, :target, :counter_type, :amount
 
-      def initialize(permanent: nil, counter_type:, amount:)
-        @permanent = permanent
+      def initialize(source:, target:, counter_type:, amount: 1)
+        @target = target
         @counter_type = counter_type
         @amount = amount
       end
 
       def inspect
-        "#<Events::CounterAdded permanent: #{permanent.name}, type: #{counter_type}, amount: #{amount}>"
+        "#<Events::CounterAdded target: #{target.name}, counter_type: #{counter_type}, amount: #{amount}>"
+      end
+      alias_method :to_s, :inspect
+
+      def permanent
+        target
       end
     end
   end

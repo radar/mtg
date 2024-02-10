@@ -15,7 +15,7 @@ module Magic
             owner.create_token(token_class: SoldierToken)
 
             owner.creatures.each do |creature|
-              creature.add_counter(Counters::Plus1Plus1)
+              creature.add_counter(counter_type: Counters::Plus1Plus1)
             end
           end
         end
@@ -36,7 +36,7 @@ module Magic
         end
 
         def resolve!(target:)
-          target.add_counter(Counters::Plus1Plus1)
+          target.add_counter(counter_type: Counters::Plus1Plus1)
           target.grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
         end
       end

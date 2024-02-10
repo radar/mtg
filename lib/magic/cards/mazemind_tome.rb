@@ -34,17 +34,28 @@ module Magic
 
       def activated_abilities = [ActivatedAbility, ActivatedAbility2]
 
-      def event_handlers
-        {
-          Events::CounterAddedToPermanent => ->(receiver, event) {
-            return unless event.permanent == receiver
+      def state_triggered_abilities = [StateTriggeredAbility]
 
-            if receiver.counters.of_type(Magic::Counters::Page).count >= 4
-              receiver.trigger_effect(:exile, target: receiver)
-              receiver.trigger_effect(:gain_life, life: 4)
-            end
-          }
-        }
+      class StateTriggeredAbility
+        attr_reader :source
+        def initialize(source:)
+          @source = source
+        end
+
+        def name
+          self.class
+        end
+
+        def condition_met?
+          source.counters.of_type(Magic::Counters::Page).count >= 4
+        end
+
+        def resolve!
+          if source.zone.battlefield?
+            source.trigger_effect(:exile, target: source)
+            source.trigger_effect(:gain_life, life: 4)
+          end
+        end
       end
     end
   end

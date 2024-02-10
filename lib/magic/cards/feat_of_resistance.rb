@@ -26,7 +26,7 @@ module Magic
       end
 
       def resolve!(target:)
-        target.add_counter(Counters::Plus1Plus1)
+        target.add_counter(counter_type: Counters::Plus1Plus1)
         game.choices.add(Choice.new(source: self, target: target))
       end
     end
