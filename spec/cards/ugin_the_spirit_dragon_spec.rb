@@ -76,7 +76,7 @@ RSpec.describe Magic::Cards::UginTheSpiritDragon do
 
       choice = game.choices.last
       expect(choice).to be_a(Magic::Cards::UginTheSpiritDragon::Choice)
-      permanents = p1.hand.cards.permanents.last(7)
+      permanents = p1.hand.cards.permanents.first(7)
       expect(permanents.count).to eq(7)
       game.resolve_choice!(choices: permanents)
 

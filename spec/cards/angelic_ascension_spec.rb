@@ -11,8 +11,10 @@ RSpec.describe Magic::Cards::AngelicAscension do
       action.targeting(wood_elves)
     end
 
-    expect(wood_elves.card.zone).to be_exile
-    expect(wood_elves.zone).to be_nil
+    aggregate_failures do
+      expect(wood_elves.card.zone).to be_exile
+      expect(wood_elves.zone).to be_nil
+    end
 
     expect(creatures.count).to eq(1)
     angel = creatures.first

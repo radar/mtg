@@ -67,21 +67,7 @@ module Magic
       end
 
       def fight(target, assigned_damage = power)
-        game.notify!(
-          Events::CombatDamageDealt.new(source: self, target: target, damage: assigned_damage)
-        )
-        if target.is_a?(Magic::Player) && has_keyword?(Magic::Keywords::Toxic)
-          trigger_effect(
-            :add_counter,
-            counter_type: Counters::Toxic,
-            target: target,
-          )
-        end
-
-        controller.gain_life(assigned_damage) if lifelink?
-        if target.is_a?(Creature)
-          target.mark_for_death! if deathtouch?
-        end
+        trigger_effect(:deal_combat_damage, source: self, target: target, damage: assigned_damage)
       end
 
       def attacking?

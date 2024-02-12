@@ -10,7 +10,7 @@ module Magic
     class AnnexSentry < Creature
       KEYWORDS = [Keywords::Toxic.new(1)]
 
-      class Effect < Effects::Exile
+      class Effect < Effects::ExilePermanent
         def resolve!
           super
           source.exiled_cards << target.card

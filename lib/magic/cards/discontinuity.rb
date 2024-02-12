@@ -10,7 +10,7 @@ module Magic
     class Discontinuity < Instant
       def resolve!
         game.stack.exile!
-        move_to_exile!
+        exile!
 
         game.current_turn.end!
       end

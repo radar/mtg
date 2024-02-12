@@ -11,16 +11,16 @@ module Magic
 
     def initialize(
       name: "",
-      graveyard: Zones::Graveyard.new(owner: self, cards: []),
+      graveyard: Zones::Graveyard.new(owner: self, items: []),
       library: [],
-      hand: Zones::Hand.new(owner: self, cards: []),
+      hand: Zones::Hand.new(owner: self, items: []),
       mana_pool: Hash.new(0),
       floating_mana: Hash.new(0),
       life: 20
     )
       @name = name
       @lost = false
-      @library = Zones::Library.new(owner: self, cards: library)
+      @library = Zones::Library.new(owner: self, items: library)
       @graveyard = graveyard
       @hand = hand
       @mana_pool = mana_pool
@@ -284,7 +284,14 @@ module Magic
       when Events::PlayerLoses
         lose!
       when Events::DamageDealt, Events::CombatDamageDealt
-        lose_life(event.damage)
+        trigger_effect(:lose_life, life: event.damage, source: event.source)
+      end
+    end
+
+    def trigger_effect(effect_name, **args)
+      case effect_name
+      when :lose_life
+        game.add_effect(Effects::LoseLife.new(target: self, **args))
       end
     end
 
@@ -294,13 +301,6 @@ module Magic
 
     def add_counter(counter_type:, amount: 1)
       @counters = Counters::Collection.new(@counters + [counter_type.new] * amount)
-      counter_added = Events::CounterAddedToPlayer.new(
-        player: self,
-        counter_type: counter_type,
-        amount: amount
-      )
-
-      game.notify!(counter_added)
     end
   end
 end

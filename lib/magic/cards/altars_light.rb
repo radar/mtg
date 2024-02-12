@@ -10,7 +10,7 @@ module Magic
       end
 
       def resolve!(target:)
-        game.add_effect(Effects::Exile.new(source: self, target: target))
+        trigger_effect(:exile, target: target)
       end
     end
   end

@@ -25,7 +25,7 @@ RSpec.describe Magic::Cards::ExperimentalOverload do
     choice = game.choices.first
     expect(choice).to be_a(Magic::Choice::SearchGraveyard)
 
-    choice.resolve!(target: p1.graveyard.cards.first)
+    choice.resolve!(target: p1.graveyard.cards.by_name("Shock").first)
 
     shock = p1.hand.by_name("Shock").first
     expect(shock).to be_a(Magic::Cards::Shock)

@@ -7,6 +7,7 @@ RSpec.describe Magic::Cards::EpitaphGolem do
   let!(:wood_elves) { Card("Wood Elves") }
 
   before do
+    3.times { p1.library.add(Card("Island")) }
     p1.graveyard.add(wood_elves)
   end
 

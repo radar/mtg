@@ -24,7 +24,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:move_zone, target: target, destination: battlefield)
+          trigger_effect(:return_target_from_graveyard_to_battlefield, target: target)
         end
       end
 

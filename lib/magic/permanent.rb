@@ -6,6 +6,7 @@ module Magic
     include Permanents::Modifications
     include Keywords
     include Types
+    include Targetable
 
     extend Forwardable
     attr_reader :game,
@@ -36,14 +37,15 @@ module Magic
 
     attr_accessor :zone
 
-    def self.resolve(game:, card:, owner: card.owner, from_zone: owner.library, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false)
+    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false)
       permanent = Magic::Permanent.new(
         game: game,
         owner: owner,
         card: card,
         kicked: kicked,
         cast: cast,
-        token: token
+        token: token,
+        copy: copy,
       )
 
       permanent.tap! if enters_tapped
@@ -51,7 +53,7 @@ module Magic
       permanent
     end
 
-    def initialize(game:, owner:, card:, token: false, cast: true, kicked: false, timestamp: Time.now)
+    def initialize(game:, owner:, card:, token: false, cast: true, kicked: false, copy: false, timestamp: Time.now)
       @game = game
       @owner = owner
       @controller = owner
@@ -59,6 +61,7 @@ module Magic
       @token = token
       @cast = cast
       @kicked = kicked
+      @copy = copy
       @base_types = card.types
       @delayed_responses = []
       @attachments = []
@@ -108,48 +111,34 @@ module Magic
       @token
     end
 
+    def copy?
+      @copy
+    end
+
     def cast?
       @cast
     end
 
     def move_zone!(from: zone, to:)
-      card.zone = to
-      game.notify!(*leaving_zone_notifications(from: from, to: to))
-
-      if from&.battlefield?
-        self.zone = nil
-        from.remove(self)
-        to.add(card) unless token?
-      elsif to.battlefield?
-        to.add(self)
-        from&.remove(card)
-      end
-
-      game.notify!(*entering_zone_notifications(from: from, to: to))
+      trigger_effect(:move_permanent_zone, target: self, from: from, to: to)
     end
 
-    def has_replacement_effect?(event)
-      !!card.replacement_effects[event.class]
+    # Permanents can only exist on the battlefield.
+    def zone=(new_zone)
+      @zone = new_zone.battlefield? ? new_zone : nil
     end
 
-    def handle_replacement_effect(event)
-      card.replacement_effects[event.class].call(self, event)
+    def replacement_effect_for(effect)
+      card.replacement_effects[effect.class]&.call(self, effect)
     end
 
     def receive_notification(event)
       super
 
       trigger_delayed_response(event)
-
       case event
-      when Events::CounterAddedToPermanent
-        add_counter(counter_type: event.counter_type, amount: event.amount) if event.permanent == self
       when Events::CreatureDied
         died! if event.permanent == self
-      when Events::PermanentLeavingZone
-        left_the_battlefield! if event.permanent == self && event.from.battlefield?
-      when Events::EnteredTheBattlefield
-        entered_the_battlefield! if event.permanent == self
       end
 
       handler = card.event_handlers[event.class]
@@ -245,15 +234,15 @@ module Magic
 
     def destroy!
       move_zone!(to: controller.graveyard)
+      unless copy?
+        card.move_zone!(to: controller.graveyard)
+      end
     end
     alias_method :sacrifice!, :destroy!
 
-    def exile!
-      move_zone!(to: game.exile)
-    end
-
     def return_to_hand
       move_zone!(to: owner.hand)
+      card.move_zone!(to: owner.hand)
     end
 
     def can_activate_ability?(ability)
@@ -365,22 +354,6 @@ module Magic
     def remove_until_eot_modifiers!
       until_eot_modifiers = modifiers.select(&:until_eot?)
       until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }
-    end
-
-    def leaving_zone_notifications(from:, to:)
-      Events::PermanentLeavingZoneTransition.new(
-        self,
-        from: from,
-        to: to
-      )
-    end
-
-    def entering_zone_notifications(from:, to:)
-      Events::PermanentEnteredZoneTransition.new(
-        self,
-        from: from,
-        to: to
-      )
     end
   end
 end

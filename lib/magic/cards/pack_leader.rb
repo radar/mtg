@@ -10,9 +10,10 @@ module Magic
     class PackLeader < Creature
       def replacement_effects
         {
-          Events::CombatDamageDealt => -> (receiver, event) do
-            if receiver.attacking? && event.target.is_a?(Permanent) && event.target.type?(T::Creatures["Dog"])
-              return nil
+          Effects::DealCombatDamage => -> (receiver, event) do
+            # Whenever Pack Leader attacks, prevent all combat damage that would be dealt this turn to Dogs you control.
+            if receiver.attacking? && event.target.creature? && event.target.type?(T::Creatures["Dog"])
+              Effects::Noop.new(source: receiver)
             else
               event
             end

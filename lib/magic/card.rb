@@ -116,41 +116,22 @@ module Magic
     end
 
     def move_to_hand!(target_controller = controller)
-      move_zone!(target_controller.hand)
+      move_zone!(to: target_controller.hand)
     end
 
     def move_to_graveyard!(target_controller = controller)
-      move_zone!(target_controller.graveyard)
+      move_zone!(to: target_controller.graveyard)
     end
 
-    def move_to_exile!
-      move_zone!(game.exile)
-    end
-
-    def move_zone!(new_zone)
-      old_zone = zone
-      if old_zone
-        game.notify!(
-          Events::CardLeavingZoneTransition.new(
-            self,
-            from: old_zone,
-            to: new_zone
-          )
-        )
-
-        old_zone.remove(self)
-      end
-
-      new_zone.add(self) unless new_zone.is_a?(Magic::Zones::Battlefield)
-
-      game.notify!(
-        Events::CardEnteredZoneTransition.new(
-          self,
-          from: old_zone,
-          to: new_zone
-        )
+    def move_zone!(to:)
+      effect = Effects::MoveCardZone.new(
+        from: zone,
+        to: to,
+        target: self,
+        source: self,
       )
 
+      game.add_effect(effect)
     end
 
     def resolve!(enters_tapped: enters_tapped?, kicked: false)
@@ -163,7 +144,7 @@ module Magic
           enters_tapped: enters_tapped,
           kicked: kicked
         )
-        move_zone!(game.battlefield)
+        move_zone!(to: battlefield)
         permanent
       end
     end
@@ -171,11 +152,11 @@ module Magic
     alias_method :play!, :resolve!
 
     def discard!
-      move_zone!(zone.owner.graveyard)
+      move_zone!(to: zone.owner.graveyard)
     end
 
     def exile!
-      move_zone!(exile)
+      move_zone!(to: exile)
     end
 
     def notify!(event)

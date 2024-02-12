@@ -26,7 +26,7 @@ module Magic
       end
 
       def exile!
-        card.move_to_exile!
+        card.exile!
       end
 
       def mana_cost=(cost)

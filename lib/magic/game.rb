@@ -5,7 +5,7 @@ module Magic
     attr_reader :logger, :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn
 
     def_delegators :@battlefield, :creatures
-    def_delegators :@stack, :choices, :add_choice, :skip_choice!, :resolve_choice!, :effects, :add_effect
+    def_delegators :@stack, :choices, :add_choice, :skip_choice!, :resolve_choice!, :effects
 
     def_delegators :@current_turn, :take_action, :take_actions, :can_cast_sorcery?
 
@@ -96,6 +96,21 @@ module Magic
       battlefield.creatures + battlefield.planeswalkers + players
     end
 
+    def add_effect(effect)
+      replacement_effects = battlefield.map { _1.replacement_effect_for(effect) }.compact
+      if replacement_effects.any?
+        # TODO: Support players choosing which replacement effect to apply
+        logger.debug "EFFECT REPLACED!"
+        logger.debug "  Original: #{effect}"
+        logger.debug "  Replaced: #{replacement_effects.first}"
+        effect = replacement_effects.first
+      end
+
+      logger.debug "Resolving effect: #{effect}"
+      binding.pry if effect.is_a?(Array)
+      effect.resolve!
+    end
+
     def tick!
       stack.resolve!
       move_dead_creatures_to_graveyard
@@ -112,7 +127,7 @@ module Magic
     end
 
     def graveyard_cards
-      CardList.new(players.flat_map { _1.graveyard.cards })
+      CardList.new(players.flat_map { _1.graveyard.items })
     end
 
     def move_dead_creatures_to_graveyard

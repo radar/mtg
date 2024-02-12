@@ -24,7 +24,9 @@ module Magic
             !permanent.colorless?
           end
 
-          permanents.each(&:exile!)
+          permanents.each do |permanent|
+            trigger_effect(:exile, source: source, target: permanent)
+          end
         end
       end
 

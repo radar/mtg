@@ -21,7 +21,7 @@ module Magic
       end
 
       def resolve!(target:)
-        target.exile!
+        trigger_effect(:exile, target: target)
 
         target.controller.create_token(token_class: SoldierToken)
       end

@@ -31,6 +31,7 @@ RSpec.describe Magic::Cards::ContainmentPriest do
         expect{
           ResolvePermanent('Story Seeker', owner: p2, cast: false)
         }.to change { game.exile.cards.count }.by(1)
+
         expect(game.battlefield.permanents.count).to eq(2)
         expect(game.battlefield.permanents.map(&:name)).to_not include('Story Seeker')
       end

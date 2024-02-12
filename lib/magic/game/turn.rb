@@ -191,13 +191,6 @@ module Magic
         events.each do |event|
           logger.debug "EVENT: #{event.inspect}"
           track_event(event)
-          replacement_sources = replacement_effect_sources(event)
-          # TODO: Handle multiple replacement effects -- player gets to choose which one to pick
-          if replacement_sources.any?
-            event = replacement_sources.first.handle_replacement_effect(event)
-            logger.debug "  EVENT REPLACED! Replaced by: #{replacement_sources.first}"
-            logger.debug "    New Event -> #{event}"
-          end
 
           if event
             emblems.each { |emblem| emblem.receive_event(event) }
@@ -205,10 +198,6 @@ module Magic
             players.each { |player| player.receive_event(event) }
           end
         end
-      end
-
-      def replacement_effect_sources(event)
-        battlefield.cards.select { |card| card.has_replacement_effect?(event) }
       end
 
       def spells_cast

@@ -13,7 +13,14 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:move_zone, source: source, target: target, destination: controller.library)
+          trigger_effect(
+            :move_card_zone,
+            source: source,
+            target: target,
+            from: source.zone,
+            to: controller.library,
+            placement: -1
+          )
         end
       end
 

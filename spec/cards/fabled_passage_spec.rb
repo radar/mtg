@@ -10,9 +10,7 @@ RSpec.describe Magic::Cards::FabledPassage do
   end
 
   def activate_ability
-    p1.activate_ability(ability: subject.activated_abilities.first) do
-      _1.pay(:self_sacrifice)
-    end
+    p1.activate_ability(ability: subject.activated_abilities.first)
 
     choice = game.choices.last
     expect(choice).to be_a(Magic::Cards::FabledPassage::Choice)
@@ -32,7 +30,7 @@ RSpec.describe Magic::Cards::FabledPassage do
     it "finds a land, that land remains tapped" do
       activate_ability
 
-      forest = game.battlefield.cards.by_name("Forest").select(&:tapped?).first
+      forest = game.battlefield.permanents.by_name("Forest").select(&:tapped?).first
       expect(forest.zone).to be_battlefield
     end
   end
@@ -47,7 +45,7 @@ RSpec.describe Magic::Cards::FabledPassage do
     it "finds a land, that land remains tapped" do
       activate_ability
 
-      forest = game.battlefield.cards.by_name("Forest")
+      forest = game.battlefield.permanents.by_name("Forest")
       expect(forest.all?(&:untapped?)).to be_truthy
     end
   end

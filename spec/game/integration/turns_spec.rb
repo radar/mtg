@@ -33,6 +33,7 @@ RSpec.describe Magic::Game::Turn, "turn walkthrough" do
     # 6 islands on game start draw, + aegis turtle
     # additional island on 1st turn draw - up to 7
     # one island played, down to 6 in hand
+    binding.pry
     expect(p1.hand.by_name("Island").count).to eq(6)
 
     island = p1.permanents.by_name("Island").first

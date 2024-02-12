@@ -11,11 +11,15 @@ module Magic
     class ContainmentPriest < Creature
       def replacement_effects
         {
-          Events::EnteredTheBattlefield => -> (receiver, event) do
+          Effects::MovePermanentZone => -> (receiver, event) do
+            return unless event.to.battlefield?
             return if receiver == event.permanent
             return if event.permanent.cast? || event.permanent.token?
 
-            receiver.trigger_effect(:exile, target: event.permanent)
+            Effects::ExilePermanent.new(
+              source: receiver,
+              target: event.permanent,
+            )
           end
         }
       end

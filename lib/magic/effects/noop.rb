@@ -1,8 +1,8 @@
 module Magic
   module Effects
-    class Sacrifice < TargetedEffect
+    class Noop < Effect
       def resolve!
-        target.sacrifice!
+        # no-op
       end
     end
   end

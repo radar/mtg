@@ -61,12 +61,6 @@ module Magic
       end
     end
 
-    def add_effect(effect)
-      logger.debug "Effect added: #{effect}"
-
-      effect.resolve!
-    end
-
     def add_choice(choice)
       logger.debug "Choice added: #{choice}"
       @choices.add(choice)

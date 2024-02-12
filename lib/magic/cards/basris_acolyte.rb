@@ -9,12 +9,9 @@ module Magic
     end
 
     class BasrisAcolyte < Creature
-      class FirstChoice < Magic::Choice
+      class FirstChoice < Magic::Choice::Targeted
         def choices
-          Magic::Targets::Choices.new(
-            choices: battlefield.creatures - [source],
-            amount: 1,
-          )
+          battlefield.creatures - [source]
         end
 
         def resolve!(target:)
@@ -24,7 +21,7 @@ module Magic
         end
       end
 
-      class SecondChoice < Magic::Choice
+      class SecondChoice < Magic::Choice::Targeted
         attr_reader :choices
 
         def initialize(choices:, **args)

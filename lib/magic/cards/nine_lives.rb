@@ -6,10 +6,16 @@ module Magic
     end
 
     class NineLives < Enchantment
+      class LTB < TriggeredAbility::EnterTheBattlefield
+        def perform
+          source.trigger_effect(:lose_game, source: source, player: source.controller)
+        end
+      end
+
       def replacement_effects
         {
-          Events::LifeLoss => -> (receiver, event) do
-            Events::CounterAddedToPermanent.new(
+          Effects::LoseLife => -> (receiver, event) do
+            Effects::AddCounterToPermanent.new(
               source: receiver,
               counter_type: Counters::Incarnation,
               target: receiver,
@@ -20,24 +26,15 @@ module Magic
 
       def event_handlers
         {
-          Events::LeavingZone => -> (receiver, event) do
-            return unless event.from.battlefield?
-
-            receiver.controller.lose!
-          end,
           Events::CounterAddedToPermanent => -> (receiver, event) do
             if receiver.counters.of_type(Counters::Incarnation).count >= 9
-              receiver.trigger_effect(:exile, target: receiver)
-
-              loss_event = Events::PlayerLoses.new(
-                player: receiver.controller,
-              )
-
-              game.notify!(loss_event)
+              trigger_effect(:exile, target: receiver)
             end
           end
         }
       end
+
+      def ltb_triggers = [LTB]
     end
   end
 end

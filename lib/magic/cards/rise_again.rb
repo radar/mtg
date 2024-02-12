@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!(target:)
-        Permanent.resolve(game: game, owner: controller, from_zone: controller.graveyard, card: target, cast: false)
+        trigger_effect(:return_target_from_graveyard_to_battlefield, target: target)
       end
     end
   end

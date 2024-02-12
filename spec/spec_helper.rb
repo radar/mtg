@@ -105,8 +105,8 @@ RSpec.shared_context "two player game" do
   end
 
   before do
-    p1_library.each { p1.library.add(_1) }
-    p2_library.each { p2.library.add(_1) }
+    p1_library.each_with_index { p1.library.add(_1, _2) }
+    p2_library.each_with_index { p2.library.add(_1, _2) }
     game.add_players(p1, p2)
 
     game.start!

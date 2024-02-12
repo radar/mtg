@@ -14,7 +14,7 @@ RSpec.describe Magic::Permanent do
     end
 
     context "when permanent is a token" do
-      let!(:permanent) { ResolvePermanent("Scute Swarm", owner: p1, token: true) }
+      let!(:permanent) { ResolvePermanent("Scute Swarm", owner: p1, token: true, copy: true) }
 
       it "does not move the card to the graveyard" do
         permanent.destroy!

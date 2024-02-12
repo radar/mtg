@@ -22,7 +22,7 @@ module Magic
       end
 
       def resolve!(target:)
-        target.exile!
+        trigger_effect(:exile, target: target)
 
         controller = target.controller
 
