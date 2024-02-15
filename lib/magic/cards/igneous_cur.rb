@@ -1,17 +1,13 @@
 module Magic
   module Cards
-    IgneousCur = Creature("Igneous Cur") do
+    class IgneousCur < Creature
       cost "{1}{R}"
-      creature_type("Elemental Dog")
+      creature_type "Elemental Dog"
       power 1
       toughness 2
-    end
 
-    class IgneousCur < Creature
       class ActivatedAbility < Magic::ActivatedAbility
-        def costs
-          [Costs::Mana.new(red: 1, generic: 1)]
-        end
+        costs "{1}{R}"
 
         def resolve!
           source.modify_power(2)
