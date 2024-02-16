@@ -25,29 +25,36 @@ module Magic
         end
       end
 
-      def etb_triggers = [ETB]
-
-      def event_handlers
-        {
-          Events::BeginningOfEndStep => -> (receiver, event) do
-            cards_returned_to_hand = game.current_turn.events.select do |event|
-              next unless event.is_a?(Events::PermanentEnteredZone)
-
-              event.from == game.battlefield && event.to == receiver.controller.hand
-            end
-
-            receiver.controller.draw! if cards_returned_to_hand.any?
-          end
-        }
-      end
-
-
-
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
           game.choices.add(Choice.new(actor: actor))
         end
       end
+
+      class BeginningOfEndStepTrigger < TriggeredAbility::Base
+        def should_perform?
+          cards_returned_to_hand = game.current_turn.events.select do |event|
+            next unless event.is_a?(Events::PermanentEnteredZone)
+
+            event.from == game.battlefield && event.to == controller.hand
+          end
+
+          cards_returned_to_hand.any?
+        end
+
+        def call
+          controller.draw!
+        end
+      end
+
+      def etb_triggers = [ETB]
+
+      def event_handlers
+        {
+          Events::BeginningOfEndStep => BeginningOfEndStepTrigger
+        }
+      end
+
     end
   end
 end
