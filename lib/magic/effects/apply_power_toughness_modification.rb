@@ -3,9 +3,10 @@ module Magic
     class ApplyPowerToughnessModification < TargetedEffect
       attr_reader :power, :toughness
 
-      def initialize(power: 0, toughness: 0, **args)
+      def initialize(power: 0, toughness: 0, until_eot: true, **args)
         @power = power
         @toughness = toughness
+        @until_eot = until_eot
         super(**args)
       end
 
