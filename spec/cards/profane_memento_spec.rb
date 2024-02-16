@@ -7,9 +7,9 @@ RSpec.describe Magic::Cards::ProfaneMemento do
 
   context "receive notification" do
     context "when creature enters controller's graveyard" do
-      let(:p1_creature) { ResolvePermanent("Loxodon Wayfarer", owner: p1) }
+      let(:p1_creature) { Card("Loxodon Wayfarer", owner: p1) }
       let(:event) do
-        Magic::Events::PermanentEnteredZone.new(
+        Magic::Events::CardEnteredZone.new(
           p1_creature,
           from: game.battlefield,
           to: p1.graveyard
@@ -22,9 +22,9 @@ RSpec.describe Magic::Cards::ProfaneMemento do
     end
 
     context "when a creature enters opponent's graveyard" do
-      let(:p2_creature) { ResolvePermanent("Loxodon Wayfarer", owner: p2) }
+      let(:p2_creature) { Card("Loxodon Wayfarer", owner: p2) }
       let(:event) do
-        Magic::Events::PermanentEnteredZone.new(
+        Magic::Events::CardEnteredZone.new(
           p2_creature,
           from: game.battlefield,
           to: p2.graveyard,
@@ -37,9 +37,9 @@ RSpec.describe Magic::Cards::ProfaneMemento do
     end
 
     context "when an artifact enters opponent's graveyard" do
-      let(:p2_artifact) { ResolvePermanent("Profane Memento", owner: p2) }
+      let(:p2_artifact) { Card("Profane Memento", owner: p2) }
       let(:event) do
-        Magic::Events::PermanentEnteredZone.new(
+        Magic::Events::CardEnteredZone.new(
           p2_artifact,
           from: game.battlefield,
           to: p2.graveyard,
