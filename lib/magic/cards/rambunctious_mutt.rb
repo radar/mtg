@@ -8,14 +8,14 @@ module Magic
       toughness 2
 
       enters_the_battlefield do
-        game.choices.add(RambunctiousMutt::Choice.new(source: permanent))
+        game.choices.add(RambunctiousMutt::Choice.new(actor: actor))
       end
     end
 
     class RambunctiousMutt < Creature
       class Choice < Choice::DestroyTarget
         def choices
-          game.battlefield.cards.by_any_type("Artifact", "Enchantment").not_controlled_by(source.controller)
+          battlefield.by_any_type("Artifact", "Enchantment").not_controlled_by(actor.controller)
         end
       end
     end

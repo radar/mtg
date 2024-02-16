@@ -25,7 +25,7 @@ module Magic
         # 2. Creates a scute, adding to this array
         # 3. `.each` continues on its merry way, going to Scute #2
         # 4. Go to Step 2.
-        permanents.dup.each { _1.receive_notification(event) }
+        permanents.dup.each { _1.receive_event(event) }
       end
 
       def permanents

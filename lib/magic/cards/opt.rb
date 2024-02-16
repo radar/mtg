@@ -8,12 +8,12 @@ module Magic
       class Choice < Magic::Choice::Scry
         def resolve!(**args)
           super(**args)
-          source.trigger_effect(:draw_cards)
+          actor.trigger_effect(:draw_cards)
         end
       end
 
       def resolve!
-        game.choices.add(Choice.new(source: self, amount: 1))
+        game.choices.add(Choice.new(actor: self, amount: 1))
 
         super
       end

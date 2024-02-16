@@ -10,7 +10,7 @@ module Magic
     class ElderfangRitualist < Creature
       class Choice < Choice::SearchGraveyard
         def choices
-          source.controller.graveyard
+          controller.graveyard
         end
 
         def choice_amount
@@ -24,7 +24,7 @@ module Magic
 
       class Death < TriggeredAbility::Death
         def perform
-          game.add_choice(ElderfangRitualist::Choice.new(source: source))
+          game.add_choice(ElderfangRitualist::Choice.new(actor: actor))
         end
       end
 

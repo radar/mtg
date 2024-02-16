@@ -20,7 +20,7 @@ module Magic
       def resolve!(target:)
         trigger_effect(:counter_spell, target: target)
 
-        game.choices.add(Choice.new(source: self))
+        game.choices.add(Choice.new(actor: self))
 
         super()
 

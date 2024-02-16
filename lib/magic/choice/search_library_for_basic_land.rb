@@ -2,8 +2,8 @@ module Magic
   class Choice
     class SearchLibraryForBasicLand < Choice
       attr_reader :enters_tapped
-      def initialize(source:, enters_tapped: false)
-        super(source: source)
+      def initialize(actor:, enters_tapped: false)
+        super(actor: actor)
         @enters_tapped = enters_tapped
       end
 
@@ -13,7 +13,7 @@ module Magic
 
       def resolve!(target:)
         permanent = target.resolve!(enters_tapped: enters_tapped)
-        source.controller.shuffle!
+        controller.shuffle!
         permanent
       end
     end

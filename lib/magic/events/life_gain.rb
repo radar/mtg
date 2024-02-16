@@ -1,11 +1,12 @@
 module Magic
   module Events
-    class LifeGain
+    class LifeGain < Base
       attr_reader :player, :life
 
       def initialize(player:, life:)
         @player = player
         @life = life
+        super()
       end
 
       def inspect

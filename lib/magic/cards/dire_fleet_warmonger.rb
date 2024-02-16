@@ -14,18 +14,17 @@ module Magic
 
         def resolve!(choice:)
           trigger_effect(:sacrifice, target: choice)
-          trigger_effect(:modify_power_toughness, power: 2, toughness: 2, target: source)
-          trigger_effect(:grant_keyword, keyword: :trample, target: source)
+          trigger_effect(:modify_power_toughness, power: 2, toughness: 2, target: actor)
+          trigger_effect(:grant_keyword, keyword: :trample, target: actor)
         end
       end
-
 
       def event_handlers
       {
         Events::BeginningOfCombat => -> (receiver, event) do
           return unless event.active_player == owner
 
-          game.choices.add(DireFleetWarmonger::Choice.new(source: receiver))
+          game.choices.add(DireFleetWarmonger::Choice.new(actor: receiver))
 
 
         end

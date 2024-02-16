@@ -13,7 +13,7 @@ module Magic
       keywords :prowess
 
       enters_the_battlefield do
-        game.add_choice(Choice::Scry.new(source: source, amount: 2))
+        game.add_choice(Choice::Scry.new(actor: actor, amount: 2))
       end
 
       private

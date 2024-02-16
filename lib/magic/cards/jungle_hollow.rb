@@ -3,7 +3,7 @@ module Magic
     JungleHollow = Card("Jungle Hollow") do
       type "Land"
       enters_the_battlefield do
-        permanent.trigger_effect(:gain_life, life: 1)
+        actor.trigger_effect(:gain_life, life: 1)
       end
     end
 

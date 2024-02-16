@@ -9,7 +9,7 @@ module Magic
       protections [Protection.new(condition: -> (card) { card.multi_colored? })]
 
       enters_the_battlefield do
-        game.add_choice(BasrisLieutenant::Choice.new(source: permanent))
+        game.add_choice(BasrisLieutenant::Choice.new(actor: actor))
       end
     end
 
@@ -32,7 +32,7 @@ module Magic
         end
 
         def resolve!(target:)
-          source.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, target: target)
+          actor.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, target: target)
         end
       end
 

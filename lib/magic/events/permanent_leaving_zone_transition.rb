@@ -3,8 +3,11 @@ module Magic
     class PermanentLeavingZoneTransition
       def self.new(permanent, from:, to:)
         events = []
-        if (from && from.battlefield?) && to.graveyard? && permanent.creature?
-          events << Events::CreatureDied.new(permanent)
+        if from && from.battlefield?
+          events << Events::LeftTheBattlefield.new(permanent, to: to)
+          if to.graveyard? && permanent.creature?
+            events << Events::CreatureDied.new(permanent)
+          end
         end
 
         if from

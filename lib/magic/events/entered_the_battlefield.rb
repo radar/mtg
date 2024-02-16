@@ -1,6 +1,6 @@
 module Magic
   module Events
-    class EnteredTheBattlefield
+    class EnteredTheBattlefield < Base
       attr_reader :permanent, :from
 
       def initialize(permanent, from:)

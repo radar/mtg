@@ -5,6 +5,7 @@ RSpec.describe Magic::Cards::IdolOfEndurance do
 
   let(:wood_elves) { Card("Wood Elves") }
   subject(:idol_of_endurance) { ResolvePermanent("Idol Of Endurance", owner: p1) }
+  let(:etb_event) { instance_double(Magic::Events::EnteredTheBattlefield, permanent: idol_of_endurance) }
 
   before do
     p1.graveyard.add(wood_elves)
@@ -13,7 +14,7 @@ RSpec.describe Magic::Cards::IdolOfEndurance do
 
   context "when it enters the battlefield" do
     it "exiles all creature cards with mana cost 3 or less from graveyard" do
-      subject.entered_the_battlefield!
+      subject.entered_the_battlefield!(etb_event)
       expect(wood_elves.zone).to be_exile
       expect(idol_of_endurance.exiled_cards).to include(wood_elves)
     end

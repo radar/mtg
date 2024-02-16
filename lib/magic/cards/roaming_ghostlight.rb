@@ -8,7 +8,7 @@ module Magic
       keywords :flying
 
       enters_the_battlefield do
-        game.add_choice(RoamingGhostlight::Choice.new(source: source))
+        game.add_choice(RoamingGhostlight::Choice.new(actor: actor))
       end
     end
 

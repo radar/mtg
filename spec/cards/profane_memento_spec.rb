@@ -17,7 +17,7 @@ RSpec.describe Magic::Cards::ProfaneMemento do
       end
 
       it "does not gain life" do
-        expect { subject.receive_notification(event) }.not_to(change { p1.life })
+        expect { subject.receive_event(event) }.not_to(change { p1.life })
       end
     end
 
@@ -32,7 +32,7 @@ RSpec.describe Magic::Cards::ProfaneMemento do
       end
 
       it "gains life" do
-        expect { subject.receive_notification(event) }.to(change { p1.life }.by(1))
+        expect { subject.receive_event(event) }.to(change { p1.life }.by(1))
       end
     end
 
@@ -47,7 +47,7 @@ RSpec.describe Magic::Cards::ProfaneMemento do
       end
 
       it "gains no life" do
-        expect { subject.receive_notification(event) }.not_to(change { p1.life })
+        expect { subject.receive_event(event) }.not_to(change { p1.life })
       end
     end
   end

@@ -15,8 +15,8 @@ module Magic
 
       class Choice < Magic::Choice::Color
         attr_reader :target
-        def initialize(source:, target:)
-          super(source: source)
+        def initialize(actor:, target:)
+          super(actor: actor)
           @target = target
         end
 
@@ -27,7 +27,7 @@ module Magic
 
       def resolve!(target:)
         target.add_counter(counter_type: Counters::Plus1Plus1)
-        game.choices.add(Choice.new(source: self, target: target))
+        game.choices.add(Choice.new(actor: self, target: target))
       end
     end
   end

@@ -17,9 +17,9 @@ module Magic
         end
 
         def resolve!(target:)
-          source.trigger_effect(
+          actor.trigger_effect(
             :return_to_owners_hand,
-            source: source,
+            source: actor,
             targets: [target],
           )
         end
@@ -45,7 +45,7 @@ module Magic
 
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          game.choices.add(Choice.new(source: permanent))
+          game.choices.add(Choice.new(actor: actor))
         end
       end
     end

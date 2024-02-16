@@ -8,17 +8,17 @@ module Magic
       keywords :flash
 
       enters_the_battlefield do
-        valid_targets = creatures_you_control.except(permanent)
-        game.choices.add(NiambiEsteemedSpeaker::Choice.new(source: permanent, choices: valid_targets))
+        valid_targets = creatures_you_control.except(actor)
+        game.choices.add(NiambiEsteemedSpeaker::Choice.new(actor: actor, choices: valid_targets))
       end
     end
 
     class NiambiEsteemedSpeaker < Creature
       class Choice < Magic::Choice
-        attr_reader :source
+        attr_reader :actor
 
-        def initialize(source:, choices:)
-          @source = source
+        def initialize(actor:, choices:)
+          @actor = actor
           @choices = choices
         end
 
@@ -26,7 +26,7 @@ module Magic
 
         def choose(target:)
           target.return_to_hand
-          source.controller.gain_life(target.mana_value)
+          controller.gain_life(target.mana_value)
         end
       end
 

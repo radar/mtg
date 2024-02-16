@@ -7,8 +7,8 @@ module Magic
     class LoftyDenial < Instant
       class Choice < Magic::Choice
         attr_reader :target
-        def initialize(source:, target:)
-          super(source:)
+        def initialize(actor:, target:)
+          super(actor:)
           @target = target
         end
 
@@ -17,7 +17,7 @@ module Magic
         end
 
         def costs
-          has_flying = source.controller.creatures.any?(&:flying?)
+          has_flying = controller.creatures.any?(&:flying?)
           @costs ||= [Costs::Mana.new(generic: has_flying ? 4 : 1)]
         end
 
@@ -28,7 +28,7 @@ module Magic
 
         def resolve!
           if costs.none?(&:paid?)
-            source.trigger_effect(:counter_spell, target: target)
+            trigger_effect(:counter_spell, target: target)
           end
         end
       end
@@ -42,7 +42,7 @@ module Magic
       end
 
       def resolve!(target:)
-        game.choices.add(Choice.new(source: self, target:))
+        game.choices.add(Choice.new(actor: self, target:))
       end
     end
   end

@@ -8,8 +8,10 @@ RSpec.describe Magic::Cards::BarrinTolarianArchmage do
   let!(:wood_elves_2) { ResolvePermanent("Wood Elves", owner: p2) }
   let!(:basri_ket) { ResolvePermanent("Basri Ket", owner: p1) }
 
+  let(:etb_event) { instance_double(Magic::Events::EnteredTheBattlefield, permanent: permanent) }
+
   it "returns a creature" do
-    subject.entered_the_battlefield!
+    subject.entered_the_battlefield!(etb_event)
     expect(game.choices.last).to be_a(Magic::Cards::BarrinTolarianArchmage::Choice)
     game.resolve_choice!(target: wood_elves)
     game.tick!
@@ -33,7 +35,7 @@ RSpec.describe Magic::Cards::BarrinTolarianArchmage do
   end
 
   it "elects to skip the choice" do
-    subject.entered_the_battlefield!
+    subject.entered_the_battlefield!(etb_event)
     expect(game.choices.last).to be_a(Magic::Cards::BarrinTolarianArchmage::Choice)
     game.skip_choice!
     game.tick!
@@ -42,7 +44,7 @@ RSpec.describe Magic::Cards::BarrinTolarianArchmage do
   end
 
   it "returns a planeswalker" do
-    subject.entered_the_battlefield!
+    subject.entered_the_battlefield!(etb_event)
     expect(game.choices.last).to be_a(Magic::Cards::BarrinTolarianArchmage::Choice)
     game.resolve_choice!(target: basri_ket)
     game.tick!
@@ -63,7 +65,7 @@ RSpec.describe Magic::Cards::BarrinTolarianArchmage do
   end
 
   it "returns another player's creature, so does not draw a card" do
-    subject.entered_the_battlefield!
+    subject.entered_the_battlefield!(etb_event)
     expect(game.choices.last).to be_a(Magic::Cards::BarrinTolarianArchmage::Choice)
     game.resolve_choice!(target: wood_elves_2)
     game.tick!

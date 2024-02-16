@@ -13,7 +13,7 @@ module Magic
     class BogBadger < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          if permanent.kicked?
+          if actor.kicked?
             controller.creatures.each do |creature|
               creature.grant_keyword(:menace, until_eot: true)
             end

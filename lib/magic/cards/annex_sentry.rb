@@ -2,7 +2,7 @@ module Magic
   module Cards
     AnnexSentry = Creature("Annex Sentry") do
       artifact_creature_type("Phyrexian Cleric")
-      cost white: 1, generic: 2
+      cost "{2}{W}"
       power 1
       toughness 4
     end
@@ -19,12 +19,12 @@ module Magic
 
       class Choice < Magic::Choice
         def choices
-          game.battlefield.not_controlled_by(source.controller).cmc_lte(3).by_any_type(T::Creature, T::Artifact)
+          game.battlefield.not_controlled_by(actor.controller).cmc_lte(3).by_any_type(T::Creature, T::Artifact)
         end
 
         def resolve!(target:)
           effect = AnnexSentry::Effect.new(
-            source: source,
+            source: actor,
             target: target,
           )
           game.add_effect(effect)
@@ -34,7 +34,7 @@ module Magic
 
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          game.choices.add(Choice.new(source: permanent))
+          game.choices.add(Choice.new(actor: actor))
         end
       end
 
@@ -42,7 +42,7 @@ module Magic
 
       class LTB < TriggeredAbility::EnterTheBattlefield
         def perform
-          permanent.exiled_cards.each { _1.move_zone!(battlefield) }
+          actor.exiled_cards.each { _1.resolve! }
         end
       end
 

@@ -1,6 +1,7 @@
 module Magic
   module Cards
     class IgneousCur < Creature
+      card_name "Igneous Cur"
       cost "{1}{R}"
       creature_type "Elemental Dog"
       power 1

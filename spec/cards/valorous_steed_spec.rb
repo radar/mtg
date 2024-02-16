@@ -4,6 +4,7 @@ RSpec.describe Magic::Cards::ValorousSteed do
   include_context "two player game"
 
   subject(:valorous_steed) { Permanent("Valorous Steed", owner: p1) }
+  let(:etb_event) { instance_double(Magic::Events::EnteredTheBattlefield, permanent: subject) }
 
   before do
     game.battlefield.add(subject)
@@ -15,7 +16,7 @@ RSpec.describe Magic::Cards::ValorousSteed do
 
   context "when it enters the battlefield" do
     it "creates a 2/2 white Knight with vigilance" do
-      subject.entered_the_battlefield!
+      subject.entered_the_battlefield!(etb_event)
       knight = creatures.by_name("Knight").controlled_by(p1).first
       expect(knight).not_to be_nil
       expect(knight).to be_vigilant

@@ -4,14 +4,14 @@ module Magic
       cost white: 2
 
       enters_the_battlefield do
-        game.choices.add(RunedHalo::Choice.new(source: permanent))
+        game.choices.add(RunedHalo::Choice.new(actor: actor))
       end
     end
 
     class RunedHalo < Enchantment
       class Choice < Magic::Choice::CardName
         def resolve!(choice: nil)
-          source.protections << Protection.new(condition: -> (c) { choice == c.class }, protects_player: true)
+          actor.protections << Protection.new(condition: -> (c) { choice == c.class }, protects_player: true)
         end
       end
     end

@@ -7,7 +7,7 @@ RSpec.describe Magic::Cards::ExquisiteBlood do
 
   context "receive notification" do
     it "controller gains life equal to life lost" do
-      subject.receive_notification(
+      subject.receive_event(
         Magic::Events::LifeLoss.new(
           player: p2,
           life: 6

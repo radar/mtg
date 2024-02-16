@@ -4,7 +4,7 @@ module Magic
       type "Land"
 
       enters_the_battlefield do
-        game.add_choice(Choice::Scry.new(source: source))
+        game.add_choice(Choice::Scry.new(actor: actor))
       end
     end
 

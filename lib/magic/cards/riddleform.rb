@@ -9,7 +9,7 @@ module Magic
             return if event.spell.creature?
             return if event.spell.controller != receiver.controller
 
-            game.choices.add(Riddleform::Choice.new(source: receiver))
+            game.choices.add(Riddleform::Choice.new(actor: receiver))
 
           end
         }
@@ -20,10 +20,10 @@ module Magic
       class Choice < Magic::Choice
 
         def resolve!
-          source.add_types(T::Creature, T::Creatures["Sphinx"])
-          source.modify_base_power(3)
-          source.modify_base_toughness(3)
-          source.grant_keyword(Magic::Keywords::FLYING)
+          actor.add_types(T::Creature, T::Creatures["Sphinx"])
+          actor.modify_base_power(3)
+          actor.modify_base_toughness(3)
+          actor.grant_keyword(Magic::Keywords::FLYING)
         end
 
       end

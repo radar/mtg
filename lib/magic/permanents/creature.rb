@@ -57,7 +57,7 @@ module Magic
         )
       end
 
-      def receive_notification(event)
+      def receive_event(event)
         return if !event.respond_to?(:target) || event.target != self
 
         case event

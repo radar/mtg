@@ -4,7 +4,7 @@ module Magic
       type "Land"
 
       enters_the_battlefield do
-        permanent.controller.gain_life(2)
+        controller.gain_life(2)
       end
     end
 

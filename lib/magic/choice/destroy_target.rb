@@ -1,12 +1,6 @@
 module Magic
   class Choice
     class DestroyTarget < Choice
-      attr_reader :source
-
-      def initialize(source:)
-        @source = source
-      end
-
       def choices
         raise NotImplemented
       end

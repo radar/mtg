@@ -3,10 +3,10 @@ module Magic
     class Scry < Choice
       attr_reader :player, :amount
 
-      def initialize(source:, amount: 1)
-        @source = source
+      def initialize(actor:, amount: 1)
+        @actor = actor
         @amount = amount
-        super(source: source)
+        super(actor: actor)
       end
 
       def choices
@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!(top: [], bottom: [])
-        source.controller.scry(amount:, top:, bottom:)
+        controller.scry(amount:, top:, bottom:)
       end
     end
   end

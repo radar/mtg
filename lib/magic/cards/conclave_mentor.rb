@@ -27,7 +27,7 @@ module Magic
 
       class Death < TriggeredAbility::Death
         def perform
-          source.trigger_effect(:gain_life, life: source.power)
+          actor.trigger_effect(:gain_life, life: actor.power)
         end
       end
 

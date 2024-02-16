@@ -107,6 +107,10 @@ module Magic
       @controller = other_controller
     end
 
+    def opponents
+      game.opponents(controller)
+    end
+
     def token?
       @token
     end
@@ -132,40 +136,54 @@ module Magic
       card.replacement_effects[effect.class]&.call(self, effect)
     end
 
-    def receive_notification(event)
+    def receive_event(event)
       super
 
       trigger_delayed_response(event)
       case event
+      when Events::EnteredTheBattlefield
+        entered_the_battlefield!(event)
+      when Events::LeftTheBattlefield
+        left_the_battlefield!(event)
       when Events::CreatureDied
-        died! if event.permanent == self
+        died!(event)
       end
 
-      handler = card.event_handlers[event.class]
-      if handler
-        logger.debug "EVENT HANDLER: #{self} handling #{event}"
-        handler.call(self, event)
+      handler_class = card.event_handlers[event.class]
+      if handler_class
+        # TODO: deprecate procs, move to classes
+        if handler_class.is_a?(Proc)
+          handler_class.call(self, event)
+        else
+          logger.debug "EVENT HANDLER: #{self} handling #{event}"
+          handler = handler_class.new(actor: self, event: event)
+
+          handler.perform!
+        end
       end
     end
 
-    def died!
+    def died!(event)
+      return unless event.permanent == self
       card.death_triggers.each do |trigger|
-        trigger.new(game: game, source: self).perform
+        trigger.new(actor: self, event: event).perform
       end
-      left_the_battlefield!
     end
 
-    def left_the_battlefield!
+    def left_the_battlefield!(event)
+      return unless event.permanent == self
       @attachments.each(&:destroy!)
 
       card.ltb_triggers.each do |trigger|
-        trigger.new(game: game, source: self).perform
+        trigger.new(actor: self, event: event).perform
       end
     end
 
-    def entered_the_battlefield!
+    def entered_the_battlefield!(event)
+      return unless event.permanent == self
+
       card.etb_triggers.each do |trigger|
-        trigger.new(game: game, source: self).perform
+        trigger.new(actor: self, event: event).perform
       end
     end
 

@@ -12,7 +12,7 @@ module Magic
 
       class Choice < Magic::Choice::SearchGraveyard
         def choices
-          source.controller.graveyard
+          controller.graveyard
         end
 
         def amount
@@ -32,7 +32,7 @@ module Magic
           base_toughness: weird_power
         )
 
-        game.choices.add(Choice.new(source: self))
+        game.choices.add(Choice.new(actor: self))
       end
     end
   end

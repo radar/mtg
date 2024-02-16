@@ -2,16 +2,17 @@ module Magic
   class Choice
     include BattlefieldFilters
 
-    attr_reader :source
-    def initialize(source:)
-      @source = source
+    attr_reader :actor
+    def initialize(actor:)
+      @actor = actor
     end
 
     def trigger_effect(effect, **args)
-      source.trigger_effect(effect, **args)
+      actor.trigger_effect(effect, **args)
     end
 
-    def controller = source.controller
+    def controller = actor.controller
+    def game = actor.game
 
     def to_s = inspect
   end

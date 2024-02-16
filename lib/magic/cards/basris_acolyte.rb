@@ -11,12 +11,12 @@ module Magic
     class BasrisAcolyte < Creature
       class FirstChoice < Magic::Choice::Targeted
         def choices
-          battlefield.creatures - [source]
+          battlefield.creatures - [actor]
         end
 
         def resolve!(target:)
-          source.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, source: source, target: target)
-          choice = SecondChoice.new(source: source, choices: choices - [target])
+          actor.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, source: actor, target: target)
+          choice = SecondChoice.new(actor: actor, choices: choices - [target])
           game.choices.add(choice)
         end
       end
@@ -30,15 +30,15 @@ module Magic
         end
 
         def resolve!(target:)
-          source.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, source: source, target: target)
+          actor.trigger_effect(:add_counter, counter_type: Counters::Plus1Plus1, source: actor, target: target)
         end
       end
 
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          choices = battlefield.creatures - [permanent]
+          choices = other_creatures_you_control
           effect = FirstChoice.new(
-            source: permanent,
+            actor: actor,
           )
           game.choices.add(effect)
         end

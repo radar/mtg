@@ -37,7 +37,7 @@ module Magic
           Events::PermanentUntapped => -> (receiver, event) do
             return if event.permanent != receiver
 
-            game.choices.add(Choice.new(source: receiver))
+            game.choices.add(Choice.new(actor: receiver))
 
             receiver.controller.draw!
           end

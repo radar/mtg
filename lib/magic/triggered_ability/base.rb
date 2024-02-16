@@ -2,14 +2,17 @@ module Magic
   module TriggeredAbility
     class Base
       include BattlefieldFilters
-      attr_reader :game, :source
+      attr_reader :event, :actor
 
-      def initialize(game:, source:)
-        @game = game
-        @source = source
+      def initialize(event:, actor:)
+        @event = event
+        @actor = actor
       end
 
-      alias_method :permanent, :source
+      def perform!
+        return unless should_perform?
+        call
+      end
     end
   end
 end

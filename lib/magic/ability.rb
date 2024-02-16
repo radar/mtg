@@ -4,7 +4,6 @@ module Magic
 
     attr_reader :source
 
-
     def initialize(source:)
       @source = source
     end
@@ -15,6 +14,14 @@ module Magic
 
     def add_choice(choice, **args)
       source.add_choice(choice, **args)
+    end
+
+    def game
+      source.game
+    end
+
+    def controller
+      source.controller
     end
   end
 end

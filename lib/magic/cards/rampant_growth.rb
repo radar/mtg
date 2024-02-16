@@ -6,13 +6,13 @@ module Magic
 
     class RampantGrowth < Sorcery
       class Choice < Magic::Choice::SearchLibraryForBasicLand
-        def initialize(source:)
-          super(source: source, enters_tapped: true)
+        def initialize(actor:)
+          super(actor: actor, enters_tapped: true)
         end
       end
 
       def resolve!
-        game.choices.add(Choice.new(source: self))
+        game.choices.add(Choice.new(actor: self))
         super
       end
     end

@@ -9,7 +9,7 @@ module Magic
           Events::FirstMainPhase => -> (receiver, event) do
             return unless event.active_player == receiver.controller
 
-            game.choices.add(SanctumOfCalmWaters::Choice.new(source: receiver))
+            game.choices.add(SanctumOfCalmWaters::Choice.new(actor: receiver))
           end
         }
       end
@@ -20,9 +20,9 @@ module Magic
 
         def resolve!
           shrines = controller.permanents.by_type("Shrine").count
-          source.trigger_effect(:draw_cards, number_to_draw: shrines)
+          actor.trigger_effect(:draw_cards, number_to_draw: shrines)
 
-          source.add_choice(:discard)
+          actor.add_choice(:discard)
         end
       end
     end

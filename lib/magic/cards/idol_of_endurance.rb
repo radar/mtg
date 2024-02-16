@@ -9,8 +9,8 @@ module Magic
         def perform
           cards_to_exile = controller.graveyard.cmc_lte(3)
           cards_to_exile.each do |card|
-            permanent.trigger_effect(:exile, target: card)
-            permanent.exiled_cards << card
+            actor.trigger_effect(:exile, target: card)
+            actor.exiled_cards << card
           end
         end
       end
@@ -21,7 +21,7 @@ module Magic
         def perform
           # TODO: Should this take into account the graveyard the cards came _from_?
           # If this Idol changes controllers before the LTB is triggered, those cards would go to that new controller's graveyard.
-          permanent.exiled_cards.each { _1.move_to_graveyard!(permanent.controller) }
+          actor.exiled_cards.each { _1.move_to_graveyard!(controller) }
         end
       end
 

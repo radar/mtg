@@ -8,7 +8,7 @@ module Magic
       keywords :flying
 
       enters_the_battlefield do
-        permanent.trigger_effect(:draw_cards)
+        actor.trigger_effect(:draw_cards)
       end
     end
   end

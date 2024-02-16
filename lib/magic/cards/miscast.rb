@@ -6,15 +6,15 @@ module Magic
 
     class Miscast < Instant
       class Choice < Magic::Choice
-        attr_reader :source, :target
-        def initialize(source:, target:)
-          super(source:)
-          @source = source
+        attr_reader :actor, :target
+        def initialize(actor:, target:)
+          super(actor:)
+          @actor = actor
           @target = target
         end
 
         def inspect
-          "#<Miscast::Counter target spell source:#{source}, target:#{target}>"
+          "#<Miscast::Counter target spell actor:#{actor}, target:#{target}>"
         end
 
         def costs
@@ -28,7 +28,7 @@ module Magic
 
         def resolve!
           if costs.none?(&:paid?)
-            source.trigger_effect(:counter_spell, target: target)
+            trigger_effect(:counter_spell, target: target)
           end
         end
       end
@@ -42,7 +42,7 @@ module Magic
       end
 
       def resolve!(target:)
-        game.choices.add(Choice.new(source: self, target:))
+        game.choices.add(Choice.new(actor: self, target:))
       end
     end
   end

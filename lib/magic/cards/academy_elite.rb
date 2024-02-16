@@ -11,7 +11,7 @@ module Magic
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
           counters = game.graveyard_cards.by_any_type(T::Instant, T::Sorcery).count
-          source.trigger_effect(:add_counter, target: source, counter_type: Counters::Plus1Plus1, amount: counters)
+          actor.trigger_effect(:add_counter, target: actor, counter_type: Counters::Plus1Plus1, amount: counters)
         end
       end
 

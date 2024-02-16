@@ -8,7 +8,7 @@ module Magic
       toughness 2
 
       enters_the_battlefield do
-        game.choices.add(AcidicSlime::Choice.new(source: self))
+        game.choices.add(AcidicSlime::Choice.new(actor: actor))
       end
     end
 

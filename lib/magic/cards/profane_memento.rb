@@ -13,7 +13,7 @@ module Magic
             return if event.permanent.controller?(receiver.controller)
             return unless event.permanent.creature?
 
-              receiver.controller.gain_life(1)
+            receiver.trigger_effect(:gain_life, life: 1)
           end
         }
       end

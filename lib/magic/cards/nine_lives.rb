@@ -8,7 +8,7 @@ module Magic
     class NineLives < Enchantment
       class LTB < TriggeredAbility::EnterTheBattlefield
         def perform
-          source.trigger_effect(:lose_game, source: source, player: source.controller)
+          actor.trigger_effect(:lose_game, player: controller)
         end
       end
 

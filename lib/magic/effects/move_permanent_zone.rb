@@ -17,14 +17,11 @@ module Magic
       def resolve!
         game.notify!(*leaving_zone_notifications(from: from, to: to))
 
-        target.left_the_battlefield! if from&.battlefield?
-
         from&.remove(target)
 
         target.zone = to
         if to.battlefield?
           to.add(target)
-          target.entered_the_battlefield!
         end
 
         game.notify!(*entering_zone_notifications(from: from, to: to))

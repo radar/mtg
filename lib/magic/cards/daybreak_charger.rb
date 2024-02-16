@@ -7,7 +7,7 @@ module Magic
       toughness 1
 
       enters_the_battlefield do
-        game.choices.add(DaybreakCharger::Choice.new(source: permanent))
+        game.choices.add(DaybreakCharger::Choice.new(actor: actor))
       end
     end
 
@@ -21,7 +21,7 @@ module Magic
         end
 
         def resolve!(target:)
-          source.trigger_effect(:modify_power_toughness, power: 2, target: target)
+          actor.trigger_effect(:modify_power_toughness, power: 2, target: target)
         end
       end
     end

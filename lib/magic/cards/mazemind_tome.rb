@@ -14,7 +14,7 @@ module Magic
         end
 
         def resolve!
-          add_choice(:scry, source: source)
+          add_choice(:scry, actor: source)
         end
       end
 

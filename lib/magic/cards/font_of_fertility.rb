@@ -7,8 +7,8 @@ module Magic
 
     class FontOfFertility < Enchantment
       class Choice < Magic::Choice::SearchLibraryForBasicLand
-        def initialize(source:)
-          super(source: source, enters_tapped: true)
+        def initialize(actor:)
+          super(actor: actor, enters_tapped: true)
         end
       end
 
@@ -16,7 +16,7 @@ module Magic
         costs "{G}, Sacrifice {this}"
 
         def resolve!
-          game.choices.add(Choice.new(source: source))
+          game.choices.add(Choice.new(actor: source))
         end
       end
 

@@ -8,8 +8,8 @@ module Magic
       end
 
       class Choice < Magic::Choice::SearchLibraryForBasicLand
-        def initialize(source:)
-          super(source: source, enters_tapped: true)
+        def initialize(actor:)
+          super(actor: actor, enters_tapped: true)
         end
 
         def choices
@@ -18,7 +18,7 @@ module Magic
 
         def resolve!(target:)
           land = super
-          if source.controller.lands.count >= 4
+          if actor.controller.lands.count >= 4
             land.untap!
           end
         end
@@ -28,7 +28,7 @@ module Magic
         costs "{T}, Sacrifice {this}"
 
         def resolve!
-          game.choices.add(Choice.new(source: source))
+          game.choices.add(Choice.new(actor: source))
         end
       end
 

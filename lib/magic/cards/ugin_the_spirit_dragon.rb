@@ -38,7 +38,7 @@ module Magic
           controller.gain_life(7)
           7.times { controller.draw! }
 
-          game.choices.add(UginTheSpiritDragon::Choice.new(source: source))
+          game.choices.add(UginTheSpiritDragon::Choice.new(actor: source))
         end
       end
 
