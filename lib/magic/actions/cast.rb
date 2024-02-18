@@ -98,6 +98,11 @@ module Magic
         self
       end
 
+      def auto_pay_mana
+        mana_cost.auto_pay(player: player)
+        self
+      end
+
       def pay_kicker(payment)
         kicker_cost.pay(player:, payment:)
       end

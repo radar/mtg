@@ -7,7 +7,7 @@ RSpec.describe Magic::Cards::TitanicGrowth do
   it "gets +4/+4 until end of turn" do
     p1.add_mana(green: 2)
     p1.cast(card: Card("Titanic Growth")) do
-      _1.pay_mana(green: 1, generic: { green: 1 })
+      _1.auto_pay_mana
       _1.targeting(wood_elves)
     end
 

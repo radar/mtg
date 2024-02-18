@@ -62,11 +62,11 @@ module Magic
         pay_colors(payment.slice(*Magic::Mana::COLORS))
       end
 
-      def auto_pay(player)
+      def auto_pay(player:)
         raise CannotPay unless can_pay?(player)
 
         pay_colors(color_costs)
-        pay_generic(generic: cost[:generic]) if cost[:generic]
+        auto_pay_generic_costs(player) if cost[:generic]
       end
 
       def finalize!(player)
@@ -130,6 +130,15 @@ module Magic
       def pay_generic(payment)
         balance[:generic] -= payment.values.sum
         @payments[:generic].merge!(payment) { |key, old_value, new_value| old_value + new_value }
+      end
+
+
+      def auto_pay_generic_costs(player)
+        available_mana = player.mana_pool.flat_map do |color, amount|
+          [color] * amount
+        end
+
+        pay_generic(available_mana.take(cost[:generic]).tally)
       end
 
       def pay_colors(color_payments)
