@@ -1,20 +1,19 @@
 module Magic
   module Cards
-    AcidicSlime = Creature("Acidic Slime") do
+    class AcidicSlime < Creature
+      card_name "Acidic Slime"
       cost generic: 3, green: 2
-      creature_type("Ooze")
+      creature_type "Ooze"
       keywords :deathtouch
       power 2
       toughness 2
 
-      enters_the_battlefield do
-        game.choices.add(AcidicSlime::Choice.new(actor: actor))
+      def target_choices
+        game.battlefield.cards.by_any_type("Artifact", "Enchantment", "Land")
       end
-    end
 
-    class AcidicSlime < Creature
-      class Choice < Choice::DestroyTarget
-        def choices = game.battlefield.cards.by_any_type("Artifact", "Enchantment", "Land")
+      def resolve!(target:)
+        trigger_effect(:destroy_target, target: target)
       end
     end
   end
