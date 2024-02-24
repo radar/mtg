@@ -35,7 +35,6 @@ module Magic
             else
               game.add_effect(Effects::ExileCard.new(source: source, **args))
             end
-
           when :gain_life
             game.add_effect(Effects::GainLife.new(source: source, target: source.controller, **args))
           when :grant_keyword
