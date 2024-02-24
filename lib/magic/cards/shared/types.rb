@@ -10,7 +10,7 @@ module Magic
               end
 
               def creature_types(types)
-                types.split(" ").map { T::Creatures[_1] }.join(" ")
+                types.split(/(?<!Time) (?!Lord)/).map { T::Creatures[_1] }.join(" ")
               end
 
               def creature_type(types)
