@@ -62,11 +62,9 @@ module Magic
       end
 
       def perform
-        resolver = ability.method(:resolve!)
-        args = {}
-        args[:target] = targets.first if resolver.parameters.include?([:keyreq, :target])
-        args[:targets] = targets if resolver.parameters.include?([:keyreq, :targets])
-        ability.resolve!(**args)
+        game.stack.add(self)
+
+        game.notify!(Events::AbilityActivated.new(ability: ability, player: player))
       end
 
       def pay(cost_type, payment = nil)
@@ -107,6 +105,14 @@ module Magic
 
       def finalize_costs!(player)
         costs.each { |cost| cost.finalize!(player) }
+      end
+
+      def resolve!
+        resolver = ability.method(:resolve!)
+        args = {}
+        args[:target] = targets.first if resolver.parameters.include?([:keyreq, :target])
+        args[:targets] = targets if resolver.parameters.include?([:keyreq, :targets])
+        ability.resolve!(**args)
       end
     end
   end
