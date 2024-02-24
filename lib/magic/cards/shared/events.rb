@@ -19,10 +19,12 @@ module Magic
             else
               game.add_effect(Effects::AddCounterToPermanent.new(source: source, **args))
             end
-          when :deal_combat_damage
-            game.add_effect(Effects::DealCombatDamage.new(source: source, **args))
+          when :counter_ability
+            game.add_effect(Effects::CounterAbility.new(source: source, **args))
           when :counter_spell
             game.add_effect(Effects::CounterSpell.new(source: source, **args))
+          when :deal_combat_damage
+            game.add_effect(Effects::DealCombatDamage.new(source: source, **args))
           when :deal_damage
             game.add_effect(Effects::DealDamage.new(source: source, **args))
           when :destroy_target

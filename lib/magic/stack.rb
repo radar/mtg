@@ -55,6 +55,10 @@ module Magic
       @stack.select { |item| item.is_a?(Magic::Actions::Cast) }
     end
 
+    def abilities
+      @stack.select { |item| item.is_a?(Magic::Actions::ActivateAbility) || item.is_a?(TriggeredAbility::Base) }
+    end
+
     def cards
       @stack.map do |item|
         item.respond_to?(:card) ? item.card : item
@@ -72,8 +76,6 @@ module Magic
         end
       end
     end
-
-
 
     def pending_choices?
       @choices.any?

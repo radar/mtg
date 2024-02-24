@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class Island < BasicLand
-      name "Island"
+      card_name "Island"
       color :blue
     end
   end

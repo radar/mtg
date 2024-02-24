@@ -20,7 +20,7 @@ RSpec.describe Magic::Cards::BlossomingSands do
   end
 
   it "taps for green" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+    p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:green)
     end
 
@@ -28,18 +28,21 @@ RSpec.describe Magic::Cards::BlossomingSands do
   end
 
   it "taps for white" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+    p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:white)
     end
+
+    game.tick!
 
     expect(p1.mana_pool[:white]).to eq(1)
   end
 
   it "cannot tap for another color" do
     expect {
-      p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+      p1.activate_ability(ability: permanent.activated_abilities.first) do
         _1.choose(:blue)
       end
+
     }.to raise_error(/Invalid choice made for mana ability/)
   end
 end

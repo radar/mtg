@@ -15,6 +15,8 @@ RSpec.describe Magic::Cards::SeasonedHallowblade do
       p1.activate_ability(ability: subject.activated_abilities.first) do
         _1.pay(:discard, p1.hand.cards.first)
       end
+
+      game.tick!
       expect(subject).to be_tapped
       expect(subject).to be_indestructible
       expect(subject.keyword_grants.count).to eq(1)

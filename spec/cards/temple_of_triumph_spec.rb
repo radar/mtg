@@ -23,7 +23,7 @@ RSpec.describe Magic::Cards::TempleOfTriumph do
   end
 
   it "taps for white" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+    p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:white)
     end
 
@@ -31,7 +31,7 @@ RSpec.describe Magic::Cards::TempleOfTriumph do
   end
 
   it "taps for red" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+    p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:red)
     end
 
@@ -40,7 +40,7 @@ RSpec.describe Magic::Cards::TempleOfTriumph do
 
   it "cannot tap for another color" do
     expect {
-      p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+      p1.activate_ability(ability: permanent.activated_abilities.first) do
         _1.choose(:green)
       end
     }.to raise_error(/Invalid choice made for mana ability/)

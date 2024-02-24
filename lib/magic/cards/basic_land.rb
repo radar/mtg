@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class BasicLand < Land
-      def self.name(name)
+      def self.card_name(name)
         const_set(:NAME, name)
         const_set(:TYPE_LINE, "Basic Land -- #{name}")
       end

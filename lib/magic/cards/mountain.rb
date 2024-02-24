@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class Mountain < BasicLand
-      name "Mountain"
+      card_name "Mountain"
       color :red
     end
   end

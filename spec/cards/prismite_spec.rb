@@ -9,7 +9,7 @@ RSpec.describe Magic::Cards::Prismite do
     it "can add one mana of any color" do
       ability = permanent.activated_abilities.first
       p1.add_mana(blue: 2)
-      p1.activate_mana_ability(ability: ability) do
+      p1.activate_ability(ability: ability) do
         _1.pay_mana(generic: { blue: 2 })
         _1.choose(:black)
       end

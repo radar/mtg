@@ -20,7 +20,7 @@ RSpec.describe Magic::Cards::TranquilCove do
   end
 
   it "taps for white" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+    p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:white)
     end
 
@@ -28,7 +28,7 @@ RSpec.describe Magic::Cards::TranquilCove do
   end
 
   it "taps for blue" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+    p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:blue)
     end
 
@@ -37,7 +37,7 @@ RSpec.describe Magic::Cards::TranquilCove do
 
   it "cannot tap for another color" do
     expect {
-      p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+      p1.activate_ability(ability: permanent.activated_abilities.first) do
         _1.choose(:red)
       end
     }.to raise_error(/Invalid choice made for mana ability/)

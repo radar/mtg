@@ -3,23 +3,18 @@ module Magic
     ReadTheTides = Sorcery("Read the Tides") do
       cost generic: 5, blue: 1
 
-      class DrawThreeCards < Magic::Effect
-        def resolve
-          game.add_effect(Effects::DrawCards.new(source: source, player: controller, number_to_draw: 3))
+      class DrawThreeCards < Mode
+        def resolve!
+          game.add_effect(Effects::DrawCards.new(source: source, player: source.controller, number_to_draw: 3))
         end
       end
 
-      class ReturnUpToTwoTargetCreatures < Magic::Effect
-        def choices
-          creatures
+      class ReturnUpToTwoTargetCreatures < Mode
+        def target_choices
+          game.battlefield.creatures
         end
 
-        def targeting(*targets)
-          @targets = targets
-          self
-        end
-
-        def resolve
+        def resolve!(targets:)
           targets.each(&:return_to_hand)
         end
       end

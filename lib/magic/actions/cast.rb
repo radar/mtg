@@ -6,22 +6,24 @@ module Magic
       class InvalidTarget < StandardError; end
 
       def_delegators :@card, :enchantment?, :artifact?, :multi_target?
-      attr_reader :card, :targets, :value_for_x, :controller, :mode
+      attr_reader :card, :targets, :value_for_x, :controller, :modes
 
-      def initialize(card:, value_for_x: nil, controller: card.controller, mode: nil, **args)
+      def initialize(card:, value_for_x: nil, controller: card.controller, **args)
         super(**args)
         @card = card
         @targets = []
+        @modes = []
+
         @value_for_x = value_for_x
-        @mode = mode
       end
 
       def inspect
-        "#<Actions::Cast card: #{card.name}, player: #{player.inspect}, mode: #{mode.inspect}>"
+        "#<Actions::Cast card: #{card.name}, player: #{player.inspect}>"
       end
       alias_method :name, :inspect
 
       def countered!
+        game.notify!(Events::SpellCountered.new(spell: card, player: player))
         card.move_to_graveyard!(player)
       end
 
@@ -114,20 +116,27 @@ module Magic
         game.notify!(Events::SpellCast.new(spell: card, player: player))
       end
 
+      def choose_mode(mode_class, &)
+        mode = Mode.new(mode_class.new(game: game, card: card))
+        yield mode if block_given?
+        @modes << mode
+      end
+
       def resolve!
-        if mode
-          resolver = mode.method(:resolve)
+        if modes.any?
+          modes.each do |mode|
+            mode.resolve!
+          end
         else
           resolver = card.method(:resolve!)
+          args = {}
+          args[:target] = targets.first if resolver.parameters.include?([:keyreq, :target])
+          args[:targets] = targets if resolver.parameters.include?([:keyreq, :targets])
+          args[:kicked] = kicker_cost.paid? if resolver.parameters.include?([:key, :kicked])
+          args[:value_for_x] = mana_cost.x if resolver.parameters.include?([:keyreq, :value_for_x])
+
+          card.resolve!(**args)
         end
-
-        args = {}
-        args[:target] = targets.first if resolver.parameters.include?([:keyreq, :target])
-        args[:targets] = targets if resolver.parameters.include?([:keyreq, :targets])
-        args[:kicked] = kicker_cost.paid? if resolver.parameters.include?([:key, :kicked])
-        args[:value_for_x] = mana_cost.x if resolver.parameters.include?([:keyreq, :value_for_x])
-
-        resolver.call(**args)
 
         if card.sorcery? || card.instant?
           card.move_to_graveyard!(player)

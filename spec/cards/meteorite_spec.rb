@@ -21,7 +21,7 @@ RSpec.describe Magic::Cards::Meteorite do
     let(:mana_ability) { subject.activated_abilities.first }
 
     it "lets player choose which mana" do
-      p1.activate_mana_ability(ability: mana_ability) do
+      p1.activate_ability(ability: mana_ability) do
         _1.choose(:green)
       end
 

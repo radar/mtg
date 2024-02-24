@@ -42,6 +42,7 @@ RSpec.describe Magic::Cards::NiambiEsteemedSpeaker do
   context "activated ability" do
     let!(:niambi) { ResolvePermanent("Niambi, Esteemed Speaker", owner: p1) }
     before do
+      p1.skip_choice(game.choices.first)
       p1.hand.add(Card("Aron, Benalia's Ruin"))
     end
 
@@ -54,6 +55,8 @@ RSpec.describe Magic::Cards::NiambiEsteemedSpeaker do
         _1.pay_mana(white: 1, blue: 1, generic: { white: 1 })
         _1.pay_discard(aron)
       end
+
+      game.tick!
 
       expect(aron.zone).to be_graveyard
     end

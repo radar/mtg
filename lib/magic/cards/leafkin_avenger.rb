@@ -7,7 +7,7 @@ module Magic
       power 4
       toughness 3
 
-      class Ability < ActivatedAbility
+      class Ability < ManaAbility
         costs "{T}"
 
         def resolve!

@@ -20,7 +20,7 @@ RSpec.describe Magic::Cards::ScouredBarrens do
   end
 
   it "taps for white" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+    p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:white)
     end
 
@@ -28,7 +28,7 @@ RSpec.describe Magic::Cards::ScouredBarrens do
   end
 
   it "taps for black" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+    p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:black)
     end
 
@@ -37,7 +37,7 @@ RSpec.describe Magic::Cards::ScouredBarrens do
 
   it "cannot tap for another color" do
     expect {
-      p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+      p1.activate_ability(ability: permanent.activated_abilities.first) do
         _1.choose(:blue)
       end
     }.to raise_error(/Invalid choice made for mana ability/)

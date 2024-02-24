@@ -14,6 +14,8 @@ RSpec.describe Magic::Cards::MazemindTome do
 
       expect(subject.counters.of_type(Magic::Counters::Page).count).to eq(1)
 
+      game.tick!
+
       choice = game.choices.last
       expect(choice).to be_a(Magic::Choice::Scry)
 
@@ -30,6 +32,8 @@ RSpec.describe Magic::Cards::MazemindTome do
       p1.activate_ability(ability: ability) do
         _1.pay_mana(generic: { blue: 2 })
       end
+
+      game.tick!
 
       expect(subject.counters.of_type(Magic::Counters::Page).count).to eq(1)
     end

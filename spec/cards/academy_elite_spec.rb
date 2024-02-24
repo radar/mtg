@@ -69,12 +69,17 @@ RSpec.describe Magic::Cards::AcademyElite do
         _1.pay_mana(generic: { blue: 2 }, blue: 1)
       end
 
+      game.tick!
+
       expect(academy_elite.counters.count).to eq(0)
 
       choice = game.choices.last
       expect(choice).to be_a(Magic::Choice::Discard)
-      game.resolve_choice!(card: p1.hand.cards.first)
-      expect(p1.graveyard.cards.count).to eq(1)
+      chosen_card = p1.hand.cards.first
+      game.resolve_choice!(card: chosen_card)
+      expect(p1.graveyard.cards).to include(chosen_card)
+      # Academy Elite is in GY as has no counters, which makes it a 0/0, and so it died.
+      expect(p1.graveyard.cards).to include(academy_elite.card)
     end
   end
 end

@@ -10,11 +10,15 @@ RSpec.describe Magic::Cards::RambunctiousMutt do
 
   context "when rambunctious mutt enters the battlefield" do
     it "triggers a destroy effect" do
-      cast_and_resolve(card: subject, player: p1)
-      choice = game.choices.first
+      p1.add_mana(white: 5)
+      p1.cast(card: rambunctious_mutt) do
+        _1.targeting(enchantment)
+        _1.auto_pay_mana
+      end
 
-      expect(choice).to be_a(Magic::Choice::DestroyTarget)
-      expect(choice.choices).to match_array([enchantment, artifact_2])
+      game.tick!
+
+      expect(enchantment.card.zone).to be_graveyard
     end
   end
 end
