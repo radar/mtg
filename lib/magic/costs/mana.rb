@@ -138,6 +138,7 @@ module Magic
           [color] * amount
         end
 
+
         pay_generic(available_mana.take(cost[:generic]).tally)
       end
 

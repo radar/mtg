@@ -14,6 +14,9 @@ RSpec.describe Magic::Cards::KeenGlidemaster do
           .pay_mana(generic: { blue: 2 }, blue: 1)
           .targeting(wood_elves)
       end
+
+      game.tick!
+
       expect(wood_elves).to be_flying
       expect(wood_elves.keyword_grants.first.until_eot?).to eq(true)
     end

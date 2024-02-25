@@ -36,6 +36,8 @@ RSpec.describe Magic::Cards::LeafkinAvenger do
         _1.targeting(p2)
       end
 
+      game.tick!
+
       expect(p2.life).to eq(16)
     end
   end

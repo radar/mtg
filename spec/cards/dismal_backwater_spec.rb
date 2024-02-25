@@ -20,26 +20,32 @@ RSpec.describe Magic::Cards::DismalBackwater do
   end
 
   it "taps for blue" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+    p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:blue)
     end
+
+    game.tick!
 
     expect(p1.mana_pool[:blue]).to eq(1)
   end
 
   it "taps for black" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+    p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:black)
     end
+
+    game.tick!
 
     expect(p1.mana_pool[:black]).to eq(1)
   end
 
   it "cannot tap for another color" do
     expect {
-      p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
+      p1.activate_ability(ability: permanent.activated_abilities.first) do
         _1.choose(:white)
       end
+
+      game.tick!
     }.to raise_error(/Invalid choice made for mana ability/)
   end
 end

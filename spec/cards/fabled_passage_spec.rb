@@ -12,6 +12,8 @@ RSpec.describe Magic::Cards::FabledPassage do
   def activate_ability
     p1.activate_ability(ability: subject.activated_abilities.first)
 
+    game.tick!
+
     choice = game.choices.last
     expect(choice).to be_a(Magic::Cards::FabledPassage::Choice)
     game.resolve_choice!(target: choice.choices.first)

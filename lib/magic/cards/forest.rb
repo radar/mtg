@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class Forest < BasicLand
-      name "Forest"
+      card_name "Forest"
       color :green
     end
   end

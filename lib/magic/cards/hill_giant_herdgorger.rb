@@ -1,4 +1,4 @@
-module Magic
+  module Magic
   module Cards
     HillGiantHerdgorger = Creature("Hill Giant Herdgorger") do
       creature_type("Giant")

@@ -18,6 +18,8 @@ RSpec.describe Magic::Cards::EpitaphGolem do
       _1.targeting(wood_elves)
     end
 
+    game.tick!
+
     expect(wood_elves.zone).to be_library
     expect(p1.library.last).to eq(wood_elves)
   end

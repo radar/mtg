@@ -11,7 +11,8 @@ RSpec.describe Magic::Cards::ReadTheTides do
     mode_class = read_the_tides.modes.first
 
     p1.add_mana(blue: 6)
-    p1.cast(card: read_the_tides, mode: read_the_tides.choose_mode(mode_class)) do
+    p1.cast(card: read_the_tides) do
+      _1.choose_mode(mode_class)
       _1.pay_mana(blue: 1, generic: { blue: 5 })
     end
 
@@ -24,7 +25,10 @@ RSpec.describe Magic::Cards::ReadTheTides do
     it "chooses return a single target" do
       mode_class = read_the_tides.modes.last
       p1.add_mana(blue: 6)
-      p1.cast(card: read_the_tides, mode: read_the_tides.choose_mode(mode_class).targeting(wood_elves)) do
+      p1.cast(card: read_the_tides) do
+        _1.choose_mode(mode_class) do |mode|
+          mode.targeting(wood_elves)
+        end
         _1.pay_mana(blue: 1, generic: { blue: 5 })
       end
 

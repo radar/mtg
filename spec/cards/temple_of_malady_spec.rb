@@ -22,27 +22,36 @@ RSpec.describe Magic::Cards::TempleOfMalady do
     game.resolve_choice!(top: [choice.choices.first])
   end
 
-  it "taps for black" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
-      _1.choose(:black)
+  context "after scry" do
+    before do
+      choice = game.choices.last
+      game.resolve_choice!(top: [choice.choices.first])
     end
 
-    expect(p1.mana_pool[:black]).to eq(1)
-  end
-
-  it "taps for green" do
-    p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
-      _1.choose(:green)
-    end
-
-    expect(p1.mana_pool[:green]).to eq(1)
-  end
-
-  it "cannot tap for another color" do
-    expect {
-      p1.activate_mana_ability(ability: permanent.activated_abilities.first) do
-        _1.choose(:blue)
+    it "taps for black" do
+      p1.activate_ability(ability: permanent.activated_abilities.first) do
+        _1.choose(:black)
       end
-    }.to raise_error(/Invalid choice made for mana ability/)
+
+      game.tick!
+
+      expect(p1.mana_pool[:black]).to eq(1)
+    end
+
+    it "taps for green" do
+      p1.activate_ability(ability: permanent.activated_abilities.first) do
+        _1.choose(:green)
+      end
+
+      expect(p1.mana_pool[:green]).to eq(1)
+    end
+
+    it "cannot tap for another color" do
+      expect {
+        p1.activate_ability(ability: permanent.activated_abilities.first) do
+          _1.choose(:blue)
+        end
+      }.to raise_error(/Invalid choice made for mana ability/)
+    end
   end
 end

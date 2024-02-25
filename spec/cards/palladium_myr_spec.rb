@@ -8,7 +8,7 @@ RSpec.describe Magic::Cards::PalladiumMyr do
   context "when Palladium Myr is on the battlefield" do
     it "adds two generic mana" do
       ability = permanent.activated_abilities.first
-      p1.activate_mana_ability(ability: ability)
+      p1.activate_ability(ability: ability)
 
       expect(permanent).to be_tapped
 

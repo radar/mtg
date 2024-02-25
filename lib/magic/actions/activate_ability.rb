@@ -32,6 +32,10 @@ module Magic
         self
       end
 
+      def countered!
+        game.notify!(Events::AbilityCountered.new(ability: ability, player: player))
+      end
+
       def pay_mana(payment)
         pay(:mana, payment)
         self
