@@ -24,7 +24,46 @@ module Magic
         end
       end
 
-      modes CounterTargetSpell, CounterTargetActivatedOrTriggeredAbility
+      class ReturnTargetNonlandPermanentToItsOwnersHand < Mode
+        def target_choices
+          game.battlefield.nonland
+        end
+
+        def resolve!(target:)
+          trigger_effect(:return_to_owners_hand, target: target)
+        end
+      end
+
+      class CreateCopyToken < Mode
+        def target_choices
+          game.battlefield.creatures.controlled_by(controller)
+        end
+
+        def resolve!(target:)
+          Permanent.resolve(
+            game: game,
+            owner: controller,
+            card: target.card,
+            token: true,
+          )
+        end
+      end
+
+      class DrawsCard < Mode
+        def target_choices
+          game.players
+        end
+
+        def resolve!(target:)
+          trigger_effect(:draw_cards, player: target)
+        end
+      end
+
+      modes CounterTargetSpell,
+        CounterTargetActivatedOrTriggeredAbility,
+        ReturnTargetNonlandPermanentToItsOwnersHand,
+        CreateCopyToken,
+        DrawsCard
     end
   end
 end

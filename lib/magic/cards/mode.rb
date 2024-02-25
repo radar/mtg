@@ -9,6 +9,10 @@ module Magic
         @card = card
       end
 
+      def controller
+        card.controller
+      end
+
       def source
         card
       end
