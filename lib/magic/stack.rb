@@ -56,7 +56,7 @@ module Magic
     end
 
     def abilities
-      @stack.select { |item| item.is_a?(Magic::Actions::ActivateAbility) || item.is_a?(TriggeredAbility::Base) }
+      @stack.select { |item| item.is_a?(Magic::Actions::ActivateAbility) || item.is_a?(TriggeredAbility) }
     end
 
     def cards

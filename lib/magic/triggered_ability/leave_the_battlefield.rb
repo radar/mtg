@@ -1,6 +1,6 @@
 module Magic
-  module TriggeredAbility
-    class LeaveTheBattlefield < Base
+  class TriggeredAbility
+    class LeaveTheBattlefield < TriggeredAbility
     end
   end
 end

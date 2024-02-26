@@ -10,7 +10,7 @@ module Magic
         battlefield.creatures
       end
 
-      class LifeGain < TriggeredAbility::Base
+      class LifeGain < TriggeredAbility
         def should_perform?
           event.player == controller
         end

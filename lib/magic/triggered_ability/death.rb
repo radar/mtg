@@ -1,6 +1,6 @@
 module Magic
-  module TriggeredAbility
-    class Death < Base
+  class TriggeredAbility
+    class Death < TriggeredAbility
     end
   end
 end

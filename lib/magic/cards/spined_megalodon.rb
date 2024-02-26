@@ -9,7 +9,7 @@ module Magic
 
       keywords :hexproof
 
-      class ScryTrigger < TriggeredAbility::Base
+      class ScryTrigger < TriggeredAbility
         def should_perform?
           return false if event.attacks.none? { |attack| attack.attacker == actor }
           true

@@ -5,7 +5,7 @@ module Magic
       COST = { any: 1 }
       TYPE_LINE = "Artifact"
 
-      class PermanentEnteredZoneTrigger < TriggeredAbility::Base
+      class PermanentEnteredZoneTrigger < TriggeredAbility
         def should_perform?
           event.to.graveyard? && event.card.creature? && event.card.controller != controller
         end
