@@ -19,7 +19,7 @@ module Magic
             controller = receiver.controller
             lands = battlefield.controlled_by(controller).lands.count
             if lands < 6
-              controller.create_token(token_class: InsectToken)
+              trigger_effect(:create_token, token_class: InsectToken)
             else
               token = Permanent.resolve(
                 game: game,

@@ -107,7 +107,6 @@ module Magic
       end
 
       logger.debug "Resolving effect: #{effect}"
-      binding.pry if effect.is_a?(Array)
       effect.resolve!
     end
 

@@ -24,7 +24,7 @@ module Magic
         end
 
         def resolve!
-          source.controller.create_token(token_class: AngelToken)
+          trigger_effect(:create_token, token_class: AngelToken)
         end
       end
 

@@ -45,11 +45,11 @@ module Magic
           Events::SpellCast => -> (receiver, event) do
             return unless event.spell.controller == receiver.controller
             if event.spell.type?("Dog")
-              controller.create_token(token_class: CatToken)
+              trigger_effect(:create_token, token_class: CatToken)
             end
 
             if event.spell.type?("Cat")
-              controller.create_token(token_class: DogToken)
+              trigger_effect(:create_token, token_class: DogToken)
             end
           end
         }

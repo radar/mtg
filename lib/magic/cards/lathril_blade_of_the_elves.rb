@@ -36,7 +36,7 @@ module Magic
           Events::CombatDamageDealt => -> (receiver, event) do
             return unless event.target.player?
 
-            controller.create_tokens(token_class: ElfWarriorToken, amount: event.damage)
+            trigger_effect(:create_token, token_class: ElfWarriorToken, amount: event.damage)
           end
         }
       end

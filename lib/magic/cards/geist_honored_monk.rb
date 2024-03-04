@@ -39,7 +39,7 @@ module Magic
 
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
-          controller.create_token(token_class: SpiritToken, amount: 2)
+          actor.trigger_effect(:create_token, token_class: SpiritToken, amount: 2)
         end
       end
 

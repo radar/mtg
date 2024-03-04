@@ -26,7 +26,8 @@ module Magic
 
       def resolve!
         weird_power = controller.graveyard.cards.count { |card| card.instant? || card.sorcery? }
-        weird = controller.create_token(
+        trigger_effect(
+          :create_token,
           token_class: WeirdToken,
           base_power: weird_power,
           base_toughness: weird_power

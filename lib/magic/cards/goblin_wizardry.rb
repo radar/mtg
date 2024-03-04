@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!
-        controller.create_token(token_class: GoblinWizardToken, amount: 2)
+        trigger_effect(:create_token, token_class: GoblinWizardToken, amount: 2)
 
         super
       end

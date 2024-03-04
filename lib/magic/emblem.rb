@@ -1,8 +1,11 @@
 module Magic
   class Emblem
-    attr_reader :owner
+    include Cards::Shared::Events
 
-    def initialize(owner:)
+    attr_reader :game, :owner
+
+    def initialize(game:, owner:)
+      @game = game
       @owner = owner
     end
 

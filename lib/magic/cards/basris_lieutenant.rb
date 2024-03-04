@@ -42,7 +42,7 @@ module Magic
             return unless event.permanent.controller == receiver.controller
 
             if event.permanent.counters.any? { |counter| counter.is_a?(Counters::Plus1Plus1) }
-              receiver.controller.create_token(token_class: KnightToken)
+              trigger_effect(:create_token, token_class: KnightToken)
             end
           end
         }

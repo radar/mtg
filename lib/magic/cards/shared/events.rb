@@ -23,6 +23,8 @@ module Magic
             game.add_effect(Effects::CounterAbility.new(source: source, **args))
           when :counter_spell
             game.add_effect(Effects::CounterSpell.new(source: source, **args))
+          when :create_token
+            game.add_effect(Effects::CreateToken.new(source: source, **args))
           when :deal_combat_damage
             game.add_effect(Effects::DealCombatDamage.new(source: source, **args))
           when :deal_damage

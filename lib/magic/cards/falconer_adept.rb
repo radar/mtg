@@ -20,7 +20,7 @@ module Magic
         {
           Events::PreliminaryAttackersDeclared => -> (receiver, event) do
             return if event.attacks.none? { |attack| attack.attacker == receiver }
-            token = controller.create_token(token_class: BirdToken, enters_tapped: true)
+            token = trigger_effect(:create_token, token_class: BirdToken, enters_tapped: true).first
             game.current_turn.declare_attacker(token)
           end
         }
