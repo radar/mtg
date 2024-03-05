@@ -10,12 +10,12 @@ module Magic
 
       def resolve!
         game.notify!(
-          Events::CombatDamageDealt.new(source: self, target: target, damage: damage)
+          Events::CombatDamageDealt.new(source: self, target: target, damage: damage, infect: source.infect?)
         )
         if target.player? && source.has_keyword?(Magic::Keywords::Toxic)
           source.trigger_effect(
             :add_counter,
-            counter_type: Counters::Toxic,
+            counter_type: Counters::Poison,
             target: target,
           )
         end

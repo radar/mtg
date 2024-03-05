@@ -256,13 +256,27 @@ module Magic
         @life += event.life
       when Events::PlayerLoses
         lose!
-      when Events::DamageDealt, Events::CombatDamageDealt
+      when Events::DamageDealt
         trigger_effect(:lose_life, life: event.damage, source: event.source)
+      when Events::CombatDamageDealt
+        if event.infect?
+          trigger_effect(
+            :add_counter,
+            counter_type: Counters::Poison,
+            target: self,
+            source: event.source,
+            amount: event.damage
+          )
+        else
+          trigger_effect(:lose_life, life: event.damage, source: event.source)
+        end
       end
     end
 
     def trigger_effect(effect_name, **args)
       case effect_name
+      when :add_counter
+        game.add_effect(Effects::AddCounterToPlayer.new(source: args[:source], player: args[:target], **args))
       when :lose_life
         game.add_effect(Effects::LoseLife.new(target: self, **args))
       end

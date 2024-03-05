@@ -1,6 +1,6 @@
 module Magic
   module Counters
-    class Toxic
+    class Poison
     end
   end
 end

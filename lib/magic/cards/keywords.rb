@@ -13,6 +13,7 @@ module Magic
       HASTE = Class.new(Keyword)
       HEXPROOF = Class.new(Keyword)
       INDESTRUCTIBLE = Class.new(Keyword)
+      INFECT = Class.new(Keyword)
       LIFELINK = Class.new(Keyword)
       MENACE = Class.new(Keyword)
       PROWESS = Class.new(Keyword)
@@ -64,6 +65,10 @@ module Magic
           keywords.include?(keyword) ||
           keyword_grants.map(&:keyword).include?(keyword) ||
           (is_a?(Magic::Permanent) && attachments.flat_map(&:keyword_grants).include?(keyword))
+      end
+
+      def infect?
+        has_keyword?(Keywords::INFECT)
       end
 
       def hexproof?
