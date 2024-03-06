@@ -25,7 +25,7 @@ module Magic
             life_gained = life_gain_events.sum(&:life)
 
             if life_gained >= 3
-              controller.create_token(token_class: GriffinToken)
+              trigger_effect(:create_token, token_class: GriffinToken)
             end
           end
         }
