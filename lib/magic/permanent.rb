@@ -133,7 +133,11 @@ module Magic
     end
 
     def replacement_effect_for(effect)
-      card.replacement_effects[effect.class]&.call(self, effect)
+      replacement_effect = card.replacement_effects[effect.class]
+      if replacement_effect
+        replacement = replacement_effect.new(receiver: self)
+        replacement if replacement.applies?(effect)
+      end
     end
 
     def receive_event(event)
