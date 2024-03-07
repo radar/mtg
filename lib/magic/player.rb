@@ -127,6 +127,8 @@ module Magic
     end
 
     def lose_life(loss)
+      @life -= loss
+
       game.notify!(
         Events::LifeLoss.new(
           player: self,
@@ -250,26 +252,12 @@ module Magic
     def receive_event(event)
       return unless event_targets_self?(event)
       case event
-      when Events::LifeLoss
-        @life -= event.life
       when Events::LifeGain
         @life += event.life
       when Events::PlayerLoses
         lose!
       when Events::DamageDealt
         trigger_effect(:lose_life, life: event.damage, source: event.source)
-      when Events::CombatDamageDealt
-        if event.infect?
-          trigger_effect(
-            :add_counter,
-            counter_type: Counters::Poison,
-            target: self,
-            source: event.source,
-            amount: event.damage
-          )
-        else
-          trigger_effect(:lose_life, life: event.damage, source: event.source)
-        end
       end
     end
 
