@@ -12,7 +12,7 @@ module Magic
       class ETB < TriggeredAbility::EnterTheBattlefield
         def perform
           flying_creatures = controller.creatures.count(&:flying?)
-          controller.gain_life(2 * flying_creatures)
+          actor.trigger_effect(:gain_life, life: 2 * flying_creatures)
         end
       end
 
