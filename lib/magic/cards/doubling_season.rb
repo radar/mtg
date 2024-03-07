@@ -4,13 +4,7 @@ module Magic
       card_name "Doubling Season"
       cost generic: 4, green: 1
 
-      class TokenDoubler
-        attr_reader :receiver
-
-        def initialize(receiver:)
-          @receiver = receiver
-        end
-
+      class TokenDoubler < ReplacementEffect
         # If an effect would create one or more tokens under _your control_ ...
         def applies?(effect)
           effect.controller == receiver.controller
@@ -26,13 +20,7 @@ module Magic
         end
       end
 
-      class CounterDoubler
-        attr_reader :receiver
-
-        def initialize(receiver:)
-          @receiver = receiver
-        end
-
+      class CounterDoubler < ReplacementEffect
         # If an effect would put one or more counters on a permanent you control ...
         def applies?(effect)
           effect.target.controller == receiver.controller

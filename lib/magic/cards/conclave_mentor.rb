@@ -7,21 +7,26 @@ module Magic
       power 2
       toughness 2
 
+      class AddMoreCounters < ReplacementEffect
+        def applies?(effect)
+          effect.counter_type == Counters::Plus1Plus1 &&
+            effect.target.controller == receiver.controller &&
+            effect.target.creature?
+        end
+
+        def call(effect)
+          Effects::AddCounterToPermanent.new(
+            source: receiver,
+            counter_type: Counters::Plus1Plus1,
+            target: effect.target,
+            amount: effect.amount + 1,
+          )
+        end
+      end
+
       def replacement_effects
         {
-          Effects::AddCounterToPermanent => -> (receiver, effect) do
-            # If one or more +1/+1 counters would be put on a creature you control, that many plus one +1/+1 counters are put on that creature instead.
-            return effect if effect.counter_type != Counters::Plus1Plus1
-            return effect if effect.target.controller != controller
-            return effect unless effect.target.creature?
-
-            Effects::AddCounterToPermanent.new(
-              source: receiver,
-              counter_type: Counters::Plus1Plus1,
-              target: effect.target,
-              amount: effect.amount + 1,
-            )
-          end
+          Effects::AddCounterToPermanent => AddMoreCounters,
         }
       end
 
