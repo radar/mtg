@@ -135,7 +135,7 @@ module Magic
       )
     end
 
-    def take_damage(source:, damage:)
+    def take_damage(damage)
       lose_life(damage)
     end
 

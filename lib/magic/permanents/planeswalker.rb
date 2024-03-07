@@ -12,7 +12,7 @@ module Magic
         destroy! if loyalty <= 0
       end
 
-      def take_damage(source:, damage:)
+      def take_damage(damage)
         super
 
         change_loyalty!(-damage) if planeswalker?

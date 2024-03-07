@@ -9,9 +9,15 @@ module Magic
       end
 
       def resolve!
+        target.take_damage(damage)
         game.notify!(
-          Events::CombatDamageDealt.new(source: self, target: target, damage: damage, infect: source.infect?)
+          Events::CombatDamageDealt.new(
+            source: source,
+            target: target,
+            damage: damage,
+          )
         )
+
         if target.player? && source.has_keyword?(Magic::Keywords::Toxic)
           source.trigger_effect(
             :add_counter,

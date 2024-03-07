@@ -31,13 +31,19 @@ module Magic
 
       def activated_abilities = [ActivatedAbility]
 
+      class ElfSpawner < TriggeredAbility
+        def should_perform?
+          event.target.player?
+        end
+
+        def call
+          actor.trigger_effect(:create_token, token_class: ElfWarriorToken, amount: event.damage)
+        end
+      end
+
       def event_handlers
         {
-          Events::CombatDamageDealt => -> (receiver, event) do
-            return unless event.target.player?
-
-            trigger_effect(:create_token, token_class: ElfWarriorToken, amount: event.damage)
-          end
+          Events::CombatDamageDealt => ElfSpawner
         }
       end
     end

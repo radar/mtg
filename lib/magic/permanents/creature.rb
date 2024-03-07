@@ -47,23 +47,8 @@ module Magic
           static_ability_mods.sum(&:toughness)
       end
 
-      def take_damage(source:, damage:)
-        game.notify!(
-          Events::DamageDealt.new(
-            source: source,
-            target: self,
-            damage: damage,
-          )
-        )
-      end
-
-      def receive_event(event)
-        return if !event.respond_to?(:target) || event.target != self
-
-        case event
-        when Events::CombatDamageDealt, Events::DamageDealt
-          @damage += event.damage
-        end
+      def take_damage(damage)
+        @damage += damage
       end
 
       def fight(target, assigned_damage = power)

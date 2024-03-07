@@ -141,8 +141,6 @@ module Magic
     end
 
     def receive_event(event)
-      super
-
       trigger_delayed_response(event)
       case event
       when Events::EnteredTheBattlefield
