@@ -10,6 +10,12 @@ module Magic
         super(**args)
       end
 
+      def inspect
+        "#<#{self.class.name} power=#{power} toughness=#{toughness} target=#{target.name}>"
+      end
+
+
+
       def resolve!
         target.modify_power(power) if power
         target.modify_toughness(toughness) if toughness
