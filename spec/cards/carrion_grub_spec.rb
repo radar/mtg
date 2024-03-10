@@ -3,6 +3,10 @@ require "spec_helper"
 RSpec.describe Magic::Cards::CarrionGrub do
   include_context "two player game"
 
+  before do
+    5.times { p1.library.add(Card("Forest")) }
+  end
+
   subject! { ResolvePermanent("Carrion Grub", owner: p1) }
 
   it "on ETB, p1 mills 4 cards" do
