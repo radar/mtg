@@ -198,6 +198,7 @@ module Magic
     def mill(amount)
       amount.times do
         card = library.mill
+        card.move_to_graveyard!
         game.notify!(
           Events::CardMilled.new(
             player: self,

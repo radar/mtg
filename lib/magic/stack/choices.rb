@@ -2,8 +2,7 @@ module Magic
   class Stack
     class Choices < SimpleDelegator
       def add(choice)
-
-        self << choice
+        unshift(choice)
       end
     end
   end

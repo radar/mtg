@@ -15,7 +15,6 @@ module Magic
 
       def resolve!
         number_to_draw.times do
-
           player.draw!
         end
       end
