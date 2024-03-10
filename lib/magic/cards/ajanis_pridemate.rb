@@ -13,7 +13,12 @@ module Magic
         end
 
         def call
-          actor.add_counter(counter_type: Counters::Plus1Plus1, amount: event.life)
+          actor.trigger_effect(
+            :add_counter,
+            target: actor,
+            counter_type: Counters::Plus1Plus1,
+            amount: event.life
+          )
         end
       end
 
