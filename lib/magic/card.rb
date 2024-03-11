@@ -115,6 +115,10 @@ module Magic
       colors.count == 0
     end
 
+    def return_to_hand
+      move_to_hand!
+    end
+
     def move_to_hand!(target_controller = controller)
       move_zone!(to: target_controller.hand)
     end

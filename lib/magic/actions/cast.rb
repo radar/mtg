@@ -27,6 +27,10 @@ module Magic
         card.move_to_graveyard!(player)
       end
 
+      def return_to_hand!
+        card.move_to_hand!(player)
+      end
+
       def exile!
         card.exile!
       end

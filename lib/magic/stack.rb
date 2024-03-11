@@ -41,13 +41,17 @@ module Magic
       @stack.unshift(item)
     end
 
+    def remove(target)
+      @stack.delete(target)
+    end
+
     def exile!
       @stack.each(&:exile!)
       @stack.clear
     end
 
     def counter!(target)
-      @stack.delete(target)
+      remove(target)
       target.countered!
     end
 
