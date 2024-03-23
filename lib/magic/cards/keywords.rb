@@ -61,6 +61,10 @@ module Magic
       end
 
       def has_keyword?(keyword)
+        if keyword.is_a?(Symbol)
+          keyword = Keywords.one(keyword)
+        end
+
         keywords.any? { |kw| kw.is_a?(keyword) } ||
           keywords.include?(keyword) ||
           keyword_grants.map(&:keyword).include?(keyword) ||
@@ -117,6 +121,10 @@ module Magic
 
       def prowess?
         has_keyword?(Keywords::PROWESS)
+      end
+
+      def reach?
+        has_keyword?(Keywords::REACH)
       end
     end
   end
