@@ -14,17 +14,19 @@ module Magic
           @caster = caster
         end
 
-        def choose(mana:)
-          ensure_paying_correct_cost(mana: mana)
-          owner.draw! unless mana && caster.pay_mana(mana)
+        def costs
+          @costs ||= [Costs::Mana.new(generic: 1)]
         end
 
-        private
+        def pay(player:, payment:)
+          cost = costs.first
+          cost.pay!(player:, payment:)
+        end
 
-        def cost = 1
-
-        def ensure_paying_correct_cost(mana:)
-          raise "Must only pay 1 mana if paying" if mana && Magic::Costs::Mana.new(mana).mana_value != cost
+        def resolve!
+          if !costs.all?(&:paid?)
+            owner.draw!
+          end
         end
       end
 
@@ -33,14 +35,14 @@ module Magic
       def event_handlers
         {
           Events::SpellCast => ->(receiver, event) do
-            if event.player != receiver.controller
-              game
-                .choices
-                .add(
-                  Magic::Cards::RhysticStudy::Choice.new(owner: receiver.controller,
-                    caster: event.player)
-                )
-            end
+            return if event.player == receiver.controller
+
+            game
+              .choices
+              .add(
+                Magic::Cards::RhysticStudy::Choice.new(owner: receiver.controller,
+                  caster: event.player)
+              )
           end
         }
       end

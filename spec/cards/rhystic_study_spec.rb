@@ -17,9 +17,7 @@ RSpec.describe Magic::Cards::RhysticStudy do
 
       choice = game.choices.first
       expect(choice).to be_a(Magic::Cards::RhysticStudy::Choice)
-      choice.choose(mana: nil)
-
-      game.tick!
+      game.resolve_choice!
     end
 
     it "p1 casts 1 wood elf, Rhystic Study doesn't trigger" do
@@ -31,8 +29,6 @@ RSpec.describe Magic::Cards::RhysticStudy do
 
       choice = game.choices.first
       expect(choice).to be_nil
-
-      game.tick!
     end
 
     it "p2 casts 1 wood elf, p2 pays the 1, p1 doesn't draws" do
@@ -44,9 +40,8 @@ RSpec.describe Magic::Cards::RhysticStudy do
 
       choice = game.choices.first
       expect(choice).to be_a(Magic::Cards::RhysticStudy::Choice)
-      choice.choose(mana: {green: 1})
-
-      game.tick!
+      choice.pay(player: p2, payment: {generic: {green: 1}})
+      choice.resolve!
     end
 
     it "p2 casts 1 wood elf, p2 tries to pay 3, which is not allowed" do
@@ -59,10 +54,8 @@ RSpec.describe Magic::Cards::RhysticStudy do
 
         choice = game.choices.first
         expect(choice).to be_a(Magic::Cards::RhysticStudy::Choice)
-        choice.choose(mana: {green: 3})
-
-        game.tick!
-      }.to raise_error(/Must only pay 1 mana if paying/)
+        choice.pay(player: p2, payment: {generic: {green: 3}})
+      }.to raise_error(Magic::Costs::Mana::Overpayment)
     end
   end
 end
