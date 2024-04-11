@@ -1,7 +1,7 @@
 module Magic
   module Abilities
     module Static
-      class ManaCostAdjustment
+      class ManaCostAdjustment < StaticAbility
         attr_reader :source, :adjustment, :applies_to
         def initialize(source:, adjustment:, applies_to:)
           @source = source

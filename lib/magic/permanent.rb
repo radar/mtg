@@ -19,7 +19,6 @@ module Magic
       :protections,
       :modifiers,
       :counters,
-      :keywords,
       :keyword_grants,
       :activated_abilities,
       :state_triggered_abilities,
@@ -67,7 +66,6 @@ module Magic
       @attachments = []
       @modifiers = []
       @tapped = false
-      @keywords = card.keywords
       @keyword_grants = card.keyword_grants
       @counters = Counters::Collection.new([])
       @damage = 0

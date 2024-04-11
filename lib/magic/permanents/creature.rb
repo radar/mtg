@@ -47,6 +47,10 @@ module Magic
           static_ability_mods.sum(&:toughness)
       end
 
+      def keywords
+        card.keywords + static_ability_mods.flat_map(&:keywords)
+      end
+
       def take_damage(damage)
         @damage += damage
       end
@@ -60,7 +64,7 @@ module Magic
       end
 
       def static_ability_mods
-        game.battlefield.static_abilities.of_type(Abilities::Static::PowerAndToughnessModification).applies_to(self)
+        game.battlefield.static_abilities.applies_to(self)
       end
     end
   end
