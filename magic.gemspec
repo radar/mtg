@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   # spec.add_dependency "example-gem", "~> 1.0"
   spec.add_dependency 'state_machines'
   spec.add_dependency 'zeitwerk'
-  spec.add_dependency "dry-types"
+  spec.add_dependency "dry-types", "~> 1.7"
 
   # For more information and examples about making a new gem, checkout our
   # guide at: https://bundler.io/guides/creating_gem.html
