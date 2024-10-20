@@ -24,7 +24,7 @@ module Magic
 
         after_transition to: :upkeep do |turn|
           turn.notify!(
-            Events::BeginningOfUpkeep.new
+            Events::BeginningOfUpkeep.new(player: turn.active_player)
           )
         end
 
