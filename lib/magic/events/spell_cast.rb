@@ -7,6 +7,10 @@ module Magic
         @spell = spell
         @player = player
       end
+
+      def type?(type)
+        spell.types.include?(type)
+      end
     end
   end
 end

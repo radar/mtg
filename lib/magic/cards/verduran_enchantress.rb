@@ -9,33 +9,26 @@ module Magic
 
     class VerduranEnchantress < Creature
       class Choice < Magic::Choice::May
-        attr_reader :owner
-
-        def initialize(owner:)
-          @owner = owner
-        end
-
         def resolve!
           owner.draw!
         end
       end
 
-      def event_handlers
-        {
-          Events::SpellCast => ->(receiver, event) do
-            return if event.player != receiver.controller
-            return unless event.spell.type?("Enchantment")
+      class SpellCastTrigger < TriggeredAbility
+        def should_perform?
+          you? && event.type?("Enchantment")
+        end
 
-            game
-              .choices
-              .add(
-                self.class::Choice.new(owner: receiver.controller)
-              )
-          end
-        }
+        def call
+          game.add_choice(VerduranEnchantress::Choice.new(actor: actor))
+        end
       end
 
-
+      def event_handlers
+        {
+          Events::SpellCast => SpellCastTrigger
+        }
+      end
     end
   end
 end

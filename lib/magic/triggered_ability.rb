@@ -8,6 +8,10 @@ module Magic
       @actor = actor
     end
 
+    def you?
+      controller == event.player
+    end
+
     def perform!
       return unless should_perform?
       call

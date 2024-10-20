@@ -9,7 +9,7 @@ module Magic
 
       class LifeGain < TriggeredAbility
         def should_perform?
-          event.player == controller
+          you?
         end
 
         def call
