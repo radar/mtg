@@ -337,6 +337,10 @@ module Magic
       card.trigger_effect(effect, source: source, **args)
     end
 
+    def create_token(token_class:, amount: 1, controller: self.controller)
+      trigger_effect(:create_token, token_class: token_class, amount: amount, controller: controller)
+    end
+
     def add_choice(choice, **args)
       card.add_choice(choice, **args)
     end
