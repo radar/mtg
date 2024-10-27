@@ -12,6 +12,14 @@ module Magic
       controller == event.player
     end
 
+    def this?
+      actor == event.permanent
+    end
+
+    def type?(type)
+      event.permanent.types.include?(type)
+    end
+
     def perform!
       return unless should_perform?
       call
