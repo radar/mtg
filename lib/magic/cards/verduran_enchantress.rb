@@ -14,9 +14,9 @@ module Magic
         end
       end
 
-      class SpellCastTrigger < TriggeredAbility
+      class SpellCastTrigger < TriggeredAbility::SpellCast
         def should_perform?
-          you? && event.type?("Enchantment")
+          you? && enchantment?
         end
 
         def call
