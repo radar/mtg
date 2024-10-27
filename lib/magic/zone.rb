@@ -51,5 +51,9 @@ module Magic
     def exile?
       false
     end
+
+    def lands
+      cards.lands
+    end
   end
 end

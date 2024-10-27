@@ -32,6 +32,10 @@ module Magic
       by_any_type(T::Artifact, T::Creature, T::Enchantment, T::Land, T::Planeswalker)
     end
 
+    def enchantments
+      select(&:enchantment?)
+    end
+
     def dead
       select(&:dead?)
     end
