@@ -11,5 +11,9 @@ module Magic
     def keywords
       []
     end
+
+    def applies_to?(_permanent)
+      true
+    end
   end
 end

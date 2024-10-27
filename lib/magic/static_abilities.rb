@@ -22,7 +22,9 @@ module Magic
     end
 
     def applies_to(card)
-      select { |ability| ability.applies_to?(card) }
+      select do |ability|
+        ability.applies_to?(card)
+      end
     end
   end
 end

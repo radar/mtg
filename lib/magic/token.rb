@@ -38,7 +38,7 @@ module Magic
       end
     end
 
-    def initialize(game:, owner:, base_power:, base_toughness:)
+    def initialize(game:, owner:, base_power: self.class::POWER, base_toughness: self.class::TOUGHNESS)
       @name = self.class::NAME
       @type_line = self.class::TYPE_LINE
       @keywords = self.class::KEYWORDS
@@ -68,6 +68,10 @@ module Magic
 
     def colorless?
       colors.count == 0
+    end
+
+    def enters_tapped?
+      false
     end
 
     def receive_notification(...)
