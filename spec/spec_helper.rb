@@ -4,7 +4,7 @@ require "magic"
 
 module CardHelper
   def Card(name, owner: p1, **args)
-    Magic::Cards.const_get(name.gsub(/[^a-z]/i, "").gsub(/\s(a-z)/) { $1.upcase }).new(game: game, owner:, **args)
+    Magic::Cards.const_get(name.gsub("\sof\s", "Of").gsub(/[^a-z]/i, "").gsub(/\s(a-z)/) { $1.upcase }).new(game: game, owner:, **args)
   end
 
   def Permanent(name, **args)
