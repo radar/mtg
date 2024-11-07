@@ -12,6 +12,7 @@ RSpec.describe Magic::Cards::TitanicGrowth do
     end
 
     game.stack.resolve!
+    game.tick!
 
     expect(wood_elves.power).to eq(5)
     expect(wood_elves.toughness).to eq(5)

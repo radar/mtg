@@ -18,6 +18,7 @@ RSpec.describe Magic::Cards::FeatOfResistance do
     action.pay_mana(white: 1, generic: { white: 1})
     game.take_action(action)
     game.stack.resolve!
+    game.tick!
 
     expect(wood_elves.power).to eq(2)
     expect(wood_elves.toughness).to eq(2)

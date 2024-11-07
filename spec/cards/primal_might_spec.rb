@@ -15,6 +15,7 @@ RSpec.describe Magic::Cards::PrimalMight do
       _1.pay_mana(green: 1, x: { green: 3 })
     end
     game.stack.resolve!
+    game.tick!
 
     expect(wood_elves.power).to eq(4)
     expect(alpine_watchdog.damage).to eq(4)

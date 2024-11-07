@@ -15,6 +15,7 @@ RSpec.describe Magic::Cards::BogBadger do
       action.pay_kicker(black: 1)
       game.take_action(action)
       game.stack.resolve!
+      game.tick!
 
       creatures = p1.creatures
       expect(creatures.all? { |c| c.has_keyword?(:menace) }).to eq(true)

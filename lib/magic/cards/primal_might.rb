@@ -22,6 +22,8 @@ module Magic
           toughness: value_for_x
         )
 
+        game.tick!
+
         first_creature.fight(second_creature)
       end
     end

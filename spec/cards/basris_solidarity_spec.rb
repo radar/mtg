@@ -11,6 +11,8 @@ RSpec.describe Magic::Cards::BasrisSolidarity do
   it "adds a counter to each creature under p1's control" do
     cast_and_resolve(card: subject, player: p1)
 
+    game.tick!
+
     expect(wood_elves.counters.count).to eq(1)
     expect(wood_elves.power).to eq(2)
     expect(wood_elves.toughness).to eq(2)

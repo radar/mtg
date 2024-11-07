@@ -29,8 +29,8 @@ RSpec.describe Magic::Cards::AnimalSanctuary do
         _1.pay_mana(generic: { green: 2 })
         _1.targeting(rambunctious_mutt)
       end
-
       game.stack.resolve!
+      game.tick!
     end
 
     it "puts a +1/+1 counter on target creature" do

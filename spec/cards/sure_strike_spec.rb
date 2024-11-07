@@ -14,6 +14,7 @@ RSpec.describe Magic::Cards::SureStrike do
         _1.pay_mana(generic: { red: 1 }, red: 1).targeting(onakke_ogre)
       end
       game.stack.resolve!
+      game.tick!
 
       expect(onakke_ogre.power).to eq(7)
       expect(onakke_ogre.toughness).to eq(2)
@@ -21,6 +22,7 @@ RSpec.describe Magic::Cards::SureStrike do
       game.current_turn.end!
       game.current_turn.cleanup!
       game.next_turn
+      game.tick!
 
       expect(onakke_ogre.power).to eq(4)
       expect(onakke_ogre.first_strike?).to eq(false)

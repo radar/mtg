@@ -20,6 +20,7 @@ RSpec.describe Magic::Cards::DoomwakeGiant do
       end
 
       game.stack.resolve!
+      game.tick!
 
       aggregate_failures do
         expect(p1_ajanis_pridemate.power).to eq(2)
@@ -50,6 +51,7 @@ RSpec.describe Magic::Cards::DoomwakeGiant do
       end
 
       game.stack.resolve!
+      game.tick!
 
       aggregate_failures do
         expect(p1_ajanis_pridemate.power).to eq(2)

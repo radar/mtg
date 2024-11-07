@@ -13,6 +13,7 @@ RSpec.describe Magic::Cards::RookieMistake do
       _1.pay_mana(blue: 1)
     end
     game.stack.resolve!
+    game.tick!
 
     expect(wood_elves.toughness).to eq(3)
     expect(pack_leader.power).to eq(0)

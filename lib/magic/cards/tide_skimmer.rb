@@ -5,6 +5,8 @@ module Magic
       cost "{3}{U}"
       creature_type "Drake"
       keywords :flying
+      power 2
+      toughness 3
 
       class AttackerTrigger < TriggeredAbility
         def should_perform?

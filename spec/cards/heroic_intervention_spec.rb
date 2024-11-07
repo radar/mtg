@@ -14,6 +14,7 @@ RSpec.describe Magic::Cards::HeroicIntervention do
 
   it "all permanents you control gain hexproof and indestructible" do
     cast_and_resolve(card: subject)
+    game.tick!
 
     island = p1.permanents.by_name("Island").first
     wood_elves = p1.permanents.by_name("Wood Elves").first

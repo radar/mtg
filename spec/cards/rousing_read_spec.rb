@@ -16,6 +16,7 @@ RSpec.describe Magic::Cards::RousingRead do
     end
 
     game.stack.resolve!
+    game.tick!
 
     choice = game.choices.last
     game.resolve_choice!(card: choice.cards.first)

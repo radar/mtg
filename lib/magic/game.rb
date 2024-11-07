@@ -110,9 +110,7 @@ module Magic
       end
 
       logger.debug "Resolving effect: #{effect}"
-      result = effect.resolve!
-      tick!
-      result
+      effect.resolve!
     end
 
     def tick!

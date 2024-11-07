@@ -16,6 +16,7 @@ RSpec.describe Magic::Cards::WatcherOfTheSpheres do
     end
 
     it "adds a +1/+1 buff" do
+      game.tick!
       expect(watcher_of_the_spheres.power).to eq(3)
       expect(watcher_of_the_spheres.toughness).to eq(3)
     end

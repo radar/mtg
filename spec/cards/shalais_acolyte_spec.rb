@@ -13,6 +13,7 @@ RSpec.describe Magic::Cards::ShalaisAcolyte do
       action.pay_kicker(generic: { white: 1 }, green: 1)
       game.take_action(action)
       game.stack.resolve!
+      game.tick!
 
       permanent = p1.creatures.by_name("Shalai's Acolyte").first
       expect(permanent.power).to eq(5)
@@ -26,6 +27,7 @@ RSpec.describe Magic::Cards::ShalaisAcolyte do
       action.pay_mana(white: 1, generic: { white: 4 })
       game.take_action(action)
       game.stack.resolve!
+      game.tick!
 
       permanent = p1.creatures.by_name("Shalai's Acolyte").first
       expect(permanent.power).to eq(3)
