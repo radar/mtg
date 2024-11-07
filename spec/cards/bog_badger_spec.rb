@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::BogBadger do
       action.pay_mana(green: 1, generic: { green: 2 })
       action.pay_kicker(black: 1)
       game.take_action(action)
-      game.tick!
+      game.stack.resolve!
 
       creatures = p1.creatures
       expect(creatures.all? { |c| c.has_keyword?(:menace) }).to eq(true)
@@ -27,7 +27,7 @@ RSpec.describe Magic::Cards::BogBadger do
       action = cast_action(card: subject, player: p1)
       action.pay_mana(green: 1, generic: { green: 2 })
       game.take_action(action)
-      game.tick!
+      game.stack.resolve!
 
       creatures = p1.creatures
       expect(creatures.all? { |c| c.has_keyword?(:menace) }).to eq(false)

@@ -9,12 +9,12 @@ module Magic
         []
       end
 
-      def power
-        @power || 0
+      def power_modification
+        @power_modification || 0
       end
 
-      def toughness
-        @toughness || 0
+      def toughness_modification
+        @toughness_modification || 0
       end
 
       def until_eot?

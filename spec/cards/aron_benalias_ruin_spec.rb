@@ -20,7 +20,9 @@ RSpec.describe Magic::Cards::AronBenaliasRuin do
         _1.pay_mana(white: 1, black: 1)
         _1.pay_sacrifice(wood_elves)
       end
+
       game.stack.resolve!
+      game.tick!
 
       aggregate_failures do
         expect(subject.power).to eq(4)

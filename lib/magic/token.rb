@@ -97,6 +97,10 @@ module Magic
       []
     end
 
+    def state_triggered_abilities
+      []
+    end
+
     def permanent?
       true
     end

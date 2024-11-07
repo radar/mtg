@@ -28,9 +28,9 @@ module Magic
         end
       end
 
-      class LifelinkAddition < StaticAbility
+      class LifelinkAddition < Abilities::Static::KeywordGrant
         keyword_grants Cards::Keywords::LIFELINK
-        applicable_targets { source.controller.creatures.of_type("Pegasus") }
+        applicable_targets { source.controller.creatures.by_type("Pegasus") }
       end
 
       def static_abilities = [LifelinkAddition]

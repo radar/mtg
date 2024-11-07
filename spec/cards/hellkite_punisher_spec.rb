@@ -17,13 +17,13 @@ RSpec.describe Magic::Cards::HellkitePunisher do
       p1.activate_ability(ability: ability) do
         _1.pay_mana(red: 1)
       end
-      game.stack.resolve!
+      game.tick!
       expect(subject.power).to eq(7)
 
       p1.activate_ability(ability: ability) do
         _1.pay_mana(red: 1)
       end
-      game.stack.resolve!
+      game.tick!
 
       expect(subject.power).to eq(8)
       expect(subject.toughness).to eq(6)

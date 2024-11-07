@@ -16,14 +16,14 @@ RSpec.describe Magic::Cards::IgneousCur do
       p1.activate_ability(ability: ability) do
         _1.pay_mana(red: 1, generic: { red: 1 })
       end
-      game.stack.resolve!
+      game.tick!
       expect(subject.power).to eq(3)
 
       p1.add_mana(red: 2)
       p1.activate_ability(ability: ability) do
         _1.pay_mana(red: 1, generic: { red: 1 })
       end
-      game.stack.resolve!
+      game.tick!
 
       expect(subject.power).to eq(5)
       expect(subject.toughness).to eq(2)

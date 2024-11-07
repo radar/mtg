@@ -15,9 +15,11 @@ RSpec.describe Magic::Cards::BasrisLieutenant do
     expect(subject.protected_from?(multi_colored_card)).to eq(true)
   end
 
-  it "adds a counter to a target creature on enter" do
+  it "adds a counter to a target creature on enter", aggregate_failures: true do
     # Basri's Lieutenant ETB'd, is only creature under controller's control
     # Automatically allocated the +/+1 counter
+    subject
+    game.tick!
     expect(subject.power).to eq(4)
     expect(subject.toughness).to eq(5)
   end

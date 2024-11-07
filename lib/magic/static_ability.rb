@@ -1,28 +1,36 @@
 module Magic
   class StaticAbility
-    def self.keyword_grants(*keywords)
-      define_method(:keywords) { keywords }
-    end
+    extend Forwardable
 
     def self.applicable_targets(&block)
       define_method(:applicable_targets, block)
     end
 
+    def self.applies_to_target
+      define_method(:applicable_targets) { [source.attached_to] }
+    end
+
+    def_delegators :@source, :controller, :owner, :game
+
     def initialize(source:)
       @source = source
     end
 
-    def power
-      0
+    def battlefield
+      game.battlefield
     end
 
-    def toughness
-      0
+    def your
+      source.controller
     end
 
-    def keywords
-      []
-    end
+    # def power_modification
+    #   0
+    # end
+
+    # def toughness_modification
+    #   0
+    # end
 
     def applies_to?(_permanent)
       true

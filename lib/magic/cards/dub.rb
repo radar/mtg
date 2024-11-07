@@ -1,8 +1,8 @@
 module Magic
   module Cards
     class Dub < Aura
-      NAME = "Dub"
-      COST = { generic: 2, white: 1 }
+      card_name "Dub"
+      cost "{2}{W}"
 
       def target_choices
         battlefield.creatures

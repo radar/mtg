@@ -8,21 +8,9 @@ module Magic
       toughness 1
 
       class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
-        def initialize(source:)
-          @source = source
-        end
+        modify power: 1, toughness: 1
 
-        def power
-          1
-        end
-
-        def toughness
-          1
-        end
-
-        def applicable_targets
-          source.controller.creatures.by_type("Elf") - [source]
-        end
+        applicable_targets { your.creatures.all("Elf").except(source) }
       end
 
       class Choice < Magic::Choice

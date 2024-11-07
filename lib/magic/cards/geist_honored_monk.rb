@@ -16,15 +16,11 @@ module Magic
       end
 
       class DynamicPowerAndToughness < Abilities::Static::PowerAndToughnessModification
-        def initialize(source:)
-          @source = source
-        end
-
-        def power
+        def power_modification
           creature_count
         end
 
-        def toughness
+        def toughness_modification
           creature_count
         end
 

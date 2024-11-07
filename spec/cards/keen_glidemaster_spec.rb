@@ -18,7 +18,7 @@ RSpec.describe Magic::Cards::KeenGlidemaster do
       game.tick!
 
       expect(wood_elves).to be_flying
-      expect(wood_elves.keyword_grants.first.until_eot?).to eq(true)
+      expect(wood_elves.keyword_grant_modifiers.first.until_eot?).to eq(true)
     end
   end
 end

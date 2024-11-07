@@ -4,13 +4,17 @@ module Magic
       cost generic: 1
 
       equip [Costs::Mana.new(generic: 1)]
+    end
 
-      def power_modification
-        1
+    class ShortSword < Equipment
+      class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
+        modify power: 1, toughness: 1
+        applies_to_target
+
       end
 
-      def toughness_modification
-        1
+      def static_abilities
+        [PowerAndToughnessModification]
       end
     end
   end

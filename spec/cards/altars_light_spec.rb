@@ -8,7 +8,7 @@ RSpec.describe Magic::Cards::AltarsLight do
 
   before do
     game.next_turn
-    game.battlefield.add(sol_ring)
+    add_to_battlefield(sol_ring)
   end
 
   it "exiles the sol ring" do
@@ -16,6 +16,7 @@ RSpec.describe Magic::Cards::AltarsLight do
     cast_and_resolve(card: card, player: p1) do
       _1.targeting(sol_ring)
     end
+    game.stack.resolve!
     expect(sol_ring.card.zone).to be_exile
   end
 end

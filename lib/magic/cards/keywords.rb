@@ -39,36 +39,12 @@ module Magic
         const_get(keyword.upcase)
       end
 
-      class KeywordGrant
-        attr_reader :keyword, :until_eot
-
-        def initialize(keyword:, until_eot:)
-          @keyword = keyword
-          @until_eot = until_eot
-        end
-
-        def until_eot?
-          @until_eot
-        end
-      end
-
-      def grant_keyword(keyword, until_eot: true)
-        @keyword_grants << KeywordGrant.new(keyword: keyword, until_eot: until_eot)
-      end
-
-      def remove_keyword_grant(grant)
-        @keyword_grants.delete(grant)
-      end
-
       def has_keyword?(keyword)
         if keyword.is_a?(Symbol)
           keyword = Keywords.one(keyword)
         end
 
-        keywords.any? { |kw| kw.is_a?(keyword) } ||
-          keywords.include?(keyword) ||
-          keyword_grants.map(&:keyword).include?(keyword) ||
-          (is_a?(Magic::Permanent) && attachments.flat_map(&:keyword_grants).include?(keyword))
+        keywords.any? { |kw| kw.is_a?(keyword) } || keywords.include?(keyword)
       end
 
       def infect?

@@ -16,6 +16,8 @@ RSpec.describe Magic::Cards::Pridemalkin do
       permanent = creatures.by_name("Pridemalkin").first
       game.resolve_choice!(target: permanent)
 
+      game.tick!
+
       aggregate_failures do
         expect(permanent.power).to eq(3)
         expect(permanent.toughness).to eq(2)
@@ -37,6 +39,8 @@ RSpec.describe Magic::Cards::Pridemalkin do
       game.tick!
       game.resolve_choice!(target: wood_elves)
 
+      game.tick!
+
       aggregate_failures do
         expect(wood_elves.power).to eq(2)
         expect(wood_elves.toughness).to eq(2)
@@ -54,6 +58,8 @@ RSpec.describe Magic::Cards::Pridemalkin do
       game.tick!
       permanent = creatures.by_name("Pridemalkin").first
       game.resolve_choice!(target: permanent)
+
+      game.tick!
 
       aggregate_failures do
         expect(wood_elves.power).to eq(1)

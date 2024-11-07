@@ -13,16 +13,18 @@ module Magic
         battlefield.creatures
       end
 
-      def keyword_grants
-        [Keywords::FLYING]
+      class KeywordGrantFlying < Abilities::Static::KeywordGrant
+        keyword_grants Keywords::FLYING
+        applies_to_target
       end
 
-      def power_modification
-        1
+      class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
+        modify power: 1, toughness: 1
+        applies_to_target
       end
 
-      def toughness_modification
-        1
+      def static_abilities
+        [KeywordGrantFlying, PowerAndToughnessModification]
       end
     end
   end

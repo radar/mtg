@@ -10,21 +10,9 @@ module Magic
       keywords :defender
 
       class PowerBoost < Abilities::Static::PowerAndToughnessModification
-        def initialize(source:)
-          @source = source
-        end
+        modify power: 1, toughness: 0
 
-        def power
-          1
-        end
-
-        def toughness
-          0
-        end
-
-        def applicable_targets
-          source.controller.creatures.select(&:attacking?)
-        end
+        applicable_targets { your.creatures.attacking }
       end
 
       def static_abilities = [PowerBoost]

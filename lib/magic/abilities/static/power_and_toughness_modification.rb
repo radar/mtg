@@ -5,8 +5,8 @@ module Magic
         attr_reader :source, :power, :toughness, :applicable_targets
 
         def self.modify(power:, toughness:)
-          define_method(:power) { power } if power
-          define_method(:toughness) { toughness } if toughness
+          define_method(:power_modification) { power } if power
+          define_method(:toughness_modification) { toughness } if toughness
         end
 
         def self.other_creatures(creature_type)
@@ -15,12 +15,16 @@ module Magic
           end
         end
 
-        def initialize(source:)
-          @source = source
+        def power_modification
+          0
         end
 
-        def applies_to?(target)
-          applicable_targets.include?(target)
+        def toughness_modification
+          0
+        end
+
+        def applies_to?(permanent)
+          applicable_targets.include?(permanent)
         end
       end
     end

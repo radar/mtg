@@ -12,7 +12,7 @@ module Magic
           end
 
           def resolve!(target:)
-            target.attachments << source
+            source.attach_to!(target)
           end
         end
 

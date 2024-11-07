@@ -21,6 +21,7 @@ RSpec.describe Magic::Cards::AcademyElite do
           p1.cast(card: academy_elite) do
             _1.pay_mana(generic: { blue: 3 }, blue: 1)
           end
+          game.stack.resolve!
           game.tick!
 
           permanent = p1.permanents.last
@@ -43,6 +44,7 @@ RSpec.describe Magic::Cards::AcademyElite do
           p1.cast(card: academy_elite) do
             _1.pay_mana(generic: { blue: 3 }, blue: 1)
           end
+          game.stack.resolve!
           game.tick!
 
           permanent = p1.permanents.last
@@ -69,6 +71,7 @@ RSpec.describe Magic::Cards::AcademyElite do
         _1.pay_mana(generic: { blue: 2 }, blue: 1)
       end
 
+      game.stack.resolve!
       game.tick!
 
       expect(academy_elite.counters.count).to eq(0)

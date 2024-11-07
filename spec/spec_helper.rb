@@ -104,6 +104,11 @@ RSpec.shared_context "two player game" do
     game.battlefield.creatures
   end
 
+  def add_to_battlefield(permanent)
+    game.battlefield.add(permanent)
+    game.tick!
+  end
+
   before do
     p1_library.each_with_index { p1.library.add(_1, _2) }
     p2_library.each_with_index { p2.library.add(_1, _2) }

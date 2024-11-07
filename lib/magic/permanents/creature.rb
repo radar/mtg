@@ -31,26 +31,6 @@ module Magic
         base_toughness_modifier ? base_toughness_modifier.base_toughness : base_toughness
       end
 
-      def power
-        base_power +
-          @modifiers.sum(&:power) +
-          @counters.sum(&:power) +
-          @attachments.sum(&:power_modification) +
-          static_ability_mods.sum(&:power)
-      end
-
-      def toughness
-        base_toughness +
-          @modifiers.sum(&:toughness) +
-          @counters.sum(&:toughness) +
-          @attachments.sum(&:toughness_modification) +
-          static_ability_mods.sum(&:toughness)
-      end
-
-      def keywords
-        card.keywords + static_ability_mods.flat_map(&:keywords)
-      end
-
       def take_damage(damage)
         @damage += damage
       end
@@ -61,10 +41,6 @@ module Magic
 
       def attacking?
         game.current_turn.attacking?(self)
-      end
-
-      def static_ability_mods
-        game.battlefield.static_abilities.applies_to(self)
       end
     end
   end

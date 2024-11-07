@@ -43,7 +43,7 @@ RSpec.describe Magic::Cards::ArchonOfSunsGrace do
         _1.pay_mana(generic: { white: 1 }, white: 2)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       pegasus = creatures.by_name("Pegasus").first
       expect(pegasus).not_to be_nil

@@ -1,11 +1,11 @@
 module Magic
   module Counters
     class Plus1Plus1
-      def power
+      def power_modification
         1
       end
 
-      def toughness
+      def toughness_modification
         1
       end
     end

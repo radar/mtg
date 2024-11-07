@@ -60,6 +60,7 @@ module Magic
       select { |c| c.any_type?(*types) }
     end
     alias_method :by_type, :by_any_type
+    alias_method :all, :by_any_type
 
     def nonland
       reject(&:land?)
@@ -77,6 +78,10 @@ module Magic
 
     def except(target)
       self.class.new(reject { |c| c == target })
+    end
+
+    def attacking
+      select(&:attacking?)
     end
 
     def tapped

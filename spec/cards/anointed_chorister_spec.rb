@@ -18,6 +18,7 @@ RSpec.describe Magic::Cards::AnointedChorister do
         _1.pay_mana({ generic: { white: 4 }, white: 1 })
       end
 
+      game.stack.resolve!
       game.tick!
 
       expect(p1.mana_pool[:white]).to eq(0)

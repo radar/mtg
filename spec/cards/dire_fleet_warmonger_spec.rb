@@ -17,6 +17,7 @@ RSpec.describe Magic::Cards::DireFleetWarmonger do
       expect(choice.target_choices).to eq([wood_elves])
 
       game.resolve_choice!(choice: wood_elves)
+      game.tick!
 
       expect(wood_elves.card.zone).to be_graveyard
 

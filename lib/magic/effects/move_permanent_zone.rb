@@ -22,7 +22,9 @@ module Magic
         target.zone = to
         if to.battlefield?
           to.add(target)
+          target.apply_continuous_effects!
         end
+
 
         game.notify!(*entering_zone_notifications(from: from, to: to))
       end

@@ -18,7 +18,6 @@ RSpec.describe Magic::Cards::AcidicSlime do
       game.battlefield.add(land)
       game.battlefield.add(enchantment)
       game.battlefield.add(artifact)
-
     end
 
     it "triggers a destroy effect" do
@@ -28,6 +27,7 @@ RSpec.describe Magic::Cards::AcidicSlime do
         _1.targeting(land)
       end
 
+      game.stack.resolve!
       game.tick!
 
       expect(land.card.zone).to be_graveyard

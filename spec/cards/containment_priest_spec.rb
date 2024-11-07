@@ -36,6 +36,7 @@ RSpec.describe Magic::Cards::ContainmentPriest do
         expect(game.battlefield.permanents.map(&:name)).to_not include('Story Seeker')
       end
     end
+
     context "the creature is cast" do
       it "does not exile the creature" do
         story_seeker = Card('Story Seeker')

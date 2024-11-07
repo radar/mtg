@@ -18,14 +18,14 @@ module Magic
       :attachments,
       :protections,
       :modifiers,
-      :counters,
       :keyword_grants,
+      :counters,
       :activated_abilities,
       :state_triggered_abilities,
       :exiled_cards,
       :cannot_untap_next_turn
 
-    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents
+    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :additional_lands_per_turn, :power_modification, :toughness_modification, :type_grants
     def_delegators :@game, :logger
 
     class Protections < SimpleDelegator
@@ -66,6 +66,7 @@ module Magic
       @attachments = []
       @modifiers = []
       @tapped = false
+      @types = card.types
       @keyword_grants = card.keyword_grants
       @counters = Counters::Collection.new([])
       @damage = 0
@@ -79,8 +80,40 @@ module Magic
       @kicked
     end
 
-    def types
-      @base_types + attachments.flat_map(&:type_grants) + modifiers.flat_map(&:type_grants)
+    def apply_continuous_effects!
+      Magic::Permanents::ContinuousEffects.new(game: game, permanent: self).apply!
+    end
+
+    def types=(types)
+      @types = types
+    end
+
+    def power
+      @power
+    end
+
+    def power=(power)
+      @power = power
+    end
+
+    def toughness
+      @toughness
+    end
+
+    def toughness=(toughness)
+      @toughness = toughness
+    end
+
+    def keywords
+      @keywords
+    end
+
+    def keywords=(keywords)
+      @keywords = keywords
+    end
+
+    def keyword_grant_modifiers
+      modifiers.select { |modifier| modifier.is_a?(Permanents::Modifications::KeywordGrant) }
     end
 
     def inspect
@@ -247,7 +280,7 @@ module Magic
 
     def alive?
       return true unless creature?
-      (toughness - damage).positive?
+      (toughness - damage).positive? && toughness > 0
     end
 
     def destroy!

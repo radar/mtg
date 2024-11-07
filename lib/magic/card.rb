@@ -71,6 +71,12 @@ module Magic
           true
         end
       end
+
+      def additional_lands_per_turn(amount)
+        define_method(:additional_lands_per_turn) do
+          amount
+        end
+      end
     end
 
     def initialize(game: Game.new, owner:)
@@ -193,6 +199,14 @@ module Magic
 
     def replacement_effects
       {}
+    end
+
+    def state_triggered_abilities
+      []
+    end
+
+    def additional_lands_per_turn
+      0
     end
 
     def token?

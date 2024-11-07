@@ -6,14 +6,6 @@ module Magic
         permanent.attach_to!(target)
       end
 
-      def power_modification
-        0
-      end
-
-      def toughness_modification
-        0
-      end
-
       def keyword_grants
         []
       end

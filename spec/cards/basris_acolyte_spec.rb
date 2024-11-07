@@ -29,6 +29,8 @@ RSpec.describe Magic::Cards::BasrisAcolyte do
       expect(loxodon_wayfarer.toughness).to eq(6)
 
       game.resolve_choice!(target: wood_elves)
+      game.tick!
+
       expect(wood_elves.power).to eq(2)
       expect(wood_elves.toughness).to eq(2)
     end

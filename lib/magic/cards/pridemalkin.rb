@@ -29,14 +29,8 @@ module Magic
         game.choices.add(Choice.new(actor: actor))
       end
 
-      class TrampleAddition < StaticAbility
-        def initialize(source:)
-          @source = source
-        end
-
-        def keywords
-          [Cards::Keywords::TRAMPLE]
-        end
+      class TrampleAddition < Abilities::Static::KeywordGrant
+        keyword_grants Keywords::TRAMPLE
 
         def applies_to?(permanent)
           permanent.counters.of_type(Magic::Counters::Plus1Plus1).any?

@@ -3,8 +3,12 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::CanopyTactician do
   include_context "two player game"
 
-  subject! { ResolvePermanent("Canopy Tactician", owner: p1) }
   let!(:lathril) { ResolvePermanent("Lathril, Blade Of The Elves", owner: p1) }
+  subject! { ResolvePermanent("Canopy Tactician", owner: p1) }
+
+  before do
+    game.tick!
+  end
 
   context "static ability" do
     it "gives lathril +1/+1" do
@@ -12,7 +16,7 @@ RSpec.describe Magic::Cards::CanopyTactician do
       expect(lathril.toughness).to eq(4)
     end
 
-    it "does not give itself the boost" do
+    it "does not give itself the boost", aggregate_failures: true do
       expect(subject.power).to eq(3)
       expect(subject.toughness).to eq(3)
     end

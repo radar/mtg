@@ -18,7 +18,7 @@ RSpec.describe Magic::Cards::AnnexSentry do
       _1.pay_mana(generic: { white: 2 }, white: 1)
     end
 
-    game.tick!
+    game.stack.resolve!
 
     choice = game.choices.last
     expect(choice).to be_a(Magic::Cards::AnnexSentry::Choice)

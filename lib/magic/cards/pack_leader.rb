@@ -24,21 +24,8 @@ module Magic
       end
 
       class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
-        def initialize(source:)
-          @source = source
-        end
-
-        def power
-          1
-        end
-
-        def toughness
-          1
-        end
-
-        def applicable_targets
-          source.controller.creatures.by_any_type("Dog") - [source]
-        end
+        modify power: 1, toughness: 1
+        applicable_targets { source.controller.creatures.all("Dog").except(source) }
       end
 
       def static_abilities = [PowerAndToughnessModification]

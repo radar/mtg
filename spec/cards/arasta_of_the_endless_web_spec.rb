@@ -13,7 +13,7 @@ RSpec.describe Magic::Cards::ArastaOfTheEndlessWeb do
         _1.targeting(p2)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(creatures.count).to eq(1)
     end
@@ -25,7 +25,7 @@ RSpec.describe Magic::Cards::ArastaOfTheEndlessWeb do
         _1.targeting(p1)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(creatures.count).to eq(2)
       spider = creatures.by_name("Spider").first
@@ -42,7 +42,7 @@ RSpec.describe Magic::Cards::ArastaOfTheEndlessWeb do
         _1.pay_mana(green: 1, generic: { green: 2 })
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(creatures.count).to eq(2)
     end

@@ -3,13 +3,15 @@ require "spec_helper"
 RSpec.describe Magic::Cards::CarrionGrub do
   include_context "two player game"
 
+  subject { ResolvePermanent("Carrion Grub", owner: p1) }
+
   before do
     5.times { p1.library.add(Card("Forest")) }
+    game.tick!
   end
 
-  subject! { ResolvePermanent("Carrion Grub", owner: p1) }
-
   it "on ETB, p1 mills 4 cards" do
+    subject
     mill_events = game.current_turn.events.count { _1.is_a?(Magic::Events::CardMilled) }
     expect(mill_events).to eq(4)
   end

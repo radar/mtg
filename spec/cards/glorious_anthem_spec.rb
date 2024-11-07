@@ -9,6 +9,8 @@ RSpec.describe Magic::Cards::GloriousAnthem do
 
   context "two creatures from the same controller are on the battlefield" do
     it "creature gets buffed" do
+      game.tick!
+
       expect(wood_elves.power).to eq(2)
       expect(wood_elves.toughness).to eq(2)
     end
@@ -18,6 +20,8 @@ RSpec.describe Magic::Cards::GloriousAnthem do
     context "leaving the battlefield" do
       it "clears the static ability" do
         glorious_anthem.destroy!
+        game.tick!
+
         expect(game.battlefield.static_abilities.count).to eq(0)
         expect(wood_elves.power).to eq(1)
         expect(wood_elves.toughness).to eq(1)

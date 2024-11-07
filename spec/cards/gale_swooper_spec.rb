@@ -10,8 +10,9 @@ RSpec.describe Magic::Cards::GaleSwooper do
     cast_and_resolve(card: subject, player: p1)
 
     game.resolve_choice!(target: wood_elves)
+    game.tick!
 
     expect(wood_elves).to be_flying
-    expect(wood_elves.keyword_grants.first.until_eot?).to eq(true)
+    expect(wood_elves.keyword_grant_modifiers.first.until_eot?).to eq(true)
   end
 end

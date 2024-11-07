@@ -146,7 +146,7 @@ module Magic
     end
 
     def max_lands_per_turn
-      1
+      1 + permanents.sum(&:additional_lands_per_turn)
     end
 
     def can_play_lands?

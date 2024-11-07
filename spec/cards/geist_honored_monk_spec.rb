@@ -8,6 +8,8 @@ RSpec.describe Magic::Cards::GeistHonoredMonk do
   context "power and toughness" do
     context "when it and its spirits are the only creature on the battlefield" do
       it "has power and toughness equal to creatures" do
+        game.tick!
+
         expect(geist.power).to eq(3)
         expect(geist.toughness).to eq(3)
       end
@@ -17,6 +19,8 @@ RSpec.describe Magic::Cards::GeistHonoredMonk do
       let!(:loxodon) { ResolvePermanent("Loxodon Wayfarer", owner: p1) }
 
       it "has power and toughness equal to creatures" do
+        game.tick!
+
         expect(geist.power).to eq(4)
         expect(geist.toughness).to eq(4)
         expect(loxodon.power).to eq(1)
@@ -28,6 +32,8 @@ RSpec.describe Magic::Cards::GeistHonoredMonk do
       let!(:geist_2) { ResolvePermanent("Geist-Honored Monk", owner: p1) }
 
       it "has power and toughness equal to creatures" do
+        game.tick!
+
         expect(geist.power).to eq(6)
         expect(geist.toughness).to eq(6)
         expect(geist_2.power).to eq(6)

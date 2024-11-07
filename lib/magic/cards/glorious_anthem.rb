@@ -7,21 +7,9 @@ module Magic
 
     class GloriousAnthem < Enchantment
       class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
-        def initialize(source:)
-          @source = source
-        end
+        modify power: 1, toughness: 1
 
-        def power
-          1
-        end
-
-        def toughness
-          1
-        end
-
-        def applicable_targets
-          source.controller.creatures
-        end
+        applicable_targets { your.creatures }
       end
 
       def static_abilities = [PowerAndToughnessModification]

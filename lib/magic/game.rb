@@ -111,10 +111,12 @@ module Magic
 
       logger.debug "Resolving effect: #{effect}"
       effect.resolve!
+      tick!
     end
 
     def tick!
-      stack.resolve!
+      battlefield.map(&:apply_continuous_effects!)
+      check_for_state_triggered_abilities
       move_dead_creatures_to_graveyard
     end
 

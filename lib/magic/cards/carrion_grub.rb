@@ -14,12 +14,8 @@ module Magic
       end
 
       class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
-        def initialize(source:)
-          @source = source
-        end
-
-        def power
-          source.controller.graveyard.creatures.map(&:base_power).max
+        def power_modification
+          source.controller.graveyard.creatures.map(&:base_power).max || 0
         end
 
         def applicable_targets

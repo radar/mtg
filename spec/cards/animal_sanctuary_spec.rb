@@ -30,7 +30,7 @@ RSpec.describe Magic::Cards::AnimalSanctuary do
         _1.targeting(rambunctious_mutt)
       end
 
-      game.tick!
+      game.stack.resolve!
     end
 
     it "puts a +1/+1 counter on target creature" do

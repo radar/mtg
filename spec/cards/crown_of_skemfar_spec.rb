@@ -13,10 +13,13 @@ RSpec.describe Magic::Cards::CrownOfSkemfar do
       .pay_mana(green: 2, generic: { green: 2 })
       .targeting(wood_elves)
     game.take_action(action)
-    game.stack.resolve!
-    expect(wood_elves.power).to eq(2)
-    expect(wood_elves.toughness).to eq(2)
-    expect(wood_elves.has_keyword?(Magic::Cards::Keywords::REACH)).to eq(true)
+    game.tick!
+
+    aggregate_failures do
+      expect(wood_elves.power).to eq(2)
+      expect(wood_elves.toughness).to eq(2)
+      expect(wood_elves.has_keyword?(Magic::Cards::Keywords::REACH)).to eq(true)
+    end
 
     expect(p1.permanents.by_name("Crown of Skemfar").count).to eq(1)
   end
