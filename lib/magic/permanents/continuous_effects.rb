@@ -100,42 +100,6 @@ module Magic
       def static_abilities_for(permanent)
         static_abilities.applies_to(permanent)
       end
-
-
-      # attr_writer :types, :keywords, :power, :toughness
-
-
-      # def type_grant_effects
-      #   effects_by_type(Abilities::Static::TypeGrant)
-      # end
-
-      # def keyword_grant_effects
-      #   effects_by_type(Abilities::Static::KeywordGrant)
-      # end
-
-      # def power_and_toughness_effects
-      #   effects_by_type(Abilities::Static::PowerAndToughnessModification)
-      # end
-
-      # def power_grant_effects
-      #   power_and_toughness_effects.select { |effect| effect.power_modification > 0 }
-      # end
-
-      # def counter_power_modifications
-      #   permanent.counters.sum(&:power_modification)
-      # end
-
-      # def counter_toughness_modifications
-      #   permanent.counters.sum(&:toughness_modification)
-      # end
-
-      # def toughness_grant_effects
-      #   power_and_toughness_effects.select { |effect| effect.toughness_modification > 0 }
-      # end
-
-      # def effects_by_type(type)
-      #   effects.select { |effect| effect.is_a?(type) }
-      # end
     end
   end
 end
