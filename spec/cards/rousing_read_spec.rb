@@ -15,7 +15,7 @@ RSpec.describe Magic::Cards::RousingRead do
       _1.targeting(wood_elves)
     end
 
-    game.tick!
+    game.stack.resolve!
 
     choice = game.choices.last
     game.resolve_choice!(card: choice.cards.first)

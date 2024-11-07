@@ -56,7 +56,7 @@ RSpec.describe Magic::Cards::NiambiEsteemedSpeaker do
         _1.pay_discard(aron)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(aron.zone).to be_graveyard
     end

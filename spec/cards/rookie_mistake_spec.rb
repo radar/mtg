@@ -12,7 +12,7 @@ RSpec.describe Magic::Cards::RookieMistake do
       _1.targeting(wood_elves, pack_leader)
       _1.pay_mana(blue: 1)
     end
-    game.tick!
+    game.stack.resolve!
 
     expect(wood_elves.toughness).to eq(3)
     expect(pack_leader.power).to eq(0)

@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::SecureTheScene do
         _1.pay_mana(generic: { white: 4 }, white: 1)
           .targeting(wood_elves)
       end
-      game.tick!
+      game.stack.resolve!
 
       expect(wood_elves.card.zone).to be_exile
       soldier = creatures.controlled_by(p2).first

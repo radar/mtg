@@ -44,7 +44,7 @@ RSpec.describe Magic::Cards::RinAndSeriInseperable do
         _1.pay_mana(red: 1, green: 1, white: 1)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       # One dog, one cat.
       expect(p2.life).to eq(19)

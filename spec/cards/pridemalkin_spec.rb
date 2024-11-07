@@ -12,7 +12,8 @@ RSpec.describe Magic::Cards::Pridemalkin do
         _1.pay_mana(generic: { green: 2 }, green: 1)
       end
 
-      game.tick!
+      game.stack.resolve!
+
       permanent = creatures.by_name("Pridemalkin").first
       game.resolve_choice!(target: permanent)
 
@@ -36,7 +37,7 @@ RSpec.describe Magic::Cards::Pridemalkin do
         _1.pay_mana(generic: { green: 2 }, green: 1)
       end
 
-      game.tick!
+      game.stack.resolve!
       game.resolve_choice!(target: wood_elves)
 
       game.tick!
@@ -55,7 +56,7 @@ RSpec.describe Magic::Cards::Pridemalkin do
         _1.pay_mana(generic: { green: 2 }, green: 1)
       end
 
-      game.tick!
+      game.stack.resolve!
       permanent = creatures.by_name("Pridemalkin").first
       game.resolve_choice!(target: permanent)
 

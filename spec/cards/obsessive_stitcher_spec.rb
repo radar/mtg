@@ -11,7 +11,7 @@ RSpec.describe Magic::Cards::ObsessiveStitcher do
     ability = permanent.activated_abilities.first
     p1.activate_ability(ability: ability)
 
-    game.tick!
+    game.stack.resolve!
 
     choice = game.choices.first
     expect(choice).to be_a(Magic::Choice::Discard)
@@ -27,7 +27,7 @@ RSpec.describe Magic::Cards::ObsessiveStitcher do
       _1.targeting(p1.graveyard.first)
     end
 
-    game.tick!
+    game.stack.resolve!
 
     expect(creatures.map(&:name)).to include("Wood Elves")
     expect(permanent.card.zone).to be_graveyard

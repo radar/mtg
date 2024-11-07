@@ -16,7 +16,7 @@ RSpec.describe Magic::Cards::RambunctiousMutt do
         _1.auto_pay_mana
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(enchantment.card.zone).to be_graveyard
     end

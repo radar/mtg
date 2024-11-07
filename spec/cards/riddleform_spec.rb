@@ -12,12 +12,13 @@ RSpec.describe Magic::Cards::Riddleform do
       _1.pay_mana(red: 1).targeting(p2)
     end
 
-    game.tick!
+    game.stack.resolve!
 
     choice = game.choices.last
     expect(choice).to be_a(Magic::Cards::Riddleform::Choice)
 
     game.resolve_choice!
+    game.tick!
 
     aggregate_failures do
       expect(riddleform).to be_a_creature

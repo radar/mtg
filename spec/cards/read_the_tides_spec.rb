@@ -16,7 +16,7 @@ RSpec.describe Magic::Cards::ReadTheTides do
       _1.pay_mana(blue: 1, generic: { blue: 5 })
     end
 
-    game.tick!
+    game.stack.resolve!
   end
 
   context "wood elves on the field" do
@@ -32,7 +32,7 @@ RSpec.describe Magic::Cards::ReadTheTides do
         _1.pay_mana(blue: 1, generic: { blue: 5 })
       end
 
-      game.tick!
+      game.stack.resolve!
       expect(p2.hand.by_name("Wood Elves").count).to eq(1)
     end
   end

@@ -24,7 +24,7 @@ RSpec.describe Magic::Cards::Rewind do
         _1.pay_mana(generic: { blue: 2}, blue: 2)
         _1.targeting(sol_ring_cast)
       end
-      game.tick!
+      game.stack.resolve!
     end
 
     it "counters target spell if cost is unpaid" do

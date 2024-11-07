@@ -12,7 +12,7 @@ RSpec.describe Magic::Cards::PeerIntoTheAbyss do
       _1.targeting(p2)
       _1.pay_mana(black: 3, generic: { black: 4 })
     end
-    game.tick!
+    game.stack.resolve!
 
     expect(p2.library.count).to eq(1)
     expect(p2.life).to eq(9)

@@ -16,10 +16,11 @@ RSpec.describe Magic::Cards::SelflessSavior do
         _1.pay(:self_sacrifice, subject).targeting(wood_elves)
       end
 
+      game.stack.resolve!
       game.tick!
 
       expect(wood_elves).to be_indestructible
-      expect(wood_elves.keyword_grants.first.until_eot?).to eq(true)
+      expect(wood_elves.keyword_grant_modifiers.first.until_eot?).to eq(true)
     end
   end
 end

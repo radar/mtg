@@ -19,7 +19,7 @@ RSpec.describe Magic::Cards::Miscast do
         _1.pay_mana(generic: { blue: 1}, blue: 1)
         _1.targeting(sol_ring_cast)
       end
-      game.tick!
+      game.stack.resolve!
     end
 
     it "has a 3 cost choice" do
@@ -29,7 +29,7 @@ RSpec.describe Magic::Cards::Miscast do
 
     it "counters target spell if cost is unpaid" do
       game.resolve_choice!
-      game.tick!
+      game.stack.resolve!
 
       expect(sol_ring.zone).to be_graveyard
     end
@@ -40,7 +40,7 @@ RSpec.describe Magic::Cards::Miscast do
       choice.pay(p2, generic: { white: 3 })
 
       game.resolve_choice!
-      game.tick!
+      game.stack.resolve!
       expect(sol_ring.zone).to be_battlefield
     end
   end

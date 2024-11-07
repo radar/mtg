@@ -26,7 +26,7 @@ RSpec.describe Magic::Cards::Opt do
     p1.cast(card: opt) do
       _1.pay_mana(blue: 1)
     end
-    game.tick!
+    game.stack.resolve!
 
     choice = game.choices.last
     expect(choice).to be_a(Magic::Cards::Opt::Choice)
@@ -44,7 +44,7 @@ RSpec.describe Magic::Cards::Opt do
     p1.cast(card: opt) do
       _1.pay_mana(blue: 1)
     end
-    game.tick!
+    game.stack.resolve!
 
     choice = game.choices.last
     expect(choice).to be_a(Magic::Cards::Opt::Choice)
