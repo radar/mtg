@@ -6,10 +6,6 @@ RSpec.describe Magic::Cards::WardedBattlements do
   subject!(:warded_battlements) { ResolvePermanent("Warded Battlements", owner: p1) }
   let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
-  before do
-
-  end
-
   it "has defender" do
     expect(subject.defender?).to eq(true)
   end
@@ -22,6 +18,8 @@ RSpec.describe Magic::Cards::WardedBattlements do
       wood_elves,
       target: p2,
     )
+
+    game.tick!
 
     expect(wood_elves.power).to eq(2)
     expect(wood_elves.toughness).to eq(1)

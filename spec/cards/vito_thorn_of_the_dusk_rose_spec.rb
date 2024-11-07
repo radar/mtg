@@ -31,9 +31,11 @@ RSpec.describe Magic::Cards::VitoThornOfTheDuskRose do
       end
 
       game.stack.resolve!
+      game.tick!
+
       expect(wood_elves.lifelink?).to eq(true)
-      grant = wood_elves.keyword_grants.last
-      expect(grant.keyword).to eq(Magic::Cards::Keywords::LIFELINK)
+      grant = wood_elves.keyword_grant_modifiers.last
+      expect(grant.keyword_grant).to eq(Magic::Cards::Keywords::LIFELINK)
       expect(grant.until_eot?).to eq(true)
     end
   end

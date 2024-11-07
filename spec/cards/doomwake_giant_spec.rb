@@ -19,7 +19,7 @@ RSpec.describe Magic::Cards::DoomwakeGiant do
         _1.pay_mana(generic: { black: 4 }, black: 1)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       aggregate_failures do
         expect(p1_ajanis_pridemate.power).to eq(2)
@@ -49,7 +49,7 @@ RSpec.describe Magic::Cards::DoomwakeGiant do
         _1.pay_mana(generic: { white: 1 }, white: 1)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       aggregate_failures do
         expect(p1_ajanis_pridemate.power).to eq(2)

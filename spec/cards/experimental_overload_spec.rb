@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::ExperimentalOverload do
       _1.pay_mana(generic: { blue: 2 }, blue: 1, red: 1)
     end
 
-    game.tick!
+    game.stack.resolve!
 
     weird = creatures.first
     expect(weird.name).to eq("Weird")

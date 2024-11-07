@@ -12,7 +12,7 @@ RSpec.describe Magic::Cards::Shock do
     p1.cast(card: shock) do
       _1.pay_mana(red: 1).targeting(cloudkin_seer)
     end
-    game.tick!
+    game.stack.resolve!
     expect(cloudkin_seer).to be_dead
   end
 
@@ -22,7 +22,7 @@ RSpec.describe Magic::Cards::Shock do
     p1.cast(card: shock) do
       _1.pay_mana(red: 1).targeting(p2)
     end
-    game.tick!
+    game.stack.resolve!
     expect(p2.life).to eq(p2_life_total - 2)
   end
 
@@ -31,7 +31,7 @@ RSpec.describe Magic::Cards::Shock do
     p1.cast(card: shock) do
       _1.pay_mana(red: 1).targeting(basri_ket)
     end
-    game.tick!
+    game.stack.resolve!
     expect(basri_ket.loyalty).to eq(1)
   end
 end

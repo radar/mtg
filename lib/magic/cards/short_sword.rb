@@ -7,14 +7,12 @@ module Magic
     end
 
     class ShortSword < Equipment
-      class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
-        modify power: 1, toughness: 1
-        applies_to_target
-
+      def power_modification
+        1
       end
 
-      def static_abilities
-        [PowerAndToughnessModification]
+      def toughness_modification
+        1
       end
     end
   end

@@ -15,7 +15,7 @@ RSpec.describe Magic::Cards::TemperedVeteran do
       p1.activate_ability(ability: ability) do
         _1.targeting(wood_elves).pay_mana(white: 1)
       end
-      game.tick!
+      game.stack.resolve!
 
       expect(tempered_veteran).to be_tapped
       expect(wood_elves.counters.of_type(Magic::Counters::Plus1Plus1).count).to eq(2)
@@ -30,7 +30,7 @@ RSpec.describe Magic::Cards::TemperedVeteran do
       p1.activate_ability(ability: ability) do
         _1.targeting(wood_elves).pay_mana({ generic: { white: 4 }, white: 2 })
       end
-      game.tick!
+      game.stack.resolve!
 
       expect(tempered_veteran).to be_tapped
       expect(wood_elves.counters.of_type(Magic::Counters::Plus1Plus1).count).to eq(1)

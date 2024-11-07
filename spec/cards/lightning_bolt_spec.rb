@@ -13,7 +13,7 @@ RSpec.describe Magic::Cards::LightningBolt do
     action.pay_mana(red: 1)
     action.targeting(wood_elves)
     game.take_action(action)
-    game.tick!
+    game.stack.resolve!
     expect(wood_elves).to be_dead
   end
 
@@ -24,7 +24,7 @@ RSpec.describe Magic::Cards::LightningBolt do
     action.pay_mana(red: 1)
     action.targeting(p2)
     game.take_action(action)
-    game.tick!
+    game.stack.resolve!
     expect(p2.life).to eq(p2_starting_life - 3)
   end
 end

@@ -15,7 +15,8 @@ RSpec.describe Magic::Cards::DefiantStrike do
                 .pay_mana(white: 1)
                 .targeting(wood_elves)
       game.take_action(action)
-      game.tick!
+      game.stack.resolve!
+
       buff = wood_elves.modifiers.first
       expect(buff.power_modification).to eq(1)
       expect(buff.toughness_modification).to eq(0)

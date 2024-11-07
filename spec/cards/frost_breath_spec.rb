@@ -13,7 +13,7 @@ RSpec.describe Magic::Cards::FrostBreath do
       action = cast_action(card: subject, player: p1).targeting(wood_elves, loxodon_wayfarer)
       action.pay_mana(blue: 1, generic: { blue: 2 })
       game.take_action(action)
-      game.tick!
+      game.stack.resolve!
 
       expect(wood_elves).to be_tapped
       expect(loxodon_wayfarer).to be_tapped

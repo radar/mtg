@@ -15,6 +15,7 @@ RSpec.describe Magic::Cards::KeenGlidemaster do
           .targeting(wood_elves)
       end
 
+      game.stack.resolve!
       game.tick!
 
       expect(wood_elves).to be_flying

@@ -15,6 +15,7 @@ RSpec.describe Magic::Cards::ShortSword do
         _1.pay_mana(generic: { white: 1 })
       end
 
+      game.stack.resolve!
       game.tick!
 
       expect(wood_elves.attachments.count).to eq(1)

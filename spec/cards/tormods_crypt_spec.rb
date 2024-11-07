@@ -15,7 +15,7 @@ RSpec.describe Magic::Cards::TormodsCrypt do
       _1.targeting(p2)
     end
 
-    game.tick!
+    game.stack.resolve!
 
     expect(p2.graveyard).to be_empty
     expect(wood_elves.zone).to be_exile

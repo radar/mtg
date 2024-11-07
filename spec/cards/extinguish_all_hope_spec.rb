@@ -22,7 +22,7 @@ RSpec.describe Magic::Cards::ExtinguishAllHope do
         _1.pay_mana(generic: { black: 4 }, black: 2)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(wood_elves.card.zone).to be_graveyard
       expect(doomwake_giant.zone).to be_battlefield

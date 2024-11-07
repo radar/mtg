@@ -69,7 +69,7 @@ RSpec.describe Magic::Game, "combat -- pack leader prevents damage to other dogs
       action.pay_mana(red: 1)
       action.targeting(selfless_savior)
       game.take_action(action)
-      game.tick!
+      game.stack.resolve!
 
       current_turn.declare_blocker(
         vastwood_gorger,

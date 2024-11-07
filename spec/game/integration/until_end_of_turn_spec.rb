@@ -32,10 +32,11 @@ RSpec.describe Magic::Game, "until end of turn effect" do
 
   context "eot modifiers" do
     before do
-      dranas_emissary.modifiers << instance_double(Magic::Permanents::Modification, power: 3, until_eot?: true, type_grants: [])
+      dranas_emissary.modifiers << Magic::Permanents::Modifications::Power.new(power_modification: 3, until_eot: true)
     end
 
     it "eot modifiers are cleared at end of turn" do
+      game.tick!
       expect(dranas_emissary.power).to eq(5)
 
       go_to_cleanup

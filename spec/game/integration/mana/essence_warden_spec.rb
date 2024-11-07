@@ -37,7 +37,7 @@ RSpec.describe Magic::Game, "Mana spend -- Essence Warden" do
         expect(action.can_perform?).to eq(true)
         action.pay_mana(green: 1)
         game.take_action(action)
-        game.tick!
+        game.stack.resolve!
         expect(p1.mana_pool[:green]).to eq(0)
         expect(p1.permanents.by_name(essence_warden.name).count).to eq(1)
 

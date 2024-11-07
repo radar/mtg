@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::SwiftResponse do
     action.pay_mana(generic: { white: 1 }, white: 1)
     action.targeting(wood_elves)
     game.take_action(action)
-    game.tick!
+    game.stack.resolve!
     expect(wood_elves).to be_dead
   end
 end

@@ -328,6 +328,7 @@ module Magic
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
       remove_until_eot_modifiers!
+      apply_continuous_effects!
     end
 
     def add_counter(counter_type:, amount: 1)

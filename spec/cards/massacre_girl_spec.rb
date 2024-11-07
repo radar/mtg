@@ -14,12 +14,10 @@ RSpec.describe Magic::Cards::MassacreGirl do
         _1.auto_pay_mana
       end
 
-      game.tick!
+      game.stack.resolve!
 
       # This dies to the ETB -1/-1 triggered ability
       expect(wood_elves.card.zone).to be_graveyard
-
-      game.tick!
       # This dies to the "creature died" -1/-1 triggered ability
       expect(alpine_watchdog.card.zone).to be_graveyard
     end

@@ -24,7 +24,7 @@ RSpec.describe Magic::Cards::Shacklegeist do
         _1.targeting(wood_elves)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(wood_elves).to be_tapped
     end

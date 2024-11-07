@@ -13,20 +13,20 @@ module Magic
       end
 
       def apply!
-        puts "Applying continuous effects for #{permanent}"
+        game.logger.debug "Applying continuous effects for #{permanent}"
         # Layer 4
         types = calculate_types
         permanent.types = types
-        puts "Types: #{types}"
+        game.logger.debug "Types: #{types}"
         # Layer 6
         permanent.keywords = calculate_keywords
-        puts "Keywords: #{permanent.keywords}"
+        game.logger.debug "Keywords: #{permanent.keywords}"
         # Layer 7
         if creature?(types)
           permanent.power = calculate_power
-          puts "Power: #{permanent.power}"
+          game.logger.debug "Power: #{permanent.power}"
           permanent.toughness = calculate_toughness
-          puts "Toughness: #{permanent.toughness}"
+          game.logger.debug "Toughness: #{permanent.toughness}"
         end
       end
 
@@ -41,6 +41,7 @@ module Magic
       end
 
       def calculate_power
+        base_power = modifiers_by_type(Modifications::BasePower).last&.base_power || card.base_power
         [
           permanent.counters,
           modifiers_by_type(Modifications::Power),
@@ -48,12 +49,13 @@ module Magic
           permanent.attachments,
         ]
           .flatten
-          .sum(card.base_power) do |modification|
+          .sum(base_power) do |modification|
             modification.power_modification
           end
       end
 
       def calculate_toughness
+        base_toughness = modifiers_by_type(Modifications::BaseToughness).last&.base_toughness || card.base_toughness
         [
           permanent.counters,
           modifiers_by_type(Modifications::Toughness),
@@ -61,7 +63,7 @@ module Magic
           permanent.attachments,
         ]
           .flatten
-          .sum(card.base_toughness) do |modification|
+          .sum(base_toughness) do |modification|
             modification.toughness_modification
           end
       end
@@ -74,6 +76,7 @@ module Magic
         [
           *card.types,
           *permanent.attachments.flat_map(&:type_grants),
+          *modifiers_by_type(Modifications::AdditionalType).flat_map(&:type_grants),
         ].uniq
       end
 

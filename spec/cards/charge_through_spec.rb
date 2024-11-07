@@ -16,7 +16,7 @@ RSpec.describe Magic::Cards::ChargeThrough do
       action.pay_mana(green: 1)
       action.targeting(wood_elves)
       game.take_action(action)
-      game.tick!
+      game.stack.resolve!
       expect(wood_elves.trample?).to eq(true)
       expect(charge_through.zone).to be_graveyard
     end
@@ -35,7 +35,7 @@ RSpec.describe Magic::Cards::ChargeThrough do
       action_2.targeting(wood_elves)
       game.take_action(action_2)
 
-      game.tick!
+      game.stack.resolve!
 
       expect(wood_elves).to be_dead
     end

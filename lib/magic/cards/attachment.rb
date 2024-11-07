@@ -14,6 +14,14 @@ module Magic
         []
       end
 
+      def power_modification
+        0
+      end
+
+      def toughness_modification
+        0
+      end
+
       def can_activate_ability?(_)
         true
       end

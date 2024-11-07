@@ -13,7 +13,7 @@ RSpec.describe Magic::Cards::SureStrike do
       p1.cast(card: sure_strike) do
         _1.pay_mana(generic: { red: 1 }, red: 1).targeting(onakke_ogre)
       end
-      game.tick!
+      game.stack.resolve!
 
       expect(onakke_ogre.power).to eq(7)
       expect(onakke_ogre.toughness).to eq(2)

@@ -12,7 +12,7 @@ RSpec.describe Magic::Cards::TeferisProtoge do
         _1.pay_mana(generic: { blue: 1 }, blue: 1)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       choice = game.choices.last
       expect(choice).to be_a(Magic::Choice::Discard)

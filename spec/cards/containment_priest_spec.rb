@@ -47,7 +47,7 @@ RSpec.describe Magic::Cards::ContainmentPriest do
         p2.cast(card: story_seeker) do
           _1.pay_mana(generic: { white: 1 }, white: 1)
         end
-        game.tick!
+        game.stack.resolve!
 
         expect(game.battlefield.permanents.count).to eq(3)
         expect(game.battlefield.permanents.map(&:name)).to include('Story Seeker')
@@ -72,7 +72,7 @@ RSpec.describe Magic::Cards::ContainmentPriest do
         end
 
         expect{
-          game.tick!
+          game.stack.resolve!
         }.to change { game.exile.cards.count }.by(1)
         expect(game.battlefield.permanents.count).to eq(1)
         expect(game.battlefield.permanents.map(&:name)).to_not include('Story Seeker')

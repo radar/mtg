@@ -11,7 +11,7 @@ RSpec.describe Magic::Cards::TitanicGrowth do
       _1.targeting(wood_elves)
     end
 
-    game.tick!
+    game.stack.resolve!
 
     expect(wood_elves.power).to eq(5)
     expect(wood_elves.toughness).to eq(5)

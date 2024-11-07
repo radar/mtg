@@ -10,6 +10,7 @@ RSpec.describe Magic::Game, "combat -- first striker and Odric" do
   context "when in combat" do
     before do
       skip_to_combat!
+      game.tick!
     end
 
     it "odric gains flying and first strike from battlefield raptor" do

@@ -10,7 +10,7 @@ RSpec.describe Magic::Cards::LifeGoesOn do
         _1.pay_mana(green: 1)
       end
 
-      game.tick!
+      game.stack.resolve!
       expect(p1.life).to eq(24)
     end
   end
@@ -28,7 +28,7 @@ RSpec.describe Magic::Cards::LifeGoesOn do
         _1.pay_mana(green: 1)
       end
 
-      game.tick!
+      game.stack.resolve!
       expect(p1.life).to eq(28)
     end
   end

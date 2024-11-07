@@ -26,12 +26,12 @@ RSpec.describe Magic::Game, "Mana spend -- Foundry Inspector + Free Sol Ring" do
           _1.pay_mana(generic: { red: 3 })
         end
 
-        game.tick!
+        game.stack.resolve!
 
         # Sol Ring cost discounted by 1 by Foundry Inspector, so is free
         p1.cast(card: sol_ring)
 
-        game.tick!
+        game.stack.resolve!
 
         expect(p1.permanents.by_name(sol_ring.name).count).to eq(1)
       end

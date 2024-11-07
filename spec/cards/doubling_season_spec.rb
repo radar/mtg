@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::DoublingSeason do
         _1.auto_pay_mana
       end
 
-      game.tick!
+      game.stack.resolve!
 
       angels = game.battlefield.controlled_by(p1).creatures.by_name("Angel")
       expect(angels.count).to eq(2)
@@ -39,7 +39,7 @@ RSpec.describe Magic::Cards::DoublingSeason do
         _1.auto_pay_mana
       end
 
-      game.tick!
+      game.stack.resolve!
 
       angels = game.battlefield.controlled_by(p1).creatures.by_name("Angel")
       expect(angels.count).to eq(4)
@@ -63,7 +63,7 @@ RSpec.describe Magic::Cards::DoublingSeason do
         _1.auto_pay_mana
       end
 
-      game.tick!
+      game.stack.resolve!
 
       angels = game.battlefield.controlled_by(p1).creatures.by_name("Angel")
       expect(angels.count).to eq(1)

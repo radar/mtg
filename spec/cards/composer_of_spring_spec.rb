@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::ComposerOfSpring do
         _1.pay_mana(generic: { white: 1 }, white: 2)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(game.choices.last).to be_a(Magic::Cards::ComposerOfSpring::LandChoice)
       expect(game.choices.last.choices).to eq(p1.hand.lands)
@@ -23,7 +23,7 @@ RSpec.describe Magic::Cards::ComposerOfSpring do
 
       game.resolve_choice!(target: chosen_land)
 
-      game.tick!
+      game.stack.resolve!
 
       expect(game.battlefield.by_name("Forest").count).to eq(1)
     end
@@ -43,7 +43,7 @@ RSpec.describe Magic::Cards::ComposerOfSpring do
           _1.pay_mana(generic: { white: 1 }, white: 2)
         end
 
-        game.tick!
+        game.stack.resolve!
 
         expect(game.choices.last).to be_a(Magic::Cards::ComposerOfSpring::LandOrCreatureChoice)
         expect(game.choices.last.choices).to eq(p1.hand.lands + p1.hand.creatures)
@@ -52,7 +52,7 @@ RSpec.describe Magic::Cards::ComposerOfSpring do
 
         game.resolve_choice!(target: chosen_creature)
 
-        game.tick!
+        game.stack.resolve!
 
         expect(game.battlefield.by_name(chosen_creature.name).count).to eq(1)
       end

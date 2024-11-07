@@ -21,7 +21,7 @@ RSpec.describe Magic::Cards::ShipwreckDowser do
       _1.targeting(p1.graveyard.first)
     end
 
-    game.tick!
+    game.stack.resolve!
 
     expect(p1.hand.by_name("Shock").count).to eq(1)
   end

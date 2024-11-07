@@ -15,7 +15,7 @@ RSpec.describe Magic::Cards::SilentDart do
       _1.pay_mana(generic: { black: 4 })
     end
 
-    game.tick!
+    game.stack.resolve!
 
     expect(wood_elves.damage).to eq(3)
   end

@@ -26,11 +26,13 @@ RSpec.describe Magic::Permanent do
   context "becomes" do
     let(:permanent) { ResolvePermanent("Riddleform", owner: p1) }
 
-    it "becomes a 3/3 Sphinx creature with flying" do
+    it "becomes a 3/3 Sphinx creature with flying", aggregate_failures: true do
       permanent.add_types(Magic::Types::Creature, Magic::Types::Creatures["Sphinx"])
       permanent.modify_base_power(3)
       permanent.modify_base_toughness(3)
       permanent.grant_keyword(Magic::Keywords::FLYING)
+
+      game.tick!
 
       expect(permanent).to be_a_creature
       expect(permanent.type?("Sphinx")).to eq(true)

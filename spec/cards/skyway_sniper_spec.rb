@@ -18,7 +18,7 @@ RSpec.describe Magic::Cards::SkywaySniper do
         _1.targeting(aven_gagglemaster)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(aven_gagglemaster.damage).to eq(1)
     end

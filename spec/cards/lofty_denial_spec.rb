@@ -19,12 +19,12 @@ RSpec.describe Magic::Cards::LoftyDenial do
         _1.pay_mana(generic: { blue: 1}, blue: 1)
         _1.targeting(sol_ring_cast)
       end
-      game.tick!
+      game.stack.resolve!
     end
 
     it "counters target spell if cost is unpaid" do
       game.resolve_choice!
-      game.tick!
+      game.stack.resolve!
 
       expect(sol_ring.zone).to be_graveyard
     end
@@ -35,7 +35,7 @@ RSpec.describe Magic::Cards::LoftyDenial do
       choice.pay(p2, generic: { white: 1 })
 
       game.resolve_choice!
-      game.tick!
+      game.stack.resolve!
       expect(sol_ring.zone).to be_battlefield
     end
   end
@@ -58,7 +58,7 @@ RSpec.describe Magic::Cards::LoftyDenial do
         _1.targeting(sol_ring_cast)
       end
 
-      game.tick!
+      game.stack.resolve!
       choice = game.choices.first
       expect(choice.costs.first.generic).to eq(4)
     end
@@ -78,7 +78,7 @@ RSpec.describe Magic::Cards::LoftyDenial do
         _1.targeting(sol_ring_cast)
       end
 
-      game.tick!
+      game.stack.resolve!
       choice = game.choices.first
       expect(choice.costs.first.generic).to eq(1)
     end

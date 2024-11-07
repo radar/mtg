@@ -11,7 +11,7 @@ RSpec.describe Magic::Cards::GoblinWizardry do
       p1.cast(card: goblin_wizardry) do
         _1.pay_mana(generic: { red: 3 }, red: 1)
       end
-      game.tick!
+      game.stack.resolve!
     end
 
     def goblin_wizards

@@ -16,7 +16,7 @@ RSpec.describe Magic::Cards::BurnBright do
         _1.pay_mana(red: 1, generic: { red: 2 })
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(onakke_ogre.power).to eq(6)
       expect(onakke_ogre.toughness).to eq(2)
@@ -35,7 +35,7 @@ RSpec.describe Magic::Cards::BurnBright do
       p1.cast(card: burn_bright) do
         _1.pay_mana(red: 1, generic: { red: 2 })
       end
-      game.tick!
+      game.stack.resolve!
 
       expect(cloudkin_seer.power).to eq(2)
       expect(onakke_ogre.power).to eq(6)

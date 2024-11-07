@@ -14,6 +14,7 @@ RSpec.describe Magic::Cards::Dub do
         .pay_mana(white: 1, generic: { white: 2 })
         .targeting(wood_elves)
       game.take_action(action)
+      game.stack.resolve!
       game.tick!
 
       aggregate_failures do

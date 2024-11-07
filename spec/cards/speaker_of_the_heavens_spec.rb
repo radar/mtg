@@ -19,7 +19,7 @@ RSpec.describe Magic::Cards::SpeakerOfTheHeavens do
     action.pay_self_tap
     action.finalize_costs!(p1)
     game.take_action(action)
-    game.tick!
+    game.stack.resolve!
 
     angels = creatures.by_name("Angel")
     expect(angels.count).to eq(1)

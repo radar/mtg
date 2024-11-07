@@ -19,7 +19,7 @@ RSpec.describe Magic::Cards::TeferisTutelage do
       _1.auto_pay_mana
     end
 
-    game.tick!
+    game.stack.resolve!
 
     choice = game.choices.first
     game.resolve_choice!(card: choice.cards.first)

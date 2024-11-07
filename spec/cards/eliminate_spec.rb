@@ -8,13 +8,12 @@ RSpec.describe Magic::Cards::Eliminate do
   let(:eliminate) { Card("Eliminate") }
 
   it "destroys the wood elves" do
-    p2_starting_life = p2.life
     p1.add_mana(black: 2)
     action = cast_action(player: p1, card: eliminate)
     action.pay_mana(generic: { black: 1 }, black: 1)
     action.targeting(wood_elves)
     game.take_action(action)
-    game.tick!
+    game.stack.resolve!
     expect(wood_elves).to be_dead
   end
 end

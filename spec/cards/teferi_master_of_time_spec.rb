@@ -11,7 +11,7 @@ RSpec.describe Magic::Cards::TeferiMasterOfTime do
     it "draws, then discards a card" do
       expect(p1).to receive(:draw!)
       p1.activate_loyalty_ability(ability: ability)
-      game.tick!
+      game.stack.resolve!
       expect(planeswalker.loyalty).to eq(4)
 
       choice = game.choices.last
@@ -29,7 +29,7 @@ RSpec.describe Magic::Cards::TeferiMasterOfTime do
         _1.targeting(wood_elves)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(wood_elves).to be_phased_out
     end
@@ -41,7 +41,7 @@ RSpec.describe Magic::Cards::TeferiMasterOfTime do
     it "take two additional turns" do
       p1.activate_loyalty_ability(ability: ability)
 
-      game.tick!
+      game.stack.resolve!
 
       expect(game.turns.count).to eq(3)
       # Turn 1 (current turn), Turn 2, and Turn 3

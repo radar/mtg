@@ -13,6 +13,7 @@ RSpec.describe Magic::Cards::CrownOfSkemfar do
       .pay_mana(green: 2, generic: { green: 2 })
       .targeting(wood_elves)
     game.take_action(action)
+    game.stack.resolve!
     game.tick!
 
     aggregate_failures do
@@ -38,7 +39,7 @@ RSpec.describe Magic::Cards::CrownOfSkemfar do
         _1.pay_mana(generic: { green: 2 }, green: 1)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(p1.hand).to include(crown_of_skemfar)
     end

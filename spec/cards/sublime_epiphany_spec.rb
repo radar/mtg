@@ -25,7 +25,7 @@ RSpec.describe Magic::Cards::SublimeEpiphany do
       _1.auto_pay_mana
     end
 
-    game.tick!
+    game.stack.resolve!
 
     counter_event = game.current_turn.events.select { |e| e.is_a?(Magic::Events::SpellCountered) }.first
     expect(counter_event.spell).to eq(shock)
@@ -55,7 +55,7 @@ RSpec.describe Magic::Cards::SublimeEpiphany do
       _1.auto_pay_mana
     end
 
-    game.tick!
+    game.stack.resolve!
 
     counter_event = game.current_turn.events.select { |e| e.is_a?(Magic::Events::AbilityCountered) }.first
     expect(counter_event.ability).to eq(igneous_cur.activated_abilities.first)
@@ -77,7 +77,7 @@ RSpec.describe Magic::Cards::SublimeEpiphany do
       _1.auto_pay_mana
     end
 
-    game.tick!
+    game.stack.resolve!
 
     expect(p2.hand).to include(igneous_cur.card)
   end
@@ -95,7 +95,7 @@ RSpec.describe Magic::Cards::SublimeEpiphany do
       _1.auto_pay_mana
     end
 
-    game.tick!
+    game.stack.resolve!
 
     expect(game.battlefield.creatures.by_name("Igneous Cur").count).to eq(2)
   end
@@ -112,7 +112,7 @@ RSpec.describe Magic::Cards::SublimeEpiphany do
       _1.auto_pay_mana
     end
 
-    game.tick!
+    game.stack.resolve!
   end
 
   it "chooses all the modes" do
@@ -169,7 +169,7 @@ RSpec.describe Magic::Cards::SublimeEpiphany do
       _1.auto_pay_mana
     end
 
-    game.tick!
+    game.stack.resolve!
 
     expect(game.battlefield.creatures.by_name("Igneous Cur").count).to eq(2)
   end

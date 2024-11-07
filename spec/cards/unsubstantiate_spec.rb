@@ -25,7 +25,7 @@ RSpec.describe Magic::Cards::Unsubstantiate do
         _1.targeting(game.stack.first)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(unsubstantiate.zone).to be_graveyard
       expect(shock.zone).to be_hand
@@ -48,7 +48,7 @@ RSpec.describe Magic::Cards::Unsubstantiate do
         _1.targeting(wood_elves)
       end
 
-      game.tick!
+      game.stack.resolve!
 
       expect(unsubstantiate.zone).to be_graveyard
       expect(wood_elves.card.zone).to be_hand

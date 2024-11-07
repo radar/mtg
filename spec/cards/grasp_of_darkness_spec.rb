@@ -14,7 +14,7 @@ RSpec.describe Magic::Cards::GraspOfDarkness do
         .pay_mana(black: 2)
         .targeting(wood_elves)
       game.take_action(action)
-      game.tick!
+      game.stack.resolve!
       expect(wood_elves.power).to eq(-3)
       expect(wood_elves.toughness).to eq(-3)
       expect(wood_elves).to be_dead

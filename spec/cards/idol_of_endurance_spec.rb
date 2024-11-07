@@ -33,7 +33,7 @@ RSpec.describe Magic::Cards::IdolOfEndurance do
           .targeting(wood_elves)
           .pay_mana(generic: { white: 1 }, white: 1)
       end
-      game.tick!
+      game.stack.resolve!
 
       expect(idol_of_endurance).to be_tapped
 
