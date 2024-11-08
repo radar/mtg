@@ -6,6 +6,11 @@ module Magic
 
         super
       end
+
+      def by_name(name)
+        super.map { |card| GraveyardCard.new(card: card) }
+      end
+
       def graveyard?
         true
       end

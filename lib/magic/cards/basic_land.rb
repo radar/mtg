@@ -7,7 +7,8 @@ module Magic
       end
 
       def self.color(color)
-        mana_ability = Class.new(Magic::TapManaAbility) do
+        mana_ability = Class.new(Magic::ManaAbility) do
+          costs "{T}"
           choices color
         end
 

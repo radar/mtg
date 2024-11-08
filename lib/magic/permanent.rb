@@ -14,6 +14,9 @@ module Magic
       :controller,
       :card,
       :types,
+      :power,
+      :toughness,
+      :keywords,
       :delayed_responses,
       :attachments,
       :protections,
@@ -68,6 +71,7 @@ module Magic
       @tapped = false
       @types = card.types
       @keyword_grants = card.keyword_grants
+      @activated_abilities = card.activated_abilities
       @counters = Counters::Collection.new([])
       @damage = 0
       @protections = Protections.new(card.protections.dup)
@@ -88,28 +92,20 @@ module Magic
       @types = types
     end
 
-    def power
-      @power
-    end
-
     def power=(power)
       @power = power
-    end
-
-    def toughness
-      @toughness
     end
 
     def toughness=(toughness)
       @toughness = toughness
     end
 
-    def keywords
-      @keywords
-    end
-
     def keywords=(keywords)
       @keywords = keywords
+    end
+
+    def activated_abilities=(abilities)
+      @activated_abilities = abilities
     end
 
     def keyword_grant_modifiers
@@ -118,10 +114,6 @@ module Magic
 
     def inspect
       "#<Magic::Permanent name:#{card.name} controller:#{controller.name}>"
-    end
-
-    def activated_abilities
-      @activated_abilities ||= card.activated_abilities.map { |ability| ability.new(source: self) }
     end
 
     def state_triggered_abilities

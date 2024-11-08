@@ -42,7 +42,7 @@ module Magic
       end
 
       def activated_abilities
-        [ReturnFromGraveyard.new(source: self)]
+        [ReturnFromGraveyard]
       end
     end
   end

@@ -26,14 +26,13 @@ RSpec.describe Magic::Cards::CrownOfSkemfar do
   end
 
   context "return from graveyard to hand" do
-    let(:crown_of_skemfar) { Card("Crown Of Skemfar") }
-
     before do
-      p1.graveyard.add(crown_of_skemfar)
+      p1.graveyard.add(Card("Crown Of Skemfar"))
     end
 
     it "returns to hand" do
-      ability = crown_of_skemfar.activated_abilities.first
+      graveyard_card = p1.graveyard.by_name("Crown of Skemfar").first
+      ability = graveyard_card.activated_abilities.first
       p1.add_mana(green: 3)
       p1.activate_ability(ability: ability) do
         _1.pay_mana(generic: { green: 2 }, green: 1)
@@ -41,7 +40,7 @@ RSpec.describe Magic::Cards::CrownOfSkemfar do
 
       game.stack.resolve!
 
-      expect(p1.hand).to include(crown_of_skemfar)
+      expect(p1.hand.by_name("Crown of Skemfar").count).to eq(1)
     end
   end
 end

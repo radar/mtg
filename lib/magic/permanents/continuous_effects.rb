@@ -19,6 +19,7 @@ module Magic
         permanent.types = types
         game.logger.debug "Types: #{types}"
         # Layer 6
+        permanent.activated_abilities = calculate_activated_abililities
         permanent.keywords = calculate_keywords
         game.logger.debug "Keywords: #{permanent.keywords}"
         # Layer 7
@@ -99,6 +100,14 @@ module Magic
 
       def static_abilities_for(permanent)
         static_abilities.applies_to(permanent)
+      end
+
+      def calculate_activated_abililities
+        [
+          *card.activated_abilities,
+        ].map do |ability|
+          ability.new(source: permanent)
+        end
       end
     end
   end

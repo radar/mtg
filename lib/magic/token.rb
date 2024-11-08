@@ -81,6 +81,10 @@ module Magic
       []
     end
 
+    def activated_abilities
+      []
+    end
+
     def replacement_effects
       {}
     end
