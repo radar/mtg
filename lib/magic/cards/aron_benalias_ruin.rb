@@ -2,7 +2,7 @@ module Magic
   module Cards
     class AronBenaliasRuin < Creature
       card_name "Aron, Benalia's Ruin"
-      type "Legendary Creature -- Phyrexian Human"
+      type T::Super::Legendary, T::Creature, T::Creatures['Phyrexian'], T::Creatures['Human']
       cost white: 2, black: 1
       keywords :menace
       power 3

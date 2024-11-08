@@ -16,6 +16,7 @@ module Magic
         game.logger.debug "Applying continuous effects for #{permanent}"
         # Layer 4
         types = calculate_types
+
         permanent.types = types
         game.logger.debug "Types: #{types}"
         # Layer 6
@@ -77,6 +78,7 @@ module Magic
         [
           *card.types,
           *permanent.attachments.flat_map(&:type_grants),
+          *static_abilities_for(permanent).of_type(Abilities::Static::TypeModification).flat_map(&:type_grants),
           *modifiers_by_type(Modifications::AdditionalType).flat_map(&:type_grants),
         ].uniq
       end
@@ -103,9 +105,13 @@ module Magic
       end
 
       def calculate_activated_abililities
+        class_types = permanent.types.select { |type| type.is_a?(Class) }
         [
           *card.activated_abilities,
-        ].map do |ability|
+          # Land types specifically give one mana ability each
+          *class_types.flat_map { |type| type::ManaAbility},
+        ]
+        .map do |ability|
           ability.new(source: permanent)
         end
       end

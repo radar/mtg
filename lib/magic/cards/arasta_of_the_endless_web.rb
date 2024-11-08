@@ -1,7 +1,7 @@
 module Magic
   module Cards
     ArastaOfTheEndlessWeb = Creature("Arasta of the Endless Web") do
-      type "Legendary Enchantment Creature -- Spider"
+      type Types::Super::Legendary, Types::Enchantment, Types::Creature, T::Creature['Spider']
       cost "{2}{G}{G}"
       power 3
       toughness 5
@@ -10,7 +10,7 @@ module Magic
 
     class ArastaOfTheEndlessWeb < Creature
       SpiderToken = Token.create "Spider" do
-        type "Creature —- Spider"
+        creature_type "Spider"
         power 1
         toughness 2
         keywords :reach

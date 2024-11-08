@@ -18,19 +18,25 @@ RSpec.describe Magic::Cards::DryadOfTheIlysianGrove do
     expect(p1.max_lands_per_turn).to eq(2)
   end
 
-  xit "gives the player access to all basic land types" do
+  it "gives the player access to all basic land types", aggregate_failures: true do
     subject
 
     p1.play_land(land: p1.hand.by_name("Forest").first)
 
+    game.tick!
+
     forest = game.battlefield.by_name("Forest").first
 
-    binding.pry
     expect(forest.type?("Plains")).to eq(true)
     expect(forest.type?("Island")).to eq(true)
     expect(forest.type?("Swamp")).to eq(true)
     expect(forest.type?("Mountain")).to eq(true)
     expect(forest.type?("Forest")).to eq(true)
-    binding.pry
+
+    expect(forest.activated_abilities.any? { |ability| ability.is_a?(Magic::Types::Lands::Plains::ManaAbility ) }).to eq(true)
+    expect(forest.activated_abilities.any? { |ability| ability.is_a?(Magic::Types::Lands::Island::ManaAbility ) }).to eq(true)
+    expect(forest.activated_abilities.any? { |ability| ability.is_a?(Magic::Types::Lands::Swamp::ManaAbility ) }).to eq(true)
+    expect(forest.activated_abilities.any? { |ability| ability.is_a?(Magic::Types::Lands::Mountain::ManaAbility ) }).to eq(true)
+    expect(forest.activated_abilities.any? { |ability| ability.is_a?(Magic::Types::Lands::Forest::ManaAbility ) }).to eq(true)
   end
 end

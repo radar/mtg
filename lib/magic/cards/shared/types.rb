@@ -5,8 +5,12 @@ module Magic
         def self.included(base)
           base.class_eval do
             class << self
-              def type(type)
-                const_set(:TYPE_LINE, type)
+              def set_types(*types)
+                const_set(:TYPE_LINE, types)
+              end
+
+              def types
+                const_get(:TYPE_LINE)
               end
 
               def creature_types(types)
@@ -14,16 +18,16 @@ module Magic
               end
 
               def creature_type(types)
-                type("#{T::Creature} -- #{creature_types(types)}")
+                set_types(T::Creature, *creature_types(types))
               end
 
               def artifact_creature_type(types)
-                type("#{T::Artifact} #{T::Creature} -- #{creature_types(types)}")
+                set_types(T::Artifact, T::Creature, *creature_types(types))
               end
-            end
 
-            def types
-              type_line.scan(/\w+/)
+              def type(*types)
+                set_types(*types)
+              end
             end
           end
         end

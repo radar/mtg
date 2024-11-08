@@ -1,20 +1,12 @@
 module Magic
   module Cards
     class BasicLand < Land
-      def self.card_name(name)
-        const_set(:NAME, name)
-        const_set(:TYPE_LINE, "Basic Land -- #{name}")
+      def self.inherited(klass)
+        klass.const_set(:NAME, klass.name.split("::").last)
       end
 
-      def self.color(color)
-        mana_ability = Class.new(Magic::ManaAbility) do
-          costs "{T}"
-          choices color
-        end
-
-        define_method :activated_abilities do
-          [mana_ability]
-        end
+      def self.type(type)
+        const_set(:TYPE_LINE, [Types::Super::Basic, Types::Land, type])
       end
     end
   end

@@ -10,7 +10,7 @@ module Magic
 
     class ArchonOfSunsGrace < Creature
       PegasusToken = Token.create "Pegasus" do
-        type "Creature —- Pegasus"
+        creature_type "Pegasus"
         power 2
         toughness 2
         colors :white

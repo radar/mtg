@@ -19,11 +19,11 @@ module Magic
 
         def type_grants
           [
-            "Plains",
-            "Island",
-            "Swamp",
-            "Mountain",
-            "Forest",
+            Types::Lands::Plains,
+            Types::Lands::Island,
+            Types::Lands::Swamp,
+            Types::Lands::Mountain,
+            Types::Lands::Forest,
           ]
         end
 

@@ -6,7 +6,7 @@ module Magic
 
     class AngelicAscension
       AngelToken = Token.create "Angel" do
-        type "Creature —- Angel"
+        creature_type "Angel"
         power 4
         toughness 4
         colors :white

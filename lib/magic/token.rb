@@ -3,7 +3,7 @@ module Magic
     include Cards::Shared::Events
     include Cards::Shared::Types
 
-    attr_reader :game, :owner, :name, :type_line, :keywords, :keyword_grants, :protections, :base_power, :base_toughness
+    attr_reader :game, :owner, :name, :types, :keywords, :keyword_grants, :protections, :base_power, :base_toughness
 
     KEYWORDS = []
     PROTECTIONS = []
@@ -40,7 +40,7 @@ module Magic
 
     def initialize(game:, owner:, base_power: self.class::POWER, base_toughness: self.class::TOUGHNESS)
       @name = self.class::NAME
-      @type_line = self.class::TYPE_LINE
+      @types = self.class::TYPE_LINE
       @keywords = self.class::KEYWORDS
       @keyword_grants = []
       @protections = self.class::PROTECTIONS

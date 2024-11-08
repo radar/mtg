@@ -1,8 +1,7 @@
 module Magic
   module Cards
     class Forest < BasicLand
-      card_name "Forest"
-      color :green
+      type Types::Lands::Forest
     end
   end
 end

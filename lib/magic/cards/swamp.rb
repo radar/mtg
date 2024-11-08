@@ -1,8 +1,7 @@
 module Magic
   module Cards
     class Swamp < BasicLand
-      card_name "Swamp"
-      color :black
+      type Types::Lands::Swamp
     end
   end
 end

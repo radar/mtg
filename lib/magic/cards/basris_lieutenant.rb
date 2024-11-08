@@ -1,7 +1,7 @@
 module Magic
   module Cards
     BasrisLieutenant = Creature("Basri's Lieutenant") do
-      creature_type("Human Knight")
+      creature_type "Human Knight"
       cost generic: 3, white: 1
       power 3
       toughness 4
@@ -15,7 +15,7 @@ module Magic
 
     class BasrisLieutenant < Creature
       KnightToken = Token.create "Knight" do
-        type "Creature —- Knight"
+        creature_type "Knight"
         power 2
         toughness 2
         colors :white

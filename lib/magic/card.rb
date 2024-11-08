@@ -7,7 +7,7 @@ module Magic
     include Cards::Keywords
     include Cards::Shared::Events
     include Cards::Shared::Types
-    attr_reader :game, :controller, :owner, :name, :cost, :kicker_cost, :type_line, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :counters, :modes
+    attr_reader :game, :controller, :owner, :name, :cost, :kicker_cost, :types, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :counters, :modes
     attr_accessor :tapped
 
     attr_accessor :zone
@@ -23,8 +23,8 @@ module Magic
         const_set(:NAME, name)
       end
 
-      def type(type)
-        const_set(:TYPE_LINE, type)
+      def type(*types)
+        const_set(:TYPE_LINE, types)
       end
 
       def cost(cost)
@@ -82,7 +82,7 @@ module Magic
     def initialize(game: Game.new, owner:)
       @countered = false
       @name = self.class::NAME
-      @type_line = self.class::TYPE_LINE
+      @types = self.class::TYPE_LINE
       @game = game
       @cost = Costs::Mana.new(self.class::COST.dup)
       @kicker_cost = Costs::Kicker.new(self.class::KICKER_COST.dup)
