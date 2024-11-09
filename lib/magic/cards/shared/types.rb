@@ -14,15 +14,23 @@ module Magic
               end
 
               def creature_types(types)
-                types.split(/(?<!Time) (?!Lord)/).map { T::Creatures[_1] }.join(" ")
+                types.split(/(?<!Time) (?!Lord)/).map { T::Creatures[_1] }
               end
 
               def creature_type(types)
-                set_types(T::Creature, *creature_types(types))
+                type(T::Creature, *creature_types(types))
               end
 
               def artifact_creature_type(types)
                 set_types(T::Artifact, T::Creature, *creature_types(types))
+              end
+
+              def legendary_creature_type(types)
+                set_types(T::Legendary, T::Creature, *creature_types(types))
+              end
+
+              def planeswalker(name)
+                set_types(T::Legendary, T::Planeswalker, name)
               end
 
               def type(*types)

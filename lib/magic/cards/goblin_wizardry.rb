@@ -6,7 +6,7 @@ module Magic
 
     class GoblinWizardry < Instant
       GoblinWizardToken = Token.create "Goblin Wizard" do
-        type "Creature —- Goblin Wizard"
+        creature_type "Goblin Wizard"
         power 1
         toughness 1
         colors :red

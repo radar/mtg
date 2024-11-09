@@ -3,7 +3,7 @@ module Magic
     class Pridemalkin < Creature
       card_name "Pridemalkin"
       cost "{2}{G}"
-      type "Creature -- Cat"
+      creature_type "Cat"
       power 2
       toughness 1
 

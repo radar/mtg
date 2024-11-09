@@ -7,7 +7,7 @@ module Magic
 
     class GriffinAerie < Enchantment
       GriffinToken = Token.create("Griffin") do
-        type "Creature -- Griffin"
+        creature_type "Griffin"
         power 2
         toughness 2
         colors :white

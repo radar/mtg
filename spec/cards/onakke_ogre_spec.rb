@@ -6,7 +6,9 @@ RSpec.describe Magic::Cards::OnakkeOgre do
   let!(:onakke_ogre) { ResolvePermanent("Onakke Ogre", owner: p1) }
 
   it "is an ogre warrior" do
-    expect(onakke_ogre.card.type_line).to eq("Creature -- Ogre Warrior")
+    expect(onakke_ogre.card.types).to include("Ogre")
+    expect(onakke_ogre.card.types).to include("Warrior")
+    expect(onakke_ogre.card.types).to include("Creature")
   end
 
 end

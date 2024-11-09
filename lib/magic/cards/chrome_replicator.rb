@@ -8,7 +8,7 @@ module Magic
       toughness 4
 
       Construct = Token.create "Construct" do
-        type "Artifact Creature —- Construct"
+        type T::Artifact, T::Creature, T::Creatures['Construct']
         power 4
         toughness 4
       end

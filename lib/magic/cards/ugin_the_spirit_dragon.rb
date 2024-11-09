@@ -1,8 +1,8 @@
 module Magic
   module Cards
     class UginTheSpiritDragon < Planeswalker
-      NAME = "Ugin, the Spirit Dragon"
-      TYPE_LINE = "Legendary Planeswalker -- Ugin"
+      card_name "Ugin, the Spirit Dragon"
+      planeswalker "Ugin"
       BASE_LOYALTY = 7
 
       class LoyaltyAbility1 < Magic::LoyaltyAbility

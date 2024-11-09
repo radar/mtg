@@ -12,7 +12,9 @@ RSpec.describe Magic::Cards::ContainmentPriest do
 
   context "card attributes" do
     it "is a human cleric" do
-      expect(subject.card.type_line).to eq("Creature -- Human Cleric")
+      expect(subject.card.types).to include("Creature")
+      expect(subject.card.types).to include("Human")
+      expect(subject.card.types).to include("Cleric")
     end
 
     it "has flash" do

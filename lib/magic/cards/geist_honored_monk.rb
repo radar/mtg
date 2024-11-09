@@ -2,13 +2,13 @@ module Magic
   module Cards
     GeistHonoredMonk = Creature("Geist Honored Monk") do
       cost generic: 3, white: 2
-      creature_type("Human Monk")
+      creature_type "Human Monk"
       keywords :vigilance
     end
 
     class GeistHonoredMonk < Creature
       SpiritToken = Token.create "Spirit" do
-        type "Creature —- Spirit"
+        creature_type "Spirit"
         power 1
         toughness 1
         colors :white

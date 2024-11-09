@@ -1,7 +1,7 @@
 module Magic
   module Cards
     DryadOfTheIlysianGrove = Creature("Dryad of the Ilysian Grove") do
-      type "#{T::Enchantment} #{T::Creature} -- #{creature_types("Nymph Dryad")}"
+      type T::Enchantment, T::Creature, *creature_types("Nymph Dryad")
 
       power 2
       toughness 4

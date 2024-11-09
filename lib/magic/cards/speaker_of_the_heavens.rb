@@ -4,11 +4,11 @@ module Magic
       power 1
       toughness 1
       cost white: 1
-      creature_type("Human Cleric")
+      creature_type "Human Cleric"
       keywords :vigilance, :lifelink
 
       AngelToken = Token.create("Angel") do
-        type "Creature -- Angel"
+        creature_type "Angel"
         power 4
         toughness 4
         keywords :flying

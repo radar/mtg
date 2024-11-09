@@ -9,7 +9,7 @@ module Magic
 
     class FalconerAdept < Creature
       BirdToken = Token.create("Bird") do
-        type "Creature — Bird"
+        creature_type "Bird"
         power 1
         toughness 1
         colors :white

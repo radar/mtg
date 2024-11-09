@@ -2,7 +2,7 @@ module Magic
   module Cards
     RoamingGhostlight = Creature("Roaming Ghostlight") do
       cost generic: 3, blue: 2
-      type "Creature -- Spirit"
+      creature_type "Spirit"
       power 3
       toughness 2
       keywords :flying

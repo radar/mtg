@@ -2,7 +2,7 @@ module Magic
   module Cards
     class DireFleetWarmonger < Creature
       card_name "Dire Fleet Warmonger"
-      type "Creature -- Orc Pirate"
+      creature_type "Orc Pirate"
       cost generic: 1, black: 1, red: 1
       power 3
       toughness 3

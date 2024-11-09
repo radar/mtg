@@ -7,7 +7,8 @@ RSpec.describe Magic::Cards::MistralSinger do
 
   context 'base card atrributes' do
     it "is a siren" do
-      expect(subject.card.type_line).to eq("Creature -- Siren")
+      expect(subject.card.types).to include("Siren")
+      expect(subject.card.types).to include("Creature")
     end
 
     it "Has flying" do

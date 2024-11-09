@@ -2,7 +2,7 @@ module Magic
   module Cards
     class MassacreGirl < Creature
       card_name "Massacre Girl"
-      type "Legendary Creature -- Human Assassin"
+      legendary_creature_type "Human Assassin"
       cost generic: 3, black: 2
       power 4
       toughness 4

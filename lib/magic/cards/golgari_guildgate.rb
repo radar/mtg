@@ -1,7 +1,7 @@
 module Magic
   module Cards
     GolgariGuildgate = Card("Golgari Guildgate") do
-      type "Land -- Gate"
+      type T::Land, T::Lands::Gate
     end
 
     class GolgariGuildgate < Card

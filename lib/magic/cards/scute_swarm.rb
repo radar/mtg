@@ -8,7 +8,7 @@ module Magic
 
     class ScuteSwarm < Creature
       InsectToken = Token.create("Insect") do
-        type "Creature -- Insect"
+        creature_type "Insect"
         power 1
         toughness 1
       end

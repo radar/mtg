@@ -3,7 +3,7 @@ module Magic
     class ContainmentPriest < Creature
       card_name "Containment Priest"
       cost generic: 1, white: 1
-      creature_type("Human Cleric")
+      creature_type "Human Cleric"
       keywords :flash
       power 2
       toughness 2

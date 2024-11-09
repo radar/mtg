@@ -3,7 +3,7 @@ module Magic
     class DoomwakeGiant < Creature
       card_name "Doomwake Giant"
       cost generic: 4, black: 1
-      type "Enchantment Creature -- Giant"
+      type T::Enchantment, T::Creature, T::Creatures["Giant"]
       power 4
       toughness 6
 

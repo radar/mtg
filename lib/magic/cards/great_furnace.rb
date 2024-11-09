@@ -1,8 +1,8 @@
 module Magic
   module Cards
     class GreatFurnace < Land
-      NAME = "Great Furnace"
-      TYPE_LINE = "Artifact Land"
+      card_name "Great Furnace"
+      type T::Artifact, T::Land
 
       class ManaAbility < Magic::ManaAbility
         costs "{T}"

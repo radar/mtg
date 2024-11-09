@@ -11,7 +11,6 @@ RSpec.describe Magic::Cards::GolgariGuildgate do
   end
 
   it "enters the battlefield tapped" do
-    game.stack.resolve!
     expect(permanent).to be_tapped
   end
 

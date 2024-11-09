@@ -2,7 +2,7 @@ module Magic
   module Cards
     FoundryInspector = Creature("Foundry Inspector") do
       cost generic: 3
-      type "Artifact Creature -- Constructor"
+      type T::Artifact, T::Creature, T::Creatures["Construct"]
       power 3
       toughness 2
 

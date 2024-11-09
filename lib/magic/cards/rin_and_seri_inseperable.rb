@@ -2,21 +2,21 @@ module Magic
   module Cards
     RinAndSeriInseperable = Creature("Rin and Seri, Inseparable") do
       cost "{1}{R}{G}{W}"
-      type "Legendary Creature — Dog Cat"
+      legendary_creature_type "Dog Cat"
       power 4
       toughness 4
     end
 
     class RinAndSeriInseperable < Creature
       CatToken = Token.create "Cat" do
-        type "Creature —- Cat"
+        creature_type "Cat"
         power 1
         toughness 1
         colors :green
       end
 
       DogToken = Token.create "Dog" do
-        type "Creature —- Dog"
+        creature_type "Dog"
         power 1
         toughness 1
         colors :white

@@ -1,9 +1,9 @@
 module Magic
   module Cards
     class BasriKet < Planeswalker
-      NAME = "Basri Ket"
-      TYPE_LINE = "#{T::Legendary} #{T::Planeswalker} -- Basri"
-      BASE_LOYALTY = 3
+      card_name "Basri Ket"
+      type T::Legendary, T::Planeswalker, "Basri"
+      loyalty 3
 
       class Emblem < Magic::Emblem
         def receive_event(event)

@@ -5,11 +5,11 @@ RSpec.describe Magic::Cards::ColossalDreadmaw do
 
   subject! { ResolvePermanent("Colossal Dreadmaw", owner: p1) }
 
-  context 'base card atrributes' do 
+  context 'base card atrributes' do
     it "is a dinosaur" do
-      expect(subject.card.type_line).to eq("Creature -- Dinosaur")
+      expect(subject.card.types).to include("Dinosaur")
     end
-  
+
     it "Has trample" do
       expect(subject.trample?).to eq(true)
     end
@@ -18,6 +18,6 @@ RSpec.describe Magic::Cards::ColossalDreadmaw do
       expect(subject.power).to eq(6)
       expect(subject.toughness).to eq(6)
     end
-  end 
- 
+  end
+
 end

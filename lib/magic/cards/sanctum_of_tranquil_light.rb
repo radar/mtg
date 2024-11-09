@@ -1,7 +1,7 @@
 module Magic
   module Cards
     SanctumOfTranquilLight = Enchantment("Sanctum of Tranquil Light") do
-      type "Legendary Enchantment -- Shrine"
+      type T::Legendary, T::Enchantment, "Shrine"
       cost white: 1
     end
 

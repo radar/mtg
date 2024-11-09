@@ -1,7 +1,7 @@
 module Magic
   module Cards
     LathrilBladeOfTheElves = Creature("Lathril, Blade of the Elves") do
-      creature_type "Elf Noble"
+      type T::Super::Legendary, T::Creature, *creature_types("Elf Noble")
       cost generic: 2, black: 1, green: 1
       power 2
       toughness 3
@@ -10,7 +10,7 @@ module Magic
 
     class LathrilBladeOfTheElves < Creature
       ElfWarriorToken = Token.create "Elf Warrior" do
-        type "Creature —- Elf Warror"
+        creature_type "Elf Warrior"
         power 1
         toughness 1
         colors :green

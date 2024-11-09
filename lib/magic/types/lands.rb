@@ -2,6 +2,7 @@
 module Magic
   module Types
     module Lands
+      Gate = "Gate".freeze
       class BasicLand
         def self.==(other)
           self.name.split("::").last == other
