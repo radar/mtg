@@ -31,7 +31,7 @@ module Magic
             game.add_effect(Effects::DealDamage.new(source: source, **args))
           when :destroy_target
             game.add_effect(Effects::DestroyTarget.new(source: source, **args))
-          when :draw_cards
+          when :draw_cards, :draw_card, :draw
             game.add_effect(Effects::DrawCards.new(source: source, **args))
           when :exile
             if args[:target].is_a?(Permanent)

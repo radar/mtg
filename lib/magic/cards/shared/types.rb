@@ -25,6 +25,10 @@ module Magic
                 set_types(T::Artifact, T::Creature, *creature_types(types))
               end
 
+              def enchantment_creature_type(types)
+                set_types(T::Enchantment, T::Creature, *creature_types(types))
+              end
+
               def legendary_creature_type(types)
                 set_types(T::Legendary, T::Creature, *creature_types(types))
               end
