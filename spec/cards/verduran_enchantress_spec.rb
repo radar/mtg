@@ -16,7 +16,10 @@ RSpec.describe Magic::Cards::VerduranEnchantress do
 
       game.tick!
 
+      expect(p1).to receive(:draw!)
       expect(game.choices.last).to be_a(Magic::Cards::VerduranEnchantress::Choice)
+
+      game.resolve_choice!
     end
   end
 end
