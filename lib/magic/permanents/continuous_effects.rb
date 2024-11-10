@@ -75,12 +75,14 @@ module Magic
       end
 
       def calculate_types
-        [
+        types = [
           *card.types,
           *permanent.attachments.flat_map(&:type_grants),
-          *static_abilities_for(permanent).of_type(Abilities::Static::TypeModification).flat_map(&:type_grants),
+          *static_abilities_for(permanent).of_type(Abilities::Static::TypeGrant).flat_map(&:type_grants),
           *modifiers_by_type(Modifications::AdditionalType).flat_map(&:type_grants),
-        ].uniq
+        ]
+
+        types -= static_abilities_for(permanent).of_type(Abilities::Static::TypeRemoval).flat_map(&:type_removal)
       end
 
       def calculate_keywords

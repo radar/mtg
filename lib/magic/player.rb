@@ -278,5 +278,9 @@ module Magic
     def add_counter(counter_type:, amount: 1)
       @counters = Counters::Collection.new(@counters + [counter_type.new] * amount)
     end
+
+    def devotion(color)
+      permanents.sum { |permanent| permanent.devotion(color) }
+    end
   end
 end

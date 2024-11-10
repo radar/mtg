@@ -10,7 +10,7 @@ module Magic
     class ElderfangRitualist < Creature
       class Choice < Choice::SearchGraveyard
         def choices
-          controller.graveyard.by_type("Elf")
+          controller.graveyard.cards.all("Elf")
         end
 
         def choice_amount

@@ -383,6 +383,10 @@ module Magic
       @phased_out = false
     end
 
+    def devotion(color)
+      card.cost.send(color) || 0
+    end
+
     private
 
     def remove_until_eot_keyword_grants!

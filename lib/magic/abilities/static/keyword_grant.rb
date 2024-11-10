@@ -8,10 +8,6 @@ module Magic
           define_method(:keyword_grants) { keywords }
         end
 
-        def initialize(source:)
-          @source = source
-        end
-
         def apply_to(permanent)
           if applicable_targets.include?(permanent)
             keyword_grants

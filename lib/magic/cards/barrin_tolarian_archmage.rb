@@ -4,7 +4,7 @@ module Magic
       power 2
       toughness 2
       cost "{1}{U}{U}"
-      type "#{T::Legendary} #{T::Creature} -- #{creature_types("Human Wizard")}"
+      type "#{T::Super::Legendary} #{T::Creature} -- #{creature_types("Human Wizard")}"
     end
 
     class BarrinTolarianArchmage < Creature

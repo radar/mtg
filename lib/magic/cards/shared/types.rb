@@ -30,11 +30,11 @@ module Magic
               end
 
               def legendary_creature_type(types)
-                set_types(T::Legendary, T::Creature, *creature_types(types))
+                set_types(T::Super::Legendary, T::Creature, *creature_types(types))
               end
 
               def planeswalker(name)
-                set_types(T::Legendary, T::Planeswalker, name)
+                set_types(T::Super::Legendary, T::Planeswalker, name)
               end
 
               def type(*types)

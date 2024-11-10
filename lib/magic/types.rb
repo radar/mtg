@@ -56,7 +56,7 @@ module Magic
     end
 
     def legendary?
-      type?(T::Legendary)
+      type?(T::Super::Legendary)
     end
   end
 

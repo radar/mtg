@@ -1,7 +1,7 @@
 module Magic
   module Cards
     OdricLunarchMarshal = Creature("Odric, Lunarch Marshal") do
-      type T::Legendary, T::Creature, *creature_types("Human Soldier")
+      type T::Super::Legendary, T::Creature, *creature_types("Human Soldier")
       cost generic: 3, white: 1
       power 3
       toughness 3

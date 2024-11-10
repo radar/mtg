@@ -2,7 +2,7 @@ module Magic
   module Cards
     class BasriKet < Planeswalker
       card_name "Basri Ket"
-      type T::Legendary, T::Planeswalker, "Basri"
+      type T::Super::Legendary, T::Planeswalker, "Basri"
       loyalty 3
 
       class Emblem < Magic::Emblem

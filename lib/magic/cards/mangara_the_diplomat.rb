@@ -2,7 +2,7 @@ module Magic
   module Cards
     MangaraTheDiplomat = Creature("Mangara, the Diplomat") do
       cost generic: 3, white: 1
-      type T::Legendary, T::Creature, *creature_types("Human Cleric")
+      type T::Super::Legendary, T::Creature, *creature_types("Human Cleric")
       power 2
       toughness 4
       keywords :lifelink

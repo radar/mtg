@@ -1,7 +1,7 @@
 module Magic
   module Cards
     SanctumOfCalmWaters = Enchantment("Sanctum of Calm Waters") do
-      type T::Legendary, T::Enchantment, "Shrine"
+      type T::Super::Legendary, T::Enchantment, "Shrine"
       cost generic: 3, blue: 1
 
       def event_handlers

@@ -1,10 +1,11 @@
 module Magic
   module Abilities
     module Static
-      class TypeModification < StaticAbility
+      class TypeRemoval < StaticAbility
         attr_reader :source, :applicable_targets
-        def initialize(source:)
-          @source = source
+
+        def self.type_removal(*types)
+          define_method(:type_removal) { types }
         end
 
         def applies_to?(target)

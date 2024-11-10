@@ -8,10 +8,6 @@ module Magic
           define_method(:type_grants) { keywords }
         end
 
-        def initialize(source:)
-          @source = source
-        end
-
         def applies_to?(target)
           applicable_targets.include?(target)
         end

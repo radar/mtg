@@ -12,7 +12,7 @@ module Magic
 
     class DryadOfTheIlysianGrove < Creature
       # Parent class here should be called "Continuous Effect as per Rule 611"
-      class TypeModification < Abilities::Static::TypeModification
+      class TypeModification < Abilities::Static::TypeGrant
         def initialize(source:)
           @source = source
         end
