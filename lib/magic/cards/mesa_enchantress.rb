@@ -1,13 +1,13 @@
 module Magic
   module Cards
-    VerduranEnchantress = Creature("Verduran Enchantress") do
-      cost green: 2, white: 1
+    MesaEnchantress = Creature("Verduran Enchantress") do
+      cost white: 2, generic: 1
       power 0
       toughness 2
       creature_type "Human Druid"
     end
 
-    class VerduranEnchantress < Creature
+    class MesaEnchantress < Creature
       class Choice < Magic::Choice::May
         def resolve!
           controller.draw!
@@ -20,7 +20,7 @@ module Magic
         end
 
         def call
-          game.add_choice(VerduranEnchantress::Choice.new(actor: actor))
+          game.add_choice(MesaEnchantress::Choice.new(actor: actor))
         end
       end
 
