@@ -19,19 +19,19 @@ module Magic
       end
 
       class Chapter1 < Chapter
-        def start
+        def resolve
           actor.trigger_effect(:create_token, token_class: HumanWarriorToken)
         end
       end
 
       class Chapter2 < Chapter
-        def start
+        def resolve
           actor.trigger_effect(:create_token, token_class: ElfWarriorToken)
         end
       end
 
       class Chapter3 < Chapter
-        def start
+        def resolve
           actor.game.add_choice(BattleForBretagard::Choice.new(actor: actor))
         end
       end

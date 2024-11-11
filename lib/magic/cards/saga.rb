@@ -7,6 +7,29 @@ module Magic
         def initialize(actor:)
           @actor = actor
         end
+
+        def name
+          self.class.name.split("::").last
+        end
+
+        def resolve!
+          resolve
+
+          if final_chapter?
+            card.game.notify!(Events::FinalChapterAbilityResolved, actor: actor)
+            actor.sacrifice!
+          end
+        end
+
+        def final_chapter?
+          card.chapters.count == actor.counters.of_type(Counters::Lore).count
+        end
+
+        private
+
+        def card
+          actor.card
+        end
       end
 
       type T::Enchantment, "Saga"
@@ -23,9 +46,7 @@ module Magic
         def call
           lore_counters = actor.counters.of_type(Counters::Lore)
           chapter_class = card.chapter(lore_counters)
-          chapter_class.new(actor: actor).start
-
-          actor.sacrifice! if card.chapters.count == lore_counters.count
+          game.stack.add(chapter_class.new(actor: actor))
         end
       end
 

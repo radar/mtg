@@ -14,7 +14,7 @@ RSpec.describe "Saga Lore Counters" do
   context "as a card" do
     let(:card) { Card("Battle For Bretagard") }
 
-    it "adds a lore counter when it enters" do
+    it "adds a lore counter when it enters, and for each main phase" do
       p1.add_mana(white: 2, green: 1)
       p1.cast(card: card) do
         _1.auto_pay_mana
@@ -40,6 +40,8 @@ RSpec.describe "Saga Lore Counters" do
 
       expect(permanent.counters.of_type(Magic::Counters::Lore).count).to eq(2)
 
+      game.stack.resolve!
+
       elf_warrior = game.battlefield.by_name("Elf Warrior")
       expect(elf_warrior.count).to eq(1)
 
@@ -51,6 +53,8 @@ RSpec.describe "Saga Lore Counters" do
       turn_5.upkeep!
       turn_5.draw!
       turn_5.first_main!
+
+      game.stack.resolve!
 
       expect(game.battlefield.by_name("Battle for Bretagard")).to be_empty
       expect(card.zone).to be_graveyard
