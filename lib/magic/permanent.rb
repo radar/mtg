@@ -142,6 +142,17 @@ module Magic
       @copy
     end
 
+    def copy!
+      self.class.resolve(
+        game: game,
+        owner: owner,
+        card: card,
+        token: token?,
+        cast: false,
+        copy: true,
+      )
+    end
+
     def cast?
       @cast
     end

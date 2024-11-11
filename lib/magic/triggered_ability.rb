@@ -24,6 +24,10 @@ module Magic
       event.permanent.types.include?(type)
     end
 
+    def card
+      actor.card
+    end
+
     def perform!
       return unless should_perform?
       call
