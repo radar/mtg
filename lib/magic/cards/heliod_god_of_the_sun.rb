@@ -6,6 +6,27 @@ module Magic
       keywords :indestructible
       power 5
       toughness 6
+    end
+
+    class HeliodGodOfTheSun < Creature
+      ClericToken = Token.create "Cleric" do
+        type T::Enchantment, T::Creature, T::Creatures["Cleric"]
+        power 1
+        toughness 1
+        colors :white
+      end
+
+      class ActivatedAbility < Magic::ActivatedAbility
+        def costs = [Costs::Mana.new(generic: 2, white: 2)]
+
+        def resolve!
+          source.create_token(token_class: ClericToken)
+        end
+      end
+
+      def activated_abilities
+        [ActivatedAbility]
+      end
 
       class TypeModification < Abilities::Static::TypeRemoval
         def initialize(source:)

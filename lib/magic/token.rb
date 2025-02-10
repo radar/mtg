@@ -74,6 +74,10 @@ module Magic
       false
     end
 
+    def cost
+      Costs::Mana.new({})
+    end
+
     def receive_notification(...)
     end
 
