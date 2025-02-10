@@ -11,7 +11,7 @@ module Magic
     class HeliodGodOfTheSun < Creature
       ClericToken = Token.create "Cleric" do
         type T::Enchantment, T::Creature, T::Creatures["Cleric"]
-        power 1
+        power 2
         toughness 1
         colors :white
       end

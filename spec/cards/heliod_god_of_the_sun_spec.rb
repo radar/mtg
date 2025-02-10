@@ -57,7 +57,7 @@ RSpec.describe Magic::Cards::HeliodGodOfTheSun do
         expect(cleric).to be_an_enchantment
         expect(cleric.colors).to eq([:white])
         expect(cleric).to be_creature
-        expect(cleric.power).to eq(1)
+        expect(cleric.power).to eq(2)
         expect(cleric.toughness).to eq(1)
       end
     end
