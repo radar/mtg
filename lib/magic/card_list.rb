@@ -95,5 +95,12 @@ module Magic
     def reject(&condition)
       self.class.new(super(&condition))
     end
+
+    # filters are an array of methods to filter by
+    def filter(filters)
+      self.class.new(filters.reduce(self) do |cards, filter|
+        cards.send(filter)
+      end)
+    end
   end
 end

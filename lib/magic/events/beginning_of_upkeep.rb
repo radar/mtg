@@ -8,7 +8,7 @@ module Magic
       end
 
       def inspect
-        "#<Events::BeginningOfUpkeep>"
+        "#<Events::BeginningOfUpkeep player=#{player}>"
       end
     end
   end

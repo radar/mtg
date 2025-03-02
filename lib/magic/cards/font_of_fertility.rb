@@ -6,9 +6,14 @@ module Magic
     end
 
     class FontOfFertility < Enchantment
-      class Choice < Magic::Choice::SearchLibraryForBasicLand
+      class Choice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, enters_tapped: true)
+          super(
+            actor: actor,
+            to_zone: :battlefield,
+            enters_tapped: true,
+            filter: Filter[:basic_lands]
+          )
         end
       end
 

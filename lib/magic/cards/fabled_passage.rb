@@ -7,13 +7,9 @@ module Magic
         receiver.controller.library.basic_lands
       end
 
-      class Choice < Magic::Choice::SearchLibraryForBasicLand
+      class Choice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, enters_tapped: true)
-        end
-
-        def choices
-          controller.library.basic_lands
+          super(actor: actor, to_zone: :battlefield, filter: Filter[:basic_lands], upto: 1, enters_tapped: true)
         end
 
         def resolve!(target:)

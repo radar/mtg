@@ -44,8 +44,5 @@ RSpec.describe Magic::Cards::BattleForBretagard do
     expect(elf_warrior).to have_keyword(:deathtouch)
 
     expect(battle_for_bretagard.card.zone).to be_graveyard
-
-
-
   end
 end
