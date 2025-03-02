@@ -12,6 +12,10 @@ module Magic
       Card(name, Magic::Cards::Enchantment, &block)
     end
 
+    def Saga(name, &block)
+      Card(name, Magic::Cards::Saga, &block)
+    end
+
     def Aura(name, &block)
       Card(name, Magic::Cards::Aura, &block)
     end

@@ -1,6 +1,6 @@
 module Magic
   module Cards
-    MesaEnchantress = Creature("Verduran Enchantress") do
+    MesaEnchantress = Creature("Mesa Enchantress") do
       cost white: 2, generic: 1
       power 0
       toughness 2
