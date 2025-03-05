@@ -7,7 +7,7 @@ module Magic
       power 3
       toughness 3
 
-      class Choice < Magic::Choice
+      class Choice < Magic::Choice::May
         def target_choices
           other_creatures_you_control
         end
@@ -19,17 +19,21 @@ module Magic
         end
       end
 
-      def event_handlers
-      {
-        Events::BeginningOfCombat => -> (receiver, event) do
-          return unless event.active_player == owner
-
-          game.choices.add(DireFleetWarmonger::Choice.new(actor: receiver))
-
-
+      class BeginningOfCombatTrigger < TriggeredAbility
+        def should_perform?
+          event.active_player == controller
         end
-      }
+
+        def call
+          game.choices.add(DireFleetWarmonger::Choice.new(actor: actor))
+        end
+      end
+
+      def event_handlers
+        {
+          Events::BeginningOfCombat => BeginningOfCombatTrigger
+        }
+      end
     end
   end
-end
 end

@@ -8,27 +8,28 @@ module Magic
     end
 
     class EpicureOfBlood < Creature
+      class LifeGainTrigger < TriggeredAbility
+        def should_perform?
+          event.player == controller
+        end
 
-      def target_choices(receiver)
-        game.opponents(receiver.controller)
+        def call
+          opponents = game.opponents(controller)
+          opponents.each do |opponent|
+            trigger_effect(
+              :lose_life,
+              source: actor,
+              life: 1,
+              target: opponent,
+            )
+          end
+        end
       end
 
       def event_handlers
         {
           # Whenever you gain life, each opponent loses 1 life.
-          Events::LifeGain => -> (receiver, event) do
-            return unless event.player == receiver.controller
-
-            opponents = game.opponents(receiver.controller)
-            opponents.each do |opponent|
-              trigger_effect(
-                :lose_life,
-                source: receiver,
-                life: 1,
-                target: opponent,
-              )
-            end
-          end
+          Events::LifeGain => LifeGainTrigger
         }
       end
     end
