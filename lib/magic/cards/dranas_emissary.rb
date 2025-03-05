@@ -9,26 +9,27 @@ module Magic
     end
 
     class DranasEmissary < Creature
-      def target_choices(permanent)
-        permanent.game.opponents(permanent.controller)
+      class BeginningOfUpkeepTrigger < TriggeredAbility
+        def should_perform?
+          controllers_turn?
+        end
+
+        def call
+          controller.gain_life(1)
+
+          opponents.each do |opponent|
+            actor.trigger_effect(
+              :deal_damage,
+              damage: 1,
+              target: opponent,
+            )
+          end
+        end
       end
 
       def event_handlers
         {
-          Events::BeginningOfUpkeep => -> (receiver, event) do
-            controller = receiver.controller
-            return unless game.current_turn.active_player == controller
-
-            controller.gain_life(1)
-
-            opponents.each do |opponent|
-              receiver.trigger_effect(
-                :deal_damage,
-                damage: 1,
-                target: opponent,
-              )
-            end
-          end
+          Events::BeginningOfUpkeep => BeginningOfUpkeepTrigger
         }
       end
     end
