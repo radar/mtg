@@ -12,6 +12,14 @@ module Magic
       controller == event.player
     end
 
+    def controllers_turn?
+      game.current_turn.active_player == controller
+    end
+
+    def life_gained_by(controller)
+      game.current_turn.life_gained_by_player(controller)
+    end
+
     def opponent?
       !you?
     end

@@ -208,6 +208,9 @@ module Magic
         game.stack.empty? && active_player == player
       end
 
+      def life_gained_by_player(player)
+        events.select { |event| event.is_a?(Events::LifeGain) && event.player == player }.sum(&:life)
+      end
 
       private
 
