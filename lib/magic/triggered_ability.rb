@@ -24,6 +24,10 @@ module Magic
       !you?
     end
 
+    def opponents
+      game.opponents(controller)
+    end
+
     def this?
       actor == event.permanent
     end

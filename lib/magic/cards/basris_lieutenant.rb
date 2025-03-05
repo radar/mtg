@@ -36,15 +36,22 @@ module Magic
         end
       end
 
+      # Whenever this creature or another creature you control dies, ...
+      class CreatureDiedTrigger < TriggeredAbility
+        def should_perform?
+          event.controller == actor.controller &&
+            event.permanent.counters.of_type(Counters::Plus1Plus1).any?
+        end
+
+        def call
+          actor.trigger_effect(:create_token, token_class: KnightToken)
+        end
+      end
+
+
       def event_handlers
         {
-          Events::CreatureDied => -> (receiver, event) do
-            return unless event.permanent.controller == receiver.controller
-
-            if event.permanent.counters.any? { |counter| counter.is_a?(Counters::Plus1Plus1) }
-              trigger_effect(:create_token, token_class: KnightToken)
-            end
-          end
+          Events::CreatureDied => CreatureDiedTrigger
         }
       end
     end
