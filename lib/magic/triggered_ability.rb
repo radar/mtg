@@ -1,7 +1,10 @@
 module Magic
   class TriggeredAbility
+    extend Forwardable
     include BattlefieldFilters
     attr_reader :event, :actor
+
+    def_delegators :@actor, :trigger_effect
 
     def initialize(event:, actor:)
       @event = event

@@ -6,6 +6,10 @@ module Magic
       define_method(:applicable_targets, block)
     end
 
+    def self.conditions(&block)
+      define_method(:conditions_met?, &block)
+    end
+
     def self.applies_to_target
       define_method(:applicable_targets) { [source.attached_to] }
     end
@@ -24,15 +28,11 @@ module Magic
       source.controller
     end
 
-    # def power_modification
-    #   0
-    # end
-
-    # def toughness_modification
-    #   0
-    # end
-
     def applies_to?(_permanent)
+      true
+    end
+
+    def conditions_met?
       true
     end
   end

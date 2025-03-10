@@ -15,6 +15,12 @@ module Magic
           end
         end
 
+        def self.creatures_you_control
+          define_method(:applicable_targets) do
+            source.controller.creatures
+          end
+        end
+
         def power_modification
           0
         end

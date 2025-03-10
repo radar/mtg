@@ -23,7 +23,9 @@ module Magic
 
     def applies_to(card)
       select do |ability|
-        ability.applies_to?(card)
+        # Some static abilities, like Righteous Valkyrie's, depend on a "global" condition
+        # Some others only apply on a card-by-card basis
+        ability.conditions_met? && ability.applies_to?(card)
       end
     end
   end

@@ -8,14 +8,20 @@ module Magic
     end
 
     class EssenceWarden < Creature
+      class EntersTrigger < TriggeredAbility
+        def should_perform?
+          event.permanent != actor
+        end
+
+        def call
+          trigger_effect(:gain_life, source: actor, life: 1)
+        end
+      end
+
       def event_handlers
         {
-          # Whenever another creature eenters the battefield, you gain 1 life.
-          Events::EnteredTheBattlefield => -> (receiver, event) do
-            return if event.permanent == receiver
-
-            trigger_effect(:gain_life, source: receiver, life: 1)
-          end
+          # Whenever another creature enters the battlefield, you gain 1 life.
+          Events::EnteredTheBattlefield => EntersTrigger
         }
       end
     end

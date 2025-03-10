@@ -178,6 +178,7 @@ module Magic
       if handler_class
         # TODO: deprecate procs, move to classes
         if handler_class.is_a?(Proc)
+          raise "Proc-based class for #{card}"
           handler_class.call(self, event)
         else
           logger.debug "EVENT HANDLER: #{self} handling #{event}"
