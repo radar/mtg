@@ -36,8 +36,8 @@ module Magic
           this?
         end
 
-        def resolve
-          Choice.new(actor: actor)
+        def call
+          game.choices.add(Choice.new(actor: actor))
         end
       end
 
