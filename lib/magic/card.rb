@@ -241,5 +241,15 @@ module Magic
     def opponents
       game.opponents(controller)
     end
+
+    def receive_event(event)
+      handler_class = event_handlers[event.class]
+      if handler_class
+        logger.debug "EVENT HANDLER: #{self} handling #{event}"
+        handler = handler_class.new(actor: self, event: event)
+
+        handler.perform!
+      end
+    end
   end
 end

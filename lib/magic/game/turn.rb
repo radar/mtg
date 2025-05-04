@@ -195,7 +195,10 @@ module Magic
           if event
             emblems.each { |emblem| emblem.receive_event(event) }
             battlefield.receive_event(event)
-            players.each { |player| player.receive_event(event) }
+            players.each do |player|
+              player.graveyard.each { _1.receive_event(event) }
+              player.receive_event(event)
+            end
           end
         end
       end
