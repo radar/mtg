@@ -8,14 +8,19 @@ module Magic
     end
 
     class HealerOfThePride < Creature
+      class EntersTrigger < TriggeredAbility::EnterTheBattlefield
+        def should_perform?
+          creature_under_your_control?
+        end
+
+        def call
+          controller.gain_life(2)
+        end
+      end
+
       def event_handlers
         {
-          Events::EnteredTheBattlefield => -> (receiver, event) do
-            controller = receiver.controller
-            return unless event.permanent.controller?(controller)
-
-            controller.gain_life(2)
-          end
+          Events::EnteredTheBattlefield => EntersTrigger
         }
       end
     end

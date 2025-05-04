@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::StaticAbilities do
   let(:card) { double(Magic::Card) }
-  let(:ability) { double(Magic::Abilities::Static::PowerAndToughnessModification, applies_to?: true) }
+  let(:ability) { double(Magic::Abilities::Static::PowerAndToughnessModification, applies_to?: true, conditions_met?: true) }
   subject { Magic::StaticAbilities.new([ability]) }
 
   context "applies_to" do

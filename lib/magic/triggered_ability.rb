@@ -43,6 +43,10 @@ module Magic
       event.permanent.creature?
     end
 
+    def creature_under_your_control?
+      you? && creature?
+    end
+
     def should_perform?
       true
     end

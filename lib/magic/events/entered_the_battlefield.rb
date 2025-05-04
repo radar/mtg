@@ -11,6 +11,10 @@ module Magic
       def inspect
         "#<Events::EnteredTheBattlefield permanent: #{permanent.name}, controller: #{permanent.controller.name}, from: #{from}>"
       end
+
+      def player
+        permanent.controller
+      end
     end
   end
 end
