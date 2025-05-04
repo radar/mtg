@@ -2,23 +2,25 @@ module Magic
   module Cards
     module KeywordHandlers
       module Prowess
-        def initialize(**args)
-          add_event_handler(Events::SpellCast, &method(:prowess_trigger))
-          super(**args)
+        class ProwessTrigger < TriggeredAbility::SpellCast
+          def should_perform?
+            you? && actor.creature? && !spell.creature?
+          end
+
+          def call
+            actor.trigger_effect(
+              :modify_power_toughness,
+              source: actor,
+              target: actor,
+              power: 1,
+              toughness: 1,
+            )
+          end
         end
 
-        def prowess_trigger(permanent, event)
-          spell = event.spell
-          return if spell.controller != permanent.controller
-          return if spell.creature?
-
-          permanent.trigger_effect(
-            :modify_power_toughness,
-            source: permanent,
-            target: permanent,
-            power: 1,
-            toughness: 1,
-          )
+        def initialize(**args)
+          add_event_handler(Events::SpellCast, ProwessTrigger)
+          super(**args)
         end
       end
     end

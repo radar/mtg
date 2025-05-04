@@ -39,6 +39,10 @@ module Magic
       event.permanent.types.include?(type)
     end
 
+    def creature?
+      event.permanent.creature?
+    end
+
     def should_perform?
       true
     end

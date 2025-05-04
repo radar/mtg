@@ -6,9 +6,9 @@ module Magic
           @event_handlers ||= {}
         end
 
-        def add_event_handler(event, &block)
+        def add_event_handler(event, klass)
           event_handlers[event] ||= []
-          event_handlers[event] = block
+          event_handlers[event] = klass
         end
 
         def trigger_effect(effect, source: self, **args)
