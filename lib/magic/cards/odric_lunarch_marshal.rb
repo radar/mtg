@@ -8,35 +8,36 @@ module Magic
     end
 
     class OdricLunarchMarshal < Creature
-      def event_handlers
-        {
-          Events::BeginningOfCombat => -> (receiver, event) do
-            controller = receiver.controller
+      class BeginningOfCombatTrigger < TriggeredAbility
+        def call
+          applicable_keywords = Keywords.list(
+            :first_strike,
+            :flying,
+            :deathtouch,
+            :double_strike,
+            :haste,
+            :indestructible,
+            :lifelink,
+            :reach,
+            :skulk,
+            :trample,
+            :vigilance,
+          )
 
-            applicable_keywords = Keywords.list(
-              :first_strike,
-              :flying,
-              :deathtouch,
-              :double_strike,
-              :haste,
-              :indestructible,
-              :lifelink,
-              :reach,
-              :skulk,
-              :trample,
-              :vigilance,
-            )
+          applicable_keywords.each do |keyword|
+            next unless controller.creatures.any? { |creature| creature.has_keyword?(keyword) }
 
-            applicable_keywords.each do |keyword|
-              next unless controller.creatures.any? { |creature| creature.has_keyword?(keyword) }
-
-              controller.creatures.each do |creature|
-                next if creature.has_keyword?(keyword)
-                logger.debug "Granting #{keyword} to #{creature}"
-                creature.grant_keyword(keyword, until_eot: true)
-              end
+            controller.creatures.each do |creature|
+              next if creature.has_keyword?(keyword)
+              creature.grant_keyword(keyword, until_eot: true)
             end
           end
+        end
+      end
+
+      def event_handlers
+        {
+          Events::BeginningOfCombat => BeginningOfCombatTrigger
         }
       end
     end

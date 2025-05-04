@@ -39,6 +39,10 @@ module Magic
       event.permanent.types.include?(type)
     end
 
+    def should_perform?
+      true
+    end
+
     def perform!
       return unless should_perform?
       call
