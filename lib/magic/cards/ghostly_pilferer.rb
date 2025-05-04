@@ -14,7 +14,7 @@ module Magic
     end
 
     class GhostlyPilferer < Creature
-      class Choice < Magic::Choice
+      class Choice < Magic::Choice::May
         def costs
           @costs ||= [Costs::Mana.new(generic: 2)]
         end
@@ -28,20 +28,21 @@ module Magic
           if costs.all?(&:paid?)
             controller.draw!
           end
+        end
+      end
 
+      class PermanentUntapped < TriggeredAbility
+        def should_perform?
+          this?
+        end
+
+        def resolve
+          Choice.new(actor: actor)
         end
       end
 
       def event_handlers
-        {
-          Events::PermanentUntapped => -> (receiver, event) do
-            return if event.permanent != receiver
-
-            game.choices.add(Choice.new(actor: receiver))
-
-            receiver.controller.draw!
-          end
-        }
+        { Events::PermanentUntapped => PermanentUntapped }
       end
     end
   end

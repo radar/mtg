@@ -26,6 +26,18 @@ RSpec.describe Magic::Cards::GhostlyPilferer do
     end
   end
 
+  context "when it is a different card becoming untapped" do
+    let(:wood_elves) { ResolvePermanent("Wood Elves") }
+
+    it "does not trigger the ability" do
+      wood_elves.tap!
+      wood_elves.untap!
+
+      expect(game.choices).to be_empty
+      expect(p1).not_to receive(:draw!)
+    end
+  end
+
   context "when it becomes untapped, does not pay" do
     it "cost is not paid, no card draw" do
       ghostly_pilferer.tap!
