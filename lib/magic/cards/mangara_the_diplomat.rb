@@ -9,23 +9,39 @@ module Magic
     end
 
     class MangaraTheDiplomat < Creature
+      class FinalAttackersDeclaredTrigger < TriggeredAbility
+        def should_perform?
+          controller = actor.controller
+          incoming_attacks = event.attacks.select do |attack|
+            attack.target == controller ||
+            controller.planeswalkers.any? { |planeswalker| attack.target == planeswalker }
+          end
+
+          incoming_attacks.count >= 2
+        end
+
+        def call
+          actor.controller.draw!
+        end
+      end
+
+      class SpellCastTrigger < TriggeredAbility
+        def should_perform?
+          spells_cast_by_player = game.current_turn.spells_cast.count { |spell| spell.player == event.player && !you? }
+          spells_cast_by_player == 2
+        end
+
+        def call
+          actor.controller.draw!
+        end
+      end
+
       def event_handlers
         {
           # Whenever an opponent attacks with creatures, if two or more of those creatures are
           # attacking you and/or planeswalkers you control, draw a card.
-          Events::FinalAttackersDeclared => -> (receiver, event) do
-            controller = receiver.controller
-            incoming_attacks = event.attacks.select do |attack|
-              attack.target == controller ||
-              controller.planeswalkers.any? { |planeswalker| attack.target == planeswalker }
-            end
-
-            controller.draw! if incoming_attacks.count >= 2
-          end,
-          Events::SpellCast => -> (receiver, event) do
-            spells_cast_by_player = current_turn.spells_cast.count { |spell| spell.player == event.player }
-            receiver.controller.draw! if spells_cast_by_player == 2
-          end
+          Events::FinalAttackersDeclared => FinalAttackersDeclaredTrigger,
+          Events::SpellCast => SpellCastTrigger,
         }
       end
     end

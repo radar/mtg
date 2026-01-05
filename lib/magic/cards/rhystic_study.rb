@@ -30,20 +30,25 @@ module Magic
         end
       end
 
+      class SpellCastTrigger < TriggeredAbility
+        def should_perform?
+          !you?
+        end
+
+        def call
+          game.add_choice(
+            Magic::Cards::RhysticStudy::Choice.new(
+              owner: actor.controller, caster: event.player
+            )
+          )
+        end
+      end
+
       # Whenever an opponent casts a spell,
       # you may draw a card unless that player pays {1}
       def event_handlers
         {
-          Events::SpellCast => ->(receiver, event) do
-            return if event.player == receiver.controller
-
-            game
-              .choices
-              .add(
-                Magic::Cards::RhysticStudy::Choice.new(owner: receiver.controller,
-                  caster: event.player)
-              )
-          end
+          Events::SpellCast => SpellCastTrigger
         }
       end
     end

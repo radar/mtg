@@ -38,20 +38,28 @@ module Magic
         end
       end
 
+      class SpellCastTrigger < TriggeredAbility
+        def should_perform?
+          event.spell.controller == controller &&
+            (event.spell.type?("Dog") || event.spell.type?("Cat"))
+        end
+
+        def call
+          if event.spell.type?("Dog")
+            trigger_effect(:create_token, token_class: CatToken)
+          end
+
+          if event.spell.type?("Cat")
+            trigger_effect(:create_token, token_class: DogToken)
+          end
+        end
+      end
+
       def activated_abilities = [ActivatedAbility]
 
       def event_handlers
         {
-          Events::SpellCast => -> (receiver, event) do
-            return unless event.spell.controller == receiver.controller
-            if event.spell.type?("Dog")
-              trigger_effect(:create_token, token_class: CatToken)
-            end
-
-            if event.spell.type?("Cat")
-              trigger_effect(:create_token, token_class: DogToken)
-            end
-          end
+          Events::SpellCast => SpellCastTrigger
         }
       end
     end

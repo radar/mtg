@@ -9,6 +9,10 @@ module Magic
     end
 
     class SiegeStriker < Creature
+      class LandfallTrigger < TriggeredAbility
+        def should_perform?
+
+
       def event_handlers
         {
           Events::PermanentTapped => -> (receiver, event) do

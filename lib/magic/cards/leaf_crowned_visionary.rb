@@ -38,20 +38,27 @@ module Magic
 
       def static_abilities = [PowerAndToughnessModification]
 
+      class SpellCastTrigger < TriggeredAbility::SpellCast
+        # Whenever you cast an Elf spell, ...
+        def should_perform?
+          spell.type?("Elf") && you?
+        end
+
+        # you may pay {G}. If you do, draw a card.
+        def call
+          game
+            .choices
+            .add(
+              Magic::Cards::LeafCrownedVisionary::Choice.new(owner: actor)
+            )
+        end
+      end
+
       # Whenever you cast an Elf spell,
       # you may pay {G}. If you do, draw a card.
       def event_handlers
         {
-          Events::SpellCast => ->(receiver, event) do
-            return if event.player != receiver.controller
-            return unless event.spell.type?("Elf")
-
-            game
-              .choices
-              .add(
-                Magic::Cards::LeafCrownedVisionary::Choice.new(owner: receiver.controller)
-              )
-          end
+          Events::SpellCast => SpellCastTrigger
         }
       end
     end

@@ -4,13 +4,19 @@ module Magic
       type T::Super::Legendary, T::Enchantment, "Shrine"
       cost generic: 3, blue: 1
 
+      class FirstMainPhaseTrigger < TriggeredAbility
+        def should_perform?
+          event.active_player == controller
+        end
+
+        def call
+          game.choices.add(SanctumOfCalmWaters::Choice.new(actor: actor))
+        end
+      end
+
       def event_handlers
         {
-          Events::FirstMainPhase => -> (receiver, event) do
-            return unless event.active_player == receiver.controller
-
-            game.choices.add(SanctumOfCalmWaters::Choice.new(actor: receiver))
-          end
+          Events::FirstMainPhase => FirstMainPhaseTrigger
         }
       end
     end

@@ -6,13 +6,19 @@ module Magic
       power 1
       toughness 2
 
+      class CreatureAttackedTrigger < TriggeredAbility
+        def should_perform?
+          this?
+        end
+
+        def call
+          actor.controller.draw!
+        end
+      end
+
       def event_handlers
         {
-          Events::CreatureAttacked => -> (receiver, event) do
-            return if event.attacker != receiver
-
-            receiver.controller.draw!
-          end
+          Events::CreatureAttacked => CreatureAttackedTrigger
         }
       end
     end
