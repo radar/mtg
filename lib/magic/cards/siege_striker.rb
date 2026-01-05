@@ -9,28 +9,29 @@ module Magic
     end
 
     class SiegeStriker < Creature
-      class LandfallTrigger < TriggeredAbility
+      class PermanentTappedTrigger < TriggeredAbility
         def should_perform?
+          return false if event.permanent == actor
+          return false unless game.current_turn.active_player == actor.controller
+          return false unless event.permanent.creature?
+          # Only apply if within attack phase of controller's turn
+          game.current_turn.step == "declare_attackers"
+        end
 
+        def call
+          actor.trigger_effect(
+            :modify_power_toughness,
+            source: actor,
+            target: actor,
+            power: 1,
+            toughness: 1,
+          )
+        end
+      end
 
       def event_handlers
         {
-          Events::PermanentTapped => -> (receiver, event) do
-            return if event.permanent == receiver
-            # TODO: Only apply if within attack phase of controller's turn
-            return unless game.current_turn.active_player == receiver.controller
-            return unless game.current_turn.step?(:declare_attackers)
-            return unless event.permanent.creature?
-
-            receiver.trigger_effect(
-              :modify_power_toughness,
-              source: receiver,
-              target: receiver,
-              power: 1,
-              toughness: 1,
-            )
-
-          end
+          Events::PermanentTapped => PermanentTappedTrigger
         }
       end
     end
