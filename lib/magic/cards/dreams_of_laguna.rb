@@ -20,32 +20,9 @@ module Magic
         super
       end
 
-      # Flashback is castable from graveyard
+      # Flashback allows casting from graveyard for alternative cost
       def flashback_cost
         FLASHBACK_COST
-      end
-
-      class FlashbackAbility < Magic::ActivatedAbility
-        def costs = []
-
-        def resolve!
-          action = Magic::Actions::Cast.new(
-            card: source,
-            player: source.controller,
-            game: source.game,
-            flashback: true
-          )
-          action.mana_cost = source.flashback_cost
-          source.game.stack.add(action)
-        end
-      end
-
-      def activated_abilities
-        if zone.graveyard?
-          [FlashbackAbility]
-        else
-          []
-        end
       end
     end
   end

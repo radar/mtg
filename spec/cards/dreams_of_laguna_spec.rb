@@ -70,11 +70,10 @@ RSpec.describe Magic::Cards::DreamsOfLaguna do
       dreams_of_laguna.move_to_graveyard!(p1)
     end
 
-    it "can be exiled after casting with flashback" do
-      # Simplified test - just verify that flashback flag causes exile
-      # The full flashback flow would require more complex setup
+    it "can be cast from graveyard with flashback cost and exiled after" do
+      # Flashback is an alternative casting cost, not an activated ability
+      # When casting from graveyard, use the flashback cost and set flashback: true
       
-      # Manually create a cast action with flashback flag
       p1.add_mana(blue: 4)
       action = Magic::Actions::Cast.new(
         card: dreams_of_laguna,
@@ -93,7 +92,7 @@ RSpec.describe Magic::Cards::DreamsOfLaguna do
       choice = game.choices.last
       game.resolve_choice!(top: [top_card])
 
-      # Card should be exiled, not in graveyard
+      # Card should be exiled, not in graveyard (flashback's key feature)
       expect(dreams_of_laguna.zone).to be_exile
       expect(p1.graveyard.by_name("Dreams of Laguna")).to be_empty
     end
