@@ -8,7 +8,7 @@ RSpec.describe Magic::Cards::TownGreeter do
   before do
     p1.hand.add(card)
     2.times { p1.library.add(Card("Island")) }
-    2.times { p1.library.add(Card)}
+    2.times { p1.library.add(Card("Adventurer's Inn")) }
   end
 
   describe "entering the battlefield" do
@@ -30,8 +30,32 @@ RSpec.describe Magic::Cards::TownGreeter do
       choice.resolve!(target: choice.choices.first)
       game.tick!
 
-      expect(p1.hand.by_name("Island").count).to eq(1)
+      expect(p1.hand.by_name("Adventurer's Inn").count).to eq(1)
       expect(p1.graveyard.count).to eq(3)
+    end
+
+    it "mills 4, returns a town card to hand" do
+      p1.add_mana(green: 2)
+      p1.cast(card: card) do
+        _1.pay_mana(generic: { green: 1}, green: 1)
+      end
+
+      game.stack.resolve!
+      game.tick!
+
+      expect(p1.graveyard.count).to eq(4)
+
+      choice = game.choices.last
+      expect(choice).to be_a(Magic::Cards::TownGreeter::Choice)
+      expect(choice.choices.count).to eq(4)
+
+      choice.resolve!(target: choice.choices.by_name("Adventurer's Inn").first)
+      game.tick!
+
+      expect(p1.hand.by_name("Adventurer's Inn").count).to eq(1)
+      expect(p1.graveyard.count).to eq(3)
+
+      expect(p1.life).to eq(22)
     end
   end
 end
