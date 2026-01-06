@@ -8,11 +8,12 @@ module Magic
       def_delegators :@card, :enchantment?, :artifact?, :multi_target?
       attr_reader :card, :targets, :value_for_x, :controller, :modes
 
-      def initialize(card:, value_for_x: nil, controller: card.controller, **args)
+      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, **args)
         super(**args)
         @card = card
         @targets = []
         @modes = []
+        @flashback = flashback
 
         @value_for_x = value_for_x
       end
@@ -60,7 +61,7 @@ module Magic
       end
 
       def can_perform?
-        return false unless card.zone.hand?
+        return false unless @flashback ? card.zone.graveyard? : card.zone.hand?
         return true if mana_cost.zero?
 
         mana_cost.can_pay?(player)
@@ -143,7 +144,11 @@ module Magic
         end
 
         if card.sorcery? || card.instant?
-          card.move_to_graveyard!(player)
+          if @flashback
+            card.exile!
+          else
+            card.move_to_graveyard!(player)
+          end
         end
       end
     end
