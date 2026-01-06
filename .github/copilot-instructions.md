@@ -11,7 +11,8 @@ This is a Ruby implementation of a Magic: The Gathering simulation. The project 
 
 ## Code Style
 
-- Use `# frozen_string_literal: true` at the top of all Ruby files
+- Use `# frozen_string_literal: true` at the top of main library files (like `lib/magic.rb`, `lib/magic/version.rb`) and spec files
+- Card files in `lib/magic/cards/` do not use the frozen_string_literal pragma
 - Follow standard Ruby conventions and style guides
 - Use descriptive variable and method names
 - Prefer clarity over brevity
@@ -146,4 +147,22 @@ When implementing cards:
 3. Add appropriate tests for card functionality
 4. Follow existing code patterns and conventions
 
-For cards that don't use CardBuilder DSL (legacy cards), consider migrating them to use the DSL for consistency.
+### Legacy vs. CardBuilder DSL Pattern
+
+Most cards now use the CardBuilder DSL. Some older cards may use a direct class inheritance pattern:
+
+```ruby
+class CardName < Creature
+  # Implementation
+end
+```
+
+Modern cards should use the CardBuilder DSL pattern:
+
+```ruby
+CardName = Creature("Card Name") do
+  # Implementation
+end
+```
+
+For cards with complex abilities, use the DSL first, then extend with a class definition (see `lib/magic/cards/academy_elite.rb` for an example).
