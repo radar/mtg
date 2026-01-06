@@ -1,7 +1,7 @@
 module Magic
   module Cards
     AdventurersInn = Card("Adventurer's Inn") do
-      type "Land", "Town"
+      type T::Land, T::Lands::Town
 
       enters_the_battlefield do
         controller.gain_life(2)
