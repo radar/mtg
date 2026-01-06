@@ -16,13 +16,20 @@ module Magic
         keywords :flying
       end
 
+      class PreliminaryAttackersDeclaredTrigger < TriggeredAbility
+        def should_perform?
+          event.attacks.any? { |attack| attack.attacker == actor }
+        end
+
+        def call
+          token = trigger_effect(:create_token, token_class: BirdToken, enters_tapped: true).first
+          game.current_turn.declare_attacker(token)
+        end
+      end
+
       def event_handlers
         {
-          Events::PreliminaryAttackersDeclared => -> (receiver, event) do
-            return if event.attacks.none? { |attack| attack.attacker == receiver }
-            token = trigger_effect(:create_token, token_class: BirdToken, enters_tapped: true).first
-            game.current_turn.declare_attacker(token)
-          end
+          Events::PreliminaryAttackersDeclared => PreliminaryAttackersDeclaredTrigger
         }
       end
 

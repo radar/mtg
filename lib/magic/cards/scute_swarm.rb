@@ -13,22 +13,29 @@ module Magic
         toughness 1
       end
 
+      class LandfallTrigger < TriggeredAbility
+        def should_perform?
+          event.player == controller
+        end
+
+        def call
+          lands = battlefield.controlled_by(controller).lands.count
+          if lands < 6
+            trigger_effect(:create_token, token_class: InsectToken)
+          else
+            Permanent.resolve(
+              game: game,
+              owner: actor.controller,
+              card: actor.card,
+              token: true,
+            )
+          end
+        end
+      end
+
       def event_handlers
         {
-          Events::Landfall => -> (receiver, event) do
-            controller = receiver.controller
-            lands = battlefield.controlled_by(controller).lands.count
-            if lands < 6
-              trigger_effect(:create_token, token_class: InsectToken)
-            else
-              token = Permanent.resolve(
-                game: game,
-                owner: receiver.controller,
-                card: receiver.card,
-                token: true,
-              )
-            end
-          end
+          Events::Landfall => LandfallTrigger
         }
       end
     end

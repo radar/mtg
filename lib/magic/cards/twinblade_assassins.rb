@@ -7,13 +7,21 @@ module Magic
       power 5
       toughness 4
 
+      class EndStepTrigger < TriggeredAbility
+        def should_perform?
+          return false unless event.active_player == controller
+          death_events = game.current_turn.events.select { |e| e.is_a?(Events::CreatureDied) }
+          death_events.any?
+        end
+
+        def call
+          trigger_effect(:draw_cards, number_to_draw: 1)
+        end
+      end
+
       def event_handlers
         {
-          Events::BeginningOfEndStep => -> (receiver, event) {
-            return if receiver.controller != event.active_player
-            death_events = current_turn.events.select { |e| e.is_a?(Events::CreatureDied) }
-            trigger_effect(:draw_cards) if death_events.any?
-          }
+          Events::BeginningOfEndStep => EndStepTrigger
         }
       end
     end

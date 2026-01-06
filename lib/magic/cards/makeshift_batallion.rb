@@ -8,16 +8,24 @@ module Magic
     end
 
     class MakeshiftBatallion < Creature
+      class FinalAttackersDeclaredTrigger < TriggeredAbility
+        def should_perform?
+          attacks = event.attacks
+          return false if attacks.none? { |event| event.attacker == actor }
+          return false if attacks.count < 3
+
+          true
+        end
+
+        def call
+          actor.add_counter(counter_type: Counters::Plus1Plus1)
+        end
+      end
+
       def event_handlers
         {
           # Whenever Makeshift Battalion and at least two other creatures attack, put a +1/+1 counter on Makeshift Battalion.
-          Events::FinalAttackersDeclared => -> (receiver, event) do
-            attacks = event.attacks
-            return if attacks.none? { |event| event.attacker == receiver }
-            return if attacks.count < 3
-
-            receiver.add_counter(counter_type: Counters::Plus1Plus1)
-          end
+          Events::FinalAttackersDeclared => FinalAttackersDeclaredTrigger
         }
       end
     end

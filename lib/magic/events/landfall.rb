@@ -10,6 +10,10 @@ module Magic
       def inspect
         "#<Events::Landfall permanent: #{land.name}>"
       end
+
+      def player
+        land.controller
+      end
     end
   end
 end

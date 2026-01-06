@@ -8,6 +8,10 @@ module Magic
         @target = target
       end
 
+      def permanent
+        attacker
+      end
+
       def inspect
         "#<Events::CreatureAttacked attacker: #{attacker}, target: #{target}>"
       end
