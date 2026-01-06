@@ -224,6 +224,19 @@ module Magic
       )
     end
 
+    def surveil(amount:, graveyard:, top:)
+      cards = library.shift(amount)
+      library.unshift(*top)
+      graveyard.compact.each { |card| card.move_to_graveyard!(self) }
+      game.notify!(
+        Events::Surveil.new(
+          player: self,
+          graveyard: graveyard.count,
+          top: top.count,
+        )
+      )
+    end
+
     def tap!(card)
       card.tap!
     end
