@@ -19,15 +19,15 @@ module Magic
         end
       end
 
-      class EnteredTheBattlefieldTrigger < TriggeredAbility
-        # TODO: Make this into a neater API like: another_creature? & flying? & under_your_control?
+      class EnteredTheBattlefieldTrigger < TriggeredAbility::EnterTheBattlefield
+        # Whenever another creature you control with flying enters
         def should_perform?
-          another_creature? && event.permanent.flying? && event.permanent.controller == controller
+          another_creature? && flying? && under_your_control?
         end
 
         def call
-          source.modify_power(1)
-          source.modify_toughness(1)
+          actor.modify_power(1)
+          actor.modify_toughness(1)
         end
       end
 

@@ -9,6 +9,10 @@ module Magic
         creature? && actor != event.permanent
       end
 
+      def flying?
+        event.permanent.flying?
+      end
+
       def any_type?(*types)
         event.permanent.any_type?(*types)
       end
