@@ -12,7 +12,9 @@ module Magic
       def target_choices
         battlefield.creatures
       end
+    end
 
+    class RousingRead < Aura
       class KeywordGrantFlying < Abilities::Static::KeywordGrant
         keyword_grants Keywords::FLYING
         applies_to_target

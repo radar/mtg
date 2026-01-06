@@ -6,7 +6,9 @@ module Magic
       power 2
       toughness 4
       keywords :flying
+    end
 
+    class RighteousValkyrie < Creature
       class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
         # As long as you have at least 7 life more than your starting life total...
         conditions do
