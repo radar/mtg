@@ -13,7 +13,7 @@ module Magic
         toughness 1
       end
 
-      class LandfallTrigger < TriggeredAbility
+      class LandfallTrigger < TriggeredAbility::Landfall
         def should_perform?
           event.player == controller
         end
