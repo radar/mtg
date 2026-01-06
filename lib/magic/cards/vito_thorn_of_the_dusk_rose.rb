@@ -15,14 +15,19 @@ module Magic
         def choose(player) = player.lose_life(amount)
       end
 
+      class LifeGainTrigger < TriggeredAbility
+        def should_perform?
+          event.player == controller
+        end
+
+        def call
+          game.choices << LifeLossChoice.new(amount: event.life)
+        end
+      end
+
       def event_handlers
         {
-          Events::LifeGain => -> (receiver, event) do
-            return unless event.player == controller
-
-            game.choices << LifeLossChoice.new(amount: event.life)
-
-          end
+          Events::LifeGain => LifeGainTrigger
         }
       end
 
