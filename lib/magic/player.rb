@@ -225,7 +225,7 @@ module Magic
     end
 
     def surveil(amount:, graveyard:, top:)
-      cards = library.shift(amount)
+      library.shift(amount)
       library.unshift(*top)
       graveyard.compact.each { |card| card.move_to_graveyard!(self) }
       game.notify!(

@@ -8,6 +8,7 @@ module Magic
       def_delegators :@card, :enchantment?, :artifact?, :multi_target?
       attr_reader :card, :targets, :value_for_x, :controller, :modes
 
+      # @param flashback [Boolean] When true, allows casting from graveyard and exiles after resolution
       def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, **args)
         super(**args)
         @card = card
