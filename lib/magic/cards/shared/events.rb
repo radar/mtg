@@ -59,6 +59,8 @@ module Magic
             game.add_effect(Effects::ReturnTargetFromGraveyardToBattlefield.new(source: source, **args))
           when :return_to_owners_hand
             game.add_effect(Effects::ReturnToOwnersHand.new(source: source, **args))
+          when :reveal_cards
+            game.add_effect(Effects::RevealCards.new(source: source, **args))
           when :sacrifice
             game.add_effect(Effects::Sacrifice.new(source: source, **args))
           when :tap

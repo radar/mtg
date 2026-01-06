@@ -196,7 +196,7 @@ module Magic
     end
 
     def mill(amount)
-      amount.times do
+      cards = amount.times.map do
         card = library.mill
         card.move_to_graveyard!
         game.notify!(
@@ -205,7 +205,10 @@ module Magic
             card: card,
           )
         )
+        card
       end
+
+      CardList.new(cards)
     end
 
     def scry(amount:, top:, bottom:)
