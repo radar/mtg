@@ -16,6 +16,10 @@ module Magic
       def enchantment?
         event.permanent.enchantment?
       end
+
+      def flying?
+        event.permanent.flying?
+      end
     end
   end
 end
