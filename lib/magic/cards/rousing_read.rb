@@ -18,13 +18,13 @@ module Magic
         applies_to_target
       end
 
-      class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
+      class RousingReadPowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
         modify power: 1, toughness: 1
         applies_to_target
       end
 
       def static_abilities
-        [KeywordGrantFlying, PowerAndToughnessModification]
+        [KeywordGrantFlying, RousingReadPowerAndToughnessModification]
       end
     end
   end
