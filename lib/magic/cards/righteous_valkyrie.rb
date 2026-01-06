@@ -6,8 +6,10 @@ module Magic
       power 2
       toughness 4
       keywords :flying
+    end
 
-      class RighteousValkyriePowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
+    class RighteousValkyrie < Creature
+      class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
         # As long as you have at least 7 life more than your starting life total...
         conditions do
           t = controller.life >= controller.starting_life + 7
@@ -18,7 +20,7 @@ module Magic
         modify power: 2, toughness: 2
       end
 
-      def static_abilities = [RighteousValkyriePowerAndToughnessModification]
+      def static_abilities = [PowerAndToughnessModification]
 
       class AngelOrClericEnters < TriggeredAbility::EnterTheBattlefield
         def should_perform?

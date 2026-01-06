@@ -12,19 +12,21 @@ module Magic
       def target_choices
         battlefield.creatures
       end
+    end
 
+    class RousingRead < Aura
       class KeywordGrantFlying < Abilities::Static::KeywordGrant
         keyword_grants Keywords::FLYING
         applies_to_target
       end
 
-      class RousingReadPowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
+      class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
         modify power: 1, toughness: 1
         applies_to_target
       end
 
       def static_abilities
-        [KeywordGrantFlying, RousingReadPowerAndToughnessModification]
+        [KeywordGrantFlying, PowerAndToughnessModification]
       end
     end
   end
