@@ -6,12 +6,13 @@ module Magic
       power 2
       toughness 4
       keywords :flying
+    end
 
+    class RighteousValkyrie < Creature
       class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification
         # As long as you have at least 7 life more than your starting life total...
         conditions do
-          t = controller.life >= controller.starting_life + 7
-          t
+          controller.life >= controller.starting_life + 7
         end
         # ... creatures you control get +2/+2.
         creatures_you_control

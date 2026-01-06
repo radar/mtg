@@ -19,22 +19,25 @@ module Magic
         end
       end
 
+      class EnteredTheBattlefieldTrigger < TriggeredAbility
+        # TODO: Make this into a neater API like: another_creature? & flying? & under_your_control?
+        def should_perform?
+          another_creature? && event.permanent.flying? && event.permanent.controller == controller
+        end
+
+        def call
+          source.modify_power(1)
+          source.modify_toughness(1)
+        end
+      end
+
       def static_abilities = [ReduceManaCost]
 
       def event_handlers
         {
-          Events::EnteredTheBattlefield => -> (receiver, event) do
-            return if event.permanent == receiver
-            return unless event.permanent.flying?
-            return unless event.permanent.controller == receiver.controller
-
-            receiver.modify_power(1)
-            receiver.modify_toughness(1)
-          end
+          Events::EnteredTheBattlefield => EnteredTheBattlefieldTrigger
         }
-
       end
-
     end
   end
 end
