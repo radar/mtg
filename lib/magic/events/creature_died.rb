@@ -8,6 +8,8 @@ module Magic
         @controller = permanent.controller
       end
 
+      def player = controller
+
       def inspect
         "#<Events::CreatureDied permanent: #{permanent.name}, controller: #{controller.name}>"
       end

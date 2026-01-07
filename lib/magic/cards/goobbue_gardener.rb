@@ -1,13 +1,13 @@
 module Magic
   module Cards
-    GoobbueGardner = Creature("Goobbue Gardener") do
+    GoobbueGardener = Creature("Goobbue Gardener") do
       power 1
       toughness 3
       cost generic: 1, green: 1
       creature_type "Plant Beast"
     end
 
-    class GoobbueGardner < Card
+    class GoobbueGardener < Creature
       class ManaAbility < Magic::TapManaAbility
         choices :green
       end
