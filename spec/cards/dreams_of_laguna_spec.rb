@@ -73,23 +73,16 @@ RSpec.describe Magic::Cards::DreamsOfLaguna do
     it "can be cast from graveyard with flashback cost and exiled after" do
       # Flashback is an alternative casting cost, not an activated ability
       # When casting from graveyard, use the flashback cost and set flashback: true
-      
+
       p1.add_mana(blue: 4)
-      action = Magic::Actions::Cast.new(
-        card: dreams_of_laguna,
-        player: p1,
-        game: game,
-        flashback: true
-      )
-      action.mana_cost = dreams_of_laguna.flashback_cost
-      action.pay_mana(generic: { blue: 3 }, blue: 1)
-      
+      action = cast_action(player: p1, card: dreams_of_laguna, flashback: true)
+      expect(action.mana_cost).to eq(Magic::Costs::Mana.new(generic: 3, blue: 1))
+
       game.stack.add(action)
       game.stack.resolve!
 
       # Resolve the surveil choice
       top_card = p1.library.first
-      choice = game.choices.last
       game.resolve_choice!(top: [top_card])
 
       # Card should be exiled, not in graveyard (flashback's key feature)

@@ -31,6 +31,12 @@ module Magic
         const_set(:COST, cost)
       end
 
+      def flashback(cost)
+        define_method(:flashback_cost) do
+          cost
+        end
+      end
+
       def kicker_cost(cost)
         const_set(:KICKER_COST, cost)
       end

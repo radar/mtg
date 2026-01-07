@@ -43,11 +43,17 @@ module Magic
 
       def mana_cost
         @mana_cost ||= begin
+          if card.zone.graveyard?
+            cost = card.flashback_cost
+          else
+            cost = card.cost
+          end
+
           mana_cost_adjustment_abilities = game.battlefield.static_abilities
           .of_type(Abilities::Static::ManaCostAdjustment)
           .applies_to(card)
 
-          cost = mana_cost_adjustment_abilities.each_with_object(card.cost.dup) { |ability, cost| ability.apply(cost) }
+          cost = mana_cost_adjustment_abilities.each_with_object(cost.dup) { |ability, cost| ability.apply(cost) }
           cost.x = value_for_x if value_for_x
           cost
         end

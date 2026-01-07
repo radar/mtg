@@ -120,6 +120,10 @@ module Magic
         balance.values.all?(&:zero?)
       end
 
+      def ==(other)
+        cost == other.cost
+      end
+
       private
 
       def pay_x(payment)
