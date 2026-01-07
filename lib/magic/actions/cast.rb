@@ -43,7 +43,7 @@ module Magic
 
       def mana_cost
         @mana_cost ||= begin
-          if card.zone.graveyard?
+          if @flashback
             cost = card.flashback_cost
           else
             cost = card.cost
