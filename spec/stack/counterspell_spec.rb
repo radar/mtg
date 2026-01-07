@@ -9,6 +9,11 @@ RSpec.describe Magic::Cards::Counterspell do
 
   context "counters annul, which was countering sol ring" do
     it "sol ring enters the battlefield" do
+      p1.hand.add(sol_ring)
+      p1.hand.add(counterspell)
+
+      p2.hand.add(annul)
+
       p1.add_mana(red: 1)
       sol_ring_action = cast_action(card: sol_ring, player: p1)
       sol_ring_action.pay_mana(generic: { red: 1 } )
