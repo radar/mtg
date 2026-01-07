@@ -5,6 +5,10 @@ RSpec.describe Magic::Cards::BattleForBretagard do
 
   let(:card) { Card("Battle For Bretagard") }
 
+  before do
+    p1.hand.add(card)
+  end
+
   it "gets a counter + creates a human warrior when it is cast" do
     p1.add_mana(white: 1, green: 2)
 

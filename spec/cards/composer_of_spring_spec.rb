@@ -10,7 +10,9 @@ RSpec.describe Magic::Cards::ComposerOfSpring do
       subject
 
       p1.add_mana(white: 3)
-      p1.cast(card: Card("Nine Lives")) do
+      nine_lives = Card("Nine Lives")
+      p1.hand.add(nine_lives)
+      p1.cast(card: nine_lives) do
         _1.pay_mana(generic: { white: 1 }, white: 2)
       end
 
@@ -38,8 +40,10 @@ RSpec.describe Magic::Cards::ComposerOfSpring do
       it "may put a land or creature from your hand into play tapped" do
         subject
 
+        nine_lives = Card("Nine Lives")
+        p1.hand.add(nine_lives)
         p1.add_mana(white: 3)
-        p1.cast(card: Card("Nine Lives")) do
+        p1.cast(card: nine_lives) do
           _1.pay_mana(generic: { white: 1 }, white: 2)
         end
 

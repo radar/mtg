@@ -5,6 +5,10 @@ RSpec.describe Magic::Cards::BurnBright do
 
   let!(:burn_bright) { Card("Burn Bright") }
 
+  before do
+    p1.hand.add(burn_bright)
+  end
+
   context "with 2 creature in play" do
 
     let!(:blood_glutton) { ResolvePermanent("Blood Glutton", owner: p1) }

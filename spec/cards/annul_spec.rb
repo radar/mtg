@@ -30,8 +30,11 @@ RSpec.describe Magic::Cards::Annul do
     end
 
     it "cannot target a thing that is not an artifact or enchantment" do
+      wood_elves = Card("Wood Elves", owner: p2)
+      p2.hand.add(wood_elves)
+
       p2.add_mana(green: 3)
-      wood_elves_cast = p2.cast(card: Card("Wood Elves")) do
+      wood_elves_cast = p2.cast(card: wood_elves) do
         _1.pay_mana(generic: { green: 2 }, green: 1)
       end
 

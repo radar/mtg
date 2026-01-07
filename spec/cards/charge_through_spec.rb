@@ -8,6 +8,10 @@ RSpec.describe Magic::Cards::ChargeThrough do
   let(:eliminate) { Card("Eliminate", owner: p2) }
   let(:charge_through) { Card("Charge Through", owner: p1) }
 
+  before do
+    p1.hand.add(charge_through)
+  end
+
   context "cast effect" do
     it "makes the player draw a card" do
       expect(p1).to receive(:draw!)
@@ -29,6 +33,8 @@ RSpec.describe Magic::Cards::ChargeThrough do
       action.pay_mana(green: 1)
       action.targeting(wood_elves)
       game.take_action(action)
+
+      p2.hand.add(eliminate)
 
       p2.add_mana(black: 2)
       action_2 = cast_action(player: p2, card: eliminate)

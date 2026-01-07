@@ -5,6 +5,10 @@ RSpec.describe Magic::Cards::CaptureSphere do
 
   subject { Card("Capture Sphere") }
 
+  before do
+    p1.hand.add(subject)
+  end
+
   context "resolution" do
     let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 

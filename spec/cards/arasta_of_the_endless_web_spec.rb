@@ -7,8 +7,10 @@ RSpec.describe Magic::Cards::ArastaOfTheEndlessWeb do
 
   context "whenever an opponent casts an instant or sorcery spell..." do
     it "does not trigger when p1 casts" do
+      lightning_bolt = Card("Lightning Bolt", owner: p1)
+      p1.hand.add(lightning_bolt)
       p1.add_mana(red: 1)
-      p1.cast(card: Card("Lightning Bolt")) do
+      p1.cast(card: lightning_bolt) do
         _1.pay_mana(red: 1)
         _1.targeting(p2)
       end
@@ -19,8 +21,10 @@ RSpec.describe Magic::Cards::ArastaOfTheEndlessWeb do
     end
 
     it "triggers when p2 casts" do
+      lightning_bolt = Card("Lightning Bolt", owner: p2)
+      p2.hand.add(lightning_bolt)
       p2.add_mana(red: 1)
-      p2.cast(card: Card("Lightning Bolt")) do
+      p2.cast(card: lightning_bolt) do
         _1.pay_mana(red: 1)
         _1.targeting(p1)
       end
@@ -37,8 +41,10 @@ RSpec.describe Magic::Cards::ArastaOfTheEndlessWeb do
     end
 
     it "does not trigger when p2 casts wood elves" do
+      wood_elves = Card("Wood Elves", owner: p2)
+      p2.hand.add(wood_elves)
       p2.add_mana(green: 3)
-      p2.cast(card: Card("Wood Elves")) do
+      p2.cast(card: wood_elves) do
         _1.pay_mana(green: 1, generic: { green: 2 })
       end
 

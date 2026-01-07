@@ -30,7 +30,6 @@ module Magic
         end
 
         def applies_to?(permanent)
-          binding.pry if $RYAN
           applicable_targets.include?(permanent)
         end
       end

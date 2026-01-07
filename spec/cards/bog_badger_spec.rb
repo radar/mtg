@@ -7,6 +7,10 @@ RSpec.describe Magic::Cards::BogBadger do
   let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", owner: p1) }
   let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
 
+  before do
+    p1.hand.add(subject)
+  end
+
   context "resolution" do
     it "kicker cost paid" do
       p1.add_mana(green: 3, black: 1)

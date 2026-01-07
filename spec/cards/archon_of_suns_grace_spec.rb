@@ -38,8 +38,10 @@ RSpec.describe Magic::Cards::ArchonOfSunsGrace do
     end
 
     it "... under your control, create a pegasus" do
+      nine_lives = Card("Nine Lives", owner: p1)
+      p1.hand.add(nine_lives)
       p1.add_mana(white: 3)
-      p1.cast(card: Card("Nine Lives")) do
+      p1.cast(card: nine_lives) do
         _1.pay_mana(generic: { white: 1 }, white: 2)
       end
 

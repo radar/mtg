@@ -8,6 +8,10 @@ RSpec.describe Magic::Cards::AnnexSentry do
   let(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
   let(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", owner: p2) }
 
+  before do
+    p1.hand.add(annex_sentry)
+  end
+
   it "has toxic 1" do
     expect(annex_sentry).to have_keyword(Magic::Cards::Keywords::Toxic)
   end
