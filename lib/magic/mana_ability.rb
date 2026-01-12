@@ -10,6 +10,10 @@ module Magic
       end
     end
 
+    def self.amount(value)
+      define_method(:amount) { value }
+    end
+
     def initialize(**args)
       super(**args)
     end
@@ -22,11 +26,19 @@ module Magic
       @choice = color
     end
 
-    def resolve!
+    def amount
+      1
+    end
+
+    def validate_choice!
       @choice ||= choices.first if choices.length == 1
 
       raise "Invalid choice made for mana ability. Choice: #{choice}, Choices: #{choices}" unless choices.include?(choice)
-      source.controller.add_mana(choice => 1)
+    end
+
+    def resolve!
+      validate_choice!
+      source.controller.add_mana(choice => amount)
     end
   end
 end
