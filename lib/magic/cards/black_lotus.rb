@@ -10,9 +10,10 @@ module Magic
         choices :all
 
         def resolve!
-          super # Handle choice validation
-          # Add 2 more mana (parent adds 1, we need 3 total)
-          source.controller.add_mana(choice => 2)
+          @choice ||= choices.first if choices.length == 1
+
+          raise "Invalid choice made for mana ability. Choice: #{choice}, Choices: #{choices}" unless choices.include?(choice)
+          source.controller.add_mana(choice => 3)
         end
       end
 
