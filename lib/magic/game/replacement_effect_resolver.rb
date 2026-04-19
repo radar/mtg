@@ -48,15 +48,11 @@ module Magic
         game.logger
       end
 
-      def battlefield
-        game.battlefield
-      end
-
       def applicable_replacement_effects(context:)
-        battlefield.filter_map do |permanent|
-          permanent.replacement_effect_for(
-            context,
-          )
+        game.replacement_effect_sources.filter_map do |source|
+          next unless source.respond_to?(:replacement_effect_for)
+
+          source.replacement_effect_for(context)
         end
       end
 

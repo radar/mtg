@@ -116,6 +116,10 @@ module Magic
       end
     end
 
+    def replacement_effect_sources
+      Game::ReplacementEffectSources.new(game: self).all
+    end
+
     def tick!
       battlefield.map(&:apply_continuous_effects!)
       check_for_state_triggered_abilities
