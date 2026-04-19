@@ -10,9 +10,15 @@ module Magic
         applied_replacement_keys = []
 
         loop do
-          replacement_effect = next_replacement_effect(
+          replacement_effects = applicable_replacement_effects(
             effect: current_effect,
             applied_replacement_keys: applied_replacement_keys,
+          )
+          break if replacement_effects.empty?
+
+          replacement_effect = game.choose_replacement_effect(
+            effect: current_effect,
+            replacement_effects: replacement_effects,
           )
           break unless replacement_effect
 
@@ -41,16 +47,13 @@ module Magic
         game.battlefield
       end
 
-      def next_replacement_effect(effect:, applied_replacement_keys:)
-        battlefield.each do |permanent|
-          replacement_effect = permanent.replacement_effect_for(
+      def applicable_replacement_effects(effect:, applied_replacement_keys:)
+        battlefield.filter_map do |permanent|
+          permanent.replacement_effect_for(
             effect,
             applied_replacement_keys: applied_replacement_keys,
           )
-          return replacement_effect if replacement_effect
         end
-
-        nil
       end
 
       def replacement_key_for(replacement_effect)

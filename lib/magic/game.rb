@@ -103,6 +103,15 @@ module Magic
       effect.resolve!
     end
 
+    def choose_replacement_effect(effect:, replacement_effects:)
+      chooser = replacement_effect_chooser_for(effect)
+      if chooser
+        chooser.choose_replacement_effect(effect: effect, replacement_effects: replacement_effects)
+      else
+        replacement_effects.first
+      end
+    end
+
     def tick!
       battlefield.map(&:apply_continuous_effects!)
       check_for_state_triggered_abilities
@@ -125,6 +134,26 @@ module Magic
 
     def move_dead_creatures_to_graveyard
       battlefield.creatures.dead.each(&:destroy!)
+    end
+
+    private
+
+    def replacement_effect_chooser_for(effect)
+      if effect.respond_to?(:target)
+        target = effect.target
+        return target if target.respond_to?(:player?) && target.player?
+        return target.controller if target.respond_to?(:controller)
+      end
+
+      if effect.respond_to?(:controller)
+        return effect.controller
+      end
+
+      if effect.respond_to?(:permanent) && effect.permanent.respond_to?(:controller)
+        return effect.permanent.controller
+      end
+
+      nil
     end
   end
 end
