@@ -273,8 +273,6 @@ module Magic
         @life += event.life
       when Events::PlayerLoses
         lose!
-      when Events::DamageDealt
-        trigger_effect(:lose_life, life: event.damage, source: event.source)
       end
     end
 
