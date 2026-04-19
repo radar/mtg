@@ -10,8 +10,16 @@ module Magic
       raise NotImplemented
     end
 
+    def applies_with_context?(context)
+      applies?(context.effect)
+    end
+
     def call
       raise NotImplemented
+    end
+
+    def call_with_context(context)
+      call(context.effect)
     end
   end
 end

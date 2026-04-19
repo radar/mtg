@@ -287,7 +287,7 @@ module Magic
       end
     end
 
-    def choose_replacement_effect(effect:, replacement_effects:)
+    def choose_replacement_effect(effect:, replacement_effects:, replacement_context: nil)
       replacement_effects.first
     end
 

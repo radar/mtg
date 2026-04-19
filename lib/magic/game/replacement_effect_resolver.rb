@@ -10,19 +10,24 @@ module Magic
         applied_replacement_keys = []
 
         loop do
-          replacement_effects = applicable_replacement_effects(
+          context = ReplacementEffectContext.new(
             effect: current_effect,
             applied_replacement_keys: applied_replacement_keys,
+          )
+
+          replacement_effects = applicable_replacement_effects(
+            context: context,
           )
           break if replacement_effects.empty?
 
           replacement_effect = game.choose_replacement_effect(
-            effect: current_effect,
+            effect: context.effect,
+            replacement_context: context,
             replacement_effects: replacement_effects,
           )
           break unless replacement_effect
 
-          new_effect = replacement_effect.call(current_effect)
+          new_effect = replacement_effect.call_with_context(context)
           logger.debug "EFFECT REPLACED!"
           logger.debug "  Original: #{current_effect}"
           logger.debug "  Replacer: #{replacement_effect}"
@@ -47,11 +52,10 @@ module Magic
         game.battlefield
       end
 
-      def applicable_replacement_effects(effect:, applied_replacement_keys:)
+      def applicable_replacement_effects(context:)
         battlefield.filter_map do |permanent|
           permanent.replacement_effect_for(
-            effect,
-            applied_replacement_keys: applied_replacement_keys,
+            context,
           )
         end
       end
