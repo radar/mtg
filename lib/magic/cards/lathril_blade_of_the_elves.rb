@@ -33,7 +33,7 @@ module Magic
 
       class ElfSpawner < TriggeredAbility
         def should_perform?
-          event.target.player?
+          event.combat? && event.target.player?
         end
 
         def call
@@ -43,7 +43,7 @@ module Magic
 
       def event_handlers
         {
-          Events::CombatDamageDealt => ElfSpawner
+          Events::DamageDealt => ElfSpawner
         }
       end
     end

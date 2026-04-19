@@ -38,6 +38,16 @@ module Magic
         target.take_damage(damage)
 
         game.notify!(
+          Events::DamageDealt.new(
+            source: source,
+            target: target,
+            damage: damage,
+            combat: true,
+            infect: source.has_keyword?(Magic::Keywords::INFECT),
+          )
+        )
+
+        game.notify!(
           Events::CombatDamageDealt.new(
             source: source,
             target: target,
