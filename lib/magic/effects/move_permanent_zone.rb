@@ -15,16 +15,6 @@ module Magic
       end
 
       def resolve!
-        if to.battlefield?
-          game.notify!(
-            Events::WillEnterTheBattlefield.new(
-              target,
-              from: from,
-              to: to,
-            )
-          )
-        end
-
         game.notify!(*leaving_zone_notifications(from: from, to: to))
 
         from&.remove(target)
