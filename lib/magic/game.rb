@@ -97,17 +97,7 @@ module Magic
     end
 
     def add_effect(effect)
-      replacement_effects = battlefield.map { _1.replacement_effect_for(effect) }.compact
-      if replacement_effects.any?
-        effect = replacement_effects.inject(effect) do |effect, replacement_effect|
-          new_effect = replacement_effect.call(effect)
-          logger.debug "EFFECT REPLACED!"
-          logger.debug "  Original: #{effect}"
-          logger.debug "  Replacer: #{replacement_effect}"
-          logger.debug "  New Effect: #{new_effect}"
-          new_effect
-        end
-      end
+      effect = Game::ReplacementEffectResolver.new(game: self).resolve(effect)
 
       logger.debug "Resolving effect: #{effect}"
       effect.resolve!
