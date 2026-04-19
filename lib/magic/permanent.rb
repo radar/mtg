@@ -155,14 +155,28 @@ module Magic
       @zone = new_zone.battlefield? ? new_zone : nil
     end
 
-    def replacement_effect_for(effect, applied_replacement_keys: [])
-      replacement_effect = card.replacement_effects[effect.class]
-      if replacement_effect
+    def replacement_effect_for(context)
+      card.replacement_effects.each do |matcher, replacement_effect|
+        next unless replacement_matcher_applies?(matcher, context.effect)
+
         replacement_key = [object_id, replacement_effect]
-        return if applied_replacement_keys.include?(replacement_key)
+        next if context.applied_replacement_keys.include?(replacement_key)
 
         replacement = replacement_effect.new(receiver: self)
-        replacement if replacement.applies?(effect)
+        return replacement if replacement.applies_with_context?(context)
+      end
+
+      nil
+    end
+
+    def replacement_matcher_applies?(matcher, effect)
+      case matcher
+      when nil
+        true
+      when Class
+        effect.is_a?(matcher)
+      else
+        matcher == effect.class
       end
     end
 

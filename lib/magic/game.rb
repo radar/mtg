@@ -103,10 +103,14 @@ module Magic
       effect.resolve!
     end
 
-    def choose_replacement_effect(effect:, replacement_effects:)
-      chooser = replacement_effect_chooser_for(effect)
+    def choose_replacement_effect(effect:, replacement_effects:, replacement_context: nil)
+      chooser = replacement_effect_chooser_for(effect, replacement_context)
       if chooser
-        chooser.choose_replacement_effect(effect: effect, replacement_effects: replacement_effects)
+        chooser.choose_replacement_effect(
+          effect: effect,
+          replacement_context: replacement_context,
+          replacement_effects: replacement_effects,
+        )
       else
         replacement_effects.first
       end
@@ -138,7 +142,11 @@ module Magic
 
     private
 
-    def replacement_effect_chooser_for(effect)
+    def replacement_effect_chooser_for(effect, replacement_context = nil)
+      if replacement_context&.affected_controller
+        return replacement_context.affected_controller
+      end
+
       if effect.respond_to?(:target)
         target = effect.target
         return target if target.respond_to?(:player?) && target.player?
