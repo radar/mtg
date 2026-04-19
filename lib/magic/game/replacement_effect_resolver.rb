@@ -18,6 +18,7 @@ module Magic
           replacement_effects = applicable_replacement_effects(
             context: context,
           )
+          log_candidates(context: context, replacement_effects: replacement_effects)
           break if replacement_effects.empty?
 
           replacement_effect = game.choose_replacement_effect(
@@ -25,13 +26,15 @@ module Magic
             replacement_context: context,
             replacement_effects: replacement_effects,
           )
+          log_selected_replacement(context: context, replacement_effect: replacement_effect)
           break unless replacement_effect
 
           new_effect = replacement_effect.call_with_context(context)
-          logger.debug "EFFECT REPLACED!"
-          logger.debug "  Original: #{current_effect}"
-          logger.debug "  Replacer: #{replacement_effect}"
-          logger.debug "  New Effect: #{new_effect}"
+          log_application(
+            original_effect: current_effect,
+            replacement_effect: replacement_effect,
+            new_effect: new_effect,
+          )
 
           applied_replacement_keys << replacement_key_for(replacement_effect)
           current_effect = new_effect
@@ -58,6 +61,36 @@ module Magic
 
       def replacement_key_for(replacement_effect)
         [replacement_effect.receiver.object_id, replacement_effect.class]
+      end
+
+      def replacement_effect_identifier(replacement_effect)
+        "#{replacement_effect.class}(receiver=#{replacement_effect.receiver})"
+      end
+
+      def log_candidates(context:, replacement_effects:)
+        payload = {
+          effect: context.effect.class.name,
+          affected_controller: context.affected_controller,
+          candidates: replacement_effects.map { replacement_effect_identifier(_1) },
+        }
+        logger.debug "REPLACEMENT_CANDIDATES: #{payload.inspect}"
+      end
+
+      def log_selected_replacement(context:, replacement_effect:)
+        payload = {
+          effect: context.effect.class.name,
+          selected: replacement_effect && replacement_effect_identifier(replacement_effect),
+        }
+        logger.debug "REPLACEMENT_SELECTED: #{payload.inspect}"
+      end
+
+      def log_application(original_effect:, replacement_effect:, new_effect:)
+        payload = {
+          original: original_effect.class.name,
+          replacement: replacement_effect_identifier(replacement_effect),
+          result: new_effect.class.name,
+        }
+        logger.debug "REPLACEMENT_APPLIED: #{payload.inspect}"
       end
     end
   end

@@ -9,7 +9,12 @@ module Magic
       end
 
       def affected_target
-        effect.target if effect.respond_to?(:target)
+        if effect.respond_to?(:targets)
+          targets = effect.targets || []
+          return targets.first if targets.count == 1
+        end
+
+        nil
       end
 
       def affected_player
@@ -31,8 +36,8 @@ module Magic
           affected_player
         elsif affected_permanent&.respond_to?(:controller)
           affected_permanent.controller
-        elsif effect.respond_to?(:controller)
-          effect.controller
+        elsif effect.respond_to?(:source) && effect.source.respond_to?(:controller)
+          effect.source.controller
         end
       end
     end
