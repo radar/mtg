@@ -287,6 +287,10 @@ module Magic
       end
     end
 
+    def choose_replacement_effect(effect:, replacement_effects:)
+      replacement_effects.first
+    end
+
     def protected_from?(card)
       permanents.flat_map { |card| card.protections.player }.any? { |protection| protection.protected_from?(card) }
     end
