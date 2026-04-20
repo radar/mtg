@@ -46,14 +46,6 @@ module Magic
             infect: source.has_keyword?(Magic::Keywords::INFECT),
           )
         )
-
-        game.notify!(
-          Events::CombatDamageDealt.new(
-            source: source,
-            target: target,
-            damage: damage,
-          )
-        )
       end
     end
   end

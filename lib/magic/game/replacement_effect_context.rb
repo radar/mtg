@@ -1,11 +1,13 @@
 module Magic
   class Game
     class ReplacementEffectContext
-      attr_reader :effect, :applied_replacement_keys
+      attr_reader :effect, :applied_replacement_keys, :trace_id, :iteration
 
-      def initialize(effect:, applied_replacement_keys: [])
+      def initialize(effect:, applied_replacement_keys: [], trace_id:, iteration: 1)
         @effect = effect
         @applied_replacement_keys = applied_replacement_keys
+        @trace_id = trace_id
+        @iteration = iteration
       end
 
       def affected_target
@@ -39,6 +41,15 @@ module Magic
         elsif effect.respond_to?(:source) && effect.source.respond_to?(:controller)
           effect.source.controller
         end
+      end
+
+      def next(effect:)
+        self.class.new(
+          effect: effect,
+          applied_replacement_keys: applied_replacement_keys,
+          trace_id: trace_id,
+          iteration: iteration + 1,
+        )
       end
     end
   end

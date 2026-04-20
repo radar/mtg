@@ -6,7 +6,7 @@ module Magic
       end
 
       def all
-        active_battlefield_permanents + active_emblems + active_players
+        active_battlefield_permanents + active_emblems + active_players + active_rule_effect_sources
       end
 
       private
@@ -22,7 +22,11 @@ module Magic
       end
 
       def active_players
-        game.players.reject { |player| ineligible_source?(player) }
+        game.players.reject { |player| ineligible_source?(player) || player.lost? }
+      end
+
+      def active_rule_effect_sources
+        game.rule_effect_sources.reject { |source| ineligible_source?(source) }
       end
 
       def ineligible_source?(source)

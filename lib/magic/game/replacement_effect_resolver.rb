@@ -1,3 +1,6 @@
+require "json"
+require "securerandom"
+
 module Magic
   class Game
     class ReplacementEffectResolver
@@ -6,15 +9,14 @@ module Magic
       end
 
       def resolve(effect)
-        current_effect = effect
         applied_replacement_keys = []
+        context = ReplacementEffectContext.new(
+          effect: effect,
+          applied_replacement_keys: applied_replacement_keys,
+          trace_id: SecureRandom.hex(6),
+        )
 
         loop do
-          context = ReplacementEffectContext.new(
-            effect: current_effect,
-            applied_replacement_keys: applied_replacement_keys,
-          )
-
           replacement_effects = applicable_replacement_effects(
             context: context,
           )
@@ -31,16 +33,16 @@ module Magic
 
           new_effect = replacement_effect.call_with_context(context)
           log_application(
-            original_effect: current_effect,
+            context: context,
             replacement_effect: replacement_effect,
             new_effect: new_effect,
           )
 
           applied_replacement_keys << replacement_key_for(replacement_effect)
-          current_effect = new_effect
+          context = context.next(effect: new_effect)
         end
 
-        current_effect
+        context.effect
       end
 
       private
@@ -56,41 +58,62 @@ module Magic
           next unless source.respond_to?(:replacement_effect_for)
 
           source.replacement_effect_for(context)
-        end
+        end.reject { |replacement_effect| replacement_already_applied?(context, replacement_effect) }
       end
 
       def replacement_key_for(replacement_effect)
         [replacement_effect.receiver.object_id, replacement_effect.class]
       end
 
+      def replacement_already_applied?(context, replacement_effect)
+        context.applied_replacement_keys.include?(replacement_key_for(replacement_effect))
+      end
+
       def replacement_effect_identifier(replacement_effect)
         "#{replacement_effect.class}(receiver=#{replacement_effect.receiver})"
       end
 
+      def log_replacement(stage:, payload:)
+        message = { stage: stage }.merge(payload)
+        logger.debug "REPLACEMENT_TRACE #{JSON.generate(message)}"
+      end
+
       def log_candidates(context:, replacement_effects:)
-        payload = {
-          effect: context.effect.class.name,
-          affected_controller: context.affected_controller,
-          candidates: replacement_effects.map { replacement_effect_identifier(_1) },
-        }
-        logger.debug "REPLACEMENT_CANDIDATES: #{payload.inspect}"
+        log_replacement(
+          stage: "candidates",
+          payload: {
+            trace_id: context.trace_id,
+            iteration: context.iteration,
+            effect: context.effect.class.name,
+            affected_controller: context.affected_controller&.name,
+            candidates: replacement_effects.map { replacement_effect_identifier(_1) },
+          },
+        )
       end
 
       def log_selected_replacement(context:, replacement_effect:)
-        payload = {
-          effect: context.effect.class.name,
-          selected: replacement_effect && replacement_effect_identifier(replacement_effect),
-        }
-        logger.debug "REPLACEMENT_SELECTED: #{payload.inspect}"
+        log_replacement(
+          stage: "selected",
+          payload: {
+            trace_id: context.trace_id,
+            iteration: context.iteration,
+            effect: context.effect.class.name,
+            selected: replacement_effect && replacement_effect_identifier(replacement_effect),
+          },
+        )
       end
 
-      def log_application(original_effect:, replacement_effect:, new_effect:)
-        payload = {
-          original: original_effect.class.name,
-          replacement: replacement_effect_identifier(replacement_effect),
-          result: new_effect.class.name,
-        }
-        logger.debug "REPLACEMENT_APPLIED: #{payload.inspect}"
+      def log_application(context:, replacement_effect:, new_effect:)
+        log_replacement(
+          stage: "applied",
+          payload: {
+            trace_id: context.trace_id,
+            iteration: context.iteration,
+            original: context.effect.class.name,
+            replacement: replacement_effect_identifier(replacement_effect),
+            result: new_effect.class.name,
+          },
+        )
       end
     end
   end

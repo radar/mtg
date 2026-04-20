@@ -2,7 +2,7 @@ module Magic
   class Game
     extend Forwardable
 
-    attr_reader :logger, :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn
+    attr_reader :logger, :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn, :rule_effect_sources
 
     def_delegators :@battlefield, :creatures
     def_delegators :@stack, :choices, :add_choice, :skip_choice!, :resolve_choice!, :effects
@@ -34,6 +34,7 @@ module Magic
       @player_count = 0
       @players = players
       @emblems = []
+      @rule_effect_sources = []
       @turns = []
     end
 
@@ -49,6 +50,10 @@ module Magic
 
     def add_emblem(emblem)
       @emblems << emblem
+    end
+
+    def add_rule_effect_source(source)
+      @rule_effect_sources << source
     end
 
     def start!
