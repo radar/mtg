@@ -9,7 +9,7 @@ module Magic
 
     class StormCaller < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           actor.opponents.each do |opponent|
             actor.trigger_effect(:deal_damage, damage: 2, target: opponent)
           end

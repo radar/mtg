@@ -35,7 +35,7 @@ module Magic
       end
 
       class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           choices = other_creatures_you_control
           effect = FirstChoice.new(
             actor: actor,

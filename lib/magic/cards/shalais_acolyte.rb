@@ -12,7 +12,7 @@ module Magic
 
     class ShalaisAcolyte < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           if actor.kicked?
             actor.trigger_effect(
               :add_counter,

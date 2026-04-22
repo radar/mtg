@@ -31,7 +31,7 @@ module Magic
       end
 
       class Death < TriggeredAbility::Death
-        def perform
+        def call
           actor.trigger_effect(:gain_life, life: actor.power)
         end
       end

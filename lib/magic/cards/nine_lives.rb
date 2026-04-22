@@ -21,7 +21,7 @@ module Magic
       end
 
       class LTB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           actor.trigger_effect(:lose_game, player: controller)
         end
       end

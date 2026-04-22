@@ -182,52 +182,12 @@ module Magic
 
     def receive_event(event)
       trigger_delayed_response(event)
-      case event
-      when Events::EnteredTheBattlefield
-        entered_the_battlefield!(event)
-      when Events::LeftTheBattlefield
-        left_the_battlefield!(event)
-      when Events::CreatureDied
-        died!(event)
-      end
-
-      handler_class = card.event_handlers[event.class]
-      if handler_class
-        # TODO: deprecate procs, move to classes
-        if handler_class.is_a?(Proc)
-          raise "Proc-based class for #{card}"
-          handler_class.call(self, event)
-        else
-          logger.debug "EVENT HANDLER: #{self} handling #{event}"
-          handler = handler_class.new(actor: self, event: event)
-
-          handler.perform!
-        end
-      end
-    end
-
-    def died!(event)
-      return unless event.permanent == self
-      card.death_triggers.each do |trigger|
-        trigger.new(actor: self, event: event).perform
-      end
-    end
-
-    def left_the_battlefield!(event)
-      return unless event.permanent == self
-      @attachments.each(&:destroy!)
-
-      card.ltb_triggers.each do |trigger|
-        trigger.new(actor: self, event: event).perform
-      end
+      dispatch_lifecycle_triggers(event)
+      dispatch_event_handlers(event)
     end
 
     def entered_the_battlefield!(event)
-      return unless event.permanent == self
-
-      card.etb_triggers.each do |trigger|
-        trigger.new(actor: self, event: event).perform
-      end
+      dispatch_lifecycle_triggers(event)
     end
 
     def protected_from?(card)
@@ -406,6 +366,32 @@ module Magic
     end
 
     private
+
+    def dispatch_lifecycle_triggers(event)
+      return unless event.respond_to?(:permanent) && event.permanent == self
+
+      @attachments.each(&:destroy!) if event.is_a?(Events::LeftTheBattlefield)
+
+      lifecycle_triggers_for(event).each do |trigger_class|
+        trigger_class.new(actor: self, event: event).perform!
+      end
+    end
+
+    def lifecycle_triggers_for(event)
+      case event
+      when Events::EnteredTheBattlefield then card.etb_triggers
+      when Events::LeftTheBattlefield     then card.ltb_triggers
+      when Events::CreatureDied           then card.death_triggers
+      else []
+      end
+    end
+
+    def dispatch_event_handlers(event)
+      Array(card.event_handlers[event.class]).each do |handler_class|
+        logger.debug "EVENT HANDLER: #{self} handling #{event}"
+        handler_class.new(actor: self, event: event).perform!
+      end
+    end
 
     def remove_until_eot_keyword_grants!
       until_eot_grants = keyword_grants.select(&:until_eot?)

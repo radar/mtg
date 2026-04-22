@@ -7,8 +7,7 @@ module Magic
         end
 
         def add_event_handler(event, klass)
-          event_handlers[event] ||= []
-          event_handlers[event] = klass
+          event_handlers[event] = Array(event_handlers[event]) + [klass]
         end
 
         def trigger_effect(effect, source: self, **args)
