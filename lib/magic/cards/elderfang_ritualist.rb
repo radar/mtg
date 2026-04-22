@@ -23,7 +23,7 @@ module Magic
       end
 
       class Death < TriggeredAbility::Death
-        def perform
+        def call
           game.add_choice(ElderfangRitualist::Choice.new(actor: actor))
         end
       end

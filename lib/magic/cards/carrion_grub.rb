@@ -8,7 +8,7 @@ module Magic
 
     class CarrionGrub < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           controller.mill(4)
         end
       end

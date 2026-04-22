@@ -6,7 +6,7 @@ module Magic
 
     class IdolOfEndurance < Artifact
       class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           cards_to_exile = controller.graveyard.cmc_lte(3)
           cards_to_exile.each do |card|
             actor.trigger_effect(:exile, target: card)
@@ -18,7 +18,7 @@ module Magic
       def etb_triggers = [ETB]
 
       class LTB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           # TODO: Should this take into account the graveyard the cards came _from_?
           # If this Idol changes controllers before the LTB is triggered, those cards would go to that new controller's graveyard.
           actor.exiled_cards.each { _1.move_to_graveyard!(controller) }

@@ -65,7 +65,7 @@ module Magic
 
       def enters_the_battlefield(&block)
         etb = Class.new(TriggeredAbility::EnterTheBattlefield)
-        etb.define_method(:perform, &block)
+        etb.define_method(:call, &block)
 
         define_method(:etb_triggers) do
           [etb]

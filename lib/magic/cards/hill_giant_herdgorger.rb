@@ -9,7 +9,7 @@
 
     class HillGiantHerdgorger < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           controller.gain_life(3)
         end
       end

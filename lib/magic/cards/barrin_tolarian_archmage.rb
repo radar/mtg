@@ -26,7 +26,7 @@ module Magic
       end
 
       class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           game.choices.add(Choice.new(actor: actor))
         end
       end

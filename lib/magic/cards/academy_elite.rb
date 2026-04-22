@@ -9,7 +9,7 @@ module Magic
 
     class AcademyElite < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           counters = game.graveyard_cards.by_any_type(T::Instant, T::Sorcery).count
           actor.trigger_effect(:add_counter, target: actor, counter_type: Counters::Plus1Plus1, amount: counters)
         end

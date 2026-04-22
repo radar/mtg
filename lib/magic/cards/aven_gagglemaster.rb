@@ -10,7 +10,7 @@ module Magic
 
     class AvenGagglemaster < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           flying_creatures = controller.creatures.count(&:flying?)
           actor.trigger_effect(:gain_life, life: 2 * flying_creatures)
         end

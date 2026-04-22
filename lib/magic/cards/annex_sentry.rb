@@ -33,7 +33,7 @@ module Magic
 
 
       class ETB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           game.choices.add(Choice.new(actor: actor))
         end
       end
@@ -41,7 +41,7 @@ module Magic
       def etb_triggers = [ETB]
 
       class LTB < TriggeredAbility::EnterTheBattlefield
-        def perform
+        def call
           actor.exiled_cards.each { _1.resolve! }
         end
       end
