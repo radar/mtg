@@ -187,6 +187,7 @@ module Magic
       game.notify!(
         Events::CardDraw.new(
           player: self,
+          card: card,
         )
       )
       card.move_to_hand!(self)
