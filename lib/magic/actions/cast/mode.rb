@@ -2,6 +2,8 @@ module Magic
   module Actions
     class Cast < Action
       class Mode
+        include Magic::ResolvesWithArgs
+
         attr_reader :mode, :targets
 
         def initialize(mode)
@@ -35,12 +37,7 @@ module Magic
         end
 
         def resolve!
-          resolver = mode.method(:resolve!)
-          args = {}
-          args[:target] = targets.first if resolver.parameters.include?([:keyreq, :target])
-          args[:targets] = targets if resolver.parameters.include?([:keyreq, :targets])
-
-          mode.resolve!(**args)
+          resolve_with_args(mode, target: targets.first, targets: targets)
         end
 
       end

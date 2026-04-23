@@ -112,11 +112,7 @@ module Magic
       end
 
       def resolve!
-        resolver = ability.method(:resolve!)
-        args = {}
-        args[:target] = targets.first if resolver.parameters.include?([:keyreq, :target])
-        args[:targets] = targets if resolver.parameters.include?([:keyreq, :targets])
-        ability.resolve!(**args)
+        resolve_with_args(ability, target: targets.first, targets: targets)
       end
     end
   end
