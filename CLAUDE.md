@@ -53,6 +53,7 @@ The system uses an **event-driven architecture** to handle triggered and state-b
 
 - **Events** (`lib/magic/events/`): 47+ event types (e.g., `CardDraw`, `CreatureAttacked`, `BeginningOfUpkeep`) notify the system when game state changes
 - **TriggeredAbility** (`lib/magic/triggered_ability.rb`): Responds to events with `should_perform?` condition check and `call` execution
+- **Saga** (`lib/magic/cards/saga.rb`): Enchantment subtype that adds a lore counter on ETB and again at the beginning of the controller's first main phase each subsequent turn (`FirstMainPhaseTrigger`). Each lore counter addition fires `Events::CounterAddedToPermanent`, which triggers the corresponding chapter ability via `CounterAdded`. After the final chapter resolves, the saga sacrifices itself.
 - **ActivatedAbility** (`lib/magic/activated_ability.rb`): Player-triggered abilities with costs and effects
 - **Event Handlers**: Cards define `event_handlers` hash mapping event class to ability class for automatic triggering
 
@@ -131,6 +132,11 @@ Uses **Zeitwerk** (`lib/magic.rb`) for automatic constant loading from `lib/magi
 - `cast_and_resolve(card:, player:)`: Cast a spell and resolve it immediately
 
 **Card Helper**: `Card(name, owner: p1)` creates card instances by snake_case lookup.
+
+**Testing Sagas**: Since turns alternate between players, advancing to the controller's next main phase requires two `game.next_turn` calls (to skip the opponent's turn) followed by `go_to_main_phase!`. Each chapter is tested in a nested `context` block. Example:
+```ruby
+before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; game.tick! }
+```
 
 **Integration Tests**: Focus on game mechanics and card interactions, not unit testing individual methods. Example test file: `spec/cards/island_spec.rb`
 
