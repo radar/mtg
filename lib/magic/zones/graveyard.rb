@@ -5,6 +5,13 @@ module Magic
         return if card.token?
 
         super
+        card.game.subscribe(card) if card.event_handlers.any?
+      end
+
+      def remove(card)
+        super
+        return unless card.is_a?(Magic::Card)
+        card.game.unsubscribe(card) if card.event_handlers.any?
       end
 
       def by_name(name)

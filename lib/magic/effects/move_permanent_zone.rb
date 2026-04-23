@@ -27,14 +27,16 @@ module Magic
 
         game.notify!(*leaving_zone_notifications(from: from, to: to))
 
+        game.unsubscribe(target) if from&.battlefield?
+
         from&.remove(target)
 
         target.zone = to
         if to.battlefield?
           to.add(target)
+          game.subscribe(target)
           target.apply_continuous_effects!
         end
-
 
         game.notify!(*entering_zone_notifications(from: from, to: to))
       end

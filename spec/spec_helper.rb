@@ -72,11 +72,11 @@ RSpec.shared_context "two player game" do
   let(:p2) { Magic::Player.new(name: "P2") }
 
   def p1_library
-    7.times.map { Card("Forest") }
+    14.times.map { Card("Forest") }
   end
 
   def p2_library
-    7.times.map { Card("Mountain") }
+    14.times.map { Card("Mountain") }
   end
 
   def current_turn
