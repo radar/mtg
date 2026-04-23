@@ -5,6 +5,7 @@ RSpec.describe Magic::Cards::PeerIntoTheAbyss do
   subject(:peer_into_the_abyss) { Card("Peer Into The Abyss") }
 
   it "p2 draws half their library, and loses half their life, rounded up" do
+    p2.library.items.clear
     3.times { p2.library.add(Card("Forest")) }
     p2.lose_life(1)
     p1.add_mana(black: 7)

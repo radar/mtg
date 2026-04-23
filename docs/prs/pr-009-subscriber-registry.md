@@ -43,8 +43,21 @@
 | Permanent enters battlefield | `MovePermanentZone#resolve!` (after LTB, before ETB) | `MovePermanentZone#resolve!` (after LTB fires, before removal) |
 | Card enters graveyard with handlers | `Graveyard#add` | `Graveyard#remove` |
 
+**`lib/magic/player.rb`**
+- `lose!` now calls `game.unsubscribe(self)` after setting `@lost = true`, so a lost player no longer receives events
+
+**`lib/magic/game.rb`**
+- `start!` deals the opening hand by calling `player.library.draw` and `card&.move_to_hand!` directly, bypassing `Player#draw!`'s empty-library guard. This prevents `lose!` from firing during setup when the library is exactly 7 cards.
+
+**`spec/spec_helper.rb`**
+- Default library size increased from 7 to 14 cards so the draw step at the start of each turn doesn't immediately exhaust the library
+
+**`spec/cards/peer_into_the_abyss_spec.rb`**
+- Added `p2.library.items.clear` before seeding 3 test cards, since p2's library is no longer empty after `game.start!`
+
 ## Invariants Preserved
 
 - Newly entering permanents don't receive the ETB event for other permanents entering in the same batch (dup on `event_listeners`)
 - Bloodghast and any other graveyard-ability card subscribes when entering the graveyard and unsubscribes when leaving
+- A lost player is removed from `event_listeners` immediately after `PlayerLost` fires, so it receives no further events
 - All 534 tests pass

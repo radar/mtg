@@ -115,6 +115,7 @@ module Magic
       )
 
       @lost = true
+      game.unsubscribe(self)
     end
 
     def gain_life(gain)
