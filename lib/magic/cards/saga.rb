@@ -18,11 +18,17 @@ module Magic
         actor.trigger_effect(:add_counter, counter_type: Magic::Counters::Lore, target: actor)
       end
 
-      class CounterAdded < TriggeredAbility::LoreCounterAdded
+      class FirstMainPhaseTrigger < TriggeredAbility
         def should_perform?
-          super
+          event.active_player == controller
         end
 
+        def call
+          actor.trigger_effect(:add_counter, counter_type: Magic::Counters::Lore, target: actor)
+        end
+      end
+
+      class CounterAdded < TriggeredAbility::LoreCounterAdded
         def call
           lore_counters = actor.counters.of_type(Magic::Counters::Lore).count
 
@@ -40,6 +46,7 @@ module Magic
 
       def event_handlers
         {
+          Events::FirstMainPhase => FirstMainPhaseTrigger,
           Events::CounterAddedToPermanent => CounterAdded
         }
       end
