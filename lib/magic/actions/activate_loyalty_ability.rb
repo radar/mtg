@@ -44,12 +44,9 @@ module Magic
       end
 
       def resolve!
-        resolver = ability.method(:resolve!)
-        args = {}
-        args[:target] = targets.first if resolver.parameters.include?([:keyreq, :target])
-        args[:targets] = targets if resolver.parameters.include?([:keyreq, :targets])
-        args[:value_for_x] = x_value if x_value && resolver.parameters.include?([:keyreq, :value_for_x])
-        ability.resolve!(**args)
+        pool = { target: targets.first, targets: targets }
+        pool[:value_for_x] = x_value if x_value
+        resolve_with_args(ability, **pool)
       end
     end
   end

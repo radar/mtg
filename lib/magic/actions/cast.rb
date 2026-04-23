@@ -142,18 +142,14 @@ module Magic
 
       def resolve!
         if modes.any?
-          modes.each do |mode|
-            mode.resolve!
-          end
+          modes.each { |mode| mode.resolve! }
         else
-          resolver = card.method(:resolve!)
-          args = {}
-          args[:target] = targets.first if resolver.parameters.include?([:keyreq, :target])
-          args[:targets] = targets if resolver.parameters.include?([:keyreq, :targets])
-          args[:kicked] = kicker_cost.paid? if resolver.parameters.include?([:key, :kicked])
-          args[:value_for_x] = mana_cost.x if resolver.parameters.include?([:keyreq, :value_for_x])
-
-          card.resolve!(**args)
+          resolve_with_args(card,
+            target: targets.first,
+            targets: targets,
+            kicked: kicker_cost.paid?,
+            value_for_x: mana_cost.x,
+          )
         end
 
         if card.sorcery? || card.instant?
