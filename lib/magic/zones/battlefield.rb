@@ -18,16 +18,6 @@ module Magic
         StaticAbilities.new(permanents.flat_map(&:static_abilities))
       end
 
-      def receive_event(event)
-        # the dup here is so that if an event adds a permanent to the array, we do not infinitely loop
-        # For example:
-        # 1. Scute Swarm's Triggered Landfall Abililty
-        # 2. Creates a scute, adding to this array
-        # 3. `.each` continues on its merry way, going to Scute #2
-        # 4. Go to Step 2.
-        permanents.dup.each { _1.receive_event(event) }
-      end
-
       def permanents
         items
       end

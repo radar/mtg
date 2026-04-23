@@ -2,7 +2,26 @@ module Magic
   class Game
     extend Forwardable
 
-    attr_reader :logger, :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn
+    attr_reader :logger, :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn, :event_listeners
+
+    class EmblemList
+      include Enumerable
+
+      def initialize(game)
+        @game = game
+        @items = []
+      end
+
+      def <<(emblem)
+        @items << emblem
+        @game.subscribe(emblem)
+        self
+      end
+
+      def each(&block)
+        @items.each(&block)
+      end
+    end
 
     def_delegators :@battlefield, :creatures
     def_delegators :@stack, :choices, :add_choice, :skip_choice!, :resolve_choice!, :effects
@@ -33,8 +52,9 @@ module Magic
       @logger.level = ENV['LOG_LEVEL'] || "INFO"
       @player_count = 0
       @players = players
-      @emblems = []
+      @emblems = EmblemList.new(self)
       @turns = []
+      @event_listeners = []
     end
 
     def add_players(*players)
@@ -45,10 +65,19 @@ module Magic
       @player_count += 1
       @players << player
       player.join_game(self)
+      subscribe(player)
     end
 
     def add_emblem(emblem)
-      @emblems << emblem
+      @emblems << emblem  # EmblemList handles subscription
+    end
+
+    def subscribe(listener)
+      @event_listeners << listener
+    end
+
+    def unsubscribe(listener)
+      @event_listeners.delete(listener)
     end
 
     def start!

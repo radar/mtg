@@ -191,15 +191,7 @@ module Magic
         events.each do |event|
           logger.debug "EVENT: #{event.inspect}"
           track_event(event)
-
-          if event
-            emblems.each { |emblem| emblem.receive_event(event) }
-            players.each do |player|
-              player.graveyard.each { _1.receive_event(event) }
-              player.receive_event(event)
-            end
-            battlefield.receive_event(event)
-          end
+          game.event_listeners.dup.each { |listener| listener.receive_event(event) } if event
         end
       end
 
