@@ -16,6 +16,10 @@ module Magic
       select(&:basic_land?)
     end
 
+    def shrines
+      by_any_type("Shrine")
+    end
+
     def creatures
        select(&:creature?)
     end
