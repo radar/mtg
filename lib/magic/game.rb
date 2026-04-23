@@ -83,10 +83,7 @@ module Magic
     def start!
       @current_turn = add_turn(number: 1, active_player: players.first)
       players.each do |player|
-        7.times do
-          card = player.library.draw
-          card&.move_to_hand!(player)
-        end
+        7.times { player.draw! }
       end
     end
 

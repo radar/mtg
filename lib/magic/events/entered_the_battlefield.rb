@@ -3,9 +3,14 @@ module Magic
     class EnteredTheBattlefield < Base
       attr_reader :permanent, :from
 
-      def initialize(permanent, from:)
+      def initialize(permanent, from:, kicked: false)
         @from = from
         @permanent = permanent
+        @kicked = kicked
+      end
+
+      def kicked?
+        @kicked
       end
 
       def inspect

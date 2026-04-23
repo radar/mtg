@@ -125,7 +125,13 @@ module Magic
         mana_cost.finalize!(player)
         game.stack.add(self)
 
-        game.notify!(Events::SpellCast.new(spell: card, player: player))
+        game.notify!(Events::SpellCast.new(
+          spell: card,
+          player: player,
+          x_value: value_for_x,
+          flashback: @flashback,
+          targets: targets,
+        ))
       end
 
       def choose_mode(mode_class, &)

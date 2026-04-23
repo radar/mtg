@@ -1,10 +1,11 @@
 module Magic
   module Events
     class CardDraw
-      attr_reader :player
+      attr_reader :player, :card
 
-      def initialize(player:)
+      def initialize(player:, card: nil)
         @player = player
+        @card = card
       end
 
       def inspect
