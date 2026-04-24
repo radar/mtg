@@ -24,6 +24,10 @@ The test suite uses RSpec with integration testing patterns. See `spec/spec_help
 - Card files in `lib/magic/cards/` do **not** use the frozen_string_literal pragma
 - Follow standard Ruby conventions with descriptive variable and method names
 
+### Workflow
+- Each new card implementation must be its own commit, branch, and pull request.
+- Name branches after the card (e.g. `pr14-terror-of-the-peaks`).
+
 ## High-Level Architecture
 
 This is a Magic: The Gathering simulation engine written in Ruby without UI. The system models the core game mechanics and card effects using an event-driven architecture with state machines.
