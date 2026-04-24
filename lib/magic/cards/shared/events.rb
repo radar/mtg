@@ -3,7 +3,11 @@ module Magic
     module Shared
       module Events
         def event_handlers
-          @event_handlers ||= {}
+          handlers = @event_handlers ||= {}
+          if self.class.const_defined?(:WARD_TRIGGER, false)
+            handlers = { Magic::Events::SpellCast => self.class::WARD_TRIGGER }.merge(handlers)
+          end
+          handlers
         end
 
         def add_event_handler(event, klass)
