@@ -24,6 +24,11 @@ The test suite uses RSpec with integration testing patterns. See `spec/spec_help
 - Card files in `lib/magic/cards/` do **not** use the frozen_string_literal pragma
 - Follow standard Ruby conventions with descriptive variable and method names
 
+### Workflow
+- Each new card implementation must be its own commit, branch, and pull request.
+- Name branches after the card in kebab-case (e.g. `terror-of-the-peaks` for "Terror of the Peaks").
+- After implementing a card, review whether any new patterns, conventions, or gotchas were encountered. If so, update CLAUDE.md and include that change in the same commit as the card implementation so future sessions have the context immediately.
+
 ## High-Level Architecture
 
 This is a Magic: The Gathering simulation engine written in Ruby without UI. The system models the core game mechanics and card effects using an event-driven architecture with state machines.
@@ -132,7 +137,7 @@ Uses **Zeitwerk** (`lib/magic.rb`) for automatic constant loading from `lib/magi
 - `ResolvePermanent(name, owner: p1)`: Create and resolve a permanent
 - `cast_and_resolve(card:, player:)`: Cast a spell and resolve it immediately
 
-**Card Helper**: `Card(name, owner: p1)` creates card instances by snake_case lookup.
+**Card Helper**: `Card(name, owner: p1)` and `ResolvePermanent(name)` look up constants by stripping non-letter characters from the name. Every word must be capitalised — use `"Terror Of The Peaks"` not `"Terror of the Peaks"`. Lowercase words like "of", "the", and "a" must be uppercased or the constant lookup will fail.
 
 **Testing Sagas**: Since turns alternate between players, advancing to the controller's next main phase requires two `game.next_turn` calls (to skip the opponent's turn) followed by `go_to_main_phase!`. Each chapter is tested in a nested `context` block. Example:
 ```ruby
@@ -140,6 +145,12 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 ```
 
 **Integration Tests**: Focus on game mechanics and card interactions, not unit testing individual methods. Example test file: `spec/cards/island_spec.rb`
+
+## Common Card Ability Patterns
+
+**Ward (additional life cost)**: Implement as a `SpellCast` triggered ability. Check `opponents.include?(event.player) && event.targets.include?(actor)`, then `trigger_effect(:lose_life, target: event.player, life: N)`. Example: `TerrorOfThePeaks::WardTrigger`.
+
+**Targeted ETB trigger ("deals damage to any target")**: Add a `Magic::Choice::Targeted` subclass to the card's class reopening. Define `choices` (e.g. `game.any_target`) and `resolve!(target:)` to apply the effect. In the trigger's `call`, push an instance onto `game.choices`. Pass any data needed at resolution (e.g. entering creature's power) via the constructor. Example: `TerrorOfThePeaks::DamageChoice`.
 
 ## Important Files & Entry Points
 
