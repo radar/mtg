@@ -17,7 +17,6 @@ module Magic
       :power,
       :toughness,
       :keywords,
-      :delayed_responses,
       :attachments,
       :protections,
       :modifiers,
@@ -65,7 +64,6 @@ module Magic
       @kicked = kicked
       @copy = copy
       @base_types = card.types
-      @delayed_responses = []
       @attachments = []
       @modifiers = []
       @tapped = false
@@ -181,7 +179,6 @@ module Magic
     end
 
     def receive_event(event)
-      trigger_delayed_response(event)
       dispatch_lifecycle_triggers(event)
       dispatch_event_handlers(event)
     end
@@ -282,17 +279,6 @@ module Magic
       card.can_block?(permanent) && attachments.all? { |attachment| attachment.can_block?(permanent) }
     end
 
-
-    def delayed_response(turn:, event_type:, response:)
-      @delayed_responses << { turn: turn.number, event_type: event_type, response: response }
-    end
-
-    def trigger_delayed_response(event)
-      responses = delayed_responses.select { |response| event.is_a?(response[:event_type]) && response[:turn] == game.current_turn.number }
-      responses.each do |response|
-        response[:response].call
-      end
-    end
 
     def cleanup!
       remove_until_eot_keyword_grants!

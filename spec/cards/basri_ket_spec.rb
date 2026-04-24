@@ -32,14 +32,13 @@ RSpec.describe Magic::Cards::BasriKet do
       allow(game).to receive(:current_turn) { turn }
     end
 
-    it "adds an after attackers declared step trigger" do
+    it "registers trigger for attackers declared this turn" do
       p1.activate_loyalty_ability(ability: ability)
       game.stack.resolve!
       game.tick!
 
       expect(subject.loyalty).to eq(1)
-      expect(subject.delayed_responses.count).to eq(1)
-      expect(subject.delayed_responses.first[:event_type]).to eq(Magic::Events::PreliminaryAttackersDeclared)
+      expect(subject.card.minus2_active_turn).to eq(1)
     end
   end
 
