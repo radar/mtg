@@ -27,6 +27,7 @@ The test suite uses RSpec with integration testing patterns. See `spec/spec_help
 ### Workflow
 - Each new card implementation must be its own commit, branch, and pull request.
 - Name branches after the card in kebab-case (e.g. `terror-of-the-peaks` for "Terror of the Peaks").
+- After implementing a card, review whether any new patterns, conventions, or gotchas were encountered. If so, update CLAUDE.md and include that change in the same commit as the card implementation so future sessions have the context immediately.
 
 ## High-Level Architecture
 
