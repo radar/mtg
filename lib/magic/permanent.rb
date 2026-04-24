@@ -64,6 +64,7 @@ module Magic
       @kicked = kicked
       @copy = copy
       @base_types = card.types
+      @eot_handlers = []
       @attachments = []
       @modifiers = []
       @tapped = false
@@ -280,7 +281,12 @@ module Magic
     end
 
 
+    def register_until_eot_handler(event_type, handler_class)
+      @eot_handlers << { event_type: event_type, handler_class: handler_class }
+    end
+
     def cleanup!
+      @eot_handlers = []
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
       remove_until_eot_modifiers!
@@ -376,6 +382,10 @@ module Magic
       Array(card.event_handlers[event.class]).each do |handler_class|
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
         handler_class.new(actor: self, event: event).perform!
+      end
+
+      @eot_handlers.select { |h| event.is_a?(h[:event_type]) }.each do |h|
+        h[:handler_class].new(actor: self, event: event).perform!
       end
     end
 

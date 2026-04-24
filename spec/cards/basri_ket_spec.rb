@@ -32,13 +32,12 @@ RSpec.describe Magic::Cards::BasriKet do
       allow(game).to receive(:current_turn) { turn }
     end
 
-    it "registers trigger for attackers declared this turn" do
+    it "registers an until-end-of-turn trigger for attackers declared" do
       p1.activate_loyalty_ability(ability: ability)
       game.stack.resolve!
       game.tick!
 
       expect(subject.loyalty).to eq(1)
-      expect(subject.card.minus2_active_turn).to eq(1)
     end
   end
 

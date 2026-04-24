@@ -41,25 +41,21 @@ module Magic
         end
       end
 
-      class LoyaltyAbility2 < Magic::LoyaltyAbility
-        def loyalty_change = -2
-
-        def resolve!
-          source.card.minus2_active_turn = game.current_turn.number
-        end
-      end
-
       class PreliminaryAttackersHandler < TriggeredAbility
-        def should_perform?
-          actor.card.minus2_active_turn == game.current_turn.number
-        end
-
         def call
           attackers = game.current_turn.attacks.count
           attackers.times do
             token = trigger_effect(:create_token, token_class: SoldierToken, enters_tapped: true).first
             game.current_turn.declare_attacker(token)
           end
+        end
+      end
+
+      class LoyaltyAbility2 < Magic::LoyaltyAbility
+        def loyalty_change = -2
+
+        def resolve!
+          source.register_until_eot_handler(Events::PreliminaryAttackersDeclared, PreliminaryAttackersHandler)
         end
       end
 
@@ -71,8 +67,6 @@ module Magic
         end
       end
 
-      attr_accessor :minus2_active_turn
-
       def loyalty_abilities
         [
           LoyaltyAbility1,
@@ -81,11 +75,6 @@ module Magic
         ]
       end
 
-      def event_handlers
-        {
-          Events::PreliminaryAttackersDeclared => PreliminaryAttackersHandler
-        }
-      end
     end
   end
 end
