@@ -46,6 +46,7 @@ This is a Magic: The Gathering simulation engine written in Ruby without UI. The
    - Base card types: `Creature`, `Instant`, `Sorcery`, `Enchantment`, `Aura`, `Saga`, `Artifact`, `Equipment`
    - Simple cards need only cost and creature stats (Example: `StorySeeker`)
    - Complex cards extend the base class with triggered abilities, activated abilities, and event handlers (Example: `AcademyElite`)
+   - **DSL block vs class reopening**: The DSL block (`Enchantment("Name") do ... end`) runs in the `Magic::Cards` lexical scope, so any `class Foo` defined inside it lands in `Magic::Cards::Foo` — not nested inside the card class. To avoid name collisions between cards, keep the DSL block to type and cost only, then define trigger classes, choice classes, and `event_handlers` in a class reopening (`class CardName < Enchantment; ...; end`). Constants defined there are properly scoped to the card. Example: `SanctumOfCalmWaters`, `SanctumOfFruitfulHarvest`.
 
 ### Events & Abilities
 

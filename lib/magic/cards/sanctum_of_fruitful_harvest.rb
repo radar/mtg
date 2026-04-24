@@ -1,27 +1,25 @@
 module Magic
   module Cards
-    SanctumOfCalmWaters = Enchantment("Sanctum of Calm Waters") do
+    SanctumOfFruitfulHarvest = Enchantment("Sanctum of Fruitful Harvest") do
       type T::Super::Legendary, T::Enchantment, "Shrine"
-      cost generic: 3, blue: 1
+      cost generic: 2, green: 1
     end
 
-    class SanctumOfCalmWaters < Enchantment
+    class SanctumOfFruitfulHarvest < Enchantment
       class FirstMainPhaseTrigger < TriggeredAbility
         def should_perform?
           event.active_player == controller
         end
 
         def call
-          game.choices.add(SanctumOfCalmWaters::Choice.new(actor: actor))
+          game.choices.add(SanctumOfFruitfulHarvest::ColorChoice.new(actor: actor))
         end
       end
 
-      class Choice < Magic::Choice
-        def resolve!
+      class ColorChoice < Magic::Choice::Color
+        def resolve!(color:)
           shrines = controller.permanents.by_type("Shrine").count
-          actor.trigger_effect(:draw_cards, number_to_draw: shrines)
-
-          actor.add_choice(:discard)
+          controller.add_mana(color => shrines)
         end
       end
 
