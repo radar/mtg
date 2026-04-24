@@ -7,9 +7,9 @@ module Magic
       power 5
       toughness 4
 
-      class EndStepTrigger < TriggeredAbility
+      class EndStepTrigger < TriggeredAbility::BeginningOfEndStep
         def should_perform?
-          return false unless event.active_player == controller
+          return false unless controllers_end_step?
           death_events = game.current_turn.events.select { |e| e.is_a?(Events::CreatureDied) }
           death_events.any?
         end

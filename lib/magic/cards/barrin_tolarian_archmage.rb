@@ -31,7 +31,7 @@ module Magic
         end
       end
 
-      class BeginningOfEndStepTrigger < TriggeredAbility
+      class BeginningOfEndStepTrigger < TriggeredAbility::BeginningOfEndStep
         def should_perform?
           cards_returned_to_hand = game.current_turn.events.select do |event|
             next unless event.is_a?(Events::PermanentEnteredZone)

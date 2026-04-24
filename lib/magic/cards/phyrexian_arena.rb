@@ -6,11 +6,7 @@ module Magic
     end
 
     class PhyrexianArena < Card
-      class BeginningOfUpkeepTrigger < TriggeredAbility
-        def should_perform?
-          you?
-        end
-
+      class BeginningOfUpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         def call
           actor.trigger_effect(:draw_cards, source: actor)
           actor.trigger_effect(:lose_life, target: controller, life: 1)
