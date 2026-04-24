@@ -83,6 +83,18 @@ module Magic
           amount
         end
       end
+
+      def ward(life:)
+        ward_trigger = Class.new(TriggeredAbility::SpellCast) do
+          define_method(:should_perform?) do
+            opponents.include?(event.player) && event.targets.include?(actor)
+          end
+          define_method(:call) do
+            trigger_effect(:lose_life, target: event.player, life: life)
+          end
+        end
+        const_set(:WARD_TRIGGER, ward_trigger)
+      end
     end
 
     def initialize(game: Game.new, owner:)

@@ -4,21 +4,12 @@ module Magic
       cost generic: 3, red: 2
       creature_type "Dragon"
       keywords :flying
+      ward life: 3
       power 5
       toughness 4
     end
 
     class TerrorOfThePeaks < Creature
-      class WardTrigger < TriggeredAbility
-        def should_perform?
-          opponents.include?(event.player) && event.targets.include?(actor)
-        end
-
-        def call
-          trigger_effect(:lose_life, target: event.player, life: 3)
-        end
-      end
-
       class CreatureEnteredTrigger < TriggeredAbility::EnterTheBattlefield
         def should_perform?
           another_creature? && under_your_control?
@@ -52,10 +43,7 @@ module Magic
       end
 
       def event_handlers
-        {
-          Events::SpellCast => WardTrigger,
-          Events::EnteredTheBattlefield => CreatureEnteredTrigger
-        }
+        super.merge(Events::EnteredTheBattlefield => CreatureEnteredTrigger)
       end
     end
   end
