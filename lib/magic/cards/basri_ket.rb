@@ -41,23 +41,21 @@ module Magic
         end
       end
 
+      class PreliminaryAttackersHandler < TriggeredAbility
+        def call
+          attackers = game.current_turn.attacks.count
+          attackers.times do
+            token = trigger_effect(:create_token, token_class: SoldierToken, enters_tapped: true).first
+            game.current_turn.declare_attacker(token)
+          end
+        end
+      end
+
       class LoyaltyAbility2 < Magic::LoyaltyAbility
         def loyalty_change = -2
 
         def resolve!
-          source.delayed_response(
-            turn: game.current_turn,
-            event_type: Events::PreliminaryAttackersDeclared,
-            response: -> {
-              attackers = game.current_turn.attacks.count
-
-              attackers.times do
-                token = trigger_effect(:create_token, token_class: SoldierToken, enters_tapped: true).first
-
-                game.current_turn.declare_attacker(token)
-              end
-            }
-          )
+          source.register_until_eot_handler(Events::PreliminaryAttackersDeclared, PreliminaryAttackersHandler)
         end
       end
 
@@ -76,6 +74,7 @@ module Magic
           LoyaltyAbility3,
         ]
       end
+
     end
   end
 end

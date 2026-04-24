@@ -17,7 +17,6 @@ module Magic
       :power,
       :toughness,
       :keywords,
-      :delayed_responses,
       :attachments,
       :protections,
       :modifiers,
@@ -65,7 +64,7 @@ module Magic
       @kicked = kicked
       @copy = copy
       @base_types = card.types
-      @delayed_responses = []
+      @eot_handlers = []
       @attachments = []
       @modifiers = []
       @tapped = false
@@ -181,7 +180,6 @@ module Magic
     end
 
     def receive_event(event)
-      trigger_delayed_response(event)
       dispatch_lifecycle_triggers(event)
       dispatch_event_handlers(event)
     end
@@ -283,18 +281,12 @@ module Magic
     end
 
 
-    def delayed_response(turn:, event_type:, response:)
-      @delayed_responses << { turn: turn.number, event_type: event_type, response: response }
-    end
-
-    def trigger_delayed_response(event)
-      responses = delayed_responses.select { |response| event.is_a?(response[:event_type]) && response[:turn] == game.current_turn.number }
-      responses.each do |response|
-        response[:response].call
-      end
+    def register_until_eot_handler(event_type, handler_class)
+      @eot_handlers << { event_type: event_type, handler_class: handler_class }
     end
 
     def cleanup!
+      @eot_handlers = []
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
       remove_until_eot_modifiers!
@@ -390,6 +382,10 @@ module Magic
       Array(card.event_handlers[event.class]).each do |handler_class|
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
         handler_class.new(actor: self, event: event).perform!
+      end
+
+      @eot_handlers.select { |h| event.is_a?(h[:event_type]) }.each do |h|
+        h[:handler_class].new(actor: self, event: event).perform!
       end
     end
 

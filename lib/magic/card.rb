@@ -7,7 +7,7 @@ module Magic
     include Cards::Keywords
     include Cards::Shared::Events
     include Cards::Shared::Types
-    attr_reader :game, :controller, :owner, :name, :cost, :kicker_cost, :types, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :modes
+    attr_reader :game, :controller, :owner, :name, :cost, :kicker_cost, :types, :countered, :keyword_grants, :keywords, :protections, :modes
     attr_accessor :tapped
 
     attr_accessor :zone
@@ -93,7 +93,6 @@ module Magic
       @cost = Costs::Mana.new(self.class::COST.dup)
       @kicker_cost = Costs::Kicker.new(self.class::KICKER_COST.dup)
       @tapped = tapped
-      @delayed_responses = []
       @keywords = self.class::KEYWORDS
       @keyword_grants = []
       @protections = self.class::PROTECTIONS

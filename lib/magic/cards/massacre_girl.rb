@@ -8,20 +8,19 @@ module Magic
       toughness 4
       keywords :menace
 
-      enters_the_battlefield do
-        debuff = -> do
+      class CreatureDiedDebuff < TriggeredAbility
+        def call
           game.creatures.except(actor).each do |creature|
-            actor.trigger_effect(:modify_power_toughness, target: creature, power: -1, toughness: -1)
+            trigger_effect(:modify_power_toughness, target: creature, power: -1, toughness: -1)
           end
         end
+      end
 
-        debuff.call
-
-        actor.delayed_response(
-          turn: game.current_turn,
-          event_type: Events::CreatureDied,
-          response: debuff,
-        )
+      enters_the_battlefield do
+        game.creatures.except(actor).each do |creature|
+          actor.trigger_effect(:modify_power_toughness, target: creature, power: -1, toughness: -1)
+        end
+        actor.register_until_eot_handler(Events::CreatureDied, CreatureDiedDebuff)
       end
     end
   end
