@@ -14,9 +14,9 @@ module Magic
         keywords :flying
       end
 
-      class EndStepTrigger < TriggeredAbility
+      class EndStepTrigger < TriggeredAbility::BeginningOfEndStep
         def should_perform?
-          controllers_turn? && life_gained_by(controller) >= 3
+          controllers_end_step? && life_gained_by(controller) >= 3
         end
 
         def call

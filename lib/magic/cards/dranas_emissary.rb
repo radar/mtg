@@ -9,11 +9,7 @@ module Magic
     end
 
     class DranasEmissary < Creature
-      class BeginningOfUpkeepTrigger < TriggeredAbility
-        def should_perform?
-          controllers_turn?
-        end
-
+      class BeginningOfUpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         def call
           controller.gain_life(1)
 
