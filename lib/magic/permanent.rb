@@ -17,7 +17,6 @@ module Magic
       :power,
       :toughness,
       :keywords,
-      :delayed_responses,
       :attachments,
       :protections,
       :modifiers,
@@ -65,8 +64,8 @@ module Magic
       @kicked = kicked
       @copy = copy
       @base_types = card.types
-      @delayed_responses = []
       @attachments = []
+      @turn_triggers = {}
       @modifiers = []
       @tapped = false
       @types = card.types
@@ -181,9 +180,13 @@ module Magic
     end
 
     def receive_event(event)
-      trigger_delayed_response(event)
       dispatch_lifecycle_triggers(event)
       dispatch_event_handlers(event)
+      dispatch_turn_triggers(event)
+    end
+
+    def register_turn_trigger(event_class, trigger_class)
+      @turn_triggers[event_class] = Array(@turn_triggers[event_class]) + [trigger_class]
     end
 
     def entered_the_battlefield!(event)
@@ -283,18 +286,8 @@ module Magic
     end
 
 
-    def delayed_response(turn:, event_type:, response:)
-      @delayed_responses << { turn: turn.number, event_type: event_type, response: response }
-    end
-
-    def trigger_delayed_response(event)
-      responses = delayed_responses.select { |response| event.is_a?(response[:event_type]) && response[:turn] == game.current_turn.number }
-      responses.each do |response|
-        response[:response].call
-      end
-    end
-
     def cleanup!
+      @turn_triggers = {}
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
       remove_until_eot_modifiers!
@@ -410,6 +403,12 @@ module Magic
     def remove_until_eot_modifiers!
       until_eot_modifiers = modifiers.select(&:until_eot?)
       until_eot_modifiers.each { |modifier| modifiers.delete(modifier) }
+    end
+
+    def dispatch_turn_triggers(event)
+      Array(@turn_triggers[event.class]).each do |handler_class|
+        handler_class.new(actor: self, event: event).perform!
+      end
     end
   end
 end
