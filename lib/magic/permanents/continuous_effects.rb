@@ -112,10 +112,23 @@ module Magic
           *card.activated_abilities,
           # Land types specifically give one mana ability each
           *class_types.flat_map { |type| type::ManaAbility},
+          *cauldron_granted_abilities,
         ]
         .map do |ability|
           ability.new(source: permanent)
         end
+      end
+
+      def cauldron_granted_abilities
+        return [] unless permanent.types.include?(T::Creature)
+        return [] unless permanent.counters.any? { |c| c.is_a?(Counters::Plus1Plus1) }
+
+        game.battlefield
+          .controlled_by(permanent.controller)
+          .select { |p| p.card.is_a?(Cards::AgathasSoulCauldron) }
+          .flat_map { |cauldron| cauldron.exiled_cards }
+          .select { |card| card.types.include?(T::Creature) }
+          .flat_map(&:activated_abilities)
       end
     end
   end

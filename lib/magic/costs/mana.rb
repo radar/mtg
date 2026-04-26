@@ -17,6 +17,12 @@ module Magic
         @payments = Hash.new(0)
         @payments[:generic] = Hash.new(0)
         @payments[:x] = Hash.new(0)
+        @any_color = false
+        @actual_color_payments = Hash.new(0)
+      end
+
+      def treat_any_color_as_any!
+        @any_color = true
       end
 
       def mana_value
@@ -45,6 +51,11 @@ module Magic
 
       def can_pay?(player)
         return true if cost.values.all?(&:zero?)
+
+        if @any_color
+          total_needed = color_costs.values.sum + (cost[:generic] || 0)
+          return player.mana_pool.values.sum >= total_needed
+        end
 
         pool = player.mana_pool.dup
         deduct_from_pool(pool, color_costs)
@@ -75,7 +86,11 @@ module Magic
         raise CannotPay unless can_pay?(player)
 
         player.pay_mana(@payments[:generic]) if @payments[:generic].any?
-        player.pay_mana(color_costs) if color_costs.values.any?(&:positive?)
+        if @any_color
+          player.pay_mana(@actual_color_payments) if @actual_color_payments.any?
+        else
+          player.pay_mana(color_costs) if color_costs.values.any?(&:positive?)
+        end
       end
 
       def pay!(player:, payment:)
@@ -147,10 +162,21 @@ module Magic
       end
 
       def pay_colors(color_payments)
-        color_payments.each_with_object(balance) do |(color, amount), remaining_balance|
-          remaining_balance[color] -= amount
+        if @any_color
+          remaining = color_payments.values.sum
+          color_costs.each_key do |color|
+            break if remaining <= 0
+            deduction = [balance[color], remaining].min
+            balance[color] -= deduction
+            remaining -= deduction
+          end
+          color_payments.each { |color, amount| @actual_color_payments[color] += amount }
+        else
+          color_payments.each_with_object(balance) do |(color, amount), remaining_balance|
+            remaining_balance[color] -= amount
+          end
+          @payments.merge!(color_payments) { |key, old_value, new_value| old_value + new_value }
         end
-        @payments.merge!(color_payments) { |key, old_value, new_value| old_value + new_value }
       end
 
       def outstanding_balance?
