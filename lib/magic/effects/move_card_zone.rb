@@ -34,7 +34,7 @@ module Magic
         end
 
         game.notify!(
-          Events::CardEnteredZoneTransition.new(
+          Events::CardEnteredZone.new(
             target,
             from: from,
             to: to
