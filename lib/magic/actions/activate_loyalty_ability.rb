@@ -40,6 +40,7 @@ module Magic
         end
 
         planeswalker.change_loyalty!(loyalty_change)
+        game.notify!(Events::AbilityActivated.new(ability: ability, player: player))
         game.stack.add(self)
       end
 

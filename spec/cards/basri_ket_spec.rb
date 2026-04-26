@@ -27,19 +27,15 @@ RSpec.describe Magic::Cards::BasriKet do
   context "-2 triggered ability" do
     let(:ability) { planeswalker.loyalty_abilities[1] }
 
-    let(:turn) { double(Magic::Game::Turn, number: 1, notify!: nil) }
-    before do
-      allow(game).to receive(:current_turn) { turn }
-    end
-
-    it "adds an after attackers declared step trigger" do
+    it "registers a turn trigger for PreliminaryAttackersDeclared" do
       p1.activate_loyalty_ability(ability: ability)
       game.stack.resolve!
       game.tick!
 
       expect(subject.loyalty).to eq(1)
-      expect(subject.delayed_responses.count).to eq(1)
-      expect(subject.delayed_responses.first[:event_type]).to eq(Magic::Events::PreliminaryAttackersDeclared)
+      expect(subject.instance_variable_get(:@turn_triggers)).to include(
+        Magic::Events::PreliminaryAttackersDeclared => [Magic::Cards::BasriKet::SoldierTokensTrigger]
+      )
     end
   end
 
