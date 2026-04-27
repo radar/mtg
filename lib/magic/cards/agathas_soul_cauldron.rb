@@ -39,8 +39,22 @@ module Magic
       class AnyColorForCreatureActivations < Abilities::Static::AnyColorForCreatureActivations
       end
 
+      class GrantAbilitiesFromExile < Abilities::Static::GrantActivatedAbilities
+        def applies_to?(permanent)
+          permanent.types.include?(T::Creature) &&
+            permanent.controller == controller &&
+            permanent.counters.any? { |c| c.is_a?(Counters::Plus1Plus1) }
+        end
+
+        def granted_abilities
+          @source.exiled_cards
+            .select { |card| card.types.include?(T::Creature) }
+            .flat_map(&:activated_abilities)
+        end
+      end
+
       def activated_abilities = [ExileAbility]
-      def static_abilities = [AnyColorForCreatureActivations]
+      def static_abilities = [AnyColorForCreatureActivations, GrantAbilitiesFromExile]
     end
   end
 end
