@@ -36,7 +36,11 @@ module Magic
         end
       end
 
+      class AnyColorForCreatureActivations < Abilities::Static::AnyColorForCreatureActivations
+      end
+
       def activated_abilities = [ExileAbility]
+      def static_abilities = [AnyColorForCreatureActivations]
     end
   end
 end

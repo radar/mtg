@@ -94,7 +94,7 @@ module Magic
         cost = costs.find { |cost| cost.is_a?(cost_type) }
         raise "Unknown cost: #{cost_type}" if cost.nil?
 
-        if cost.is_a?(Costs::Mana) && creature_source? && controller_has_cauldron?
+        if cost.is_a?(Costs::Mana) && any_color_for_creature_activations?
           cost.treat_any_color_as_any!
         end
 
@@ -107,12 +107,11 @@ module Magic
         self
       end
 
-      def creature_source?
-        ability.source.types.include?(T::Creature)
-      end
-
-      def controller_has_cauldron?
-        game.battlefield.controlled_by(player).any? { |p| p.card.is_a?(Cards::AgathasSoulCauldron) }
+      def any_color_for_creature_activations?
+        game.battlefield.static_abilities
+          .of_type(Abilities::Static::AnyColorForCreatureActivations)
+          .applies_to(ability.source)
+          .any?
       end
 
       def has_cost?(cost_type)
