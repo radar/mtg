@@ -172,6 +172,27 @@ Pre-built subclasses in `lib/magic/abilities/static/` — declare these on a car
 
 **Pattern**: define an inner class on the card that subclasses the relevant base, implement `applies_to?` and any extra methods, return it from `def static_abilities`. Access the source permanent via `@source`. Example: `AgathasSoulCauldron::GrantAbilitiesFromExile`.
 
+## CardList Helper Methods
+
+`Magic::CardList` (`lib/magic/card_list.rb`) wraps arrays of cards/permanents with filtering helpers. Use these instead of manual `select` with type checks:
+
+- `.creatures` — cards/permanents where `creature?` is true
+- `.lands` — `land?`
+- `.enchantments` — `enchantment?`
+- `.planeswalkers` — `planeswalker?`
+- `.artifacts` — via `.by_any_type(T::Artifact)`
+- `.basic_lands` — `basic_land?`
+- `.shrines` — subtype "Shrine"
+- `.controlled_by(player)` / `.not_controlled_by(player)` — filter by controller
+- `.by_name(name)` — filter by card name
+- `.by_any_type(*types)` — filter by one or more type constants
+- `.cmc_lte(n)` — mana value ≤ n
+- `.nonland` / `.nontoken` — exclusion filters
+- `.except(target)` — exclude a specific card/permanent
+- `.tapped` / `.attacking` — combat/state filters
+
+These return a new `CardList`, so they chain: `source.exiled_cards.creatures.flat_map(&:activated_abilities)`. Prefer these over `select { |c| c.types.include?(T::Creature) }` or similar manual filters.
+
 ## Important Files & Entry Points
 
 - `lib/magic.rb`: Entry point, Zeitwerk setup

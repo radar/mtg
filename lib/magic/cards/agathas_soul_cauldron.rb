@@ -47,9 +47,7 @@ module Magic
         end
 
         def granted_abilities
-          @source.exiled_cards
-            .select { |card| card.types.include?(T::Creature) }
-            .flat_map(&:activated_abilities)
+          @source.exiled_cards.creatures.flat_map(&:activated_abilities)
         end
       end
 
