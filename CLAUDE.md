@@ -159,6 +159,19 @@ Pre-built subclasses in `lib/magic/triggered_ability/` — use these to avoid re
 - `TriggeredAbility::SpellCast` — provides `spell`, `enchantment?`
 - `TriggeredAbility::Landfall`, `::Death`, `::LeaveTheBattlefield`, `::CounterAdded`, `::LoreCounterAdded`
 
+## Static Ability Subclasses
+
+Pre-built subclasses in `lib/magic/abilities/static/` — declare these on a card via `def static_abilities = [...]`. `ContinuousEffects` and `ActivateAbility` query them generically; **never add card-class checks to those layers**.
+
+- `Abilities::Static::KeywordGrant` — grants keywords to matching permanents
+- `Abilities::Static::PowerAndToughnessModification` — modifies power/toughness
+- `Abilities::Static::TypeGrant` / `TypeRemoval` — adds/removes types
+- `Abilities::Static::ManaCostAdjustment` — reduces/adjusts mana costs for matching cards
+- `Abilities::Static::AnyColorForCreatureActivations` — controller can spend mana as any color when activating abilities of creature permanents (e.g. Agatha's Soul Cauldron)
+- `Abilities::Static::GrantActivatedAbilities` — grants activated abilities to matching permanents; subclass and implement `applies_to?(permanent)` and `granted_abilities` (e.g. Agatha's Soul Cauldron grants abilities from exiled creature cards to creatures with +1/+1 counters)
+
+**Pattern**: define an inner class on the card that subclasses the relevant base, implement `applies_to?` and any extra methods, return it from `def static_abilities`. Access the source permanent via `@source`. Example: `AgathasSoulCauldron::GrantAbilitiesFromExile`.
+
 ## Important Files & Entry Points
 
 - `lib/magic.rb`: Entry point, Zeitwerk setup
