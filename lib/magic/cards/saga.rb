@@ -15,7 +15,7 @@ module Magic
       type T::Enchantment, 'Saga'
 
       enters_the_battlefield do
-        actor.trigger_effect(:add_counter, counter_type: Magic::Counters::Lore, target: actor)
+        actor.trigger_effect(:add_counter, counter_type: "lore", target: actor)
       end
 
       class FirstMainPhaseTrigger < TriggeredAbility
@@ -24,7 +24,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:add_counter, counter_type: Magic::Counters::Lore, target: actor)
+          actor.trigger_effect(:add_counter, counter_type: "lore", target: actor)
         end
       end
 

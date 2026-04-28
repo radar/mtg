@@ -15,7 +15,7 @@ module Magic
             trigger_effect(:create_token, token_class: SoldierToken, controller: owner)
 
             owner.creatures.each do |creature|
-              trigger_effect(:add_counter, target: creature, counter_type: Counters::Plus1Plus1)
+              trigger_effect(:add_counter, target: creature, counter_type: "+1/+1")
             end
           end
         end
@@ -36,7 +36,7 @@ module Magic
         end
 
         def resolve!(target:)
-          target.add_counter(counter_type: Counters::Plus1Plus1)
+          target.add_counter("+1/+1")
           target.grant_indestructible!
         end
       end

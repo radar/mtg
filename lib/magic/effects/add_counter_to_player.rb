@@ -15,7 +15,7 @@ module Magic
       end
 
       def resolve!
-        target.add_counter(counter_type:, amount:)
+        target.add_counter(counter_type, amount:)
 
         game.notify!(
           Events::CounterAddedToPlayer.new(

@@ -14,7 +14,7 @@ module Magic
         def call(effect)
           Effects::AddCounterToPermanent.new(
             source: receiver,
-            counter_type: Counters::Incarnation,
+            counter_type: "incarnation",
             target: receiver,
           )
         end

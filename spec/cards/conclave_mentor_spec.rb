@@ -8,7 +8,7 @@ RSpec.describe Magic::Cards::ConclaveMentor do
   it "if one or more counters would be put on a creature you control" do
     effect = Magic::Effects::AddCounterToPermanent.new(
       source: wood_elves,
-      counter_type: Magic::Counters::Plus1Plus1,
+      counter_type: "+1/+1",
       target: wood_elves,
     )
 

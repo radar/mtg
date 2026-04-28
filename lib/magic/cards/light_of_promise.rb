@@ -16,7 +16,7 @@ module Magic
         end
 
         def call
-          actor.attached_to.add_counter(counter_type: Counters::Plus1Plus1, amount: event.life)
+          actor.attached_to.add_counter("+1/+1", amount: event.life)
         end
       end
 

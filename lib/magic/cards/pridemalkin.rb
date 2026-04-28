@@ -20,7 +20,7 @@ module Magic
             :add_counter,
             source: actor,
             target: target,
-            counter_type: Counters::Plus1Plus1
+            counter_type: "+1/+1"
           )
         end
       end

@@ -15,7 +15,7 @@ RSpec.describe Magic::Game, "replacement effects -- semantic applicability" do
 
       effect = subclassed_counter_effect.new(
         source: wood_elves,
-        counter_type: Magic::Counters::Plus1Plus1,
+        counter_type: "+1/+1",
         target: wood_elves,
         amount: 1,
       )
@@ -30,7 +30,7 @@ RSpec.describe Magic::Game, "replacement effects -- semantic applicability" do
 
       effect = subclassed_counter_effect.new(
         source: wood_elves,
-        counter_type: Magic::Counters::Plus1Plus1,
+        counter_type: "+1/+1",
         target: wood_elves,
         amount: 1,
       )

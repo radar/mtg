@@ -12,7 +12,7 @@ module Magic
         if target.player? && source.has_keyword?(Magic::Keywords::Toxic)
           source.trigger_effect(
             :add_counter,
-            counter_type: Counters::Poison,
+            counter_type: "poison",
             target: target,
           )
           deal_combat_damage!
@@ -20,7 +20,7 @@ module Magic
         elsif target.player? && source.has_keyword?(Magic::Keywords::INFECT)
           source.trigger_effect(
             :add_counter,
-            counter_type: Counters::Poison,
+            counter_type: "poison",
             target: target,
             amount: damage,
           )

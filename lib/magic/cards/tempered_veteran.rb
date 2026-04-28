@@ -20,7 +20,7 @@ module Magic
         def resolve!(target:)
           trigger_effect(
             :add_counter,
-            counter_type: Counters::Plus1Plus1,
+            counter_type: "+1/+1",
             target: target,
           )
         end
@@ -40,7 +40,7 @@ module Magic
         def resolve!(target:)
           trigger_effect(
             :add_counter,
-            counter_type: Counters::Plus1Plus1,
+            counter_type: "+1/+1",
             target: target,
           )
         end

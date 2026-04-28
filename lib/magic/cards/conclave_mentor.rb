@@ -9,7 +9,7 @@ module Magic
 
       class AddMoreCounters < ReplacementEffect
         def applies?(effect)
-          effect.counter_type == Counters::Plus1Plus1 &&
+          effect.counter_type == "+1/+1" &&
             effect.target.controller == receiver.controller &&
             effect.target.creature?
         end
@@ -17,7 +17,7 @@ module Magic
         def call(effect)
           Effects::AddCounterToPermanent.new(
             source: receiver,
-            counter_type: Counters::Plus1Plus1,
+            counter_type: "+1/+1",
             target: effect.target,
             amount: effect.amount + 1,
           )
