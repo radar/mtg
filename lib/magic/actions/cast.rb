@@ -108,6 +108,7 @@ module Magic
       end
 
       def pay_mana(payment)
+        treat_any_color_as_any! if any_color_for_controller?
         mana_cost.pay(player:, payment:)
         self
       end
@@ -159,6 +160,18 @@ module Magic
             card.move_to_graveyard!(player)
           end
         end
+      end
+
+      private
+
+      def treat_any_color_as_any!
+        mana_cost.treat_any_color_as_any!
+      end
+
+      def any_color_for_controller?
+        game.battlefield.static_abilities
+          .of_type(Abilities::Static::AnyColorForController)
+          .any? { |ability| ability.applies_to_player?(player) }
       end
     end
   end

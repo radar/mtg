@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Magic
   module Actions
     class ActivateAbility < Action
@@ -68,7 +70,7 @@ module Magic
       def perform
         game.stack.add(self)
 
-        game.notify!(Events::AbilityActivated.new(ability: ability, player: player))
+        game.notify!(Events::AbilityActivated.new(ability: ability, player: player, targets: targets))
       end
 
       def pay(cost_type, payment = nil)
@@ -94,7 +96,7 @@ module Magic
         cost = costs.find { |cost| cost.is_a?(cost_type) }
         raise "Unknown cost: #{cost_type}" if cost.nil?
 
-        if cost.is_a?(Costs::Mana) && any_color_for_creature_activations?
+        if cost.is_a?(Costs::Mana) && (any_color_for_creature_activations? || any_color_for_controller?)
           cost.treat_any_color_as_any!
         end
 
@@ -112,6 +114,12 @@ module Magic
           .of_type(Abilities::Static::AnyColorForCreatureActivations)
           .applies_to(ability.source)
           .any?
+      end
+
+      def any_color_for_controller?
+        game.battlefield.static_abilities
+          .of_type(Abilities::Static::AnyColorForController)
+          .any? { |ability| ability.applies_to_player?(player) }
       end
 
       def has_cost?(cost_type)

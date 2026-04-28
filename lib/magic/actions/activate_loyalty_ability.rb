@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Magic
   module Actions
     class ActivateLoyaltyAbility < Action
@@ -40,7 +42,7 @@ module Magic
         end
 
         planeswalker.change_loyalty!(loyalty_change)
-        game.notify!(Events::AbilityActivated.new(ability: ability, player: player))
+        game.notify!(Events::AbilityActivated.new(ability: ability, player: player, targets: targets))
         game.stack.add(self)
       end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Magic
   class Game
     class Turn
@@ -6,7 +8,7 @@ module Magic
       attr_reader :active_player, :number, :events, :combat, :actions
 
       def_delegators :@game, :logger, :battlefield, :emblems, :players
-      def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks, :attacking?
+      def_delegators :@combat, :declare_attacker, :choose_attacker_target, :can_block?, :attacks, :attacking?
 
       state_machine :step, initial: :beginning do
 
@@ -145,6 +147,11 @@ module Magic
 
       def take_actions(*actions)
         actions.each { take_action(_1) }
+      end
+
+      def declare_blocker(blocker, attacker:)
+        combat.declare_blocker(blocker, attacker: attacker)
+        notify!(Events::CreatureBlocked.new(blocker: blocker, attacker: attacker))
       end
 
       def attackers_declared!
