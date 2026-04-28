@@ -108,8 +108,15 @@ module Magic
       end
 
       def pay_mana(payment)
+        mana_cost.treat_any_color_as_any! if any_color_for_any_cost?
         mana_cost.pay(player:, payment:)
         self
+      end
+
+      def any_color_for_any_cost?
+        game.battlefield.static_abilities
+          .of_type(Abilities::Static::AnyColorForAnyCost)
+          .any? { |ability| ability.controller == player }
       end
 
       def auto_pay_mana
