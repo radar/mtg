@@ -15,7 +15,7 @@ module Magic
         def call
           if actor.kicked?
             controller.creatures.each do |creature|
-              creature.grant_keyword(Keywords::MENACE, until_eot: true)
+              creature.grant_menace!
             end
           end
         end

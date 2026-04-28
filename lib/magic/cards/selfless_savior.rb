@@ -20,7 +20,7 @@ module Magic
         end
 
         def resolve!(target:)
-          target.grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
+          target.grant_indestructible!
         end
       end
 

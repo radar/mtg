@@ -37,7 +37,7 @@ module Magic
 
         def resolve!(target:)
           target.add_counter(counter_type: Counters::Plus1Plus1)
-          target.grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
+          target.grant_indestructible!
         end
       end
 

@@ -37,7 +37,7 @@ module Magic
         def resolve!(target:)
           source.unprepare!
           target.modify_power(1)
-          target.grant_keyword(Keywords::DOUBLE_STRIKE, until_eot: true)
+          target.grant_double_strike!
         end
       end
 

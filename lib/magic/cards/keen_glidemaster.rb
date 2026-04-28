@@ -21,7 +21,7 @@ module Magic
         end
 
         def resolve!(target:)
-          target.grant_keyword(Keywords::FLYING, until_eot: true)
+          target.grant_flying!
         end
       end
 

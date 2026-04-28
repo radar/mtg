@@ -15,7 +15,7 @@ module Magic
 
       def resolve!(target:)
         if target.zone == battlefield
-          target.grant_keyword(Keywords::TRAMPLE, until_eot: true)
+          target.grant_trample!
           controller.draw!
         end
       end

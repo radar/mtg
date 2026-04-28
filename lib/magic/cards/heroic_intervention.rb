@@ -7,8 +7,8 @@ module Magic
     class HeroicIntervention < Instant
       def resolve!
         owner.permanents.each do
-          _1.grant_keyword(Keywords::HEXPROOF, until_eot: true)
-          _1.grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
+          _1.grant_hexproof!
+          _1.grant_indestructible!
         end
       end
     end
