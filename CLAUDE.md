@@ -149,6 +149,34 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 **Targeted ETB trigger ("deals damage to any target")**: Add `Magic::Choice::Targeted` subclass to card's class reopening. Define `choices` (e.g. `game.any_target`) and `resolve!(target:)`. In trigger's `call`, push instance onto `game.choices`. Pass data needed at resolution (e.g. entering creature's power) via constructor. Example: `TerrorOfThePeaks::DamageChoice`.
 
+**Simple ETB effect (no targeting/choice)**: Use the `enters_the_battlefield` DSL block inside the card definition — no class reopening needed. Example: `SetessanTraining` draws a card on ETB with `actor.trigger_effect(:draw_cards, number_to_draw: 1)`.
+
+**Modal ETB choice (pick one of N effects)**: Subclass `Magic::Choice` directly. Define `resolve!(mode:)` with a `case mode` switch. Use symbol constants (e.g. `COUNTER = :counter`). In the ETB trigger's `call`, push an instance onto `game.choices`. Example: `Trufflesnout`.
+
+**Optional ETB (may do X)**: Wrap the real choice in a `Magic::Choice::May` subclass — override `resolve!` to push the inner choice onto `game.choices`. Example: `AlpineHoundmaster::MaySearchChoice`.
+
+**Library search with specific card filter**: Subclass `Magic::Choice::SearchLibrary` and override `choices` to return a filtered `CardList` (e.g. `controller.library.by_name("Alpine Watchdog")`). Pass `upto:`, `reveal:` to `super`. Example: `AlpineHoundmaster::SearchChoice`.
+
+**ETB triggers**: Use `def etb_triggers = [TriggerClass]` (shorthand) instead of wiring via `event_handlers`. Both work, but `etb_triggers` is more explicit. Example: `AlpineHoundmaster`, `Trufflesnout`.
+
+**Attack trigger (boost based on attacker count)**: Handle `Events::FinalAttackersDeclared` in `event_handlers`. Check `event.attacks.any? { |a| a.attacker == actor }` in `should_perform?`. Count other attackers with `event.attacks.reject { |a| a.attacker == actor }.count`. Apply via `trigger_effect(:modify_power_toughness, power: n, target: actor, until_eot: true)`. Example: `AlpineHoundmaster`.
+
+**Activated ability with sacrifice cost**: Use `costs "{1}, Sacrifice {this}"` string. Define `single_target? = true`, `target_choices`, and `resolve!(target:)`. Example: `ThrashingBrontodon`.
+
+**Targeting artifacts/enchantments**: Use `game.battlefield.by_any_type("Artifact", "Enchantment")` — string type names work alongside `T::` constants.
+
+**Conditional keyword (only on your turn)**: Subclass `Abilities::Static::KeywordGrant`, override `applicable_targets` to return `[source]` when `game.current_turn.active_player == controller`, else `[]`. Example: `RadhaHeartOfKeld::FirstStrikeGrant`.
+
+**Legendary creature DSL**: Use `legendary_creature_type "Elf Warrior"` in the DSL block instead of `creature_type`.
+
+**String mana cost format**: `cost "{2}{R}{G}"` is valid alongside the hash format `cost generic: 2, red: 1, green: 1`. Use string format when mixing more than two colors or for readability.
+
+**Counting lands**: `controller.lands.count` returns the number of land permanents the controller controls (uses `CardList`).
+
+**Aura static abilities on the attached creature**: Use `applies_to_target` (no arguments) as a class-level declaration inside the static ability subclass — targets the attached permanent automatically. Example: `SetessanTraining::PowerModification`, `SetessanTraining::KeywordGrantTrample`.
+
+**Aura target restriction**: Override `target_choices` on the Aura card class to restrict which permanents can be targeted. Example: `SetessanTraining` restricts to `battlefield.controlled_by(controller).creatures`.
+
 ## TriggeredAbility Subclasses
 
 Pre-built subclasses in `lib/magic/triggered_ability/` — use these to avoid rewriting `should_perform?`:
