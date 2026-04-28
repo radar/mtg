@@ -51,6 +51,10 @@ module Magic
       true
     end
 
+    def call
+      raise NotImplementedError, "#{self.class} must implement #call"
+    end
+
     def perform!
       return unless should_perform?
       call
