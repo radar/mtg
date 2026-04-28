@@ -5,10 +5,6 @@ module Magic
       cost generic: 1, red: 1, white: 1
       power 2
       toughness 3
-
-      enters_the_battlefield do
-        game.choices.add(AlpineHoundmaster::MaySearchChoice.new(actor: actor))
-      end
     end
 
     class AlpineHoundmaster < Creature
@@ -27,7 +23,13 @@ module Magic
 
       class MaySearchChoice < Magic::Choice::May
         def resolve!
-          game.add_choice(AlpineHoundmaster::SearchChoice.new(actor: actor))
+          game.choices.add(AlpineHoundmaster::SearchChoice.new(actor: actor))
+        end
+      end
+
+      class ETB < TriggeredAbility::EnterTheBattlefield
+        def call
+          game.choices.add(AlpineHoundmaster::MaySearchChoice.new(actor: actor))
         end
       end
 
@@ -41,6 +43,8 @@ module Magic
           actor.trigger_effect(:modify_power_toughness, power: other_attackers, target: actor, until_eot: true)
         end
       end
+
+      def etb_triggers = [ETB]
 
       def event_handlers
         {
