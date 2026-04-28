@@ -68,7 +68,7 @@ module Magic
       def perform
         game.stack.add(self)
 
-        game.notify!(Events::AbilityActivated.new(ability: ability, player: player))
+        game.notify!(Events::AbilityActivated.new(ability: ability, player: player, targets: targets))
       end
 
       def pay(cost_type, payment = nil)
