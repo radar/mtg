@@ -112,10 +112,17 @@ module Magic
           *card.activated_abilities,
           # Land types specifically give one mana ability each
           *class_types.flat_map { |type| type::ManaAbility},
+          *granted_activated_abilities,
         ]
         .map do |ability|
           ability.new(source: permanent)
         end
+      end
+
+      def granted_activated_abilities
+        static_abilities_for(permanent)
+          .of_type(Abilities::Static::GrantActivatedAbilities)
+          .flat_map(&:granted_abilities)
       end
     end
   end
