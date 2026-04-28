@@ -26,12 +26,12 @@ RSpec.describe Magic::Cards::SetessanTraining do
   end
 
   it "can only target creatures you control" do
-    let_opponent_creature = ResolvePermanent("Wood Elves", owner: p2)
+    opponent_creature = ResolvePermanent("Wood Elves", owner: p2)
 
     p1.add_mana(green: 2)
     choices = card.target_choices
 
-    expect(choices).not_to include(let_opponent_creature)
+    expect(choices).not_to include(opponent_creature)
     expect(choices).to include(wood_elves)
   end
 end
