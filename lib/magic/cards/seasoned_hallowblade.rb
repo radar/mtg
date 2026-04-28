@@ -20,7 +20,7 @@ module Magic
 
         def resolve!
           source.tap!
-          source.grant_keyword(Keywords::INDESTRUCTIBLE, until_eot: true)
+          source.grant_indestructible!
         end
       end
 

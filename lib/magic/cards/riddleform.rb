@@ -20,7 +20,7 @@ module Magic
           actor.add_types(T::Creature, T::Creatures["Sphinx"])
           actor.modify_base_power(3)
           actor.modify_base_toughness(3)
-          actor.grant_keyword(Magic::Keywords::FLYING)
+          actor.grant_flying!
         end
       end
 

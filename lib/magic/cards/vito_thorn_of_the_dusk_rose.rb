@@ -40,7 +40,7 @@ module Magic
 
         def resolve!
           source.controller.creatures.each do
-            _1.grant_keyword(Keywords::LIFELINK, until_eot: true)
+            _1.grant_lifelink!
           end
         end
       end

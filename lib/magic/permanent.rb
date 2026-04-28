@@ -76,6 +76,7 @@ module Magic
       @protections = Protections.new(card.protections.dup)
       @exiled_cards = Magic::CardList.new([])
       @phased_out = false
+      @prepared = false
       @timestamp = timestamp
     end
 
@@ -344,6 +345,18 @@ module Magic
 
     def phased_out?
       @phased_out
+    end
+
+    def prepared?
+      @prepared
+    end
+
+    def prepare!
+      @prepared = true
+    end
+
+    def unprepare!
+      @prepared = false
     end
 
     def phase_out!

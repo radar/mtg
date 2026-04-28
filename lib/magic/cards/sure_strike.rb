@@ -13,7 +13,7 @@ module Magic
 
       def resolve!(target:)
         target.modify_power(3)
-        target.grant_keyword(Keywords::FIRST_STRIKE)
+        target.grant_first_strike!
       end
     end
   end
