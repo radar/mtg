@@ -295,8 +295,9 @@ module Magic
       apply_continuous_effects!
     end
 
-    def add_counter(counter_type:, amount: 1)
-      @counters = Counters::Collection.new(@counters + [counter_type.new] * amount)
+    def add_counter(counter_type, amount: 1)
+      resolved = Counters[counter_type]
+      @counters = Counters::Collection.new(@counters + [resolved.new] * amount)
     end
 
     def remove_counter(counter_type:, amount: 1)

@@ -18,7 +18,7 @@ module Magic
         end
 
         def call
-          actor.add_counter(counter_type: Counters::Plus1Plus1)
+          actor.add_counter("+1/+1")
         end
       end
 

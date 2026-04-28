@@ -13,7 +13,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:add_counter, source: actor, counter_type: Counters::Plus1Plus1, target: actor)
+          actor.trigger_effect(:add_counter, source: actor, counter_type: "+1/+1", target: actor)
         end
       end
 

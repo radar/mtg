@@ -10,7 +10,7 @@ RSpec.describe Magic::Game, "replacement effects -- chooser controls application
   def counter_effect
     Magic::Effects::AddCounterToPermanent.new(
       source: wood_elves,
-      counter_type: Magic::Counters::Plus1Plus1,
+      counter_type: "+1/+1",
       target: wood_elves,
       amount: 1,
     )

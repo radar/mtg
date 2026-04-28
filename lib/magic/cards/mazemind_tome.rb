@@ -9,7 +9,7 @@ module Magic
         def costs
           [
             Costs::SelfTap.new(source),
-            Costs::AddCounter.new(counter_type: Counters::Page, target: source)
+            Costs::AddCounter.new(counter_type: "page", target: source)
           ]
         end
 
@@ -23,7 +23,7 @@ module Magic
           [
             Costs::Mana.new(generic: 2),
             Costs::SelfTap.new(source),
-            Costs::AddCounter.new(counter_type: Counters::Page, target: source)
+            Costs::AddCounter.new(counter_type: "page", target: source)
           ]
         end
 
