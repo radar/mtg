@@ -12,6 +12,7 @@ module Magic
       FLYING = Class.new(Keyword)
       HASTE = Class.new(Keyword)
       HEXPROOF = Class.new(Keyword)
+      HEXPROOF_FROM_BLUE = Class.new(Keyword)
       INDESTRUCTIBLE = Class.new(Keyword)
       INFECT = Class.new(Keyword)
       LIFELINK = Class.new(Keyword)
@@ -53,6 +54,10 @@ module Magic
 
       def hexproof?
         has_keyword?(Keywords::HEXPROOF)
+      end
+
+      def hexproof_from_blue?
+        has_keyword?(Keywords::HEXPROOF_FROM_BLUE)
       end
 
       def flying?
