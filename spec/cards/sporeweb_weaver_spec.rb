@@ -12,7 +12,7 @@ RSpec.describe Magic::Cards::SporewebWeaver do
   end
 
   it "has hexproof from blue" do
-    expect(subject).to be_hexproof_from_blue
+    expect(subject.hexproof_from?(:blue)).to be(true)
   end
 
   context "when Sporeweb Weaver is dealt damage" do

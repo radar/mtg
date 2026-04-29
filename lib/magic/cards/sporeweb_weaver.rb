@@ -3,12 +3,12 @@ module Magic
     SporewebWeaver = Creature("Sporeweb Weaver") do
       cost generic: 1, green: 1
       creature_type "Spider"
-      keywords :reach, :hexproof_from_blue
       power 2
       toughness 4
     end
 
     class SporewebWeaver < Creature
+      KEYWORDS = [Keywords::REACH, Keywords::HexproofFrom.new(:blue)]
       SaprolingToken = Token.create "Saproling" do
         creature_type "Saproling"
         power 1
