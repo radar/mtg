@@ -9,6 +9,15 @@ Guidance for Claude Code when working in this repo.
 bundle install              # Install Ruby gems and dependencies
 ```
 
+> **Note for Copilot cloud agent**: `bundle` is not on PATH. Use this pattern instead:
+> ```bash
+> # First, install gems (only needed once per session):
+> HOME=/tmp ruby /usr/lib/ruby/gems/3.2.0/gems/bundler-2.4.19/libexec/bundle install --path /tmp/vendor/bundle
+>
+> # Then run commands via:
+> HOME=/tmp ruby /usr/lib/ruby/gems/3.2.0/gems/bundler-2.4.19/libexec/bundle exec rspec
+> ```
+
 ### Testing
 ```bash
 bundle exec rspec           # Run all tests
@@ -143,6 +152,10 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 **Integration Tests**: Test game mechanics and card interactions, not unit methods. Example: `spec/cards/island_spec.rb`
 
+**Paying multi-color mana costs in specs**: `pay_mana` for generic costs requires a hash specifying which color fills the generic slot — `pay_mana(generic: { green: 1 }, green: 1)` for a `{1}{G}` cost paid with two green. `add_mana` just needs the total pool — `add_mana(green: 2)`. Passing a plain integer for generic (e.g. `generic: 1`) raises `NoMethodError: undefined method 'values' for 1:Integer`.
+
+**Checking for fired events in tests**: Use `game.current_turn.events.find { |e| e.is_a?(Magic::Events::SomeEvent) }` — there is no `game.on` subscription method.
+
 ## Common Card Ability Patterns
 
 **Ward (additional life cost)**: Use `ward life: N` DSL in the card definition block. Automatically registers a `SpellCast` trigger that checks `opponents.include?(event.player) && event.targets.include?(actor)` and calls `trigger_effect(:lose_life, target: event.player, life: N)`. If the card also defines `event_handlers` in a class reopening, call `super.merge(...)` to preserve the ward trigger. Example: `TerrorOfThePeaks`.
@@ -176,6 +189,10 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 **Aura static abilities on the attached creature**: Use `applies_to_target` (no arguments) as a class-level declaration inside the static ability subclass — targets the attached permanent automatically. Example: `SetessanTraining::PowerModification`, `SetessanTraining::KeywordGrantTrample`.
 
 **Aura target restriction**: Override `target_choices` on the Aura card class to restrict which permanents can be targeted. Example: `SetessanTraining` restricts to `battlefield.controlled_by(controller).creatures`.
+
+**Scry then reveal top card (conditional draw)**: Subclass `Magic::Choice::Scry`, call `super(**args)` to perform the scry, then inspect `controller.library.first` and fire `game.notify!(Events::CardsRevealed.new(cards: [top_card]))` directly (no Effect needed — `notify!` is the right tool for a plain reveal). Check `top_card.creature? || top_card.land?` — these methods work on Card objects via `lib/magic/types.rb`. Example: `TrackDown::ScryChoice`.
+
+**`card.creature?` and `card.land?` work on cards in any zone** (not just permanents) — defined in `lib/magic/types.rb` and available on all card objects.
 
 ## TriggeredAbility Subclasses
 
