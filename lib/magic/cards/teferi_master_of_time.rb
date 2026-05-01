@@ -1,12 +1,14 @@
 module Magic
   module Cards
     class TeferiMasterOfTime < Planeswalker
-      NAME = "Teferi, Master of Time"
-      TYPE_LINE = "Legendary Planeswalker -- Teferi"
+      card_name "Teferi, Master of Time"
+      planeswalker "Teferi"
       cost generic: 2, blue: 2
       loyalty 3
 
       class LoyaltyAbility1 < LoyaltyAbility
+        def instant_speed? = true
+
         def loyalty_change
           1
         end
@@ -18,6 +20,8 @@ module Magic
       end
 
       class LoyaltyAbility2 < LoyaltyAbility
+        def instant_speed? = true
+
         def loyalty_change
           -3
         end
@@ -32,6 +36,8 @@ module Magic
       end
 
       class LoyaltyAbility3 < LoyaltyAbility
+        def instant_speed? = true
+
         def loyalty_change
           -10
         end
