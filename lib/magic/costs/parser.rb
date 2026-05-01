@@ -19,6 +19,8 @@ module Magic
             Mana.new(Costs::Parsers::Mana.parse(cost))
           when "{T}"
             SelfTap.new(source)
+          when /Sacrifice a creature with defender/
+            Sacrifice.new(source, source.controller.creatures.select(&:defender?))
           when /Sacrifice a creature/
             # TODO: Make this target only creatures controlled by player
             Sacrifice.new(source, source.controller.creatures)
