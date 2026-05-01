@@ -12,6 +12,14 @@ module Magic
       FLYING = Class.new(Keyword)
       HASTE = Class.new(Keyword)
       HEXPROOF = Class.new(Keyword)
+
+      class HexproofFrom < Keyword
+        attr_reader :color
+
+        def initialize(color)
+          @color = color
+        end
+      end
       INDESTRUCTIBLE = Class.new(Keyword)
       INFECT = Class.new(Keyword)
       LIFELINK = Class.new(Keyword)
@@ -53,6 +61,10 @@ module Magic
 
       def hexproof?
         has_keyword?(Keywords::HEXPROOF)
+      end
+
+      def hexproof_from?(color)
+        keywords.any? { |kw| kw.is_a?(Keywords::HexproofFrom) && kw.color == color }
       end
 
       def flying?
