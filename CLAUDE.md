@@ -194,6 +194,10 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 **`card.creature?` and `card.land?` work on cards in any zone** (not just permanents) — defined in `lib/magic/types.rb` and available on all card objects.
 
+**"Nth event each turn" trigger (e.g. "second card drawn each turn")**: In a `TriggeredAbility#should_perform?`, count matching events from `game.current_turn.events` — events are tracked BEFORE listeners receive them, so the current event is included in the count. Example: `JolraelMwonvuliRecluse::SecondCardDrawTrigger` checks `current_turn.events.select { |e| e.is_a?(Events::CardDraw) && e.player == controller }.count == 2`. Caveat: `game.start!` draws 7 cards into the existing turn 1 event log, so testing fresh-turn triggers requires `2.times { game.next_turn }` to reach a clean turn.
+
+**Setting base power/toughness ("base power and toughness X/X")**: Use `permanent.modify_base_power(n)` and `permanent.modify_base_toughness(n)` (defined in `lib/magic/permanents/modifications.rb`). Adds `Modifications::BasePower` / `BaseToughness` modifiers; `ContinuousEffects` uses the LAST one as the base value (typesetter effect). Modifiers default to `until_eot: true` and are removed in cleanup. To affect all controlled creatures, iterate `controller.creatures.each { _1.modify_base_power(x); _1.modify_base_toughness(x) }`. Example: `JolraelMwonvuliRecluse::ActivatedAbility`.
+
 ## TriggeredAbility Subclasses
 
 Pre-built subclasses in `lib/magic/triggered_ability/` — use these to avoid rewriting `should_perform?`:
