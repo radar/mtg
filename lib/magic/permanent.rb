@@ -267,7 +267,10 @@ module Magic
         card.move_zone!(to: controller.graveyard)
       end
     end
-    alias_method :sacrifice!, :destroy!
+    def sacrifice!
+      game.notify!(Events::PermanentSacrificed.new(permanent: self))
+      destroy!
+    end
 
     def return_to_hand
       move_zone!(to: owner.hand)

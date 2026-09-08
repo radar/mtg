@@ -35,6 +35,8 @@ module Magic
           chapter = actor.card.chapters[lore_counters - 1]
           chapter.new(actor: actor).resolve!
 
+          game.notify!(Events::FinalChapterResolved.new(saga: actor)) if chapter == actor.card.chapters.last
+
           # TODO: This must wait until the end of the resolution of the chapter
           # Rule 714.4. ... and it isn't the source of a chapter ability
           # that has triggered but not yet left the stack, ...
