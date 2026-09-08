@@ -39,6 +39,10 @@ module Magic
     attr_accessor :zone
 
     def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false)
+      enters_tapped = false if enters_tapped && game.battlefield.static_abilities.any? do |ability|
+        ability.respond_to?(:lands_enter_untapped?) && ability.lands_enter_untapped?(card)
+      end
+
       permanent = Magic::Permanent.new(
         game: game,
         owner: owner,
