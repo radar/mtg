@@ -131,6 +131,10 @@ module Magic
       cost.colors
     end
 
+    def color_identity
+      colors.dup
+    end
+
     def multi_colored?
       colors.count > 1
     end

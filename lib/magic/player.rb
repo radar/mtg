@@ -3,7 +3,7 @@ module Magic
     include Targetable
     extend Forwardable
 
-    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters
+    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters, :commander
 
     def_delegators :@game, :logger
 
@@ -302,6 +302,10 @@ module Magic
 
     def devotion(color)
       permanents.sum { |permanent| permanent.devotion(color) }
+    end
+
+    def add_commander(commander)
+      @commander = commander
     end
   end
 end
