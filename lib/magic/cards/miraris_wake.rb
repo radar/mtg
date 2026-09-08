@@ -15,7 +15,7 @@ module Magic
         def additional_mana(source, mana)
           return unless source.land? && source.controller == controller
 
-          controller.add_mana(mana)
+          controller.add_mana(**mana)
         end
       end
 

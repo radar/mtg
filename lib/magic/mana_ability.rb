@@ -26,13 +26,18 @@ module Magic
       @choice ||= choices.first if choices.length == 1
 
       raise "Invalid choice made for mana ability. Choice: #{choice}, Choices: #{choices}" unless choices.include?(choice)
-      source.controller.add_mana(choice => 1)
+      mana = mana_produced
+      source.controller.add_mana(**mana)
 
       game.battlefield.static_abilities.each do |ability|
         next unless ability.respond_to?(:additional_mana)
 
-        ability.additional_mana(source, { choice => 1 })
+        ability.additional_mana(source, mana)
       end
+    end
+
+    def mana_produced
+      { choice => 1 }
     end
   end
 end
