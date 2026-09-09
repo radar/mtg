@@ -6,9 +6,7 @@ module Magic
       end
 
       def resolve!
-        game.notify!(
-          Events::CardsRevealed.new(cards: Array(target))
-        )
+        source.controller.reveal(target)
       end
     end
   end

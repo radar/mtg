@@ -32,6 +32,10 @@ module Magic
       select(&:land?)
     end
 
+    def revealed
+      select(&:revealed?)
+    end
+
     def permanents
       by_any_type(T::Artifact, T::Creature, T::Enchantment, T::Land, T::Planeswalker)
     end

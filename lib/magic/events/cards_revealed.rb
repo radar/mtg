@@ -1,10 +1,12 @@
 module Magic
   module Events
-    class CardsRevealed
-      attr_reader :cards
+    class CardsRevealed < Base
+      attr_reader :cards, :player
 
-      def initialize(cards:)
-        @cards = cards
+      def initialize(cards:, player: nil)
+        @cards = Array(cards)
+        @player = player
+        super(source: player)
       end
 
       def inspect

@@ -6,7 +6,7 @@ module Magic
 
     class NecroblossomSnarl < Card
       def enters_tapped?
-        !controller.hand.lands.by_any_type("Swamp", "Forest").any?
+        !controller.hand.lands.revealed.by_any_type("Swamp", "Forest").any?
       end
 
       class ManaAbility < Magic::TapManaAbility

@@ -100,6 +100,7 @@ module Magic
 
     def initialize(game: Game.new, owner:)
       @countered = false
+      @revealed = false
       @name = self.class::NAME
       @types = self.class::TYPE_LINE
       @game = game
@@ -157,6 +158,7 @@ module Magic
     end
 
     def move_zone!(to:)
+      @revealed = false
       effect = Effects::MoveCardZone.new(
         from: zone,
         to: to,
@@ -194,6 +196,21 @@ module Magic
 
     def notify!(event)
       game.current_turn.notify!(event)
+    end
+
+    def reveal!(notify: true)
+      @revealed = true
+      game&.notify!(Events::CardsRevealed.new(player: controller, cards: [self])) if notify
+      self
+    end
+
+    def conceal!
+      @revealed = false
+      self
+    end
+
+    def revealed?
+      !!@revealed
     end
 
     def enters_tapped?

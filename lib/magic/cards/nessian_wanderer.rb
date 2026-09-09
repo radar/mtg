@@ -19,6 +19,7 @@ module Magic
 
         def resolve!(target:)
           @cards.each { |card| controller.library.remove(card) }
+          controller.reveal(target)
           target.move_to_hand!
           rest = @cards - [target]
           rest.shuffle.each_with_index { |card, index| controller.library.add(card, controller.library.count + index) }

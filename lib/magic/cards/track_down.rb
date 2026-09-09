@@ -12,7 +12,7 @@ module Magic
           top_card = controller.library.first
           return unless top_card
 
-          game.notify!(Events::CardsRevealed.new(cards: [top_card]))
+          controller.reveal(top_card)
 
           controller.draw! if top_card.creature? || top_card.land?
         end

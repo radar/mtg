@@ -6,7 +6,7 @@ module Magic
 
     class ShineshadowSnarl < Card
       def enters_tapped?
-        !controller.hand.lands.by_any_type("Plains", "Swamp").any?
+        !controller.hand.lands.revealed.by_any_type("Plains", "Swamp").any?
       end
 
       class ManaAbility < Magic::TapManaAbility

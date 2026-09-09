@@ -49,8 +49,8 @@ module Magic
       game.take_action(action)
     end
 
-    def play_land(land:, **args)
-      action = prepare_action(Magic::Actions::PlayLand, card: land, **args)
+    def play_land(land:, **args, &block)
+      action = prepare_action(Magic::Actions::PlayLand, card: land, **args, &block)
       game.take_action(action)
     end
 
@@ -237,6 +237,17 @@ module Magic
           top: top.count,
         )
       )
+    end
+
+    def reveal(*cards)
+      cards = cards.flat_map { |c| c.is_a?(Zone) ? c.cards : c }
+      cards.each { |card| card.reveal!(notify: false) }
+      game&.notify!(Events::CardsRevealed.new(player: self, cards: cards))
+      cards
+    end
+
+    def revealed_cards
+      hand.select(&:revealed?)
     end
 
     def tap!(card)
