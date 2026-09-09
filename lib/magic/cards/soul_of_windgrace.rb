@@ -28,6 +28,17 @@ module Magic
         end
       end
 
+      class AttackTrigger < TriggeredAbility
+        def should_perform?
+          event.attacks.any? { |attack| attack.attacker == actor }
+        end
+
+        def call
+          choice = LandChoice.new(actor: actor)
+          game.add_choice(choice) if choice.choices.any?
+        end
+      end
+
       class GainLifeAbility < Magic::ActivatedAbility
         costs "{G}"
 
@@ -37,7 +48,10 @@ module Magic
       end
 
       def event_handlers
-        { Events::EnteredTheBattlefield => EntersTrigger }
+        {
+          Events::EnteredTheBattlefield => EntersTrigger,
+          Events::FinalAttackersDeclared => AttackTrigger,
+        }
       end
 
       def activated_abilities = [GainLifeAbility]
