@@ -90,6 +90,7 @@ module Magic
           attack.attacker == attacker
         end
         attack.declare_blocker(blocker)
+        game.notify!(Events::CreatureBlocked.new(attacker: attacker, blocker: blocker))
       end
 
       def deal_first_strike_damage

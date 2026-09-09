@@ -8,7 +8,19 @@ module Magic
     end
 
     class LikenessOfTheSeeker < Creature
-      # The combat layer does not currently emit a blocker-declared event.
+      class BlockedTrigger < TriggeredAbility
+        def should_perform?
+          event.attacker == actor
+        end
+
+        def call
+          controller.lands.first(3).each(&:untap!)
+        end
+      end
+
+      def event_handlers
+        { Events::CreatureBlocked => BlockedTrigger }
+      end
     end
   end
 end
