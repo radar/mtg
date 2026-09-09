@@ -26,6 +26,7 @@ module Magic
       MENACE = Class.new(Keyword)
       PROWESS = Class.new(Keyword)
       REACH = Class.new(Keyword)
+      SHROUD = Class.new(Keyword)
       SKULK = Class.new(Keyword)
       TRAMPLE = Class.new(Keyword)
       VIGILANCE = Class.new(Keyword)
@@ -77,6 +78,10 @@ module Magic
 
       def defender?
         has_keyword?(Keywords::DEFENDER)
+      end
+
+      def shroud?
+        has_keyword?(Keywords::SHROUD)
       end
 
       def first_strike?
