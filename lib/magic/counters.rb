@@ -11,6 +11,7 @@ module Magic
       when "poison" then Poison
       when "blessing" then Blessing
       when "stun" then Stun
+      when "hatchling" then Hatchling
       else
         raise "Unknown counter type: #{counter_type}"
       end
