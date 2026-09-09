@@ -2,6 +2,7 @@ module Magic
   class Token
     include Cards::Shared::Events
     include Cards::Shared::Types
+    include Types
 
     attr_reader :game, :owner, :name, :types, :keywords, :keyword_grants, :protections, :base_power, :base_toughness
 

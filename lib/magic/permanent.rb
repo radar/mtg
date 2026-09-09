@@ -57,7 +57,7 @@ module Magic
     end
 
     def self.enters_tapped_after_replacements(game:, card:, enters_tapped:)
-      return enters_tapped unless enters_tapped && card.respond_to?(:land?) && card.land?
+      return enters_tapped unless enters_tapped && card.land?
 
       prevented = game.battlefield.static_abilities.any? do |ability|
         ability.respond_to?(:lands_enter_untapped?) && ability.lands_enter_untapped?(card)
