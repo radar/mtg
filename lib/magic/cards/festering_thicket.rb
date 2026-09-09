@@ -6,11 +6,19 @@ module Magic
     end
 
     class FesteringThicket < Card
+      class CyclingAbility < Magic::ActivatedAbility
+        costs "{2}"
+
+        def resolve!
+          source.controller.draw!
+        end
+      end
+
       class ManaAbility < Magic::TapManaAbility
         choices :black, :green
       end
 
-      def activated_abilities = [ManaAbility]
+      def activated_abilities = [ManaAbility, CyclingAbility]
     end
   end
 end

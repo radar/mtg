@@ -3,9 +3,14 @@ module Magic
     class TearAsunder < Instant
       card_name "Tear Asunder"
       cost generic: 1, green: 1
+      kicker_cost generic: 1, black: 1
 
       def target_choices
-        battlefield.permanents.by_any_type(T::Artifact, T::Enchantment)
+        if kicker_cost.paid?
+          battlefield.nonland
+        else
+          battlefield.permanents.by_any_type(T::Artifact, T::Enchantment)
+        end
       end
 
       def resolve!(target:)
