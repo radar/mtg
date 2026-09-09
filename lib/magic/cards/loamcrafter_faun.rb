@@ -20,8 +20,26 @@ module Magic
           targets.each(&:discard!)
           return if targets.empty?
 
-          graveyard_cards = controller.graveyard.cards.nonland.first(targets.count)
-          graveyard_cards.each(&:move_to_hand!)
+          game.add_choice(ReturnChoice.new(actor: actor, amount: targets.count))
+        end
+      end
+
+      class ReturnChoice < Magic::Choice::SearchGraveyard
+        def initialize(actor:, amount:)
+          @amount = amount
+          super(actor: actor)
+        end
+
+        def choices
+          controller.graveyard.cards.nonland
+        end
+
+        def choice_amount
+          @amount
+        end
+
+        def resolve!(target: nil, targets: [target].compact)
+          targets.first(@amount).each(&:move_to_hand!)
         end
       end
 
