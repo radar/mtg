@@ -8,26 +8,34 @@ module Magic
     end
 
     class MoraugFuryOfAkoum < Creature
-      class AttackTrigger < TriggeredAbility
+      class AttackPowerModification < Abilities::Static::PowerAndToughnessModification
+        def applicable_targets
+          source.controller.creatures
+        end
+
+        def power_modification
+          source.game.current_turn.events.count do |event|
+            event.is_a?(Events::AttackDeclared) && event.attack.attacker == source
+          end
+        end
+
+        def toughness_modification = 0
+      end
+
+      class LandfallTrigger < TriggeredAbility::Landfall
         def should_perform?
-          event.attacks.any? { |attack| attack.attacker == actor }
+          event.player == controller && game.current_turn.step?(:first_main)
         end
 
         def call
-          attacks_this_turn = game.current_turn.events.count do |event|
-            event.is_a?(Events::AttackDeclared) && event.attack.attacker == actor
-          end
-          actor.trigger_effect(
-            :modify_power_toughness,
-            target: actor,
-            power: attacks_this_turn,
-            until_eot: true,
-          )
+          game.current_turn.queue_additional_combat!
         end
       end
 
+      def static_abilities = [AttackPowerModification]
+
       def event_handlers
-        { Events::FinalAttackersDeclared => AttackTrigger }
+        { Events::Landfall => LandfallTrigger }
       end
     end
   end

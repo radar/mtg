@@ -112,6 +112,7 @@ module Magic
         end
 
         event :second_main do
+          transition end_of_combat: :beginning_of_combat, if: :additional_combat_pending?
           transition end_of_combat: :second_main
         end
 
@@ -133,8 +134,17 @@ module Magic
         @active_player = active_player
         @actions = []
         @events = []
+        @additional_combats = 0
         @combat = CombatPhase.new(game: game)
         super()
+      end
+
+      def queue_additional_combat!
+        @additional_combats += 1
+      end
+
+      def additional_combat_pending?
+        @additional_combats.positive?
       end
 
       def take_action(action)

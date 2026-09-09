@@ -17,4 +17,13 @@ RSpec.describe Magic::Cards::MoraugFuryOfAkoum do
 
     expect(moraug.power).to eq(7)
   end
+
+  it "queues an additional combat when a land enters during the main phase" do
+    moraug = ResolvePermanent("Moraug, Fury Of Akoum", owner: p1)
+    go_to_main_phase!
+    ResolvePermanent("Forest", owner: p1)
+
+    expect(current_turn).to be_additional_combat_pending
+    expect(moraug).to be_creature
+  end
 end
