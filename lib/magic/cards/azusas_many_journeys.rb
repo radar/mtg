@@ -5,6 +5,10 @@ module Magic
     end
 
     class AzusasManyJourneys < Saga
+      def back_face
+        LikenessOfTheSeeker
+      end
+
       class Chapter1 < Saga::ChapterAbility
         def resolve!
           actor.card.define_singleton_method(:additional_lands_per_turn) { 1 }
@@ -19,12 +23,8 @@ module Magic
 
       class Chapter3 < Saga::ChapterAbility
         def resolve!
-          actor.trigger_effect(:exile, target: actor)
-          Permanent.resolve(
-            game: actor.game,
-            owner: actor.controller,
+          actor.transform!(
             card: LikenessOfTheSeeker.new(game: actor.game, owner: actor.controller),
-            token: true,
           )
         end
       end

@@ -112,6 +112,16 @@ module Magic
       @activated_abilities = abilities
     end
 
+    def transform!(card:)
+      @card = card
+      @base_types = card.types
+      @types = card.types
+      @keyword_grants = card.keyword_grants
+      @activated_abilities = card.activated_abilities.map { |ability| ability.new(source: self) }
+      apply_continuous_effects!
+      self
+    end
+
     def keyword_grant_modifiers
       modifiers.select { |modifier| modifier.is_a?(Permanents::Modifications::KeywordGrant) }
     end

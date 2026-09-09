@@ -13,6 +13,15 @@ RSpec.describe Magic::Cards::AzusasManyJourneys do
     expect(Magic::Cards::LikenessOfTheSeeker::NAME).to eq("Likeness of the Seeker")
   end
 
+  it "transforms the same permanent into its back face" do
+    saga = ResolvePermanent("Azusa's Many Journeys", owner: p1)
+    described_class::Chapter3.new(actor: saga).resolve!
+
+    expect(saga.name).to eq("Likeness of the Seeker")
+    expect(saga.token?).to be(false)
+    expect(saga.card).to be_a(Magic::Cards::LikenessOfTheSeeker)
+  end
+
   it "untaps up to three lands when Likeness becomes blocked" do
     likeness = ResolvePermanent("Likeness of The Seeker", owner: p1)
     lands = 3.times.map { ResolvePermanent("Forest", owner: p1) }
