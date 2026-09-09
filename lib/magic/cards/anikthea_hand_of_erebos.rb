@@ -13,7 +13,7 @@ module Magic
         keyword_grants Keywords::MENACE
 
         applicable_targets do
-          source.controller.creatures.select(&:enchantment?) - [source]
+          source.controller.creatures.enchantments - [source]
         end
       end
 
