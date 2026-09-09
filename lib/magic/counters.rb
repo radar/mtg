@@ -9,6 +9,7 @@ module Magic
       when "incarnation" then Incarnation
       when "page" then Page
       when "poison" then Poison
+      when "blessing" then Blessing
       else
         raise "Unknown counter type: #{counter_type}"
       end
