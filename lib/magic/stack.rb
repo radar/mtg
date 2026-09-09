@@ -123,7 +123,8 @@ module Magic
 
     def skip_choice!
       logger.debug "Skipping Choice: #{@choices.first}"
-      choices.shift
+      choice = choices.shift
+      choice.decline! if choice.respond_to?(:decline!)
     end
 
     def resolve_choice!(**args)

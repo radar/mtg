@@ -4,6 +4,9 @@ module Magic
       def may?
         true
       end
+
+      def decline!
+      end
     end
   end
 end

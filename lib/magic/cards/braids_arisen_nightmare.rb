@@ -8,21 +8,45 @@ module Magic
     end
 
     class BraidsArisenNightmare < Creature
-      class EndStepChoice < Magic::Choice::Targeted
+      class EndStepChoice < Magic::Choice::May
         def choices
           controller.permanents
         end
 
         def resolve!(target:)
           target.sacrifice!
-          opponents.each do |opponent|
-            if opponent.permanents.any? { |permanent| permanent.any_type?(*target.types) }
-              opponent.permanents.find { |permanent| permanent.any_type?(*target.types) }.sacrifice!
-            else
-              opponent.lose_life(2)
-              controller.draw!
-            end
+          game.opponents(controller).each { |opponent| resolve_opponent_choice(opponent, target.types) }
+        end
+
+        private
+
+        def resolve_opponent_choice(opponent, types)
+          choices = opponent.permanents.select { |permanent| permanent.any_type?(*types) }
+          if choices.empty?
+            opponent.lose_life(2)
+            controller.draw!
+          else
+            game.add_choice(OpponentChoice.new(actor: actor, opponent: opponent, choices: choices))
           end
+        end
+      end
+
+      class OpponentChoice < Magic::Choice::May
+        attr_reader :choices
+
+        def initialize(actor:, opponent:, choices:)
+          @opponent = opponent
+          @choices = choices
+          super(actor: actor)
+        end
+
+        def resolve!(target:)
+          target.sacrifice!
+        end
+
+        def decline!
+          @opponent.lose_life(2)
+          controller.draw!
         end
       end
 
