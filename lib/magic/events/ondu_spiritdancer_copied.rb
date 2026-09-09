@@ -1,10 +1,10 @@
 module Magic
   module Events
     class OnduSpiritdancerCopied
-      attr_reader :dancer
+      attr_reader :actor
 
-      def initialize(dancer:)
-        @dancer = dancer
+      def initialize(actor:)
+        @actor = actor
       end
     end
   end

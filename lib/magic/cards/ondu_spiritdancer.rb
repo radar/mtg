@@ -12,12 +12,12 @@ module Magic
         def should_perform?
           enchantment? && under_your_control? &&
             !game.current_turn.events.any? do |event|
-              event.is_a?(Events::OnduSpiritdancerCopied) && event.dancer == actor
+              event.is_a?(Events::OnduSpiritdancerCopied) && event.actor == actor
             end
         end
 
         def call
-          game.current_turn.events << Events::OnduSpiritdancerCopied.new(dancer: actor)
+          game.current_turn.events << Events::OnduSpiritdancerCopied.new(actor: actor)
           Permanent.resolve(
             game: game,
             owner: controller,
