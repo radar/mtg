@@ -10,8 +10,15 @@ module Magic
 
       def resolve!(target:)
         owner = target.owner
-        trigger_effect(:exile, target: target)
+        target.move_zone!(to: owner.library)
+        target.card.move_zone!(to: owner.library)
         owner.library.shuffle!
+
+        top_card = owner.library.first
+        return unless top_card
+
+        owner.reveal(top_card)
+        top_card.resolve! if top_card.permanent?
       end
     end
   end
