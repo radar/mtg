@@ -68,7 +68,11 @@ module Magic
       end
 
       def can_perform?
-        return false unless @flashback ? card.zone.graveyard? : card.zone.hand?
+        from_top_of_library = card.zone&.library? && card == player.library.first &&
+          game.battlefield.static_abilities.any? do |ability|
+            ability.respond_to?(:permits_casting_from_top?) && ability.permits_casting_from_top?(card)
+          end
+        return false unless from_top_of_library || (@flashback ? card.zone.graveyard? : card.zone.hand?)
         return true if mana_cost.zero?
 
         mana_cost.can_pay?(player)

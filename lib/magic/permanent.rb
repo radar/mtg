@@ -39,9 +39,7 @@ module Magic
     attr_accessor :zone
 
     def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false)
-      enters_tapped = false if enters_tapped && game.battlefield.static_abilities.any? do |ability|
-        ability.respond_to?(:lands_enter_untapped?) && ability.lands_enter_untapped?(card)
-      end
+      enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:)
 
       permanent = Magic::Permanent.new(
         game: game,
@@ -56,6 +54,16 @@ module Magic
       permanent.tap! if enters_tapped
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       permanent
+    end
+
+    def self.enters_tapped_after_replacements(game:, card:, enters_tapped:)
+      return enters_tapped unless enters_tapped && card.respond_to?(:land?) && card.land?
+
+      prevented = game.battlefield.static_abilities.any? do |ability|
+        ability.respond_to?(:lands_enter_untapped?) && ability.lands_enter_untapped?(card)
+      end
+
+      !prevented
     end
 
     def initialize(game:, owner:, card:, token: false, cast: true, kicked: false, copy: false, timestamp: Time.now)
@@ -235,9 +243,7 @@ module Magic
 
     def untap_during_untap_step
       if @counters.of_type(Counters::Stun).any?
-        counters = @counters.__getobj__
-        stun_index = counters.index { |counter| counter.is_a?(Counters::Stun) }
-        @counters = Counters::Collection.new(counters.each_with_index.reject { |_, index| index == stun_index }.map(&:first))
+        @counters.remove_first(Counters::Stun)
         return
       end
 
@@ -325,16 +331,14 @@ module Magic
     end
 
     def remove_counter(counter_type:, amount: 1)
-      counters = @counters.__getobj__
-      removable_counters = counters.select { |counter| counter.is_a?(counter_type) }.first(amount)
+      removable_counters = @counters.first_of_type(counter_type, amount)
       if removable_counters.count < amount
         raise "Not enough #{counter_type} counters to remove"
       end
 
       events = []
       removable_counters.each do |counter|
-        counters = counters.reject { |candidate| candidate.equal?(counter) }
-        @counters = Counters::Collection.new(counters)
+        @counters.delete(counter)
         events << Events::CounterRemoved.new(
           permanent: self,
           counter_type: counter_type,

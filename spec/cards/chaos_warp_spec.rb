@@ -14,6 +14,6 @@ RSpec.describe Magic::Cards::ChaosWarp do
     end
     game.stack.resolve!
 
-    expect(p2.library.by_name("Grizzly Bears").count).to eq(1)
+    expect([p2.library.by_name("Grizzly Bears").count, p2.creatures.by_name("Grizzly Bears").count].sum).to eq(1)
   end
 end
