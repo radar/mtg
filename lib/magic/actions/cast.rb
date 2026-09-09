@@ -74,7 +74,11 @@ module Magic
           game.battlefield.static_abilities.any? do |ability|
             ability.respond_to?(:permits_casting_from_top?) && ability.permits_casting_from_top?(card)
           end
-        return false unless from_top_of_library || (@flashback ? card.zone.graveyard? : card.zone.hand?)
+        from_exile = card.zone&.exile? &&
+          game.battlefield.static_abilities.any? do |ability|
+            ability.respond_to?(:permits_casting_from_exile?) && ability.permits_casting_from_exile?(card)
+          end
+        return false unless from_top_of_library || from_exile || (@flashback ? card.zone.graveyard? : card.zone.hand?)
         return true if mana_cost.zero?
 
         mana_cost.can_pay?(player)
