@@ -6,7 +6,7 @@ module Magic
       class InvalidTarget < StandardError; end
 
       def_delegators :@card, :enchantment?, :artifact?, :multi_target?
-      attr_reader :card, :targets, :value_for_x, :controller, :modes
+      attr_reader :card, :targets, :value_for_x, :controller, :modes, :additional_costs
 
       # @param flashback [Boolean] When true, allows casting from graveyard and exiles after resolution
       def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, **args)
@@ -14,6 +14,8 @@ module Magic
         @card = card
         @targets = []
         @modes = []
+        @additional_costs = card.respond_to?(:additional_costs) ? card.additional_costs : []
+        @paid_additional_costs = []
         @flashback = flashback
 
         @value_for_x = value_for_x
@@ -132,7 +134,19 @@ module Magic
         kicker_cost.pay(player:, payment:)
       end
 
+      def pay_sacrifice(target)
+        cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::Sacrifice) }
+        raise "Unknown additional sacrifice cost" unless cost
+
+        cost.pay(payment: target)
+        @paid_additional_costs << cost
+        self
+      end
+
       def perform
+        missing_costs = additional_costs - @paid_additional_costs
+        raise "Additional costs have not been paid" unless missing_costs.empty?
+
         mana_cost.finalize!(player)
         game.stack.add(self)
 
