@@ -12,8 +12,8 @@ RSpec.describe Magic::Cards::ChaosWarp do
       action.targeting(target)
       action.pay_mana(red: 1, generic: { red: 2 })
     end
+    allow(p2.library).to receive(:shuffle!)
     game.stack.resolve!
-
-    expect([p2.library.by_name("Grizzly Bears").count, p2.creatures.by_name("Grizzly Bears").count].sum).to eq(1)
+    expect(game.battlefield.by_name("Grizzly Bears").count).to eq(1)
   end
 end

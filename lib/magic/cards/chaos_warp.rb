@@ -10,8 +10,10 @@ module Magic
 
       def resolve!(target:)
         owner = target.owner
-        target.move_zone!(to: owner.library)
-        target.card.move_zone!(to: owner.library)
+        game.unsubscribe(target)
+        game.battlefield.remove(target)
+        target.card.zone = owner.library
+        owner.library.add(target.card)
         owner.library.shuffle!
 
         top_card = owner.library.first
