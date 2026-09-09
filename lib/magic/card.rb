@@ -8,6 +8,7 @@ module Magic
     include Cards::Shared::Events
     include Cards::Shared::Types
     attr_reader :game, :controller, :owner, :name, :cost, :kicker_cost, :types, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :modes
+    attr_accessor :chosen_color
     attr_accessor :tapped
 
     attr_accessor :zone
