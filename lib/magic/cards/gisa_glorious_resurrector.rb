@@ -10,7 +10,7 @@ module Magic
     class GisaGloriousResurrector < Creature
       class CreatureExileReplacement < ReplacementEffect
         def applies?(effect)
-          effect.target.creature? && effect.target.controller != receiver.controller
+          !!effect.from&.battlefield? && effect.to.graveyard? && effect.target.creature? && effect.target.controller != receiver.controller
         end
 
         def call(effect)

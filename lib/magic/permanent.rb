@@ -294,7 +294,7 @@ module Magic
 
     def destroy!
       move_zone!(to: controller.graveyard)
-      unless copy?
+      unless copy? || card.zone&.exile?
         card.move_zone!(to: controller.graveyard)
       end
     end
