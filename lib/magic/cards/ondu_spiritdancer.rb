@@ -11,11 +11,13 @@ module Magic
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def should_perform?
           enchantment? && under_your_control? &&
-            !game.current_turn.events.any? { |event| event.is_a?(Events::OnduSpiritdancerCopied) }
+            !game.current_turn.events.any? do |event|
+              event.is_a?(Events::OnduSpiritdancerCopied) && event.dancer == actor
+            end
         end
 
         def call
-          game.current_turn.events << Events::OnduSpiritdancerCopied.new
+          game.current_turn.events << Events::OnduSpiritdancerCopied.new(dancer: actor)
           Permanent.resolve(
             game: game,
             owner: controller,
