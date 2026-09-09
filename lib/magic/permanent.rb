@@ -53,6 +53,14 @@ module Magic
 
       permanent.tap! if enters_tapped
       permanent.move_zone!(from: from_zone, to: game.battlefield)
+      if card.types.include?(T::Creature)
+        game.battlefield.static_abilities.each do |ability|
+          next unless ability.respond_to?(:additional_counters_for_entering)
+
+          amount = ability.additional_counters_for_entering(permanent)
+          permanent.add_counter("+1/+1", amount: amount) if amount.positive?
+        end
+      end
       permanent
     end
 
