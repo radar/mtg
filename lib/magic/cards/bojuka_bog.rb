@@ -19,7 +19,7 @@ module Magic
         end
 
         def resolve!(target:)
-          target.graveyard.cards.to_a.each(&:exile!)
+          target.graveyard.cards.each(&:exile!)
         end
       end
 
