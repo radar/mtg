@@ -16,6 +16,25 @@ module Magic
         colors :green
       end
 
+      class EntersTrigger < TriggeredAbility::EnterTheBattlefield
+        def call
+          actor.add_counter("stun", amount: 6)
+        end
+      end
+
+      class LifeAbility < Magic::ActivatedAbility
+        def costs
+          [
+            Costs::Mana.new(generic: 4),
+            Costs::Sacrifice.new(source, source.controller.lands),
+          ]
+        end
+
+        def resolve!
+          controller.gain_life(2)
+        end
+      end
+
       class LandSacrificedTrigger < TriggeredAbility
         def should_perform?
           event.permanent.land? && event.permanent.controller == controller
@@ -28,8 +47,13 @@ module Magic
       end
 
       def event_handlers
-        { Events::PermanentSacrificed => LandSacrificedTrigger }
+        {
+          Events::EnteredTheBattlefield => EntersTrigger,
+          Events::PermanentSacrificed => LandSacrificedTrigger,
+        }
       end
+
+      def activated_abilities = [LifeAbility]
     end
   end
 end

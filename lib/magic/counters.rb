@@ -10,6 +10,7 @@ module Magic
       when "page" then Page
       when "poison" then Poison
       when "blessing" then Blessing
+      when "stun" then Stun
       else
         raise "Unknown counter type: #{counter_type}"
       end

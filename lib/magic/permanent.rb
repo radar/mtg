@@ -234,6 +234,13 @@ module Magic
     end
 
     def untap_during_untap_step
+      if @counters.of_type(Counters::Stun).any?
+        counters = @counters.__getobj__
+        stun_index = counters.index { |counter| counter.is_a?(Counters::Stun) }
+        @counters = Counters::Collection.new(counters.each_with_index.reject { |_, index| index == stun_index }.map(&:first))
+        return
+      end
+
       if cannot_untap_next_turn
         @cannot_untap_next_turn = false
         return
@@ -318,14 +325,16 @@ module Magic
     end
 
     def remove_counter(counter_type:, amount: 1)
-      removable_counters = @counters.select { |counter| counter.is_a?(counter_type) }.first(amount)
+      counters = @counters.__getobj__
+      removable_counters = counters.select { |counter| counter.is_a?(counter_type) }.first(amount)
       if removable_counters.count < amount
         raise "Not enough #{counter_type} counters to remove"
       end
 
       events = []
       removable_counters.each do |counter|
-        @counters.delete(counter)
+        counters = counters.reject { |candidate| candidate.equal?(counter) }
+        @counters = Counters::Collection.new(counters)
         events << Events::CounterRemoved.new(
           permanent: self,
           counter_type: counter_type,
