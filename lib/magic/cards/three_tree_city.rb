@@ -5,11 +5,9 @@ module Magic
     end
 
     class ThreeTreeCity < Card
-      attr_accessor :chosen_creature_type
-
       class CreatureTypeChoice < Magic::Choice::CreatureType
         def resolve!(creature_type:)
-          actor.card.chosen_creature_type = creature_type
+          actor.chosen_creature_type = creature_type
         end
       end
 
@@ -30,7 +28,7 @@ module Magic
         choices :all
 
         def mana_produced
-          count = source.controller.creatures.by_type(source.card.chosen_creature_type).count
+          count = source.controller.creatures.by_type(source.chosen_creature_type).count
           { choice => count }
         end
       end

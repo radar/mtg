@@ -5,11 +5,9 @@ module Magic
     end
 
     class PatchworkBanner < Artifact
-      attr_accessor :chosen_creature_type
-
       class CreatureTypeChoice < Magic::Choice::CreatureType
         def resolve!(creature_type:)
-          actor.card.chosen_creature_type = creature_type
+          actor.chosen_creature_type = creature_type
         end
       end
 
@@ -25,7 +23,7 @@ module Magic
         modify power: 1, toughness: 1
 
         def applicable_targets
-          source.controller.creatures.by_type(source.card.chosen_creature_type)
+          source.controller.creatures.by_type(source.chosen_creature_type)
         end
       end
 
