@@ -283,6 +283,11 @@ module Magic
       !tapped?
     end
 
+    def regenerate!
+      @damage = 0
+      tap!
+    end
+
     def static_abilities
       card.static_abilities.map { |ability| ability.new(source: self) }
     end

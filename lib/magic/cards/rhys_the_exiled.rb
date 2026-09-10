@@ -23,8 +23,7 @@ module Magic
         costs "{B}, Sacrifice an Elf"
 
         def resolve!
-          source.damage = 0
-          source.tap!
+          source.regenerate!
         end
       end
 
