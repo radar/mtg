@@ -156,6 +156,8 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 **Checking for fired events in tests**: Use `game.current_turn.events.find { |e| e.is_a?(Magic::Events::SomeEvent) }` — there is no `game.on` subscription method.
 
+**Testing a `SpellCast`-triggered ability (e.g. "whenever you cast a creature spell")**: Use `player.cast(card:) { |a| a.pay_mana(...) }` (calls `game.take_action`), not the `cast_and_resolve` spec helper — `cast_and_resolve` does a raw `game.stack.add(action)` and skips `Actions::Cast#perform`, which is where `Events::SpellCast` actually gets notified. A spec built on `cast_and_resolve` for a spell-cast trigger will silently see the trigger never fire.
+
 ## Common Card Ability Patterns
 
 **Ward (additional life cost)**: Use `ward life: N` DSL in the card definition block. Automatically registers a `SpellCast` trigger that checks `opponents.include?(event.player) && event.targets.include?(actor)` and calls `trigger_effect(:lose_life, target: event.player, life: N)`. If the card also defines `event_handlers` in a class reopening, call `super.merge(...)` to preserve the ward trigger. Example: `TerrorOfThePeaks`.
