@@ -318,5 +318,13 @@ module Magic
     def add_commander(commander)
       @commander = commander
     end
+
+    def monarch?
+      game.monarch == self
+    end
+
+    def become_monarch!
+      game.make_monarch!(self)
+    end
   end
 end

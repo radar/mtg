@@ -2,7 +2,7 @@ module Magic
   class Game
     extend Forwardable
 
-    attr_reader :logger, :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn, :event_listeners
+    attr_reader :logger, :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn, :event_listeners, :monarch
 
     class EmblemList
       include Enumerable
@@ -55,6 +55,8 @@ module Magic
       @emblems = EmblemList.new(self)
       @turns = []
       @event_listeners = []
+      @monarch = nil
+      subscribe(self)
     end
 
     def add_players(*players)
@@ -119,6 +121,24 @@ module Magic
 
     def opponents(player)
       players - [player]
+    end
+
+    def make_monarch!(player)
+      return if monarch == player
+
+      @monarch = player
+      notify!(Events::PlayerBecameMonarch.new(player: player))
+    end
+
+    def receive_event(event)
+      case event
+      when Events::CombatDamageDealt
+        if monarch && event.target == monarch && event.source.respond_to?(:controller) && event.source.controller != monarch
+          make_monarch!(event.source.controller)
+        end
+      when Events::BeginningOfEndStep
+        monarch.draw! if monarch == event.active_player
+      end
     end
 
     def any_target
