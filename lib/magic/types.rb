@@ -5,6 +5,7 @@ module Magic
     Artifact = "Artifact".freeze
     Creature = "Creature".freeze
     Enchantment = "Enchantment".freeze
+    Kindred = "Kindred".freeze
     Land = "Land".freeze
     Planeswalker = "Planeswalker".freeze
     Instant = "Instant".freeze

@@ -198,6 +198,10 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 **Setting base power/toughness ("base power and toughness X/X")**: Use `permanent.modify_base_power(n)` and `permanent.modify_base_toughness(n)` (defined in `lib/magic/permanents/modifications.rb`). Adds `Modifications::BasePower` / `BaseToughness` modifiers; `ContinuousEffects` uses the LAST one as the base value (typesetter effect). Modifiers default to `until_eot: true` and are removed in cleanup. To affect all controlled creatures, iterate `controller.creatures.each { _1.modify_base_power(x); _1.modify_base_toughness(x) }`. Example: `JolraelMwonvuliRecluse::ActivatedAbility`.
 
+**Kindred (formerly Tribal)**: Use `type T::Kindred, T::Enchantment, T::Creatures["Elf"]` (or Instant/Sorcery). `T::Kindred` is `"Kindred"`. Example: `ProwessOfTheFair`.
+
+**"Another nontoken Elf is put into your graveyard from the battlefield"**: Listen for `Events::LeftTheBattlefield`, not only `Events::CreatureDied` — Kindred Elves that are not creatures still count. Check `event.to.graveyard?`, `!event.permanent.token?`, `event.permanent.type?("Elf")`, and `event.permanent.controller == controller`. Wrap the token creation in `Magic::Choice::May`. Example: `ProwessOfTheFair`.
+
 ## TriggeredAbility Subclasses
 
 Pre-built subclasses in `lib/magic/triggered_ability/` — use these to avoid rewriting `should_perform?`:
