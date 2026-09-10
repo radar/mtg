@@ -208,6 +208,8 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 **"Reveal the top N cards" into a custom multi-part choice** (not a straight search/scry): wrap `actor.controller.library.first(n)` in `Magic::CardList.new(...)` — `Zone#first` (via `Enumerable`) returns a plain `Array`, so you lose `.lands`/`.by_any_type` filtering unless you rewrap it. Reveal with `controller.reveal(*cards)`. To return the unchosen cards "to the bottom in a random order", each card is still physically present in the library's items (only cards actually moved via `move_to_hand!`/`resolve!` are removed) — `remove` then `push` each one, don't just `push`, or they'll be duplicated. Example: `BountyOfSkemfar`.
 
+**Kicker on a non-permanent spell (instant/sorcery)**: `actor.kicked?` only works for permanents (the flag is baked into the `Permanent` at resolution). For a spell that never becomes a permanent, check `kicker_cost.paid?` directly on the card instead — the same card instance persists from cast through resolution, so `kicker_cost` (set during `pay_kicker`) is still valid inside `resolve!`. Example: `VastwoodSurge`.
+
 ## TriggeredAbility Subclasses
 
 Pre-built subclasses in `lib/magic/triggered_ability/` — use these to avoid rewriting `should_perform?`:
