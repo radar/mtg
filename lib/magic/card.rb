@@ -145,6 +145,10 @@ module Magic
       colors.count == 0
     end
 
+    def can_be_countered?
+      !game.battlefield.static_abilities.any? { |ability| ability.respond_to?(:prevents_countering?) && ability.prevents_countering?(self) }
+    end
+
     def return_to_hand
       move_to_hand!
     end
