@@ -3,7 +3,7 @@ module Magic
     class ContinuousEffects
       extend Forwardable
 
-      def_delegators :@permanent, :card
+      def_delegators :@permanent, :card, :copiable_card
 
       attr_reader :game, :permanent, :controller
 
@@ -43,7 +43,7 @@ module Magic
       end
 
       def calculate_power
-        base_power = modifiers_by_type(Modifications::BasePower).last&.base_power || card.base_power
+        base_power = modifiers_by_type(Modifications::BasePower).last&.base_power || copiable_card.base_power
         [
           permanent.counters,
           modifiers_by_type(Modifications::Power),
@@ -57,7 +57,7 @@ module Magic
       end
 
       def calculate_toughness
-        base_toughness = modifiers_by_type(Modifications::BaseToughness).last&.base_toughness || card.base_toughness
+        base_toughness = modifiers_by_type(Modifications::BaseToughness).last&.base_toughness || copiable_card.base_toughness
         [
           permanent.counters,
           modifiers_by_type(Modifications::Toughness),
@@ -76,7 +76,7 @@ module Magic
 
       def calculate_types
         types = [
-          *card.types,
+          *copiable_card.types,
           *permanent.attachments.flat_map(&:type_grants),
           *static_abilities_for(permanent).of_type(Abilities::Static::TypeGrant).flat_map(&:type_grants),
           *modifiers_by_type(Modifications::AdditionalType).flat_map(&:type_grants),
@@ -87,7 +87,7 @@ module Magic
 
       def calculate_keywords
         [
-          *card.keywords,
+          *copiable_card.keywords,
           *keyword_grant_static_abilities.flat_map(&:keyword_grants),
           *modifiers_by_type(Modifications::KeywordGrant).map(&:keyword_grant),
           *permanent.attachments.flat_map(&:keyword_grants),
@@ -109,7 +109,7 @@ module Magic
       def calculate_activated_abililities
         class_types = permanent.types.select { |type| type.is_a?(Class) }
         [
-          *card.activated_abilities,
+          *copiable_card.activated_abilities,
           # Land types specifically give one mana ability each
           *class_types.flat_map { |type| type::ManaAbility},
           *granted_activated_abilities,
