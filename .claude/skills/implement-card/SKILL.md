@@ -8,15 +8,17 @@ description: Implement a Magic: The Gathering card in this repo — look up its 
 Read `CLAUDE.md` first (project root) — it documents the architecture, DSL, common
 ability patterns, and testing helpers this skill assumes. This skill is the
 step-by-step process for turning a card name into a merged commit; CLAUDE.md is the
-reference for *how* to express any given ability once you know what it needs to do.
+reference for _how_ to express any given ability once you know what it needs to do.
 
 ## 1. Get the FULL Oracle text — every line
 
-Never guess or half-remember a card's text. Look it up, and read all of it.
+Never guess or half-remember a card's text. Look it up, and read all of it. Expand `oracle.rb` with whatever additional information you need.
 
 ```bash
 bundle exec rake 'find_card[Card Name]'
 ```
+
+Do not use `python` to read this file. Do not use Scryfall's API. All the data is in the `data` directory.
 
 - Names with a comma (e.g. `Dwynen, Gilt-Leaf Daen`) need the comma escaped or rake
   splits it into a second task arg: `bundle exec rake 'find_card[Dwynen\, Gilt-Leaf Daen]'`.
@@ -27,7 +29,7 @@ bundle exec rake 'find_card[Card Name]'
   ability all in one `oracle_text` string; stopping after the first `\n` is the most
   common way to ship a card that's missing half its abilities.
 - If `rake find_card` raises `Magic::Oracle::CardNotFound`, the name doesn't match
-  exactly (check punctuation/capitalization against Scryfall), or query the bulk data
+  exactly (check punctuation/capitalization against the data file), or query the bulk data
   file directly instead of guessing:
 
   ```bash
@@ -77,7 +79,7 @@ this directory (CLAUDE.md code style — card files are the one exception).
   creature type, P/T, and keywords only.
 - If the card needs triggers, choices, static abilities, or `event_handlers`, reopen
   the class afterwards (`class CardName < Creature; ...; end`) — the DSL block runs in
-  `Magic::Cards` lexical scope, so a `class Foo` written *inside* the DSL block lands
+  `Magic::Cards` lexical scope, so a `class Foo` written _inside_ the DSL block lands
   as `Magic::Cards::Foo`, a sibling, not nested inside the card. This is the single
   most common structural mistake; see CLAUDE.md's "DSL block vs class reopening" note.
 - Match mana cost format to the card (hash for 1-2 colors, string `cost "{2}{R}{G}"`
@@ -87,7 +89,7 @@ this directory (CLAUDE.md code style — card files are the one exception).
 
 ## 4. Write the spec
 
-`spec/cards/<snake_case_name>_spec.rb`. This directory *does* use
+`spec/cards/<snake_case_name>_spec.rb`. This directory _does_ use
 `# frozen_string_literal: true` (top of file) plus `require "spec_helper"`.
 
 - `include_context "two player game"` for `game`, `p1`, `p2`, `current_turn`.
