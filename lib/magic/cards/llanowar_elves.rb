@@ -1,10 +1,10 @@
 module Magic
   module Cards
-    LlanowarElves = Creature("LLanowar Elves") do
+    LlanowarElves = Creature("Llanowar Elves") do
       cost green: 1
       power 1
       toughness 1
-      creature_type("Elf Druid")
+      creature_type "Elf Druid"
     end
 
     class LlanowarElves < Creature
