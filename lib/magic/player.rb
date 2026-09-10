@@ -14,6 +14,7 @@ module Magic
       graveyard: Zones::Graveyard.new(owner: self, items: []),
       library: [],
       hand: Zones::Hand.new(owner: self, items: []),
+      exile: Zones::Exile.new(owner: self, items: []),
       mana_pool: Hash.new(0),
       floating_mana: Hash.new(0),
       life: 20
@@ -23,6 +24,7 @@ module Magic
       @library = Zones::Library.new(owner: self, items: library)
       @graveyard = graveyard
       @hand = hand
+      @exile = exile
       @mana_pool = mana_pool
       @floating_mana = floating_mana
       @starting_life = life
