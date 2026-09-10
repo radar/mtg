@@ -15,5 +15,12 @@ module Magic
       # keep only relevant keys
       card.slice("name", "mana_cost", "type_line", "oracle_text", "colors", "color_identity", "power", "toughness")
     end
+
+    def search_cards(fragment)
+      @oracle_data
+        .select { |card| card["name"].downcase.include?(fragment.downcase) }
+        .map { |card| card["name"] }
+        .uniq
+    end
   end
 end

@@ -18,29 +18,31 @@ Never guess or half-remember a card's text. Look it up, and read all of it. Expa
 bundle exec rake 'find_card[Card Name]'
 ```
 
-Do not use `python` to read this file. Do not use Scryfall's API. All the data is in the `data` directory.
+`Magic::Oracle` (`lib/magic/oracle.rb`) is the only interface to card data — never read
+`data/*.jsonl` directly, and never use `python` or Scryfall's API to look anything up.
 
 - Names with a comma (e.g. `Dwynen, Gilt-Leaf Daen`) need the comma escaped or rake
   splits it into a second task arg: `bundle exec rake 'find_card[Dwynen\, Gilt-Leaf Daen]'`.
 - The task prints a Ruby hash via `.inspect`: `name`, `mana_cost`, `type_line`,
-  `oracle_text`, `colors`, `color_identity`. `oracle_text` is the whole rules text with
-  `\n` between lines — **read every line**, not just the first ability. Cards
-  routinely pack in a keyword line, an ETB trigger, an attack trigger, and a static
-  ability all in one `oracle_text` string; stopping after the first `\n` is the most
-  common way to ship a card that's missing half its abilities.
+  `oracle_text`, `colors`, `color_identity`, `power`, `toughness`. `oracle_text` is the
+  whole rules text with `\n` between lines — **read every line**, not just the first
+  ability. Cards routinely pack in a keyword line, an ETB trigger, an attack trigger,
+  and a static ability all in one `oracle_text` string; stopping after the first `\n`
+  is the most common way to ship a card that's missing half its abilities.
 - If `rake find_card` raises `Magic::Oracle::CardNotFound`, the name doesn't match
-  exactly (check punctuation/capitalization against the data file), or query the bulk data
-  file directly instead of guessing:
+  exactly (check punctuation/capitalization/hyphenation, e.g. a hyphen the actual card
+  name doesn't have, or a missing apostrophe). Use `Oracle#search_cards` to find the
+  exact spelling, then retry `find_card` with it:
 
   ```bash
-  grep -m1 -F '"name":"Card Name"' data/*.jsonl | \
-    python3 -c "import json,sys; d=json.loads(sys.stdin.read()); print(json.dumps({k:d[k] for k in ['name','mana_cost','type_line','oracle_text','colors','color_identity','power','toughness','loyalty'] if k in d}, indent=2, ensure_ascii=False))"
+  bundle exec rake 'search_cards[Soul Jar]'
   ```
 
-  This also surfaces `power`/`toughness`/`loyalty`, which `Oracle#find_card` strips out
-  — grab them from here if `rake find_card` doesn't give you what you need. Double
-  quotes in `oracle_text` show up as `—` etc. (JSON-escaped em dashes and the
-  like) — read past the escaping, don't transcribe it literally into the card file.
+  This does a case-insensitive substring match over card names and returns the exact
+  names it found — pick the right one and pass it back to `find_card`.
+- If you need a field `find_card` doesn't return, add it to `Oracle#find_card`'s
+  `slice(...)` call (it already includes `power`/`toughness`) — extend the Ruby class,
+  don't work around it.
 
 State back (to yourself, in the implementation) every line of oracle_text as a
 distinct piece of behavior before writing code. If a card has N sentences of rules
