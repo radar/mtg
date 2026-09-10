@@ -27,7 +27,9 @@ module Magic
       :exiled_cards,
       :cannot_untap_next_turn
 
-    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :additional_lands_per_turn, :power_modification, :toughness_modification, :type_grants
+    attr_accessor :copied_card
+
+    def_delegators :@card, :opponents, :additional_lands_per_turn, :power_modification, :toughness_modification, :type_grants
     def_delegators :@game, :logger
 
     class Protections < SimpleDelegator
@@ -103,6 +105,16 @@ module Magic
     def kicked?
       @kicked
     end
+
+    def copiable_card
+      copied_card || card
+    end
+
+    def name = copiable_card.name
+    def cmc = copiable_card.cmc
+    def mana_value = copiable_card.mana_value
+    def colors = copiable_card.colors
+    def colorless? = copiable_card.colorless?
 
     def apply_continuous_effects!
       Magic::Permanents::ContinuousEffects.new(game: game, permanent: self).apply!
