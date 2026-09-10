@@ -27,7 +27,7 @@ module Magic
       :exiled_cards,
       :cannot_untap_next_turn
 
-    attr_accessor :chosen_creature_type
+    attr_accessor :chosen_creature_type, :exile_cast_permission_turn
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :additional_lands_per_turn, :power_modification, :toughness_modification, :type_grants
     def_delegators :@game, :logger
