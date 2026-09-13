@@ -263,6 +263,18 @@ module Magic
       @cannot_untap_next_turn = true
     end
 
+    def mode_chosen_this_turn?(mode)
+      modes_chosen_this_turn.include?(mode)
+    end
+
+    def choose_mode_this_turn!(mode)
+      modes_chosen_this_turn << mode
+    end
+
+    def modes_chosen_this_turn
+      @modes_chosen_this_turn ||= []
+    end
+
     def untap_during_untap_step
       if @counters.of_type(Counters::Stun).any?
         @counters.remove_first(Counters::Stun)
@@ -346,6 +358,7 @@ module Magic
 
     def cleanup!
       @turn_triggers = {}
+      @modes_chosen_this_turn = []
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
       remove_until_eot_modifiers!
