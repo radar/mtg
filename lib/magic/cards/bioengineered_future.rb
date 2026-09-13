@@ -33,14 +33,13 @@ module Magic
         end
       end
 
-      class CreatureEntryCounters < StaticAbility
+      class CreatureEntryCounters < Abilities::Static::AdditionalCountersForEntering
         def additional_counters_for_entering(permanent)
           return 0 unless permanent.controller == controller
 
-          lands = game.current_turn.events.count do |event|
+          game.current_turn.events.count do |event|
             event.is_a?(Events::Landfall) && event.player == controller
           end
-          lands
         end
       end
 

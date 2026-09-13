@@ -26,9 +26,9 @@ module Magic
         end
       end
 
-      class LandsEnterUntapped < StaticAbility
+      class LandsEnterUntapped < Abilities::Static::LandsEnterUntapped
         def lands_enter_untapped?(card)
-          card.land? && card.controller == source.controller
+          card.land? && card.controller == controller
         end
       end
 

@@ -31,7 +31,7 @@ module Magic
         def self.activated_abilities = [Ability]
       end
 
-      class LandsEnterUntapped < StaticAbility
+      class LandsEnterUntapped < Abilities::Static::LandsEnterUntapped
         def lands_enter_untapped?(card)
           card.land? && card.controller == controller
         end

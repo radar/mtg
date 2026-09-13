@@ -262,8 +262,12 @@ Pre-built subclasses in `lib/magic/abilities/static/` — declare these on a car
 - `Abilities::Static::ManaCostAdjustment` — reduces/adjusts mana costs for matching cards
 - `Abilities::Static::AnyColorForCreatureActivations` — controller can spend mana as any color when activating abilities of creature permanents (e.g. Agatha's Soul Cauldron)
 - `Abilities::Static::GrantActivatedAbilities` — grants activated abilities to matching permanents; subclass and implement `applies_to?(permanent)` and `granted_abilities` (e.g. Agatha's Soul Cauldron grants abilities from exiled creature cards to creatures with +1/+1 counters)
+- `Abilities::Static::LandsEnterUntapped` — subclass and implement `lands_enter_untapped?(card)`; queried by `Permanent.enters_tapped_after_replacements` via `.of_type(...)`, not `respond_to?`. Example: `Spelunking`, `HorizonExplorer`.
+- `Abilities::Static::AdditionalCountersForEntering` — subclass and implement `additional_counters_for_entering(permanent)`; queried by `Permanent.resolve` (creatures only) via `.of_type(...)`. Example: `BioengineeredFuture`.
 
 **Pattern**: define an inner class on the card that subclasses the relevant base, implement `applies_to?` and any extra methods, return it from `def static_abilities`. Access the source permanent via `@source`. Example: `AgathasSoulCauldron::GrantAbilitiesFromExile`.
+
+**Querying static abilities generically**: Use `game.battlefield.static_abilities.of_type(Abilities::Static::SomeBaseClass)` (`lib/magic/static_abilities.rb`), not `.respond_to?(:some_method)` — the latter is fragile (a class overriding the method without inheriting the right base silently no-ops, or worse, an unrelated ability happens to define a same-named method). Every hook queried this way needs a real base class under `lib/magic/abilities/static/`, even if it only has one implementation so far.
 
 ## CardList Helper Methods
 

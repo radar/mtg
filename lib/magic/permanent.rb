@@ -56,9 +56,7 @@ module Magic
       permanent.tap! if enters_tapped
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       if card.types.include?(T::Creature)
-        game.battlefield.static_abilities.each do |ability|
-          next unless ability.respond_to?(:additional_counters_for_entering)
-
+        game.battlefield.static_abilities.of_type(Abilities::Static::AdditionalCountersForEntering).each do |ability|
           amount = ability.additional_counters_for_entering(permanent)
           permanent.add_counter("+1/+1", amount: amount) if amount.positive?
         end
@@ -69,8 +67,8 @@ module Magic
     def self.enters_tapped_after_replacements(game:, card:, enters_tapped:)
       return enters_tapped unless enters_tapped && card.land?
 
-      prevented = game.battlefield.static_abilities.any? do |ability|
-        ability.respond_to?(:lands_enter_untapped?) && ability.lands_enter_untapped?(card)
+      prevented = game.battlefield.static_abilities.of_type(Abilities::Static::LandsEnterUntapped).any? do |ability|
+        ability.lands_enter_untapped?(card)
       end
 
       !prevented
