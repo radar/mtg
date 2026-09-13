@@ -36,7 +36,7 @@ module Magic
       # If a triggered ability of another creature you control of the chosen
       # type triggers, it triggers an additional time.
       class TriggersAdditionalTime < Abilities::Static::TriggeredAbilityDoubler
-        def doubles_trigger_for?(permanent)
+        def doubles_trigger_for?(permanent, _event)
           permanent != source &&
             permanent.controller == controller &&
             source.chosen_creature_type &&

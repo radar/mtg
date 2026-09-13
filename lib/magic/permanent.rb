@@ -478,7 +478,7 @@ module Magic
     def perform_trigger!(trigger_class, event)
       additional_triggers = game.battlefield.static_abilities
         .of_type(Abilities::Static::TriggeredAbilityDoubler)
-        .count { |doubler| doubler.doubles_trigger_for?(self) }
+        .count { |doubler| doubler.doubles_trigger_for?(self, event) }
 
       (1 + additional_triggers).times do
         trigger_class.new(actor: self, event: event).perform!

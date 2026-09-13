@@ -8,8 +8,8 @@ module Magic
         @controller = controller
         @token_class = token_class
         @amount = amount
-        @base_power = base_power || token_class::POWER
-        @base_toughness = base_toughness || token_class::TOUGHNESS
+        @base_power = base_power || (token_class.const_defined?(:POWER) ? token_class::POWER : nil)
+        @base_toughness = base_toughness || (token_class.const_defined?(:TOUGHNESS) ? token_class::TOUGHNESS : nil)
         @enters_tapped = enters_tapped
       end
 
