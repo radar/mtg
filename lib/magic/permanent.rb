@@ -334,6 +334,11 @@ module Magic
       destroy!
     end
 
+    def exile!
+      move_zone!(to: game.exile)
+      card.move_zone!(to: game.exile) unless copy? || card.zone&.exile?
+    end
+
     def return_to_hand
       move_zone!(to: owner.hand)
       card.move_zone!(to: owner.hand)

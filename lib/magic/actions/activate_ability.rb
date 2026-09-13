@@ -61,6 +61,10 @@ module Magic
         pay(:self_sacrifice)
       end
 
+      def pay_self_exile
+        pay(:self_exile)
+      end
+
       def pay_discard(targets)
         pay(:discard, targets)
       end
@@ -87,6 +91,8 @@ module Magic
           Costs::Sacrifice
         when :self_sacrifice
           Costs::SelfSacrifice
+        when :self_exile
+          Costs::SelfExile
         else
           raise "unknown cost type: #{cost_type}"
         end

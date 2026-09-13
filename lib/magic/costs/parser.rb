@@ -26,6 +26,8 @@ module Magic
             Sacrifice.new(source, source.controller.creatures)
           when /Sacrifice {this}/
             SelfSacrifice.new(source)
+          when /Exile {this}/
+            SelfExile.new(source)
           else
             raise "Unknown cost: #{cost}"
           end

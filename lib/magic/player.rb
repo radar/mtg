@@ -69,6 +69,7 @@ module Magic
       yield action if block_given?
       action.pay_self_tap if action.has_cost?(Magic::Costs::SelfTap) && auto_tap
       action.pay_self_sacrifice if action.has_cost?(Magic::Costs::SelfSacrifice)
+      action.pay_self_exile if action.has_cost?(Magic::Costs::SelfExile)
       action.finalize_costs!(self)
       game.take_action(action)
     end
