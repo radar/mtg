@@ -35,6 +35,14 @@ module Magic
         modifiers << KeywordGrant.new(keyword_grant: keyword, until_eot: until_eot)
       end
 
+      def prevent_blocking!(until_eot: true)
+        modifiers << CannotBlock.new(until_eot: until_eot)
+      end
+
+      def prevented_from_blocking?
+        modifiers.any? { |modifier| modifier.is_a?(CannotBlock) }
+      end
+
       def method_missing(method_name, **kwargs)
         match = method_name.to_s.match(/\Agrant_(\w+)!\z/)
         if match && Cards::Keywords.const_defined?(match[1].upcase)

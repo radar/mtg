@@ -373,7 +373,7 @@ module Magic
     end
 
     def can_block?(permanent)
-      card.can_block?(permanent) && attachments.all? { |attachment| attachment.can_block?(permanent) }
+      !prevented_from_blocking? && card.can_block?(permanent) && attachments.all? { |attachment| attachment.can_block?(permanent) }
     end
 
 
