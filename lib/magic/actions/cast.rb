@@ -9,7 +9,8 @@ module Magic
       attr_reader :card, :targets, :value_for_x, :controller, :modes, :additional_costs
 
       # @param flashback [Boolean] When true, allows casting from graveyard and exiles after resolution
-      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, **args)
+      # @param blitz [Boolean] When true, pays the card's blitz cost instead of its mana cost
+      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, **args)
         super(**args)
         @card = card
         @targets = []
@@ -17,6 +18,7 @@ module Magic
         @additional_costs = card.respond_to?(:additional_costs) ? card.additional_costs : []
         @paid_additional_costs = []
         @flashback = flashback
+        @blitz = blitz
 
         @value_for_x = value_for_x
       end
@@ -47,6 +49,8 @@ module Magic
         @mana_cost ||= begin
           if @flashback && card.zone.graveyard?
             cost = card.flashback_cost
+          elsif @blitz
+            cost = card.blitz_cost
           else
             cost = card.cost
           end
@@ -173,12 +177,18 @@ module Magic
         if modes.any?
           modes.each { |mode| mode.resolve! }
         else
-          resolve_with_args(card,
+          resolved = resolve_with_args(card,
             target: targets.first,
             targets: targets,
             kicked: kicker_cost.paid?,
             value_for_x: mana_cost.x,
           )
+        end
+
+        if @blitz && resolved.is_a?(Permanent)
+          resolved.grant_haste!
+          resolved.register_turn_trigger(Events::CreatureDied, Blitz::DeathDrawTrigger)
+          resolved.register_turn_trigger(Events::BeginningOfEndStep, Blitz::EndStepSacrificeTrigger)
         end
 
         if card.sorcery? || card.instant?

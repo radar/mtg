@@ -28,6 +28,8 @@ module Magic
             SelfSacrifice.new(source)
           when /Exile {this}/
             SelfExile.new(source)
+          when /Discard a card/
+            Discard.new(source.controller)
           else
             raise "Unknown cost: #{cost}"
           end
