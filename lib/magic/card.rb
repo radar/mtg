@@ -51,6 +51,12 @@ module Magic
         const_set(:BLITZ_COST, cost)
       end
 
+      def buyback
+        define_method(:buyback?) do
+          true
+        end
+      end
+
       def kicker_cost(cost)
         const_set(:KICKER_COST, cost)
       end
@@ -288,6 +294,10 @@ module Magic
 
     def blitz_cost
       self.class.const_defined?(:BLITZ_COST, false) ? Costs::Mana.new(self.class::BLITZ_COST.dup) : nil
+    end
+
+    def buyback?
+      false
     end
 
     def prowess_trigger

@@ -196,6 +196,8 @@ module Magic
             card.exile!
           elsif card.rebound? && card.zone.hand?
             card.exile!
+          elsif card.buyback? && kicker_cost.paid?
+            card.move_to_hand!(player)
           else
             card.move_to_graveyard!(player)
           end
