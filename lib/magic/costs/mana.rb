@@ -33,6 +33,7 @@ module Magic
         @payments[:x] = Hash.new(0)
         @any_color = false
         @actual_color_payments = Hash.new(0)
+        @hybrid_actual_payments = Hash.new(0)
       end
 
       def treat_any_color_as_any!
@@ -44,7 +45,9 @@ module Magic
       end
 
       def colors
-        cost.keys.reject { |k| k == :generic || k == :colorless }
+        cost.keys.reject { |k| k == :generic || k == :colorless }.flat_map do |key|
+          hybrid_key?(key) ? hybrid_colors_for(key) : [key]
+        end
       end
 
       def adjusted_by(change, condition = nil)
@@ -93,7 +96,8 @@ module Magic
         if @any_color
           player.pay_mana(@actual_color_payments) if @actual_color_payments.any?
         else
-          player.pay_mana(color_costs) if color_costs.values.any?(&:positive?)
+          fixed_payments = color_costs.merge(@hybrid_actual_payments) { |_key, a, b| a + b }
+          player.pay_mana(fixed_payments) if fixed_payments.values.any?(&:positive?)
         end
       end
 
@@ -138,6 +142,17 @@ module Magic
         pool = player.mana_pool.dup
         deduct_from_pool(pool, color_costs)
 
+        hybrid_costs.each do |key, amount|
+          remaining = amount
+          hybrid_colors_for(key).each do |color|
+            break if remaining <= 0
+            deduction = [pool[color] || 0, remaining].min
+            pool[color] = (pool[color] || 0) - deduction
+            remaining -= deduction
+          end
+          return false if remaining.positive?
+        end
+
         generic_mana_payable = cost[:generic].nil? || pool.values.sum >= cost[:generic]
 
         generic_mana_payable && (pool.values.all? { |v| v.zero? || v.positive? })
@@ -174,9 +189,25 @@ module Magic
             remaining -= deduction
           end
           color_payments.each { |color, amount| @actual_color_payments[color] += amount }
-        else
+        elsif hybrid_costs.empty?
           color_payments.each_with_object(balance) do |(color, amount), remaining_balance|
             remaining_balance[color] -= amount
+          end
+        else
+          color_payments.each do |color, amount|
+            if cost.key?(color)
+              balance[color] -= amount
+            else
+              remaining = amount
+              hybrid_costs.each_key do |key|
+                break if remaining <= 0
+                next unless hybrid_colors_for(key).include?(color)
+                deduction = [balance[key], remaining].min
+                balance[key] -= deduction
+                remaining -= deduction
+                @hybrid_actual_payments[color] += deduction
+              end
+            end
           end
         end
       end
@@ -191,6 +222,18 @@ module Magic
 
       def color_costs
         cost.slice(*Magic::Mana::COLORS)
+      end
+
+      def hybrid_key?(key)
+        key.is_a?(Symbol) && key.to_s.include?("_or_")
+      end
+
+      def hybrid_colors_for(key)
+        key.to_s.split("_or_").map(&:to_sym)
+      end
+
+      def hybrid_costs
+        cost.select { |key, _amount| hybrid_key?(key) }
       end
 
       def deduct_from_pool(pool, mana)

@@ -18,6 +18,9 @@ module Magic
             .map do |key, values|
               if key =~ /\d+/
                 [:generic, key.to_i]
+              elsif key.include?("/")
+                colors = key.split("/").map { |symbol| symbols.fetch(symbol) }.sort
+                [:"#{colors.join("_or_")}", values.count]
               else
                 [symbols[key], values.count]
               end
