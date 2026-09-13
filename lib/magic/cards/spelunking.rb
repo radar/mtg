@@ -9,8 +9,8 @@ module Magic
         attr_reader :choices
 
         def initialize(actor:)
-          @choices = actor.controller.hand.lands
           super
+          @choices =hand.lands
         end
 
         def resolve!(target:)
