@@ -47,6 +47,18 @@ module Magic
       you? && creature?
     end
 
+    def under_your_control?
+      event.permanent.controller?(controller)
+    end
+
+    def triggered_this_turn?
+      event.permanent.triggered_once_this_turn?(self.class)
+    end
+
+    def mark_triggered_this_turn!
+      event.permanent.trigger_once_this_turn!(self.class)
+    end
+
     def should_perform?
       true
     end

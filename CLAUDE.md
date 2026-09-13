@@ -278,9 +278,11 @@ Pre-built subclasses in `lib/magic/triggered_ability/` — use these to avoid re
 
 - `TriggeredAbility::BeginningOfYourUpkeep` — fires on `Events::BeginningOfUpkeep` only during controller's upkeep (`you?` built in)
 - `TriggeredAbility::BeginningOfEndStep` — fires on `Events::BeginningOfEndStep`; provides `controllers_end_step?` helper
-- `TriggeredAbility::EnterTheBattlefield` — provides `under_your_control?`, `another_creature?`, `flying?`, `enchantment?`
+- `TriggeredAbility::EnterTheBattlefield` — provides `another_creature?`, `flying?`, `enchantment?`
 - `TriggeredAbility::SpellCast` — provides `spell`, `enchantment?`
 - `TriggeredAbility::Landfall`, `::Death`, `::LeaveTheBattlefield`, `::CounterAdded`, `::LoreCounterAdded`
+
+**Composable `should_perform?` predicates on the base `TriggeredAbility` class** (`lib/magic/triggered_ability.rb`): prefer AND-chaining these named predicates over writing out the equivalent `event.permanent`/`game.current_turn` checks inline — `you?`, `opponent?`, `this?` (event permanent is the source), `type?`/`creature?`/`under_your_control?` (all check `event.permanent`), `controllers_turn?`. For a "once per turn" trigger (e.g. "Whenever ~ becomes tapped, untap it... Do this only once each turn"), use `triggered_this_turn?` in `should_perform?` and call `mark_triggered_this_turn!` at the top of `call` — these wrap `Permanent#triggered_once_this_turn?`/`#trigger_once_this_turn!` keyed on `self.class`, so no per-card bookkeeping is needed. Example: `DionusElvishArchdruid`.
 
 ## Static Ability Subclasses
 

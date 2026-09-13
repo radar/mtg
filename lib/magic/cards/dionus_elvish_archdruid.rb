@@ -10,14 +10,11 @@ module Magic
     class DionusElvishArchdruid < Creature
       class UntapAndGrowTrigger < TriggeredAbility
         def should_perform?
-          event.permanent.controller == controller &&
-            event.permanent.type?("Elf") &&
-            game.current_turn.active_player == controller &&
-            !event.permanent.triggered_once_this_turn?(self.class)
+          under_your_control? && type?("Elf") && controllers_turn? && !triggered_this_turn?
         end
 
         def call
-          event.permanent.trigger_once_this_turn!(self.class)
+          mark_triggered_this_turn!
           event.permanent.untap!
           event.permanent.trigger_effect(:add_counter, counter_type: "+1/+1", target: event.permanent)
         end

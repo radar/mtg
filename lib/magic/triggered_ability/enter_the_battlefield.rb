@@ -1,10 +1,6 @@
 module Magic
   class TriggeredAbility
     class EnterTheBattlefield < TriggeredAbility
-      def under_your_control?
-        event.permanent.controller?(controller)
-      end
-
       def another_creature?
         creature? && actor != event.permanent
       end
