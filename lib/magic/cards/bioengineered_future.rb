@@ -37,9 +37,7 @@ module Magic
         def additional_counters_for_entering(permanent)
           return 0 unless permanent.controller == controller
 
-          game.current_turn.events.count do |event|
-            event.is_a?(Events::Landfall) && event.player == controller
-          end
+          game.current_turn.events.for_player(controller).landfall.count
         end
       end
 

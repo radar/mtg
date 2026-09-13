@@ -133,7 +133,7 @@ module Magic
         @game = game
         @active_player = active_player
         @actions = []
-        @events = []
+        @events = EventLog.new
         @additional_combats = 0
         @combat = CombatPhase.new(game: game)
         super()
