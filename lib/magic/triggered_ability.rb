@@ -51,6 +51,10 @@ module Magic
       event.permanent.controller?(controller)
     end
 
+    def add_counter(counter_type, target: actor, amount: 1)
+      trigger_effect(:add_counter, counter_type: counter_type, target: target, amount: amount)
+    end
+
     def should_perform?
       true
     end
