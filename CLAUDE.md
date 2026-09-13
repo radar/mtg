@@ -262,6 +262,10 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 **Dynamic/CDA power and toughness on a Token (not a Creature card)**: Same pattern as the Creature-card CDA case above — subclass `Abilities::Static::PowerAndToughnessModification` nested inside the `Token` subclass, `applicable_targets = [source]`, override `power_modification`/alias `toughness_modification`, and return it from `def static_abilities` on the token class. Must be a plain `class SomeToken < Token; ... end` definition (not a `Token.create("Name") do ... end` block) so the nested static-ability class lands inside the token's own namespace rather than `Magic::Cards` — same lexical-scope pitfall as the DSL-block-vs-class-reopening note at the top of this file. Example: `WrennAndSeven::TreefolkToken` (power/toughness equal to lands controlled).
 
+**"{N}, {T}, Exile this [permanent]: ..." (exiling itself as an activation cost)**: `Costs::Parser` had no exile-self cost until `Costs::SelfExile` (mirrors `Costs::SelfSacrifice`) plus a `/Exile {this}/` case in the parser — write it as `costs "{3}, {T}, Exile {this}"` same as any other multi-part cost string. `Permanent#exile!` (mirrors `destroy!`) moves both the permanent and its underlying card to `game.exile`. `Player#activate_ability` auto-pays it unconditionally once present, same as `SelfTap`/`SelfSacrifice` — no explicit `pay_self_exile` call needed in specs. Example: `PlazaOfHeroes`.
+
+**"Add one mana of any color. Spend this mana only to cast a legendary spell" (or similar restricted-use mana)**: There's no mana-pool tagging for *what a mana can be spent on* — `Player#mana_pool` is a flat `color => count` hash. Implement the production side only (`Magic::ManaAbility` with `choices :all`, or a computed `choices` list) and don't try to enforce the spending restriction; this matches the codebase's existing looseness around unenforced cost/payment rules (see kicker/counter-distribution notes above). Example: `PlazaOfHeroes`.
+
 ## TriggeredAbility Subclasses
 
 Pre-built subclasses in `lib/magic/triggered_ability/` — use these to avoid rewriting `should_perform?`:
