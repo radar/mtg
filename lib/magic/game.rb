@@ -130,6 +130,23 @@ module Magic
       notify!(Events::PlayerBecameMonarch.new(player: player))
     end
 
+    def ring_emblem_for(player)
+      emblems.find { |emblem| emblem.is_a?(Emblem::TheRing) && emblem.owner == player }
+    end
+
+    def the_ring_tempts!(player)
+      emblem = ring_emblem_for(player)
+      unless emblem
+        emblem = Emblem::TheRing.new(game: self, owner: player)
+        add_emblem(emblem)
+      end
+      emblem.gain_next_ability!
+
+      notify!(Events::TheRingTemptsPlayer.new(player: player))
+
+      add_choice(Choice::RingBearer.new(player: player)) if player.creatures.any?
+    end
+
     def receive_event(event)
       case event
       when Events::CombatDamageDealt

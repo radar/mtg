@@ -4,6 +4,7 @@ module Magic
     extend Forwardable
 
     attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters, :commander
+    attr_accessor :ring_bearer
 
     def_delegators :@game, :logger
 

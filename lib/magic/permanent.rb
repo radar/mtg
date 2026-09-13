@@ -27,7 +27,7 @@ module Magic
       :exiled_cards,
       :cannot_untap_next_turn
 
-    attr_accessor :copied_card, :chosen_creature_type, :exile_cast_permission_turn
+    attr_accessor :copied_card, :chosen_creature_type, :exile_cast_permission_turn, :ring_bearer
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :additional_lands_per_turn, :power_modification, :toughness_modification, :type_grants
     def_delegators :@game, :logger
@@ -180,6 +180,10 @@ module Magic
 
     def token?
       @token
+    end
+
+    def ring_bearer?
+      !!@ring_bearer
     end
 
     def copy?
