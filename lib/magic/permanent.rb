@@ -251,12 +251,12 @@ module Magic
     end
 
     def tap!
+      @tapped = true
+
       tapped_event = Events::PermanentTapped.new(
         permanent: self,
       )
       game.notify!(tapped_event)
-
-      @tapped = true
     end
 
     def cannot_untap_next_turn!
@@ -273,6 +273,18 @@ module Magic
 
     def modes_chosen_this_turn
       @modes_chosen_this_turn ||= []
+    end
+
+    def triggered_once_this_turn?(key)
+      triggered_once_keys_this_turn.include?(key)
+    end
+
+    def trigger_once_this_turn!(key)
+      triggered_once_keys_this_turn << key
+    end
+
+    def triggered_once_keys_this_turn
+      @triggered_once_keys_this_turn ||= []
     end
 
     def untap_during_untap_step
@@ -293,12 +305,12 @@ module Magic
 
     def untap!
       return if untapped?
+      @tapped = false
+
       untapped_event = Events::PermanentUntapped.new(
         permanent: self,
       )
       game.notify!(untapped_event)
-
-      @tapped = false
     end
 
     def tapped?
@@ -364,6 +376,7 @@ module Magic
     def cleanup!
       @turn_triggers = {}
       @modes_chosen_this_turn = []
+      @triggered_once_keys_this_turn = []
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
       remove_until_eot_modifiers!
