@@ -29,7 +29,12 @@ module Magic
           if blockers.any?
             blockers.each do |blocker|
               blocker.fight(attacker)
-              assigned_damage = [blocker.toughness, damage_output].min
+              lethal_damage = attacker.deathtouch? ? 1 : [blocker.toughness - blocker.damage, 0].max
+              assigned_damage = if attacker.trample?
+                                   [lethal_damage, damage_output].min
+                                 else
+                                   [blocker.toughness, damage_output].min
+                                 end
               attacker.fight(blocker, assigned_damage)
               damage_output -= assigned_damage
             end
