@@ -55,24 +55,28 @@ module Magic
 
       permanent.tap! if enters_tapped
       permanent.move_zone!(from: from_zone, to: game.battlefield)
-      if card.types.include?(T::Creature)
-        game.battlefield.static_abilities.of_type(Abilities::Static::AdditionalCountersForEntering).each do |ability|
-          amount = ability.additional_counters_for_entering(permanent)
-          permanent.add_counter("+1/+1", amount: amount) if amount.positive?
-        end
-      end
+      add_additional_counters_for_entering(game:, permanent:) if card.creature?
       permanent
+    end
+
+    def self.add_additional_counters_for_entering(game:, permanent:)
+      static_abilities(game, Abilities::Static::AdditionalCountersForEntering).each do |ability|
+        amount = ability.additional_counters_for_entering(permanent)
+        permanent.add_counter("+1/+1", amount: amount) if amount.positive?
+      end
     end
 
     def self.enters_tapped_after_replacements(game:, card:, enters_tapped:)
       return enters_tapped unless enters_tapped && card.land?
 
-      prevented = game.battlefield.static_abilities.of_type(Abilities::Static::LandsEnterUntapped).any? do |ability|
+      prevented = static_abilities(game, Abilities::Static::LandsEnterUntapped).any? do |ability|
         ability.lands_enter_untapped?(card)
       end
 
       !prevented
     end
+
+    def self.static_abilities(game, type) = game.battlefield.static_abilities.of_type(type)
 
     def initialize(game:, owner:, card:, token: false, cast: true, kicked: false, copy: false, timestamp: Time.now)
       @game = game
