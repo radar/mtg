@@ -15,7 +15,7 @@ module Magic
 
         def call
           event.permanent.untap!
-          event.permanent.trigger_effect(:add_counter, counter_type: "+1/+1", target: event.permanent)
+          trigger_effect(:add_counter, counter_type: "+1/+1", target: event.permanent)
         end
       end
 
