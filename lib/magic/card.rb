@@ -88,13 +88,17 @@ module Magic
         end
       end
 
-      def ward(life:)
+      def ward(life: nil, generic: nil)
         ward_trigger = Class.new(TriggeredAbility::SpellCast) do
           define_method(:should_perform?) do
             opponents.include?(event.player) && event.targets.include?(actor)
           end
           define_method(:call) do
-            trigger_effect(:lose_life, target: event.player, life: life)
+            if life
+              trigger_effect(:lose_life, target: event.player, life: life)
+            else
+              game.choices.add(Choice::Ward.new(actor: actor, payer: event.player, spell: event.spell, generic: generic))
+            end
           end
         end
         const_set(:WARD_TRIGGER, ward_trigger)

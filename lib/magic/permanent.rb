@@ -455,7 +455,7 @@ module Magic
       @attachments.each(&:destroy!) if event.is_a?(Events::LeftTheBattlefield)
 
       lifecycle_triggers_for(event).each do |trigger_class|
-        trigger_class.new(actor: self, event: event).perform!
+        perform_trigger!(trigger_class, event)
       end
     end
 
@@ -471,7 +471,17 @@ module Magic
     def dispatch_event_handlers(event)
       Array(card.event_handlers[event.class]).each do |handler_class|
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
-        handler_class.new(actor: self, event: event).perform!
+        perform_trigger!(handler_class, event)
+      end
+    end
+
+    def perform_trigger!(trigger_class, event)
+      additional_triggers = game.battlefield.static_abilities
+        .of_type(Abilities::Static::TriggeredAbilityDoubler)
+        .count { |doubler| doubler.doubles_trigger_for?(self) }
+
+      (1 + additional_triggers).times do
+        trigger_class.new(actor: self, event: event).perform!
       end
     end
 
