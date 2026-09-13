@@ -41,7 +41,7 @@ module Magic
       class CreateWormsAbility < Magic::ActivatedAbility
         def costs
           [
-            Costs::Mana.new(generic: 2, black_or_green: 3),
+            Costs::Mana.new("{2}{B/G}{B/G}{B/G}"),
             Costs::SelfTap.new(source),
             Costs::Discard.new(source.controller, ->(card) { card.land? })
           ]
