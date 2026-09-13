@@ -184,6 +184,8 @@ module Magic
         if card.sorcery? || card.instant?
           if @flashback
             card.exile!
+          elsif card.rebound? && card.zone.hand?
+            card.exile!
           else
             card.move_to_graveyard!(player)
           end

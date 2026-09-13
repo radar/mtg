@@ -41,6 +41,12 @@ module Magic
         end
       end
 
+      def rebound
+        define_method(:rebound?) do
+          true
+        end
+      end
+
       def kicker_cost(cost)
         const_set(:KICKER_COST, cost)
       end
@@ -265,6 +271,10 @@ module Magic
     end
 
     def token?
+      false
+    end
+
+    def rebound?
       false
     end
 
