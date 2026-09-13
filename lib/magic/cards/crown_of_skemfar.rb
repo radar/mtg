@@ -23,8 +23,8 @@ module Magic
         costs "{2}{G}"
 
         def resolve!
-          source.controller.graveyard.remove(source)
-          source.controller.hand.add(source)
+          graveyard.remove(source)
+          hand.add(source)
         end
       end
 

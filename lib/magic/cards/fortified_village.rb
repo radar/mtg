@@ -6,7 +6,7 @@ module Magic
 
     class FortifiedVillage < Card
       def enters_tapped?
-        !controller.hand.lands.by_any_type("Forest", "Plains").any?
+        !hand.lands.by_any_type("Forest", "Plains").any?
       end
 
       class ManaAbility < Magic::TapManaAbility

@@ -36,7 +36,7 @@ module Magic
           cards_returned_to_hand = game.current_turn.events.select do |event|
             next unless event.is_a?(Events::PermanentEnteredZone)
 
-            event.from == game.battlefield && event.to == controller.hand
+            event.from == battlefield && event.to == hand
           end
 
           cards_returned_to_hand.any?

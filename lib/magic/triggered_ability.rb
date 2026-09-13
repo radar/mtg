@@ -51,6 +51,10 @@ module Magic
       true
     end
 
+    def hand
+      controller.hand
+    end
+
     def call
       raise NotImplementedError, "#{self.class} must implement #call"
     end

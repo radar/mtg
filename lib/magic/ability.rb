@@ -23,5 +23,17 @@ module Magic
     def controller
       source.controller
     end
+
+    def hand
+      controller.hand
+    end
+
+    def graveyard
+      controller.graveyard
+    end
+
+    def library
+      controller.library
+    end
   end
 end

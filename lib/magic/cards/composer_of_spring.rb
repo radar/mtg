@@ -27,7 +27,7 @@ module Magic
 
       class LandChoice < Magic::Choice::May
         def choices
-          controller.hand.lands
+          hand.lands
         end
 
         def resolve!(target:)
@@ -37,7 +37,7 @@ module Magic
 
       class LandOrCreatureChoice < Magic::Choice::May
         def choices
-          controller.hand.lands + controller.hand.creatures
+          hand.lands + hand.creatures
         end
 
         def resolve!(target:)

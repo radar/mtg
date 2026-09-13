@@ -34,8 +34,8 @@ module Magic
         costs "{4}{G}{G}"
 
         def resolve!
-          x = controller.hand.count
-          source.controller.creatures.each do |creature|
+          x = hand.count
+          controller.creatures.each do |creature|
             creature.modify_base_power(x)
             creature.modify_base_toughness(x)
           end

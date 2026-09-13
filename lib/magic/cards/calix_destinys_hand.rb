@@ -10,10 +10,10 @@ module Magic
         def loyalty_change = 1
 
         def resolve!
-          cards = controller.library.first(4)
+          cards = library.first(4)
           target = cards.find(&:enchantment?)
-          controller.library.remove(target) if target
-          controller.hand.add(target) if target
+          library.remove(target) if target
+          hand.add(target) if target
         end
       end
 
@@ -21,11 +21,11 @@ module Magic
         def loyalty_change = -3
 
         def target_choices
-          game.battlefield.not_controlled_by(controller).by_any_type(T::Creature, T::Enchantment)
+          battlefield.not_controlled_by(controller).by_any_type(T::Creature, T::Enchantment)
         end
 
         def resolve!(target:)
-          target.exile!
+          trigger_effect(:exile, source: source, target: target)
         end
       end
 
@@ -33,7 +33,7 @@ module Magic
         def loyalty_change = -7
 
         def resolve!
-          controller.graveyard.cards.enchantments.each(&:resolve!)
+          graveyard.cards.enchantments.each(&:resolve!)
         end
       end
 

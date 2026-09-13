@@ -4,7 +4,7 @@ module Magic
       cost generic: 2, green: 2
 
       enters_the_battlefield do
-        actor.controller.become_monarch!
+        controller.become_monarch!
       end
     end
 
@@ -12,9 +12,9 @@ module Magic
       class PutCardChoice < Magic::Choice::Targeted
         def choices
           if controller.monarch?
-            controller.hand.by_any_type("Land", "Creature")
+            hand.by_any_type("Land", "Creature")
           else
-            controller.hand.lands
+            hand.lands
           end
         end
 

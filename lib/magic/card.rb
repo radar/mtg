@@ -176,6 +176,10 @@ module Magic
       game.add_effect(effect)
     end
 
+    def hand
+      controller.hand
+    end
+
     def resolve!(enters_tapped: enters_tapped?, kicked: false)
       if permanent?
         permanent = Magic::Permanent.resolve(

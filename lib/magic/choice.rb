@@ -13,6 +13,9 @@ module Magic
 
     def controller = actor.controller
     def game = actor.game
+    def hand = controller.hand
+    def graveyard = controller.graveyard
+    def library = controller.library
 
     def to_s = inspect
   end

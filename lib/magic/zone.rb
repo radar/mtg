@@ -55,5 +55,9 @@ module Magic
     def lands
       cards.lands
     end
+
+    def enchantments
+      cards.enchantments
+    end
   end
 end
