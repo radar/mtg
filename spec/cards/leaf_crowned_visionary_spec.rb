@@ -42,9 +42,9 @@ RSpec.describe Magic::Cards::LeafCrownedVisionary do
       game.stack.resolve!
 
       choice = game.choices.first
-      expect(choice).to be_a(Magic::Cards::LeafCrownedVisionary::Choice)
-      choice.pay(player: p1, payment: {green: 1})
-      choice.resolve!
+      expect(choice).to be_a(Magic::Cards::LeafCrownedVisionary::MayPayChoice)
+
+      expect { game.resolve_choice!(payment: {green: 1}) }.to change { p1.hand.count }.by(1)
     end
 
     it "skips choice" do
@@ -55,8 +55,7 @@ RSpec.describe Magic::Cards::LeafCrownedVisionary do
 
       game.stack.resolve!
 
-      choice = game.choices.first
-      p1.skip_choice(choice)
+      game.skip_choice!
       expect(game.choices).to be_empty
     end
   end

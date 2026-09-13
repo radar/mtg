@@ -13,26 +13,10 @@ module Magic
         applicable_targets { your.creatures.all("Elf").except(source) }
       end
 
-      class Choice < Magic::Choice
-        attr_reader :owner
-
-        def initialize(owner:)
-          @owner = owner
-        end
-
-        def costs
-          @costs ||= [Costs::Mana.new(green: 1)]
-        end
-
-        def pay(player:, payment:)
-          cost = costs.first
-          cost.pay!(player:, payment:)
-        end
-
-        def resolve!
-          if !costs.all?(&:paid?)
-            owner.draw!
-          end
+      class MayPayChoice < Magic::Choice::May
+        def resolve!(payment: {})
+          controller.pay_mana(payment)
+          trigger_effect(:draw_cards, number_to_draw: 1)
         end
       end
 
@@ -46,11 +30,7 @@ module Magic
 
         # you may pay {G}. If you do, draw a card.
         def call
-          game
-            .choices
-            .add(
-              Magic::Cards::LeafCrownedVisionary::Choice.new(owner: actor)
-            )
+          game.choices.add(MayPayChoice.new(actor: actor))
         end
       end
 
