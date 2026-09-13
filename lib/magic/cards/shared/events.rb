@@ -60,6 +60,8 @@ module Magic
             game.add_effect(Effects::PhaseOut.new(source: source, **args))
           when :return_target_from_graveyard_to_battlefield
             game.add_effect(Effects::ReturnTargetFromGraveyardToBattlefield.new(source: source, **args))
+          when :remove_counter
+            game.add_effect(Effects::RemoveCounterFromPermanent.new(source: source, **args))
           when :return_to_owners_hand
             game.add_effect(Effects::ReturnToOwnersHand.new(source: source, **args))
           when :reveal_cards

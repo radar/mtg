@@ -1,6 +1,6 @@
 module Magic
   module Effects
-    class AddCounterToPermanent < TargetedEffect
+    class RemoveCounterFromPermanent < TargetedEffect
       attr_reader :counter_type, :amount
 
       def initialize(counter_type:, amount: 1, **args)
@@ -10,16 +10,15 @@ module Magic
       end
 
       def inspect
-        "#<Effects::AddCounterToPermanent source:#{source} counter_type:#{counter_type} amount:#{amount} target:#{target}>"
+        "#<Effects::RemoveCounterFromPermanent source:#{source} counter_type:#{counter_type} amount:#{amount} target:#{target}>"
       end
 
       def resolve!
-        target.put_counters!(counter_type, amount:)
+        target.take_counters!(counter_type, amount:)
 
         game.notify!(
-          Events::CounterAddedToPermanent.new(
-            source: source,
-            target: target,
+          Events::CounterRemoved.new(
+            permanent: target,
             counter_type: counter_type,
             amount: amount,
           )

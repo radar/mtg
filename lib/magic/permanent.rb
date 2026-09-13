@@ -384,27 +384,29 @@ module Magic
     end
 
     def add_counter(counter_type, amount: 1)
+      trigger_effect(:add_counter, counter_type: counter_type, target: self, amount: amount)
+    end
+
+    def remove_counter(counter_type:, amount: 1)
+      trigger_effect(:remove_counter, counter_type: counter_type, target: self, amount: amount)
+    end
+
+    # Raw mutation, with no event/replacement-effect pipeline. Only for
+    # Effects::AddCounterToPermanent/RemoveCounterFromPermanent to call as part of
+    # resolving those effects -- everywhere else should go through add_counter/
+    # remove_counter above so replacement effects (e.g. Doubling Season) apply.
+    def put_counters!(counter_type, amount: 1)
       resolved = Counters[counter_type]
       @counters = Counters::Collection.new(@counters + [resolved.new] * amount)
     end
 
-    def remove_counter(counter_type:, amount: 1)
+    def take_counters!(counter_type, amount: 1)
       removable_counters = @counters.first_of_type(counter_type, amount)
       if removable_counters.count < amount
         raise "Not enough #{counter_type} counters to remove"
       end
 
-      events = []
-      removable_counters.each do |counter|
-        @counters.delete(counter)
-        events << Events::CounterRemoved.new(
-          permanent: self,
-          counter_type: counter_type,
-          amount: amount
-        )
-      end
-
-      game.notify!(events)
+      removable_counters.each { |counter| @counters.delete(counter) }
     end
 
     def target_choices
