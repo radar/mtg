@@ -13,7 +13,7 @@ module Magic
 
         def resolve!
           creatures_you_control.each do |creature|
-            creature.add_counter("+1/+1")
+            trigger_effect(:add_counter, counter_type: "+1/+1", target: creature)
           end
         end
       end
