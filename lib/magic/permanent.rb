@@ -418,10 +418,6 @@ module Magic
       game.exile.remove(card)
     end
 
-    def can_untap_during_upkeep?
-      attachments.any?(&:can_untap_during_upkeep?)
-    end
-
     def trigger_effect(effect, source: self, **args)
       card.trigger_effect(effect, source: source, **args)
     end

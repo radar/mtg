@@ -22,7 +22,7 @@ module Magic
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
           controller.draw!
-          game.add_choice(LandEntryChoice.new(actor: actor)) if controller.hand.lands.any?
+          game.add_choice(LandEntryChoice.new(actor: actor)) if hand.lands.any?
         end
       end
 

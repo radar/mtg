@@ -30,7 +30,6 @@ RSpec.describe Magic::Cards::CaptureSphere do
       expect(wood_elves.attachments.count).to eq(1)
       expect(wood_elves.attachments.first).to be_a(Magic::Permanent)
       expect(wood_elves.attachments.first.name).to eq("Capture Sphere")
-      expect(wood_elves.can_untap_during_upkeep?).to eq(false)
 
       expect(p1.permanents.by_name("Capture Sphere").count).to eq(1)
 
