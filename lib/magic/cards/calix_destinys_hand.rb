@@ -12,8 +12,7 @@ module Magic
         def resolve!
           cards = library.first(4)
           target = cards.find(&:enchantment?)
-          library.remove(target) if target
-          hand.add(target) if target
+          target&.move_to_hand!
         end
       end
 

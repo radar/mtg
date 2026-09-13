@@ -10,11 +10,8 @@ module Magic
         def loyalty_change = 1
 
         def resolve!
-          controller.library.first(4).each do |card|
-            if card.land?
-              controller.library.remove(card)
-              controller.hand.add(card)
-            end
+          library.first(4).each do |card|
+            card.move_to_hand! if card.land?
           end
         end
       end
