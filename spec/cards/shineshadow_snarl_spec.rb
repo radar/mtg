@@ -5,56 +5,101 @@ require "spec_helper"
 RSpec.describe Magic::Cards::ShineshadowSnarl do
   include_context "two player game"
 
-  it "enters tapped without a Plains or Swamp in hand" do
-    permanent = play_land(Card("Shineshadow Snarl"))
+  context "without a Plains or Swamp in hand" do
+    before { p1.hand.items.clear }
 
-    expect(permanent).to be_tapped
-  end
+    it "enters tapped" do
+      permanent = play_land(Card("Shineshadow Snarl"))
 
-  it "enters tapped with a Plains in hand if not revealed" do
-    p1.hand.add(Card("Plains", owner: p1))
-    permanent = play_land(Card("Shineshadow Snarl"))
-
-    expect(permanent).to be_tapped
-  end
-
-  it "enters untapped when revealing a Plains in hand" do
-    plains = Card("Plains", owner: p1)
-    p1.hand.add(plains)
-    permanent = play_land(Card("Shineshadow Snarl"), reveal: plains)
-
-    expect(permanent).not_to be_tapped
-  end
-
-  it "fires a CardsRevealed event when revealing" do
-    plains = Card("Plains", owner: p1)
-    p1.hand.add(plains)
-    play_land(Card("Shineshadow Snarl"), reveal: plains)
-
-    revealed_event = game.current_turn.events.find { |e| e.is_a?(Magic::Events::CardsRevealed) }
-    expect(revealed_event).not_to be_nil
-    expect(revealed_event.cards).to include(plains)
-  end
-
-  it "enters untapped when revealing a Swamp in hand via block" do
-    swamp = Card("Swamp", owner: p1)
-    p1.hand.add(swamp)
-    permanent = play_land(Card("Shineshadow Snarl")) do |action|
-      action.reveal(swamp)
+      expect(permanent).to be_tapped
     end
 
-    expect(permanent).not_to be_tapped
+    it "does not present a reveal choice" do
+      play_land(Card("Shineshadow Snarl"))
+
+      expect(game.choices).to be_empty
+    end
   end
 
-  it "enters tapped when revealing a Forest" do
-    forest = Card("Forest", owner: p1)
-    p1.hand.add(forest)
-    permanent = play_land(Card("Shineshadow Snarl"), reveal: forest)
+  context "with only an unrelated land (Forest) in hand" do
+    before do
+      p1.hand.items.clear
+      p1.hand.add(Card("Forest", owner: p1))
+    end
 
-    expect(permanent).to be_tapped
+    it "enters tapped" do
+      permanent = play_land(Card("Shineshadow Snarl"))
+
+      expect(permanent).to be_tapped
+    end
+
+    it "does not present a reveal choice" do
+      play_land(Card("Shineshadow Snarl"))
+
+      expect(game.choices).to be_empty
+    end
+  end
+
+  context "with a Plains in hand" do
+    let(:plains) { Card("Plains", owner: p1) }
+
+    before do
+      p1.hand.items.clear
+      p1.hand.add(plains)
+    end
+
+    it "presents a may choice to reveal a card" do
+      permanent = play_land(Card("Shineshadow Snarl"))
+
+      expect(game.choices.last).to be_a(Magic::Cards::ShineshadowSnarl::MayRevealChoice)
+      expect(permanent).to be_tapped
+    end
+
+    it "enters tapped when declining to reveal" do
+      permanent = play_land(Card("Shineshadow Snarl"))
+      game.skip_choice!
+
+      expect(permanent).to be_tapped
+    end
+
+    it "enters untapped when revealing the Plains" do
+      permanent = play_land(Card("Shineshadow Snarl"))
+      game.resolve_choice!
+      game.resolve_choice!(target: plains)
+
+      expect(permanent).not_to be_tapped
+    end
+
+    it "fires a CardsRevealed event when revealing" do
+      play_land(Card("Shineshadow Snarl"))
+      game.resolve_choice!
+      game.resolve_choice!(target: plains)
+
+      revealed_event = game.current_turn.events.find { |e| e.is_a?(Magic::Events::CardsRevealed) }
+      expect(revealed_event).not_to be_nil
+      expect(revealed_event.cards).to include(plains)
+    end
+  end
+
+  context "with a Swamp in hand" do
+    let(:swamp) { Card("Swamp", owner: p1) }
+
+    before do
+      p1.hand.items.clear
+      p1.hand.add(swamp)
+    end
+
+    it "enters untapped when revealing the Swamp" do
+      permanent = play_land(Card("Shineshadow Snarl"))
+      game.resolve_choice!
+      game.resolve_choice!(target: swamp)
+
+      expect(permanent).not_to be_tapped
+    end
   end
 
   it "taps for white or black" do
+    p1.hand.items.clear
     permanent = play_land(Card("Shineshadow Snarl"))
 
     p1.activate_ability(ability: permanent.activated_abilities.first) { _1.choose(:white) }
@@ -64,8 +109,8 @@ RSpec.describe Magic::Cards::ShineshadowSnarl do
 
   private
 
-  def play_land(card, **args, &block)
-    p1.play_land(land: card, **args, &block)
+  def play_land(card)
+    p1.play_land(land: card)
     p1.permanents.by_name(card.name).first
   end
 end

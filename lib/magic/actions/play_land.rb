@@ -1,16 +1,11 @@
 module Magic
   module Actions
     class PlayLand < Action
-      attr_reader :card, :reveals
+      attr_reader :card
 
-      def initialize(card:, reveals: [], reveal: nil, **args)
+      def initialize(card:, **args)
         @card = card
-        @reveals = Array(reveal || reveals)
         super(**args)
-      end
-
-      def reveal(card)
-        @reveals << card
       end
 
       def inspect
@@ -22,12 +17,7 @@ module Magic
       end
 
       def perform
-        reveals.each do |revealed_card|
-          player.reveal(revealed_card)
-        end
         card.resolve!
-      ensure
-        reveals.each(&:conceal!)
       end
     end
   end
