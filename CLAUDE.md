@@ -28,6 +28,11 @@ bundle exec rspec -k "taps for"                       # Run tests matching a pat
 
 RSpec integration tests. See `spec/spec_helper.rb` for helpers/shared contexts.
 
+### Tooling
+- Use `fd`, not `find`, for file searches.
+- Use `rg`, not `grep`, for text searches.
+- Avoid `xargs`.
+
 ### Code Style
 - `# frozen_string_literal: true` at top of `lib/magic/*.rb` and `spec/**/*_spec.rb`
 - Card files in `lib/magic/cards/` do **not** use the frozen_string_literal pragma
