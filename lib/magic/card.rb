@@ -4,7 +4,10 @@ module Magic
     extend Forwardable
     def_delegators :@game, :logger, :battlefield, :exile, :current_turn, :creatures
 
+    include BattlefieldFilters
+
     include Cards::Keywords
+
     include Cards::Shared::Events
     include Cards::Shared::Types
     attr_reader :game, :controller, :owner, :name, :cost, :kicker_cost, :types, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :modes

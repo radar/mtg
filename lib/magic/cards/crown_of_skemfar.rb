@@ -9,23 +9,18 @@ module Magic
       end
 
       def elves
-        battlefield.controlled_by(owner).by_type("Elf").count
+        creatures_you_control.by_type("Elf").count
       end
 
-      def power_modification
-        elves
-      end
-
-      def toughness_modification
-        elves
-      end
+      def power_modification = elves
+      def toughness_modification = elves
 
       def keyword_grants
         [Keywords::REACH]
       end
 
       class ReturnFromGraveyard < Magic::ActivatedAbility
-        def costs = [Costs::Mana.new(generic: 2, green: 1)]
+        costs "{2}{G}"
 
         def resolve!
           source.controller.graveyard.remove(source)
