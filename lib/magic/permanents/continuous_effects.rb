@@ -35,7 +35,15 @@ module Magic
       private
 
       def static_abilities
-        game.battlefield.static_abilities
+        StaticAbilities.new(game.battlefield.static_abilities.to_a + graveyard_static_abilities)
+      end
+
+      def graveyard_static_abilities
+        game.players.flat_map do |player|
+          player.graveyard.cards.flat_map do |card|
+            card.graveyard_static_abilities.map { |ability| ability.new(source: card) }
+          end
+        end
       end
 
       def creature?(types)

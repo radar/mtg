@@ -258,6 +258,10 @@ module Magic
       []
     end
 
+    def graveyard_static_abilities
+      []
+    end
+
     def replacement_effects
       {}
     end
