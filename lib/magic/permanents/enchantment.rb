@@ -6,9 +6,9 @@ module Magic
 
       attr_reader :attached_to
 
-      def attach_to!(permanent)
-        permanent.attachments << self
-        @attached_to = permanent
+      def attach_to!(target)
+        target.attachments << self
+        @attached_to = target
       end
 
       def power_modification

@@ -3,7 +3,7 @@ module Magic
     include Targetable
     extend Forwardable
 
-    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters, :commander
+    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters, :commander, :attachments
     attr_accessor :ring_bearer, :spell_cast_limit, :spell_cast_limit_turn
 
     def_delegators :@game, :logger
@@ -31,6 +31,7 @@ module Magic
       @starting_life = life
       @life = life
       @counters = Counters::Collection.new([])
+      @attachments = []
     end
 
     def inspect
