@@ -13,8 +13,7 @@ module Magic
       end
 
       def resolve!
-        attacking_creatures = game.battlefield.creatures.attacking.count
-        trigger_effect(:create_token, token_class: SpiderToken, amount: attacking_creatures)
+        trigger_effect(:create_token, token_class: SpiderToken, amount: attacking_creatures.count)
         super
       end
     end

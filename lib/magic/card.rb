@@ -2,7 +2,7 @@ module Magic
   class Card
     include Types
     extend Forwardable
-    def_delegators :@game, :logger, :battlefield, :exile, :current_turn, :creatures
+    def_delegators :@game, :logger, :battlefield, :exile, :current_turn
 
     include BattlefieldFilters
 
