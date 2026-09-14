@@ -5,9 +5,13 @@ description: Implement a Magic: The Gathering card in this repo — look up its 
 
 # Implementing a card
 
-Read `CLAUDE.md` first (project root) — it documents the architecture, DSL, common
-ability patterns, and testing helpers this skill assumes. This skill is the
-step-by-step process for turning a card name into a merged commit; CLAUDE.md is the
+Read `CLAUDE.md` first (project root) — it documents the architecture, DSL, and
+testing helpers this skill assumes. Then read `docs/card_patterns.md` — a short index
+into `docs/patterns/{triggers,choices,static_abilities,costs,zones_and_state,mechanics}.md`,
+each covering one slice of common ability patterns with a concrete example file for
+most mechanics. Read only the topic file(s) that match what the card's Oracle text
+needs (step 2 below) — no need to load all six for a simple card. This skill is the
+step-by-step process for turning a card name into a merged commit; those files are the
 reference for _how_ to express any given ability once you know what it needs to do.
 
 ## 1. Get the FULL Oracle text — every line
@@ -59,9 +63,8 @@ or more triggers, an activated ability, etc.
 ## 2. Survey existing patterns before writing new code
 
 Grep `lib/magic/cards/` for a card with a similar effect (same keyword, same trigger
-shape, same kind of choice) and crib its structure. CLAUDE.md's "Common Card Ability
-Patterns", "TriggeredAbility Subclasses", and "Static Ability Subclasses" sections
-name a concrete example file for most mechanics — read the named example, don't
+shape, same kind of choice) and crib its structure. The relevant `docs/patterns/*.md`
+file names a concrete example for most mechanics — read the named example, don't
 reimplement from scratch. In particular:
 
 - A static, always-on effect (keyword grant, P/T buff, type change) → a
@@ -73,7 +76,7 @@ reimplement from scratch. In particular:
   `TriggeredAbility` directly.
 - Any targeting, modality, or "may" wording → `Magic::Choice::Targeted` /
   `Magic::Choice` / `Magic::Choice::May` / `Magic::Choice::SearchLibrary` /
-  `Magic::Choice::Scry` per CLAUDE.md's patterns, not ad hoc prompting.
+  `Magic::Choice::Scry` per `docs/patterns/choices.md`, not ad hoc prompting.
 
 Never add card-name checks to shared layers (`ContinuousEffects`, `ActivateAbility`,
 etc.) to special-case a card — the static/triggered ability subclasses exist so those
@@ -130,16 +133,17 @@ bundle exec rspec                                        # full suite before com
 Don't consider the card done on a green new spec alone; a shared static-ability or
 event-handler change can silently break an unrelated card.
 
-## 6. Note anything new in CLAUDE.md
+## 6. Note anything new in docs/patterns/
 
-If you used or discovered a pattern not already documented in CLAUDE.md's "Common
-Card Ability Patterns" / subclass lists, add a bullet there in the same commit —
-that's what keeps this skill (and CLAUDE.md itself) accurate for the next card. Small,
-additive edits only — don't restructure the file for one new bullet.
+If you used or discovered a pattern not already documented, add a bullet to the
+relevant `docs/patterns/*.md` file (or `docs/card_patterns.md` for a new subclass base
+under `TriggeredAbility`/`Abilities::Static`) in the same commit — that's what keeps
+this skill (and those docs) accurate for the next card. Small, additive edits only —
+don't restructure a file for one new bullet, and don't merge topic files back together.
 
 ## 7. Commit
 
-One commit per card: the card file, the spec file, and any CLAUDE.md addition
+One commit per card: the card file, the spec file, and any docs/patterns/ addition
 together. Message style, from recent history (`git log --oneline`):
 
 ```
@@ -156,5 +160,5 @@ commits) — the branch/PR flow shows up on `origin/copilot/*` branches from the
 Copilot cloud agent instead. Default to committing directly to the current branch;
 only create a feature branch/PR if the user asks for one.
 
-Stage only the files for this card (plus CLAUDE.md if touched) — never `git add -A`,
-since stray in-progress files from other work may be sitting in the tree.
+Stage only the files for this card (plus any docs/patterns/ file touched) — never
+`git add -A`, since stray in-progress files from other work may be sitting in the tree.
