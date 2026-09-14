@@ -1,10 +1,11 @@
 module Magic
   module Cards
-    class PyromancersGoggles < Artifact
-      card_name "Pyromancer's Goggles"
-      type T::Super::Legendary, T::Artifact
+    PyromancersGoggles = Artifact("Pyromancer's Goggles") do
+      legendary_artifact
       cost generic: 5
+    end
 
+    class PyromancersGoggles < Artifact
       class TapForRed < Magic::TapManaAbility
         choices :red
 

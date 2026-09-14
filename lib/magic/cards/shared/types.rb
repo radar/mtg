@@ -33,6 +33,10 @@ module Magic
                 set_types(T::Super::Legendary, T::Creature, *creature_types(types))
               end
 
+              def legendary_artifact
+                set_types(T::Super::Legendary, T::Artifact)
+              end
+
               def planeswalker(name)
                 set_types(T::Super::Legendary, T::Planeswalker, name)
               end
