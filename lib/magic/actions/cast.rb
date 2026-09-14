@@ -4,6 +4,7 @@ module Magic
       extend Forwardable
 
       class InvalidTarget < StandardError; end
+      class SpellCastLimitReached < StandardError; end
 
       def_delegators :@card, :enchantment?, :artifact?, :multi_target?
       attr_reader :card, :targets, :value_for_x, :controller, :modes, :additional_costs
@@ -166,10 +167,13 @@ module Magic
       end
 
       def perform
+        raise SpellCastLimitReached, "#{player.inspect} cannot cast any more spells this turn" if player.spell_cast_limit_reached?
+
         missing_costs = additional_costs - @paid_additional_costs
         raise "Additional costs have not been paid" unless missing_costs.empty?
 
         mana_cost.finalize!(player)
+        player.consume_spell_cast!
         game.stack.add(self)
 
         game.notify!(Events::SpellCast.new(
