@@ -13,7 +13,7 @@ module Magic
         def should_perform?
           return false unless event.attacks.any? { |attack| attack.attacker == actor }
 
-          creatures_you_control.with_power { |power| power >= 4 }.any?
+          creatures_you_control.power_gte(4).any?
         end
 
         def call

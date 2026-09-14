@@ -52,6 +52,10 @@ module Magic
       select { |creature| yield(creature.power) }
     end
 
+    def power_gte(power)
+      with_power { |p| p >= power }
+    end
+
     def by_card(card)
       select { |c| c.name == card.name }
     end
@@ -94,6 +98,19 @@ module Magic
 
     def tapped
       select(&:tapped?)
+    end
+
+    def with_keyword(keyword)
+      select { |c| c.has_keyword?(keyword) }
+    end
+    alias_method :by_keyword, :with_keyword
+
+    def legendary
+      select(&:legendary?)
+    end
+
+    def artifacts
+      by_any_type(T::Artifact)
     end
 
     def select(&condition)

@@ -21,7 +21,7 @@ module Magic
         costs "{T}"
 
         def choices
-          controller.permanents.select(&:legendary?).flat_map(&:colors).uniq
+          controller.permanents.legendary.flat_map(&:colors).uniq
         end
       end
 
@@ -31,7 +31,7 @@ module Magic
         def single_target? = true
 
         def target_choices
-          game.battlefield.creatures.select(&:legendary?)
+          game.battlefield.creatures.legendary
         end
 
         def resolve!(target:)

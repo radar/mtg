@@ -12,7 +12,7 @@ module Magic
         costs "{2}{G}"
 
         def target_choices
-          game.battlefield.creatures.select { |c| c.has_keyword?(:flying) }
+          game.battlefield.creatures.with_keyword(:flying)
         end
 
         def resolve!(target:)

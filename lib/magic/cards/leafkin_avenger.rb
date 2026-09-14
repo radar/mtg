@@ -11,7 +11,7 @@ module Magic
         costs "{T}"
 
         def resolve!
-          count = creatures_you_control.with_power { |power| power >= 4 }.count
+          count = creatures_you_control.power_gte(4).count
           controller.add_mana(green: count)
         end
       end

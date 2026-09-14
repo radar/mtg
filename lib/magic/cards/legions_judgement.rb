@@ -6,7 +6,7 @@ module Magic
 
     class LegionsJudgement < Sorcery
       def target_choices
-        battlefield.creatures.with_power { |power| power >= 4 }
+        battlefield.creatures.power_gte(4)
       end
 
       def single_target?
