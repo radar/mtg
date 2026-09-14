@@ -51,6 +51,24 @@ module Magic
       event.permanent.controller?(controller)
     end
 
+    # The following assume the event carries a spell as event.source (e.g.
+    # Events::DamageDealt) rather than event.permanent.
+    def damage_spell?
+      event.source.is_a?(Magic::Card) && (event.source.instant? || event.source.sorcery?)
+    end
+
+    def single_target_spell?
+      !(event.source.respond_to?(:multi_target?) && event.source.multi_target?)
+    end
+
+    def spell_controlled_by_you?
+      event.source.controller == controller
+    end
+
+    def damage_target_creature?
+      event.target.is_a?(Permanent) && event.target.creature?
+    end
+
     def add_counter(counter_type, target: actor, amount: 1)
       trigger_effect(:add_counter, counter_type: counter_type, target: target, amount: amount)
     end
