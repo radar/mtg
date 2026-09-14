@@ -27,7 +27,7 @@ module Magic
       :exiled_cards,
       :cannot_untap_next_turn
 
-    attr_accessor :copied_card, :chosen_creature_type, :exile_cast_permission_turn, :ring_bearer, :prevent_opponent_lifegain_turn
+    attr_accessor :copied_card, :chosen_creature_type, :exile_cast_permission_turn, :ring_bearer, :prevent_opponent_lifegain_turn, :pending_mana_ability_uses
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :additional_lands_per_turn, :power_modification, :toughness_modification, :type_grants
     def_delegators :@game, :logger
@@ -99,6 +99,7 @@ module Magic
       @damage = 0
       @protections = Protections.new(card.protections.dup)
       @exiled_cards = Magic::CardList.new([])
+      @pending_mana_ability_uses = 0
       @phased_out = false
       @prepared = false
       @timestamp = timestamp

@@ -5,10 +5,6 @@ module Magic
     end
 
     class ArcaneBombardment < Enchantment
-      def exiled_cards
-        @exiled_cards ||= []
-      end
-
       class CastCopyChoice < Magic::Choice::Targeted
         def initialize(actor:, card:)
           super(actor: actor)

@@ -40,15 +40,18 @@ RSpec.describe Magic::Cards::ArcaneBombardment do
 
   it "only triggers on the first instant or sorcery spell cast each turn" do
     other_shock = Card("Shock", owner: p1)
-    other_bolt = Card("Lightning Bolt", owner: p1)
     p1.hand.add(other_shock)
-    p1.graveyard.add(other_bolt)
     p1.add_mana(red: 1)
 
     p1.cast(card: shock) { |a| a.pay_mana(red: 1); a.targeting(p2) }
     game.resolve_choice!
     game.resolve_choice!(target: p2)
     game.stack.resolve!
+
+    # A second instant/sorcery card lands in the graveyard only after the
+    # first trigger, so it can't be randomly chosen instead of old_bolt.
+    other_bolt = Card("Lightning Bolt", owner: p1)
+    p1.graveyard.add(other_bolt)
 
     p1.cast(card: other_shock) { |a| a.pay_mana(red: 1); a.targeting(p2) }
     game.stack.resolve!
