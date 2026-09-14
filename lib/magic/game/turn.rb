@@ -59,6 +59,10 @@ module Magic
           turn.final_attackers_declared!
         end
 
+        after_transition from: :end_of_combat, to: :beginning_of_combat do |turn|
+          turn.consume_additional_combat!
+        end
+
         after_transition to: :end do |turn|
           turn.notify!(
             Events::BeginningOfEndStep.new(active_player: turn.active_player)
@@ -145,6 +149,10 @@ module Magic
 
       def additional_combat_pending?
         @additional_combats.positive?
+      end
+
+      def consume_additional_combat!
+        @additional_combats -= 1
       end
 
       def take_action(action)
