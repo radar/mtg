@@ -24,6 +24,10 @@ module Magic
       game.battlefield
     end
 
+    def creatures
+      battlefield.creatures
+    end
+
     def your
       source.controller
     end
