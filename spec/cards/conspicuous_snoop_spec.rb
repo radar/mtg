@@ -2,25 +2,6 @@
 
 require "spec_helper"
 
-TestGoblinWithAbility = Magic::Cards.Creature("Test Goblin") do
-  cost red: 1
-  creature_type "Goblin"
-  power 1
-  toughness 1
-end
-
-class TestGoblinWithAbility
-  class PingAbility < Magic::ActivatedAbility
-    costs "{T}"
-
-    def resolve!
-      trigger_effect(:draw_cards, number_to_draw: 1)
-    end
-  end
-
-  def activated_abilities = [PingAbility]
-end
-
 RSpec.describe Magic::Cards::ConspicuousSnoop do
   include_context "two player game"
 
@@ -61,19 +42,18 @@ RSpec.describe Magic::Cards::ConspicuousSnoop do
   end
 
   it "has all activated abilities of a Goblin card on top of your library" do
-    goblin = TestGoblinWithAbility.new(game: game, owner: p1)
+    goblin = Card("Mogg Fanatic", owner: p1)
     p1.library.add(goblin)
     game.tick!
 
-    ability = snoop.activated_abilities.find { |a| a.is_a?(TestGoblinWithAbility::PingAbility) }
+    ability = snoop.activated_abilities.find { |a| a.is_a?(Magic::Cards::MoggFanatic::SacrificeAbility) }
     expect(ability).not_to be_nil
 
-    starting_hand_size = p1.hand.count
-    p1.activate_ability(ability: ability)
+    p1.activate_ability(ability: ability) { |a| a.targeting(p2) }
     game.stack.resolve!
 
-    expect(p1.hand.count).to eq(starting_hand_size + 1)
-    expect(snoop.tapped?).to eq(true)
+    expect(p2.life).to eq(19)
+    expect(snoop.zone).to be_nil
   end
 
   it "doesn't have extra activated abilities when the top card isn't a Goblin" do
