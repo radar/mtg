@@ -157,11 +157,18 @@ module Magic
         self
       end
 
-      def pay_discard(cards)
-        cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::DiscardCards) }
-        raise "Unknown additional discard cost" unless cost
+      def pay_discard(payment)
+        if payment.is_a?(Array)
+          cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::DiscardCards) }
+          raise "Unknown additional discard cost" unless cost
 
-        cost.pay(payment: cards)
+          cost.pay(payment: payment)
+        else
+          cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::Discard) }
+          raise "Unknown additional discard cost" unless cost
+
+          cost.pay(player: player, payment: payment)
+        end
         @paid_additional_costs << cost
         self
       end
