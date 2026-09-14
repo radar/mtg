@@ -55,6 +55,10 @@ module Magic
         const_set(:ADVENTURE_COST, cost)
       end
 
+      def cycling(cost)
+        const_set(:CYCLING_COST, cost)
+      end
+
       def buyback
         define_method(:buyback?) do
           true
@@ -302,6 +306,14 @@ module Magic
 
     def adventure_cost
       self.class.const_defined?(:ADVENTURE_COST, false) ? Costs::Mana.new(self.class::ADVENTURE_COST.dup) : nil
+    end
+
+    def cycling_cost
+      self.class.const_defined?(:CYCLING_COST, false) ? Costs::Mana.new(self.class::CYCLING_COST.dup) : nil
+    end
+
+    def cycling?
+      !!cycling_cost
     end
 
     def buyback?

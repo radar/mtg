@@ -58,6 +58,11 @@ module Magic
       game.take_action(action)
     end
 
+    def cycle(card:, **args, &block)
+      action = prepare_action(Magic::Actions::Cycle, card: card, **args, &block)
+      game.take_action(action)
+    end
+
     def prepare_activate_ability(ability:, **args, &block)
       prepare_action(Magic::Actions::ActivateAbility, ability: ability, **args)
     end
