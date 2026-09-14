@@ -151,6 +151,15 @@ module Magic
         self
       end
 
+      def pay_discard(cards)
+        cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::DiscardCards) }
+        raise "Unknown additional discard cost" unless cost
+
+        cost.pay(payment: cards)
+        @paid_additional_costs << cost
+        self
+      end
+
       def perform
         missing_costs = additional_costs - @paid_additional_costs
         raise "Additional costs have not been paid" unless missing_costs.empty?
