@@ -51,6 +51,10 @@ module Magic
         const_set(:BLITZ_COST, cost)
       end
 
+      def adventure(cost)
+        const_set(:ADVENTURE_COST, cost)
+      end
+
       def buyback
         define_method(:buyback?) do
           true
@@ -294,6 +298,10 @@ module Magic
 
     def blitz_cost
       self.class.const_defined?(:BLITZ_COST, false) ? Costs::Mana.new(self.class::BLITZ_COST.dup) : nil
+    end
+
+    def adventure_cost
+      self.class.const_defined?(:ADVENTURE_COST, false) ? Costs::Mana.new(self.class::ADVENTURE_COST.dup) : nil
     end
 
     def buyback?

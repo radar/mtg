@@ -10,7 +10,9 @@ module Magic
 
       # @param flashback [Boolean] When true, allows casting from graveyard and exiles after resolution
       # @param blitz [Boolean] When true, pays the card's blitz cost instead of its mana cost
-      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, **args)
+      # @param adventure [Boolean] When true, pays the card's adventure cost, resolves via
+      #   #adventure_resolve! instead of #resolve!, and exiles the card afterward
+      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, adventure: false, **args)
         super(**args)
         @card = card
         @targets = []
@@ -19,6 +21,7 @@ module Magic
         @paid_additional_costs = []
         @flashback = flashback
         @blitz = blitz
+        @adventure = adventure
 
         @value_for_x = value_for_x
       end
@@ -51,6 +54,8 @@ module Magic
             cost = card.flashback_cost
           elsif @blitz
             cost = card.blitz_cost
+          elsif @adventure
+            cost = card.adventure_cost
           else
             cost = card.cost
           end
@@ -188,6 +193,7 @@ module Magic
           modes.each { |mode| mode.resolve! }
         else
           resolved = resolve_with_args(card,
+            method: @adventure ? :adventure_resolve! : :resolve!,
             target: targets.first,
             targets: targets,
             kicked: kicker_cost.paid?,
@@ -201,7 +207,9 @@ module Magic
           resolved.register_turn_trigger(Events::BeginningOfEndStep, Blitz::EndStepSacrificeTrigger)
         end
 
-        if card.sorcery? || card.instant?
+        if @adventure
+          card.exile!
+        elsif card.sorcery? || card.instant?
           if @flashback
             card.exile!
           elsif card.rebound? && card.zone.hand?
