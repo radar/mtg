@@ -161,6 +161,7 @@ module Magic
         game.notify!(Events::SpellCast.new(
           spell: card,
           player: player,
+          mana_cost: mana_cost,
           x_value: value_for_x,
           flashback: @flashback,
           targets: targets,

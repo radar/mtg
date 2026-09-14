@@ -5,6 +5,10 @@ module Magic
         event.spell
       end
 
+      def mana_cost
+        event.mana_cost
+      end
+
       def enchantment?
         spell.enchantment?
       end

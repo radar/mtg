@@ -13,17 +13,11 @@ module Magic
 
       class FreeSpellTrigger < TriggeredAbility::SpellCast
         def should_perform?
-          cast_action&.mana_cost&.zero?
+          mana_cost.zero?
         end
 
         def call
           actor.trigger_effect(:deal_damage, damage: 5, target: event.player)
-        end
-
-        private
-
-        def cast_action
-          game.stack.spells.find { |action| action.card == spell }
         end
       end
 
