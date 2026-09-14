@@ -43,6 +43,13 @@ bundle exec rake 'find_card[Card Name]'
 - If you need a field `find_card` doesn't return, add it to `Oracle#find_card`'s
   `slice(...)` call (it already includes `power`/`toughness`) — extend the Ruby class,
   don't work around it.
+- Implementing several cards at once: use `find_cards`, not repeated `find_card`
+  calls. It reads names from stdin, one per line, and prints each result under
+  `=== Name ===` (or `NOT FOUND`):
+
+  ```bash
+  printf 'Card One\nCard Two\n' | bundle exec rake find_cards
+  ```
 
 State back (to yourself, in the implementation) every line of oracle_text as a
 distinct piece of behavior before writing code. If a card has N sentences of rules

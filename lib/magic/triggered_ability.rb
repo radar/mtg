@@ -53,8 +53,12 @@ module Magic
 
     # The following assume the event carries a spell as event.source (e.g.
     # Events::DamageDealt) rather than event.permanent.
-    def damage_spell?
-      event.source.is_a?(Magic::Card) && (event.source.instant? || event.source.sorcery?)
+    def instant?
+      event.source.instant?
+    end
+
+    def sorcery?
+      event.source.sorcery?
     end
 
     def single_target_spell?

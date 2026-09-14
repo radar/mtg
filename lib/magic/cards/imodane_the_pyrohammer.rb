@@ -10,7 +10,10 @@ module Magic
     class ImodaneThePyrohammer < Creature
       class DamageTrigger < TriggeredAbility
         def should_perform?
-          damage_spell? && spell_controlled_by_you? && single_target_spell? && damage_target_creature?
+          (instant? || sorcery?) &&
+            spell_controlled_by_you? &&
+            single_target_spell? &&
+            damage_target_creature?
         end
 
         def call
