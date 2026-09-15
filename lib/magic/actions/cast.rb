@@ -88,7 +88,12 @@ module Magic
           game.battlefield.static_abilities.any? do |ability|
             ability.respond_to?(:permits_casting_from_exile?) && ability.permits_casting_from_exile?(card)
           end
-        return false unless from_top_of_library || from_exile || (@flashback ? card.zone.graveyard? : card.zone.hand?)
+        from_graveyard = card.zone&.graveyard? &&
+          game.emblems.any? do |emblem|
+            emblem.owner == player &&
+              emblem.respond_to?(:permits_casting_from_graveyard?) && emblem.permits_casting_from_graveyard?(card)
+          end
+        return false unless from_top_of_library || from_exile || from_graveyard || (@flashback ? card.zone.graveyard? : card.zone.hand?)
         return true if mana_cost.zero?
 
         mana_cost.can_pay?(player)
@@ -222,6 +227,8 @@ module Magic
           card.exile!
         elsif card.sorcery? || card.instant?
           if @flashback
+            card.exile!
+          elsif card.zone&.graveyard? && game.emblems.any? { |emblem| emblem.owner == player && emblem.respond_to?(:exiles_after_graveyard_cast?) && emblem.exiles_after_graveyard_cast?(card) }
             card.exile!
           elsif card.rebound? && card.zone.hand?
             card.exile!

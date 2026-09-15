@@ -11,5 +11,8 @@ module Magic
 
     def receive_event(event)
     end
+
+    def permits_casting_from_graveyard?(card) = false
+    def exiles_after_graveyard_cast?(card) = false
   end
 end
