@@ -9,7 +9,6 @@ module Magic
 
       def change_loyalty!(change)
         @loyalty = loyalty + change
-        destroy! if loyalty <= 0
       end
 
       def take_damage(damage)

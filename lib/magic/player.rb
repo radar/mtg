@@ -207,8 +207,17 @@ module Magic
       end
     end
 
+    # Rule 704.5b: drawing from an empty library doesn't lose immediately;
+    # the player loses the next time state-based actions are checked.
+    def drew_from_empty_library?
+      @drew_from_empty_library
+    end
+
     def draw!
-      lose! and return if library.none?
+      if library.none?
+        @drew_from_empty_library = true
+        return
+      end
 
       card = library.draw
       game.notify!(
@@ -335,7 +344,7 @@ module Magic
 
     def add_counter(counter_type, amount: 1)
       resolved = Counters[counter_type]
-      @counters = Counters::Collection.new(@counters + [resolved.new] * amount)
+      @counters = Counters::Collection.new(@counters + Array.new(amount) { resolved.new })
     end
 
     def devotion(color)

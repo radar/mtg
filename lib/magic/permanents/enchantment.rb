@@ -7,8 +7,14 @@ module Magic
       attr_reader :attached_to
 
       def attach_to!(target)
+        detach!
         target.attachments << self
         @attached_to = target
+      end
+
+      def detach!
+        attached_to&.attachments&.delete(self)
+        @attached_to = nil
       end
 
       def power_modification

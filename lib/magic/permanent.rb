@@ -402,7 +402,7 @@ module Magic
     # remove_counter above so replacement effects (e.g. Doubling Season) apply.
     def put_counters!(counter_type, amount: 1)
       resolved = Counters[counter_type]
-      @counters = Counters::Collection.new(@counters + [resolved.new] * amount)
+      @counters = Counters::Collection.new(@counters + Array.new(amount) { resolved.new })
     end
 
     def take_counters!(counter_type, amount: 1)
@@ -467,8 +467,6 @@ module Magic
 
     def dispatch_lifecycle_triggers(event)
       return unless event.respond_to?(:permanent) && event.permanent == self
-
-      @attachments.each(&:destroy!) if event.is_a?(Events::LeftTheBattlefield)
 
       lifecycle_triggers_for(event).each do |trigger_class|
         perform_trigger!(trigger_class, event)
