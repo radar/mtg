@@ -58,7 +58,10 @@ RSpec.describe Magic::Cards::SublimeEpiphany do
     game.stack.resolve!
 
     counter_event = game.current_turn.events.select { |e| e.is_a?(Magic::Events::AbilityCountered) }.first
-    expect(counter_event.ability).to eq(igneous_cur.activated_abilities.first)
+    # Activated ability objects are rebuilt whenever continuous effects are re-applied,
+    # so compare by what the ability is rather than by object identity.
+    expect(counter_event.ability).to be_a(igneous_cur.activated_abilities.first.class)
+    expect(counter_event.ability.source).to eq(igneous_cur)
 
     expect(igneous_cur.power).to eq(1)
   end

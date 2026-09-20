@@ -4,7 +4,7 @@ module Magic
 
     def_delegators :@stack, :first, :select, :count, :include?, :map, :empty?
 
-    attr_reader :logger, :effects, :choices
+    attr_reader :logger, :effects, :choices, :game
 
     class TargetedCast
       class InvalidTarget < StandardError; end
@@ -29,8 +29,9 @@ module Magic
       end
     end
 
-    def initialize(logger: Logger.new($stdout), stack: [], effects: [], choices: [])
+    def initialize(logger: Logger.new($stdout), stack: [], effects: [], choices: [], game: nil)
       @logger = logger
+      @game = game
       @stack = stack
       @effects = Effects.new(effects)
       @choices = Choices.new(choices)
@@ -103,6 +104,7 @@ module Magic
       item.resolve!
 
       resolve_effects!
+      game&.state_based_actions_checkpoint!
 
       resolve_stack!
     end
@@ -130,6 +132,7 @@ module Magic
     def resolve_choice!(**args)
       choice = choices.shift
       choice.resolve!(**args)
+      game&.state_based_actions_checkpoint!
     end
   end
 end

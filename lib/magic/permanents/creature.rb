@@ -19,6 +19,12 @@ module Magic
         @marked_for_death || !alive? || zone.nil?
       end
 
+      # Rules 704.5g and 704.5h. Unlike `dead?`, this ignores toughness 0 and zone,
+      # because indestructible permanents survive lethal damage but not 0 toughness.
+      def lethally_damaged?
+        @marked_for_death || (toughness.positive? && damage >= toughness)
+      end
+
       def base_power
         base_power = @card.respond_to?(:base_power) ? @card.base_power : 0
         base_power_modifier = @modifiers.select { |mod| mod.is_a?(Modifications::BasePower) }.last

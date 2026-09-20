@@ -47,7 +47,7 @@ module Magic
       @logger = Logger.new(STDOUT)
       @battlefield = battlefield
       @exile = exile
-      @stack = Stack.new(logger: @logger)
+      @stack = Stack.new(logger: @logger, game: self)
       @effects = effects
       @logger.level = ENV['LOG_LEVEL'] || "INFO"
       @player_count = 0
@@ -186,10 +186,27 @@ module Magic
       Game::ReplacementEffectSources.new(game: self).all
     end
 
-    def tick!
-      battlefield.map(&:apply_continuous_effects!)
-      check_for_state_triggered_abilities
-      move_dead_creatures_to_graveyard
+    # Rule 704.3: perform state-based actions repeatedly until none apply, then check state triggers.
+    def check_state_based_actions!
+      return if @checking_state_based_actions
+
+      @checking_state_based_actions = true
+      begin
+        loop do
+          battlefield.map(&:apply_continuous_effects!)
+          break unless StateBasedActions.new(game: self).perform!
+        end
+        check_for_state_triggered_abilities
+      ensure
+        @checking_state_based_actions = false
+      end
+    end
+    alias_method :tick!, :check_state_based_actions!
+
+    # Called after each action, stack resolution and choice. SBAs are only checked when a player would
+    # receive priority, so they wait while a choice is still pending (resolution is not finished yet).
+    def state_based_actions_checkpoint!
+      check_state_based_actions! unless stack.pending_choices?
     end
 
     # Rule 603.8
@@ -204,10 +221,6 @@ module Magic
 
     def graveyard_cards
       CardList.new(players.flat_map { _1.graveyard.items })
-    end
-
-    def move_dead_creatures_to_graveyard
-      battlefield.creatures.dead.each(&:destroy!)
     end
 
     private

@@ -159,6 +159,7 @@ module Magic
         @actions << action
         logger.debug "ACTION: #{action.inspect}"
         action.perform
+        game.state_based_actions_checkpoint!
       end
 
       def take_actions(*actions)
@@ -200,9 +201,9 @@ module Magic
 
       def deal_combat_damage
         combat.deal_first_strike_damage
-        game.tick!
+        game.check_state_based_actions!
         combat.deal_combat_damage
-        game.tick!
+        game.check_state_based_actions!
       end
 
       def notify!(*events)
