@@ -5,11 +5,13 @@ Guidance for Claude Code when working in this repo.
 ## Quick Reference
 
 ### Build & Dependencies
+
 ```bash
 bundle install              # Install Ruby gems and dependencies
 ```
 
 > **Note for Copilot cloud agent**: `bundle` is not on PATH. Use this pattern instead:
+>
 > ```bash
 > # First, install gems (only needed once per session):
 > HOME=/tmp ruby /usr/lib/ruby/gems/3.2.0/gems/bundler-2.4.19/libexec/bundle install --path /tmp/vendor/bundle
@@ -19,6 +21,7 @@ bundle install              # Install Ruby gems and dependencies
 > ```
 
 ### Testing
+
 ```bash
 bundle exec rspec           # Run all tests
 bundle exec rspec spec/cards/island_spec.rb           # Run a single test file
@@ -29,17 +32,20 @@ bundle exec rspec -k "taps for"                       # Run tests matching a pat
 RSpec integration tests. See `spec/spec_helper.rb` for helpers/shared contexts.
 
 ### Tooling
+
 - Use `fd`, not `find`, for file searches.
 - Use `rg`, not `grep`, for text searches.
-- Avoid `xargs`.
+- Avoid `xargs`. Never, ever use it. Find another way.
 - Temporary files: write to a `tmp/` dir within this repo, not `/tmp`.
 
 ### Code Style
+
 - `# frozen_string_literal: true` at top of `lib/magic/*.rb` and `spec/**/*_spec.rb`
 - Card files in `lib/magic/cards/` do **not** use the frozen_string_literal pragma
 - Follow Ruby conventions
 
 ### Workflow
+
 - Each card: own commit, branch, PR.
 - Branch name: kebab-case card name (e.g. `terror-of-the-peaks`).
 - After implementing, note new patterns/gotchas in CLAUDE.md in the same commit.
@@ -81,18 +87,21 @@ Event-driven architecture for triggered and state-based abilities:
 ### Actions & Spell Resolution
 
 **Actions** (`lib/magic/actions/`): Player decisions and game operations:
+
 - `Cast`: Places spell on stack with optional targeting/flashback
 - `PlayLand`: Land from hand to battlefield
 - `ActivateAbility`: Activates card abilities with cost payment
 - `DeclareAttacker` / combat mechanics
 
 **Stack** (`lib/magic/stack.rb`): LIFO spell resolution
+
 - **Choices**: Modal effects and decisions during resolution
 - **Effects**: Side effects of resolution (draw cards, deal damage, move permanents)
 
 ### Effects System
 
 **Effects** (`lib/magic/effects/`): State changes during resolution:
+
 - `DrawCards`, `DealDamage`, `DestroyTarget`, `CreateToken`, `MoveCardZone`, `AddCounter`, etc.
 - Modified by **Replacement Effects** before applying (redirect damage, replace draw)
 - **ReplacementEffectResolver** (`lib/magic/game/replacement_effect_resolver.rb`): if/then logic before effect executes
@@ -106,6 +115,7 @@ Event-driven architecture for triggered and state-based abilities:
 - **Exile** (`lib/magic/zones/exile.rb`)
 
 **Player** (`lib/magic/player.rb`): Owns zones, tracks life, mana pool, counters
+
 - Methods: `draw!`, `play_land()`, `cast()`, `activate_ability()`, `take_action()`
 
 ### Mana & Costs
@@ -143,6 +153,7 @@ Zeitwerk (`lib/magic.rb`): auto-loads from `lib/magic/**/*.rb`. Define class →
 ## Testing Patterns
 
 **Shared Context** (`spec/spec_helper.rb`): `include_context "two player game"` gives:
+
 - `game`: Two-player game (p1, p2), 7-card libraries
 - `current_turn`: Turn state and phase transitions
 - Helpers: `go_to_main_phase!`, `skip_to_combat!`, `go_to_combat_damage!`
@@ -152,6 +163,7 @@ Zeitwerk (`lib/magic.rb`): auto-loads from `lib/magic/**/*.rb`. Define class →
 **Card Helper**: `Card(name)` and `ResolvePermanent(name)` strip non-letter chars and look up constant. Every word must be capitalised — `"Terror Of The Peaks"` not `"Terror of the Peaks"`. Lowercase words (of, the, a) must be uppercased or lookup fails.
 
 **Testing Sagas**: Turns alternate, so controller's next main phase needs two `game.next_turn` calls + `go_to_main_phase!`. Each chapter in nested `context`. Example:
+
 ```ruby
 before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; game.tick! }
 ```
