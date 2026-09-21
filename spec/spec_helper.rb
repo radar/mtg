@@ -84,10 +84,18 @@ RSpec.shared_context "two player game" do
   end
 
   def go_to_main_phase!
+    return if current_turn.main_phase?
+
     current_turn.untap!
     current_turn.upkeep!
     current_turn.draw!
     current_turn.first_main!
+  end
+
+  # Advance to the given player's next turn and go to their first main phase.
+  def go_to_main_phase_for!(player)
+    game.next_turn until current_turn.active_player == player
+    go_to_main_phase!
   end
 
   def skip_to_combat!

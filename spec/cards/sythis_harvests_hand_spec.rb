@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::SythisHarvestsHand do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "gains life when you cast an enchantment" do
     ResolvePermanent("Sythis, Harvest's Hand", owner: p1)

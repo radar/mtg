@@ -3,6 +3,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::FaithlessLooting do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:faithless_looting) { Card("Faithless Looting") }
 

@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::AnnexSentry do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:card) { Card("Annex Sentry") }
   subject(:annex_sentry) { Card("Annex Sentry", owner: p1) }

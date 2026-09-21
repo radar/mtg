@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::ManaGeyser do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject(:mana_geyser) { Card("Mana Geyser", owner: p1) }
 

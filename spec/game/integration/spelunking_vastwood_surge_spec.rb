@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Game, "Spelunking + Vastwood Surge" do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "puts the lands Vastwood Surge searches for onto the battlefield untapped" do
     ResolvePermanent("Spelunking", owner: p1)

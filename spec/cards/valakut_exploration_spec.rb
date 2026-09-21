@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::ValakutExploration do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:valakut_exploration) { ResolvePermanent("Valakut Exploration", owner: p1) }
 

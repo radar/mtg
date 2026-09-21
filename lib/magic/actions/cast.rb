@@ -4,16 +4,17 @@ module Magic
       extend Forwardable
 
       class InvalidTarget < StandardError; end
-      class SpellCastLimitReached < StandardError; end
 
       def_delegators :@card, :enchantment?, :artifact?, :multi_target?
       attr_reader :card, :targets, :value_for_x, :controller, :modes, :additional_costs
 
       # @param flashback [Boolean] When true, allows casting from graveyard and exiles after resolution
       # @param blitz [Boolean] When true, pays the card's blitz cost instead of its mana cost
+      # @param by_effect [Boolean] When true, the spell is being cast because an effect instructed it (rebound,
+      #   "you may cast it" during resolution), so its zone and timing restrictions are ignored (rule 608.2g)
       # @param adventure [Boolean] When true, pays the card's adventure cost, resolves via
       #   #adventure_resolve! instead of #resolve!, and exiles the card afterward
-      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, adventure: false, **args)
+      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, adventure: false, by_effect: false, **args)
         super(**args)
         @card = card
         @targets = []
@@ -23,6 +24,7 @@ module Magic
         @flashback = flashback
         @blitz = blitz
         @adventure = adventure
+        @by_effect = by_effect
 
         @value_for_x = value_for_x
       end
@@ -87,10 +89,12 @@ module Magic
       end
 
       def illegal_reason
-        return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
+        unless @by_effect
+          return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
 
-        if !instant_speed? && (reason = sorcery_speed_reason)
-          return "#{card.name} can only be cast at sorcery speed, but #{reason}"
+          if !instant_speed? && (reason = sorcery_speed_reason)
+            return "#{card.name} can only be cast at sorcery speed, but #{reason}"
+          end
         end
 
         "#{player.inspect} cannot cast any more spells this turn" if player.spell_cast_limit_reached?
@@ -181,8 +185,6 @@ module Magic
       end
 
       def perform
-        raise SpellCastLimitReached, "#{player.inspect} cannot cast any more spells this turn" if player.spell_cast_limit_reached?
-
         missing_costs = additional_costs - @paid_additional_costs
         raise "Additional costs have not been paid" unless missing_costs.empty?
 
@@ -242,8 +244,29 @@ module Magic
         end
       end
 
-      def castable_from_current_zone?
+      private
 
+      def castable_from_current_zone?
+        zone = card.zone
+        return true unless zone # a card that was never placed in a zone (bare spec fixture) is treated as being in hand
+        return zone.graveyard? if @flashback && zone.graveyard?
+        return true if zone.hand? && !@flashback
+
+        (zone.library? && card == player.library.first && permitted_by_static_ability?(:permits_casting_from_top?)) ||
+          (zone.exile? && permitted_by_static_ability?(:permits_casting_from_exile?)) ||
+          (zone.graveyard? && permitted_by_emblem?(:permits_casting_from_graveyard?))
+      end
+
+      def permitted_by_static_ability?(permission)
+        game.battlefield.static_abilities.any? do |ability|
+          ability.respond_to?(permission) && ability.public_send(permission, card)
+        end
+      end
+
+      def permitted_by_emblem?(permission)
+        game.emblems.any? do |emblem|
+          emblem.owner == player && emblem.respond_to?(permission) && emblem.public_send(permission, card)
+        end
       end
     end
   end

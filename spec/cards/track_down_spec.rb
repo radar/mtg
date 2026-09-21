@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::TrackDown do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:track_down) { Card("Track Down") }
 
@@ -16,6 +17,7 @@ RSpec.describe Magic::Cards::TrackDown do
       Card("Forest"),
       Card("Forest"),
       Card("Forest"),
+      Card("Forest"), # Drawn during the draw step of the first main phase setup
       # End initial card draw
       Card("Grizzly Bears"),
       Card("Sol Ring"),
@@ -71,6 +73,7 @@ RSpec.describe Magic::Cards::TrackDown do
         Card("Forest"),
         Card("Forest"),
         Card("Forest"),
+        Card("Forest"), # Drawn during the draw step of the first main phase setup
         # End initial card draw
         Card("Forest"),
         Card("Sol Ring"),
@@ -100,6 +103,7 @@ RSpec.describe Magic::Cards::TrackDown do
         Card("Forest"),
         Card("Forest"),
         Card("Forest"),
+        Card("Forest"), # Drawn during the draw step of the first main phase setup
         # End initial card draw
         Card("Sol Ring"),
         Card("Forest"),

@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::LoftyDenial do
   include_context "two player game"
+  before { go_to_main_phase_for!(p2) }
 
   subject(:lofty_denial) { Card("Lofty Denial") }
 

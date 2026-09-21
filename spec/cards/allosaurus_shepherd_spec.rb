@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::AllosaurusShepherd do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:shepherd) { ResolvePermanent("Allosaurus Shepherd", owner: p1) }
 
@@ -47,6 +48,7 @@ RSpec.describe Magic::Cards::AllosaurusShepherd do
   end
 
   it "does not prevent countering an opponent's green spells" do
+    go_to_main_phase_for!(p2)
     opponents_spell = Card("Llanowar Elves", owner: p2)
     p2.hand.add(opponents_spell)
     p2.add_mana(green: 1)

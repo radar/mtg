@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::RootsOfWisdom do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   def p1_library
     14.times.map { Card("Grizzly Bears") }

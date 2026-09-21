@@ -40,7 +40,7 @@ module Magic
 
         def resolve!(target:)
           source.remove_from_exile(target)
-          source.controller.cast(card: target) do
+          source.controller.cast(card: target, by_effect: true) do
             _1.mana_cost = 0
           end
         end

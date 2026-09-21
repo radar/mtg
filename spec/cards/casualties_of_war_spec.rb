@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::CasualtiesOfWar do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "offers all five modes" do
     expect(described_class::MODES).to eq([

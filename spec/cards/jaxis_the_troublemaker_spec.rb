@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::JaxisTheTroublemaker do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject(:jaxis) { ResolvePermanent("Jaxis, The Troublemaker", owner: p1) }
 

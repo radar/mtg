@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::ReadTheTides do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:read_the_tides) { Card("Read The Tides") }
 

@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::ArchonOfSunsGrace do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject { ResolvePermanent("Archon of Sun's Grace") }
 

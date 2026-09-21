@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::Counterspell do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:sol_ring) { Card("Sol Ring", game: game, owner: p1) }
   let(:annul) { Card("Annul", game: game, owner: p2) }

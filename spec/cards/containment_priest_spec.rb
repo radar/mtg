@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::ContainmentPriest do
   include_context "two player game"
+  before { go_to_main_phase_for!(p2) }
 
   let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
   subject! { ResolvePermanent("Containment Priest", owner: p1) }

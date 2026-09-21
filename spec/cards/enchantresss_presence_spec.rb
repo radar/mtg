@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::EnchantresssPresence do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "draws a card when you cast an enchantment" do
     ResolvePermanent("Enchantress's Presence", owner: p1)

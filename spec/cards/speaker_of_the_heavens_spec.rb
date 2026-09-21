@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::SpeakerOfTheHeavens do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject(:speaker_of_the_heavens) { ResolvePermanent("Speaker Of The Heavens", owner: p1) }
 

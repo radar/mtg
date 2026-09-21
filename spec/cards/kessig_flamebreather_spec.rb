@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::KessigFlamebreather do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject(:kessig_flamebreather) { ResolvePermanent("Kessig Flamebreather", owner: p1) }
 

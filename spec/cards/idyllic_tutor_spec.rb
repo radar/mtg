@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::IdyllicTutor do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "searches the library for an enchantment" do
     tutor = Card("Idyllic Tutor", owner: p1)

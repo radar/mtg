@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::QuirionDryad do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject!(:quirion_dryad) { ResolvePermanent("Quirion Dryad") }
 
@@ -98,6 +99,7 @@ RSpec.describe Magic::Cards::QuirionDryad do
 
   context "when an opponent casts a white spell" do
     it "does not put a +1/+1 counter on Quirion Dryad" do
+      go_to_main_phase_for!(p2)
       watchdog = Card("Alpine Watchdog", owner: p2)
       p2.hand.add(watchdog)
       p2.add_mana(white: 2)

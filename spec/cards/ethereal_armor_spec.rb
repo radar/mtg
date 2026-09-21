@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::EtherealArmor do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "grants first strike and scales with enchantments" do
     creature = ResolvePermanent("Grizzly Bears", owner: p1)

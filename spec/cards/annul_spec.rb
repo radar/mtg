@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::Annul do
   include_context "two player game"
+  before { go_to_main_phase_for!(p2) }
 
   let(:sol_ring) { Card("Sol Ring") }
   subject(:annul) { Card("Annul") }

@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::PeerIntoTheAbyss do
   include_context "two player game"
+  before { go_to_main_phase! }
   subject(:peer_into_the_abyss) { Card("Peer Into The Abyss") }
 
   it "p2 draws half their library, and loses half their life, rounded up" do

@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::LindblumIndustrialRegency do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   describe "land side" do
     let(:card) { Card("Lindblum, Industrial Regency") }

@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::IrencragFeat do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:irencrag_feat) { Card("Irencrag Feat", owner: p1) }
 
@@ -44,7 +45,7 @@ RSpec.describe Magic::Cards::IrencragFeat do
 
     expect {
       p1.cast(card: second_bolt) { |a| a.pay_mana(red: 1); a.targeting(p2) }
-    }.to raise_error(Magic::Actions::Cast::SpellCastLimitReached)
+    }.to raise_error(Magic::IllegalAction, /cannot cast any more spells/)
   end
 
   it "expires at the start of the next turn" do

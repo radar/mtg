@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::CrownOfSkemfar do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject(:crown_of_skemfar) { Card("Crown Of Skemfar") }
 

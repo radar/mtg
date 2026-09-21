@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::FirebrandArcher do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject(:firebrand_archer) { ResolvePermanent("Firebrand Archer", owner: p1) }
 

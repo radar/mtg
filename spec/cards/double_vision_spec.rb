@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::DoubleVision do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:double_vision) { ResolvePermanent("Double Vision", owner: p1) }
   let(:bolt) { Card("Lightning Bolt", owner: p1) }

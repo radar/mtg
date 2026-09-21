@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::HuntersEdge do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
   let!(:alpine_watchdog) { ResolvePermanent("Alpine Watchdog", owner: p2) }

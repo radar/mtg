@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::AllThatGlitters do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "boosts the enchanted creature for each artifact and enchantment" do
     creature = ResolvePermanent("Grizzly Bears", owner: p1)

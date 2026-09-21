@@ -36,6 +36,14 @@ module Magic
         end
       end
 
+      class ExiledCardPermission < StaticAbility
+        def permits_casting_from_exile?(card)
+          card.owner == controller && @source.exiled_cards.include?(card)
+        end
+      end
+
+      def static_abilities = [ExiledCardPermission]
+
       def event_handlers
         {
           Events::Landfall => LandfallTrigger,

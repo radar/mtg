@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::EyeblightMassacre do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
   let!(:grizzly_bears) { ResolvePermanent("Grizzly Bears", owner: p1) }

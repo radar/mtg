@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::RhysticStudy do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:rhystic_study) { ResolvePermanent("Rhystic Study", owner: p1) }
 
@@ -9,6 +10,7 @@ RSpec.describe Magic::Cards::RhysticStudy do
     let!(:wood_elves_1) { Card("Wood Elves") }
 
     it "p2 casts 1 wood elf, p2 doesn't pay the 1, p1 draws" do
+      go_to_main_phase_for!(p2)
       expect(p1).to receive(:draw!)
       p2.add_mana({green: 4})
       p2.cast(card: wood_elves_1) do
@@ -32,6 +34,7 @@ RSpec.describe Magic::Cards::RhysticStudy do
     end
 
     it "p2 casts 1 wood elf, p2 pays the 1, p1 doesn't draws" do
+      go_to_main_phase_for!(p2)
       expect(p1).to_not receive(:draw!)
       p2.add_mana({green: 4})
       p2.cast(card: wood_elves_1) do
@@ -45,6 +48,7 @@ RSpec.describe Magic::Cards::RhysticStudy do
     end
 
     it "p2 casts 1 wood elf, p2 tries to pay 3, which is not allowed" do
+      go_to_main_phase_for!(p2)
       expect {
         expect(p1).to_not receive(:draw!)
         p2.add_mana({green: 7})

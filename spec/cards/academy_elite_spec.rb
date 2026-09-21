@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::AcademyElite do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   context "ETB effects" do
     subject(:academy_elite) { Card("Academy Elite", owner: p1) }

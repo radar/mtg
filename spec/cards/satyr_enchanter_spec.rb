@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::SatyrEnchanter do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject! { ResolvePermanent("Satyr Enchanter", owner: p1) }
 

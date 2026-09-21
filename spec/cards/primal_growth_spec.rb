@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::PrimalGrowth do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "searches the library for a basic land and puts it onto the battlefield" do
     spell = Card("Primal Growth", owner: p1)

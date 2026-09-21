@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::RighteousValkyrie do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:righteous_valkyrie) do
     ResolvePermanent("Righteous Valkyrie")

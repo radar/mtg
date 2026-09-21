@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::ExperimentalOverload do
   include_context "two player game"
+  before { go_to_main_phase! }
   let(:card) { Card("Experimental Overload") }
 
   before do

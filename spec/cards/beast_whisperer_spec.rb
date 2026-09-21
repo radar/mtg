@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::BeastWhisperer do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:beast_whisperer) { ResolvePermanent("Beast Whisperer", owner: p1) }
 
@@ -44,6 +45,7 @@ RSpec.describe Magic::Cards::BeastWhisperer do
 
   context "when an opponent casts a creature spell" do
     it "does not draw a card" do
+      go_to_main_phase_for!(p2)
       spell = Card("Elvish Mystic", owner: p2)
       p2.hand.add(spell)
       p2.add_mana(green: 1)

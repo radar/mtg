@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::SigilOfTheEmptyThrone do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "creates an Angel when you cast an enchantment" do
     ResolvePermanent("Sigil of The Empty Throne", owner: p1)

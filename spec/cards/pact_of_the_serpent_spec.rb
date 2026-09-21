@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::PactOfTheSerpent do
   include_context "two player game"
+  before { go_to_main_phase! }
   subject(:pact_of_the_serpent) { Card("Pact Of The Serpent") }
 
   it "target player draws X cards and loses X life, where X is the number of creatures of the chosen type they control" do

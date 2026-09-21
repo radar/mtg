@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::BogBadger do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject { Card("Bog Badger") }
   let!(:loxodon_wayfarer) { ResolvePermanent("Loxodon Wayfarer", owner: p1) }

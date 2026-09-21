@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::MangaraTheDiplomat do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:mangara) { ResolvePermanent("Mangara, The Diplomat", owner: p2) }
 
@@ -60,6 +61,7 @@ RSpec.describe Magic::Cards::MangaraTheDiplomat do
       p1.cast(card: wood_elves_1) do
         _1.pay_mana(generic: { green: 2 }, green: 1)
       end
+      game.stack.resolve!
 
       p1.cast(card: wood_elves_2) do
         _1.pay_mana(generic: { green: 2 }, green: 1)

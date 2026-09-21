@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::SetessanTraining do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:card) { Card("Setessan Training", owner: p1) }
   let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }

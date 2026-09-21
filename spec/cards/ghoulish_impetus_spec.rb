@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::GhoulishImpetus do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "grants +1/+1 and deathtouch to an enchanted creature" do
     creature = ResolvePermanent("Grizzly Bears", owner: p1)

@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::Discontinuity do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   context "resolution" do
     let!(:wood_elves) { Card("Wood Elves") }

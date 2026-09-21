@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::DoomwakeGiant do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject(:doomwake_giant) { Card("Doomwake Giant") }
   let(:p1_ajanis_pridemate) { ResolvePermanent("Ajani's Pridemate", owner: p1) }

@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::LeafCrownedVisionary do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject!(:leaf_crowned_visionary) { ResolvePermanent("Leaf-Crowned Visionary") }
 

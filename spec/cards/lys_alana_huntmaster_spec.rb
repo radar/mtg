@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::LysAlanaHuntmaster do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:huntmaster) { ResolvePermanent("Lys Alana Huntmaster", owner: p1) }
 
@@ -56,6 +57,7 @@ RSpec.describe Magic::Cards::LysAlanaHuntmaster do
 
   context "when an opponent casts an Elf spell" do
     it "does not present a choice" do
+      go_to_main_phase_for!(p2)
       card = Card("Elvish Warmaster", owner: p2)
       p2.hand.add(card)
       p2.add_mana(green: 2)

@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::BeseechTheMirror do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "searches the library for a card" do
     spell = Card("Beseech The Mirror", owner: p1)

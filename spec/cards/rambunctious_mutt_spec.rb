@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::RambunctiousMutt do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject(:rambunctious_mutt) { Card("Rambunctious Mutt") }
   let!(:enchantment) { ResolvePermanent("Glorious Anthem", owner: p2) }

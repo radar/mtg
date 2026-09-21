@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::HarvestSeason do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "searches the library for up to X basic lands, where X is the number of tapped creatures you control, and puts them onto the battlefield tapped" do
     creature1 = ResolvePermanent("Grizzly Bears", owner: p1)

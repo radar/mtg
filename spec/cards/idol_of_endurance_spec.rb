@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::IdolOfEndurance do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:wood_elves) { Card("Wood Elves") }
   subject(:idol_of_endurance) { ResolvePermanent("Idol Of Endurance", owner: p1) }

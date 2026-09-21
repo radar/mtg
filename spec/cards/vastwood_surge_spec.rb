@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::VastwoodSurge do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "searches the library for up to two basic lands and puts them onto the battlefield tapped" do
     spell = Card("Vastwood Surge", owner: p1)

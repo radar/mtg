@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::BountyOfSkemfar do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:elf) { Card("Elvish Mystic", owner: p1) }
 

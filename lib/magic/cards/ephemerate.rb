@@ -31,7 +31,7 @@ module Magic
         end
 
         def resolve!(target:)
-          action = controller.prepare_cast(card: actor)
+          action = controller.prepare_cast(card: actor, by_effect: true)
           action.mana_cost = {}
           action.targeting(target)
           game.take_action(action)

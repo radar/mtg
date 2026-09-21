@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::SerpentsSoulJar do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject { ResolvePermanent("Serpent's Soul-Jar", owner: p1) }
 

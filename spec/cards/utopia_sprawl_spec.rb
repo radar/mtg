@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::UtopiaSprawl do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "adds the chosen color when the enchanted Forest is tapped" do
     forest = ResolvePermanent("Forest", owner: p1)

@@ -2,8 +2,9 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::AcidicSlime do
   include_context "two player game"
+  before { go_to_main_phase! }
 
-  subject { add_to_library("Acidic Slime", player: p1) }
+  subject { Card("Acidic Slime", owner: p1).tap { |card| p1.hand.add(card) } }
 
   let(:land) { Permanent("Island", owner: p1) }
   let(:enchantment) { Permanent("Glorious Anthem", owner: p1) }

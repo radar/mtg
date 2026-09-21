@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::RinAndSeriInseperable do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject!(:permanent) { ResolvePermanent("Rin And Seri, Inseperable") }
 

@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::CatharticReunion do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:card) { Card("Cathartic Reunion", owner: p1) }
   let(:discard_one) { Card("Grizzly Bears", owner: p1) }

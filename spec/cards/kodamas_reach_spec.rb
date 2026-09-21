@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::KodamasReach do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "adds a library search choice for up to two basic lands" do
     spell = Card("Kodama's Reach", owner: p1)
