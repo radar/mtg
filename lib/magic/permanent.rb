@@ -340,15 +340,26 @@ module Magic
       (toughness - damage).positive? && toughness > 0
     end
 
+    # Rule 701.7: indestructible permanents can't be destroyed. Returns whether it was destroyed.
     def destroy!
+      return false if indestructible?
+
+      put_into_graveyard!
+      true
+    end
+
+    # Moves the permanent to its controller's graveyard whether or not it is indestructible.
+    # Use this (not #destroy!) for sacrifice and for state-based actions that aren't "destroy".
+    def put_into_graveyard!
       move_zone!(to: controller.graveyard)
       unless copy? || card.zone&.exile?
         card.move_zone!(to: controller.graveyard)
       end
     end
+
     def sacrifice!
       game.notify!(Events::PermanentSacrificed.new(permanent: self))
-      destroy!
+      put_into_graveyard!
     end
 
     def exile!

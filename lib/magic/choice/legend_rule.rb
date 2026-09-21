@@ -16,7 +16,7 @@ module Magic
       def choice_amount = 1
 
       def resolve!(target:)
-        (permanents - [target]).each(&:destroy!)
+        (permanents - [target]).each(&:put_into_graveyard!)
       end
     end
   end

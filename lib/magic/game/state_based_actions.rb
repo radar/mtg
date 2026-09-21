@@ -48,24 +48,22 @@ module Magic
       # Rule 704.5f: toughness 0 or less. Indestructible does not help here.
       def put_zero_toughness_creatures_into_graveyard
         creatures = game.battlefield.creatures.select { |creature| creature.toughness <= 0 }
-        creatures.each(&:destroy!)
+        creatures.each(&:put_into_graveyard!)
         creatures.any?
       end
 
       # Rules 704.5g and 704.5h: lethal damage, or damage from a deathtouch source.
-      # Indestructible creatures survive both.
+      # These destroy the creature, so an indestructible one survives; `destroy!` reports
+      # whether it actually destroyed anything, which is what keeps an indestructible
+      # creature from looking like a change on every pass.
       def destroy_lethally_damaged_creatures
-        creatures = game.battlefield.creatures.select do |creature|
-          creature.lethally_damaged? && !creature.indestructible?
-        end
-        creatures.each(&:destroy!)
-        creatures.any?
+        game.battlefield.creatures.select(&:lethally_damaged?).map(&:destroy!).any?
       end
 
       # Rule 704.5i
       def put_zero_loyalty_planeswalkers_into_graveyard
         planeswalkers = game.battlefield.planeswalkers.select { |planeswalker| planeswalker.loyalty <= 0 }
-        planeswalkers.each(&:destroy!)
+        planeswalkers.each(&:put_into_graveyard!)
         planeswalkers.any?
       end
 
@@ -75,7 +73,7 @@ module Magic
         auras = game.battlefield.permanents.select do |permanent|
           aura?(permanent) && !attached_to_legal_host?(permanent)
         end
-        auras.each(&:destroy!)
+        auras.each(&:put_into_graveyard!)
         auras.any?
       end
 
