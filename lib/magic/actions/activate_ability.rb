@@ -18,6 +18,17 @@ module Magic
         costs.all? { |cost| cost.can_pay?(player) } && @ability.requirements_met?
       end
 
+      def can_perform?
+        illegal_reason.nil? && can_be_activated?(player)
+      end
+
+      def illegal_reason
+        return "#{ability.source.name} is not on the battlefield" unless ability.source.zone&.battlefield?
+        return "#{ability.source.name} is not controlled by #{player.inspect}" unless ability.source.controller == player
+        return "#{ability.source.name} cannot activate #{ability.class}" unless ability.source.can_activate_ability?(ability)
+        return "#{ability.class} requirements are not met" unless ability.requirements_met?
+      end
+
       def name
         ability
       end

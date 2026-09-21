@@ -18,6 +18,8 @@ RSpec.describe Magic::Cards::Shacklegeist do
 
     it "taps the creature" do
       other_spirit = p1.creatures.by_name("Ageless Guardian").first
+      2.times { game.next_turn }
+      go_to_main_phase!
 
       p1.activate_ability(ability: shacklegeist.activated_abilities.first) do
         _1.pay_multi_tap([shacklegeist, other_spirit])

@@ -15,6 +15,8 @@ RSpec.describe Magic::Cards::VoiceOfTheWoods do
 
   it "taps five untapped Elves you control to create a 7/7 green Elemental token with trample" do
     elves = 4.times.map { ResolvePermanent("Llanowar Elves", owner: p1) }
+    2.times { game.next_turn }
+    go_to_main_phase!
 
     p1.activate_ability(ability: voice.activated_abilities.first) do |a|
       a.pay_multi_tap([voice] + elves)

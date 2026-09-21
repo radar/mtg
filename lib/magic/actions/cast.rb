@@ -74,18 +74,22 @@ module Magic
       end
 
       def can_perform?
-        from_top_of_library = card.zone&.library? && card == player.library.first &&
-          game.battlefield.static_abilities.any? do |ability|
-            ability.respond_to?(:permits_casting_from_top?) && ability.permits_casting_from_top?(card)
-          end
-        from_exile = card.zone&.exile? &&
-          game.battlefield.static_abilities.any? do |ability|
-            ability.respond_to?(:permits_casting_from_exile?) && ability.permits_casting_from_exile?(card)
-          end
-        return false unless from_top_of_library || from_exile || (@flashback ? card.zone.graveyard? : card.zone.hand?)
+        return false unless castable_from_current_zone?
+        return false if illegal_reason
         return true if mana_cost.zero?
 
         mana_cost.can_pay?(player)
+      end
+
+      def illegal_reason
+        return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
+
+        if !instant_speed? && (reason = sorcery_speed_reason)
+          return "#{card.name} can only be cast at sorcery speed, but #{reason}"
+        end
+
+        return "#{player.inspect} cannot cast any more spells this turn" if player.spell_cast_limit_reached?
+        return "#{player.inspect} cannot pay #{card.name}'s mana cost" unless mana_cost.zero? || mana_cost.can_pay?(player)
       end
 
       def target_choices
@@ -156,6 +160,7 @@ module Magic
         raise "Additional costs have not been paid" unless missing_costs.empty?
 
         mana_cost.finalize!(player)
+        player.consume_spell_cast!
         game.stack.add(self)
 
         game.notify!(Events::SpellCast.new(
@@ -166,6 +171,25 @@ module Magic
           flashback: @flashback,
           targets: targets,
         ))
+      end
+
+      private
+
+      def instant_speed?
+        card.instant? || card.flash?
+      end
+
+      def castable_from_current_zone?
+        from_top_of_library = card.zone&.library? && card == player.library.first &&
+          game.battlefield.static_abilities.any? do |ability|
+            ability.respond_to?(:permits_casting_from_top?) && ability.permits_casting_from_top?(card)
+          end
+        from_exile = card.zone&.exile? &&
+          game.battlefield.static_abilities.any? do |ability|
+            ability.respond_to?(:permits_casting_from_exile?) && ability.permits_casting_from_exile?(card)
+          end
+
+        from_top_of_library || from_exile || (@flashback ? card.zone.graveyard? : card.zone.hand?)
       end
 
       def choose_mode(mode_class, &)

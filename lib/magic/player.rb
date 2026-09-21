@@ -4,7 +4,7 @@ module Magic
     extend Forwardable
 
     attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters, :commander
-    attr_accessor :ring_bearer
+    attr_accessor :ring_bearer, :spell_cast_limit, :spell_cast_limit_turn
 
     def_delegators :@game, :logger
 
@@ -68,6 +68,7 @@ module Magic
         action = prepare_activate_ability(ability: ability, **args, &block)
       end
       yield action if block_given?
+      raise IllegalAction.new(action, action.illegal_reason || "its costs cannot be paid") unless action.can_perform?
       action.pay_self_tap if action.has_cost?(Magic::Costs::SelfTap) && auto_tap
       action.pay_self_sacrifice if action.has_cost?(Magic::Costs::SelfSacrifice)
       action.pay_self_exile if action.has_cost?(Magic::Costs::SelfExile)
@@ -78,6 +79,7 @@ module Magic
     def activate_loyalty_ability(ability:, auto_tap: true, **args)
       action = prepare_action(Magic::Actions::ActivateLoyaltyAbility, ability: ability, **args)
       yield action if block_given?
+      raise IllegalAction.new(action, action.illegal_reason) unless action.can_perform?
       game.take_action(action)
     end
 
@@ -91,6 +93,23 @@ module Magic
       action = prepare_cast(card: card, **args, &block)
       game.take_action(action)
       action
+    end
+
+    def limit_spells_this_turn!(count)
+      @spell_cast_limit = count
+      @spell_cast_limit_turn = game.current_turn.number
+    end
+
+    def spell_cast_limited?
+      spell_cast_limit && spell_cast_limit_turn == game.current_turn.number
+    end
+
+    def spell_cast_limit_reached?
+      spell_cast_limited? && spell_cast_limit <= 0
+    end
+
+    def consume_spell_cast!
+      @spell_cast_limit -= 1 if spell_cast_limited?
     end
 
     def prepare_declare_attacker(attacker:, target: nil, **args)

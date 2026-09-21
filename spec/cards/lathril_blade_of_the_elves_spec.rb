@@ -13,6 +13,8 @@ RSpec.describe Magic::Cards::LathrilBladeOfTheElves do
     elves = 10.times.map do
       described_class::ElfWarriorToken.new(game: game, owner: p1, base_power: 1, base_toughness: 1).resolve!(enters_tapped: false)
     end
+    2.times { game.next_turn }
+    go_to_main_phase!
 
     p1.activate_ability(ability: subject.activated_abilities.first) do
       _1.pay_multi_tap(elves)

@@ -24,6 +24,10 @@ module Magic
       source.controller
     end
 
+    def requirements_met?
+      true
+    end
+
     def hand
       controller.hand
     end

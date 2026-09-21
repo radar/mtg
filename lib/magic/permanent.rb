@@ -27,7 +27,7 @@ module Magic
       :exiled_cards,
       :cannot_untap_next_turn
 
-    attr_accessor :copied_card, :chosen_creature_type, :exile_cast_permission_turn, :ring_bearer, :prevent_opponent_lifegain_turn
+    attr_accessor :copied_card, :chosen_creature_type, :exile_cast_permission_turn, :ring_bearer, :prevent_opponent_lifegain_turn, :activated_loyalty_ability_turn
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :additional_lands_per_turn, :power_modification, :toughness_modification, :type_grants
     def_delegators :@game, :logger
@@ -102,6 +102,7 @@ module Magic
       @phased_out = false
       @prepared = false
       @timestamp = timestamp
+      @controller_since_turn = game.current_turn&.number
     end
 
     def kicked?
@@ -172,6 +173,7 @@ module Magic
 
     def controller=(other_controller)
       @controller = other_controller
+      @controller_since_turn = game.current_turn&.number
     end
 
     def opponents
@@ -370,6 +372,10 @@ module Magic
 
     def can_attack?
       card.can_attack? && attachments.all?(&:can_attack?)
+    end
+
+    def summoning_sick?
+      creature? && @controller_since_turn == game.current_turn&.number
     end
 
     def can_block?(permanent)

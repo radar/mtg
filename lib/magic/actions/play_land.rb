@@ -13,7 +13,18 @@ module Magic
       end
 
       def can_perform?
-        player.can_play_lands?
+        legal?
+      end
+
+      def illegal_reason
+        return "#{card.name} is not a land" unless card.land?
+        return "#{card.name} is not in hand" unless card.zone&.hand?
+
+        if (reason = sorcery_speed_reason)
+          return "lands can only be played at sorcery speed, but #{reason}"
+        end
+
+        return "#{player.inspect} has already played the maximum number of lands this turn" unless player.can_play_lands?
       end
 
       def perform

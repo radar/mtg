@@ -41,6 +41,8 @@ RSpec.describe Magic::Cards::JaxisTheTroublemaker do
       discard_card = Card("Forest", owner: p1)
       p1.hand.add(discard_card)
       p1.add_mana(red: 1)
+      2.times { game.next_turn }
+      go_to_main_phase!
 
       p1.activate_ability(ability: ability) do |a|
         a.pay_mana(red: 1)
@@ -62,6 +64,8 @@ RSpec.describe Magic::Cards::JaxisTheTroublemaker do
       discard_card = Card("Forest", owner: p1)
       p1.hand.add(discard_card)
       p1.add_mana(red: 1)
+      2.times { game.next_turn }
+      go_to_main_phase!
 
       p1.activate_ability(ability: ability) do |a|
         a.pay_mana(red: 1)

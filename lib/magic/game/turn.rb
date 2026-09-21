@@ -148,6 +148,9 @@ module Magic
       end
 
       def take_action(action)
+        reason = action.illegal_reason
+        raise IllegalAction.new(action, reason) if reason
+
         @actions << action
         logger.debug "ACTION: #{action.inspect}"
         action.perform
@@ -209,8 +212,12 @@ module Magic
         events.select { |event| event.is_a?(Events::SpellCast) }
       end
 
+      def main_phase?
+        step?(:first_main) || step?(:second_main)
+      end
+
       def can_cast_sorcery?(player)
-        game.stack.empty? && active_player == player
+        game.stack.empty? && active_player == player && main_phase?
       end
 
       def life_gained_by_player(player)

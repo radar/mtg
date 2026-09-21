@@ -20,6 +20,8 @@ RSpec.describe Magic::Cards::CelestialEnforcer do
         context "and p1 controls a creature with flying" do
           before do
             ResolvePermanent("Aven Gagglemaster", owner: p1)
+            2.times { game.next_turn }
+            go_to_main_phase!
           end
 
           it "taps a target creature" do
