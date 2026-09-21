@@ -23,6 +23,7 @@ RSpec.describe Magic::Game, "Mana spend -- Essence Warden" do
       before do
         p1.hand.add(forest)
         p1.hand.add(essence_warden)
+        go_to_main_phase!
       end
 
       it "casts a forest, then an essence warden" do

@@ -5,7 +5,7 @@ require "spec_helper"
 RSpec.describe Magic::Cards::JaxisTheTroublemaker do
   include_context "two player game"
 
-  subject(:jaxis) { ResolvePermanent("Jaxis, The Troublemaker", owner: p1) }
+  subject!(:jaxis) { ResolvePermanent("Jaxis, The Troublemaker", owner: p1) }
 
   it "is a 2/3 legendary Human Warrior" do
     expect(jaxis.power).to eq(2)
@@ -23,6 +23,7 @@ RSpec.describe Magic::Cards::JaxisTheTroublemaker do
     end
 
     it "cannot be activated while the stack isn't empty" do
+      go_to_main_phase!
       shock = Card("Shock", owner: p1)
       p1.hand.add(shock)
       p1.add_mana(red: 1)
@@ -92,6 +93,7 @@ RSpec.describe Magic::Cards::JaxisTheTroublemaker do
 
     it "can be cast for {1}{R}, gaining haste" do
       p1.add_mana(generic: 1, red: 1)
+      go_to_main_phase!
       p1.cast(card: card, blitz: true) do |a|
         a.pay_mana(generic: { generic: 1 }, red: 1)
       end
@@ -104,6 +106,7 @@ RSpec.describe Magic::Cards::JaxisTheTroublemaker do
 
     it "sacrifices itself at the beginning of the next end step and draws a card when it dies" do
       p1.add_mana(generic: 1, red: 1)
+      go_to_main_phase!
       p1.cast(card: card, blitz: true) do |a|
         a.pay_mana(generic: { generic: 1 }, red: 1)
       end

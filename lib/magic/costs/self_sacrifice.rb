@@ -10,6 +10,10 @@ module Magic
         permanent.sacrifice!
       end
 
+      def can_pay?(_player)
+        permanent.zone&.battlefield?
+      end
+
       def finalize!(_player)
       end
     end

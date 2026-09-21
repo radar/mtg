@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe Magic::Cards::CelestialEnforcer do
   include_context "two player game"
 
-  let(:permanent) { ResolvePermanent("Celestial Enforcer", owner: p1) }
+  let!(:permanent) { ResolvePermanent("Celestial Enforcer", owner: p1) }
   let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
 
   context "activated ability" do

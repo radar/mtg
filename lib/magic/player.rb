@@ -67,8 +67,8 @@ module Magic
       else
         action = prepare_activate_ability(ability: ability, **args, &block)
       end
-      yield action if block_given?
       raise IllegalAction.new(action, action.illegal_reason || "its costs cannot be paid") unless action.can_perform?
+      yield action if block_given?
       action.pay_self_tap if action.has_cost?(Magic::Costs::SelfTap) && auto_tap
       action.pay_self_sacrifice if action.has_cost?(Magic::Costs::SelfSacrifice)
       action.pay_self_exile if action.has_cost?(Magic::Costs::SelfExile)

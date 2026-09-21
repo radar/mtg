@@ -41,6 +41,8 @@ RSpec.describe Magic::Cards::SerpentsSoulJar do
     elf.mark_for_death!
     game.tick!
     exiled_card = subject.exiled_cards.first
+    2.times { game.next_turn }
+    go_to_main_phase!
 
     ability = subject.activated_abilities.first
     p1.activate_ability(ability: ability)

@@ -9,6 +9,7 @@ RSpec.describe Magic::Cards::DeflectingSwat do
   let(:lightning_bolt) { Card("Lightning Bolt", owner: p2) }
 
   let!(:bolt_action) do
+    p2.hand.add(lightning_bolt)
     p2.add_mana(red: 1)
     action = cast_action(card: lightning_bolt, player: p2)
     action.pay_mana(red: 1)
@@ -19,6 +20,7 @@ RSpec.describe Magic::Cards::DeflectingSwat do
 
   context "when cast targeting a spell with a legal new target" do
     before do
+      p1.hand.add(deflecting_swat)
       p1.add_mana(red: 3)
       action = cast_action(card: deflecting_swat, player: p1)
       action.pay_mana(generic: { red: 2 }, red: 1)

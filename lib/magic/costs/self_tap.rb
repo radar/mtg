@@ -14,7 +14,7 @@ module Magic
       end
 
       def can_pay?(_player)
-        permanent.untapped? && (!permanent.creature? || permanent.haste? || !permanent.summoning_sick?)
+        permanent.untapped? && (!permanent.creature? || permanent.has_keyword?(:haste) || !permanent.summoning_sick?)
       end
 
       def finalize!(_player)

@@ -19,7 +19,7 @@ module Magic
         return "it is not #{player.inspect}'s turn" unless game.current_turn.active_player == player
         return "#{attacker.name} is tapped" if attacker.tapped?
         return "#{attacker.name} cannot attack" unless attacker.can_attack?
-        return "#{attacker.name} has summoning sickness" if attacker.summoning_sick? && !attacker.haste?
+        return "#{attacker.name} has summoning sickness" if attacker.summoning_sick? && !attacker.has_keyword?(:haste)
       end
 
       def perform

@@ -173,25 +173,6 @@ module Magic
         ))
       end
 
-      private
-
-      def instant_speed?
-        card.instant? || card.flash?
-      end
-
-      def castable_from_current_zone?
-        from_top_of_library = card.zone&.library? && card == player.library.first &&
-          game.battlefield.static_abilities.any? do |ability|
-            ability.respond_to?(:permits_casting_from_top?) && ability.permits_casting_from_top?(card)
-          end
-        from_exile = card.zone&.exile? &&
-          game.battlefield.static_abilities.any? do |ability|
-            ability.respond_to?(:permits_casting_from_exile?) && ability.permits_casting_from_exile?(card)
-          end
-
-        from_top_of_library || from_exile || (@flashback ? card.zone.graveyard? : card.zone.hand?)
-      end
-
       def choose_mode(mode_class, &)
         mode = Mode.new(mode_class.new(game: game, card: card))
         yield mode if block_given?
@@ -227,6 +208,25 @@ module Magic
             card.move_to_graveyard!(player)
           end
         end
+      end
+
+      private
+
+      def instant_speed?
+        card.instant? || card.flash?
+      end
+
+      def castable_from_current_zone?
+        from_top_of_library = card.zone&.library? && card == player.library.first &&
+          game.battlefield.static_abilities.any? do |ability|
+            ability.respond_to?(:permits_casting_from_top?) && ability.permits_casting_from_top?(card)
+          end
+        from_exile = card.zone&.exile? &&
+          game.battlefield.static_abilities.any? do |ability|
+            ability.respond_to?(:permits_casting_from_exile?) && ability.permits_casting_from_exile?(card)
+          end
+
+        from_top_of_library || from_exile || (@flashback ? card.zone&.graveyard? : card.zone&.hand?)
       end
     end
   end

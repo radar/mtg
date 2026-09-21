@@ -4,6 +4,7 @@ RSpec.describe Magic::Cards::AugurOfAutumn do
   include_context "two player game"
 
   it "reveals the top card and allows a top land to be played" do
+    go_to_main_phase!
     ResolvePermanent("Augur of Autumn", owner: p1)
     top_land = p1.library.first
 
@@ -14,6 +15,7 @@ RSpec.describe Magic::Cards::AugurOfAutumn do
   end
 
   it "allows a top creature to be cast with coven" do
+    go_to_main_phase!
     ResolvePermanent("Augur of Autumn", owner: p1)
     ResolvePermanent("Grizzly Bears", owner: p1)
     ResolvePermanent("Alpine Grizzly", owner: p1)

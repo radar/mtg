@@ -25,6 +25,7 @@ RSpec.describe Magic::Cards::ConspicuousSnoop do
   end
 
   it "lets you cast a Goblin spell from the top of your library" do
+    go_to_main_phase!
     goblin_spell = Card("Raging Goblin", owner: p1)
     p1.library.add(goblin_spell)
     p1.add_mana(red: 1)

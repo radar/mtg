@@ -116,6 +116,7 @@ RSpec.describe "action legality" do
 
       go_to_main_phase!
       p1.activate_loyalty_ability(ability: planeswalker.loyalty_abilities.first)
+      game.stack.resolve!
 
       expect do
         p1.activate_loyalty_ability(ability: planeswalker.loyalty_abilities.first)
@@ -129,6 +130,7 @@ RSpec.describe "action legality" do
       goblin = ResolvePermanent("Raging Goblin", owner: p1)
 
       skip_to_combat!
+      current_turn.declare_attackers!
 
       expect do
         p1.declare_attacker(attacker: bears, target: p2)
