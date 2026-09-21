@@ -123,6 +123,25 @@ module Magic
       players - [player]
     end
 
+    def remaining_players
+      players.reject(&:lost?)
+    end
+
+    # Rule 104.3: the game ends when at most one player is left (in a game of more than one player).
+    def over?
+      players.size > 1 && remaining_players.size <= 1
+    end
+
+    # Rule 104.4a: if every remaining player loses at the same time, the game is a draw.
+    # State-based actions make players lose together, so this is true after such a pass.
+    def drawn?
+      players.any? && remaining_players.empty?
+    end
+
+    def winner
+      remaining_players.first if over? && !drawn?
+    end
+
     def make_monarch!(player)
       return if monarch == player
 

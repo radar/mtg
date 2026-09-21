@@ -56,6 +56,27 @@ RSpec.describe "State-based actions (rule 704)" do
 
       expect(p1).not_to be_lost
     end
+
+    it "ends the game with the other player as the winner" do
+      expect(game).not_to be_over
+
+      p1.lose_life(20)
+      game.check_state_based_actions!
+
+      expect(game).to be_over
+      expect(game).not_to be_drawn
+      expect(game.winner).to eq(p2)
+    end
+
+    it "makes the game a draw when both players lose at the same time" do
+      p1.lose_life(20)
+      p2.lose_life(20)
+      game.check_state_based_actions!
+
+      expect(game).to be_over
+      expect(game).to be_drawn
+      expect(game.winner).to be_nil
+    end
   end
 
   describe "704.5b: a player who drew from an empty library loses" do
