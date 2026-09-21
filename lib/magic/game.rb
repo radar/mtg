@@ -119,6 +119,11 @@ module Magic
       @players = players.rotate(1)
     end
 
+    # The number of the most recent turn (up to and including the current one) that +player+ was the active player for.
+    def latest_turn_number_of(player)
+      turns.select { |turn| turn.number <= current_turn.number && turn.active_player == player }.map(&:number).max
+    end
+
     def opponents(player)
       players - [player]
     end

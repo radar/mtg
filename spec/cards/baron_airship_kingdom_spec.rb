@@ -16,6 +16,7 @@ RSpec.describe Magic::Cards::BaronAirshipKingdom do
   end
 
   it "taps for either blue or red" do
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:blue)
     end

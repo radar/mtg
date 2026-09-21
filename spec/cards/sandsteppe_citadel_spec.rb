@@ -17,24 +17,28 @@ RSpec.describe Magic::Cards::SandsteppeCitadel do
   end
 
   it "taps for white" do
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) { _1.choose(:white) }
 
     expect(p1.mana_pool[:white]).to eq(1)
   end
 
   it "taps for black" do
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) { _1.choose(:black) }
 
     expect(p1.mana_pool[:black]).to eq(1)
   end
 
   it "taps for green" do
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) { _1.choose(:green) }
 
     expect(p1.mana_pool[:green]).to eq(1)
   end
 
   it "cannot tap for another color" do
+    permanent.untap!
     expect {
       p1.activate_ability(ability: permanent.activated_abilities.first) { _1.choose(:blue) }
     }.to raise_error(/Invalid choice made for mana ability/)

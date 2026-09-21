@@ -73,6 +73,7 @@ RSpec.describe Magic::Cards::NecroblossomSnarl do
   it "taps for black or green" do
     p1.hand.items.clear
     permanent = play_land(Card("Necroblossom Snarl"))
+    permanent.untap!
 
     p1.activate_ability(ability: permanent.activated_abilities.first) { _1.choose(:green) }
 

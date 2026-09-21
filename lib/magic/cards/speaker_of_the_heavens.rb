@@ -6,7 +6,9 @@ module Magic
       cost white: 1
       creature_type "Human Cleric"
       keywords :vigilance, :lifelink
+    end
 
+    class SpeakerOfTheHeavens < Creature
       AngelToken = Token.create("Angel") do
         creature_type "Angel"
         power 4

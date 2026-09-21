@@ -11,6 +11,7 @@ RSpec.describe Magic::Cards::WorldMap do
 
   context "triggered ability" do
     it "searches for a basic land, reveals it" do
+      subject.untap!
       p1.add_mana(green: 1)
       p1.activate_ability(ability: subject.activated_abilities.first) do
         _1.pay_mana(generic: { green: 1 })
@@ -26,6 +27,7 @@ RSpec.describe Magic::Cards::WorldMap do
     end
 
     it "searches for a regular land, reveals it" do
+      subject.untap!
       p1.add_mana(green: 3)
       p1.activate_ability(ability: subject.activated_abilities.last) do
         _1.pay_mana(generic: { green: 3 })

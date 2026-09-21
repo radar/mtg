@@ -39,6 +39,8 @@ module Magic
     end
 
     attr_accessor :zone
+    # The number of the turn during which the current controller gained control of this permanent.
+    attr_accessor :controlled_since_turn
 
     def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false)
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:)
@@ -103,6 +105,7 @@ module Magic
       @phased_out = false
       @prepared = false
       @timestamp = timestamp
+      @controlled_since_turn = game.current_turn&.number
     end
 
     def kicked?
@@ -173,6 +176,18 @@ module Magic
 
     def controller=(other_controller)
       @controller = other_controller
+      @controlled_since_turn = game.current_turn&.number
+    end
+
+    # Rule 302.6: a creature's {T} abilities and its ability to attack need it to have been under its
+    # controller's control continuously since their most recent turn began, unless it has haste.
+    def summoning_sick?
+      return false unless creature?
+      return false if haste?
+      return false unless @controlled_since_turn
+
+      latest_turn = game.latest_turn_number_of(controller)
+      latest_turn.nil? || @controlled_since_turn >= latest_turn
     end
 
     def opponents

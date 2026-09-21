@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::ObNixilisReignited do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:card) { Card("Ob Nixilis Reignited") }
   subject(:planeswalker) { Magic::Permanent.resolve(game: game, owner: p1, card: card) }
@@ -47,6 +48,8 @@ RSpec.describe Magic::Cards::ObNixilisReignited do
     let(:ability) { planeswalker.loyalty_abilities[2] }
 
     it "gives target opponent an emblem that makes them lose 2 life whenever a player draws a card" do
+
+      planeswalker.change_loyalty!(8)
       p1.activate_loyalty_ability(ability: ability) { _1.targeting(p2) }
       game.stack.resolve!
       game.tick!

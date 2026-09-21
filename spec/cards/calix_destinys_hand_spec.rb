@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::CalixDestinysHand do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:card) { Card("Calix, Destiny's Hand") }
   subject(:planeswalker) { Magic::Permanent.resolve(game: game, owner: p1, card: card) }
@@ -82,6 +83,9 @@ RSpec.describe Magic::Cards::CalixDestinysHand do
         p1.activate_loyalty_ability(ability: planeswalker.loyalty_abilities.first)
         game.stack.resolve!
         game.tick!
+        # A planeswalker can only activate one loyalty ability per turn
+        2.times { game.next_turn }
+        go_to_main_phase!
       end
     end
 

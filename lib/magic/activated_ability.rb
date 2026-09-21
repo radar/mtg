@@ -10,6 +10,11 @@ module Magic
       self.class.name
     end
 
+    # Conditions beyond costs that must hold to activate (e.g. "activate only as a sorcery").
+    def requirements_met?
+      true
+    end
+
     def valid_targets?(*targets)
       targets.all? { target_choices.include?(_1) }
     end

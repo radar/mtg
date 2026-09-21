@@ -108,6 +108,10 @@ module Magic
         has_keyword?(Keywords::INDESTRUCTIBLE)
       end
 
+      def haste?
+        has_keyword?(Keywords::HASTE)
+      end
+
       def flash?
         has_keyword?(Keywords::FLASH)
       end

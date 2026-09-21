@@ -34,7 +34,8 @@ RSpec.describe Magic::Cards::RaidBombardment do
   context "whenever a creature an opponent controls with power 2 or less attacks" do
     it "does not deal damage" do
       goblin = ResolvePermanent("Grizzly Bears", owner: p2)
-      skip_to_combat!
+      go_to_main_phase_for!(p2)
+      current_turn.beginning_of_combat!
       current_turn.declare_attackers!
       p2.declare_attacker(attacker: goblin, target: p1)
       current_turn.attackers_declared!

@@ -5,6 +5,7 @@ RSpec.describe Magic::Cards::IndathaTriome do
 
   it "enters tapped and taps for white, black, or green" do
     triome = ResolvePermanent("Indatha Triome", owner: p1)
+    triome.untap!
     p1.activate_ability(ability: triome.activated_abilities.first) { _1.choose(:green) }
 
     expect(triome).to be_tapped

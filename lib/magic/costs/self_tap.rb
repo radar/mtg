@@ -12,7 +12,13 @@ module Magic
       end
 
       def can_pay?(_player)
-        permanent.untapped?
+        unpayable_reason.nil?
+      end
+
+      def unpayable_reason
+        return "#{permanent.name} is already tapped" if permanent.tapped?
+
+        "#{permanent.name} is summoning sick" if permanent.summoning_sick?
       end
 
       def finalize!(_player)

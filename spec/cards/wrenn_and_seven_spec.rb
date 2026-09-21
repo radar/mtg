@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::WrennAndSeven do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:card) { Card("Wrenn And Seven") }
   subject(:planeswalker) { Magic::Permanent.resolve(game: game, owner: p1, card: card) }
@@ -97,10 +98,12 @@ RSpec.describe Magic::Cards::WrennAndSeven do
     end
 
     it "returns permanent cards from the graveyard to hand and grants an emblem" do
+
+      planeswalker.change_loyalty!(3)
       p1.activate_loyalty_ability(ability: ability)
       game.stack.resolve!
 
-      expect(planeswalker.loyalty).to eq(-3)
+      expect(planeswalker.loyalty).to eq(0)
       expect(p1.hand).to include(sol_ring, wood_elves)
       expect(p1.graveyard).to be_empty
       expect(game.emblems.count).to eq(1)

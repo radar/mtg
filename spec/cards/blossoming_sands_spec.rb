@@ -21,6 +21,7 @@ RSpec.describe Magic::Cards::BlossomingSands do
   end
 
   it "taps for green" do
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:green)
     end
@@ -29,6 +30,7 @@ RSpec.describe Magic::Cards::BlossomingSands do
   end
 
   it "taps for white" do
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:white)
     end
@@ -39,6 +41,7 @@ RSpec.describe Magic::Cards::BlossomingSands do
   end
 
   it "cannot tap for another color" do
+    permanent.untap!
     expect {
       p1.activate_ability(ability: permanent.activated_abilities.first) do
         _1.choose(:blue)

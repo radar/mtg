@@ -5,7 +5,9 @@ RSpec.describe Magic::Cards::Arachnogenesis do
 
   it "creates one Spider for each attacking creature" do
     attacker = ResolvePermanent("Grizzly Bears", owner: p2)
-    skip_to_combat!
+    go_to_main_phase_for!(p2)
+    current_turn.beginning_of_combat!
+    current_turn.declare_attackers!
     p2.declare_attacker(attacker: attacker, target: p1)
     card = Card("Arachnogenesis", owner: p1)
     p1.hand.add(card)

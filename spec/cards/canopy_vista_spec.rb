@@ -22,8 +22,10 @@ RSpec.describe Magic::Cards::CanopyVista do
 
   it "taps for green or white" do
     permanent = play_land(card)
+    permanent.untap!
 
     p1.activate_ability(ability: permanent.activated_abilities.first) { _1.choose(:green) }
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) { _1.choose(:white) }
 
     expect(p1.mana_pool.slice(:green, :white)).to eq(green: 1, white: 1)

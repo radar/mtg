@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Game, "attackers declared" do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p1) }
   let!(:basri_ket) { ResolvePermanent("Basri Ket", owner: p1) }

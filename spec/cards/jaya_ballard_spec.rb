@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::JayaBallard do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:card) { Card("Jaya Ballard") }
   subject(:planeswalker) { Magic::Permanent.resolve(game: game, owner: p1, card: card) }
@@ -66,6 +67,8 @@ RSpec.describe Magic::Cards::JayaBallard do
     let(:ability) { planeswalker.loyalty_abilities[2] }
 
     it "gives you an emblem letting you cast instant and sorcery spells from your graveyard, exiling them after" do
+
+      planeswalker.change_loyalty!(8)
       p1.activate_loyalty_ability(ability: ability)
       game.stack.resolve!
       game.tick!

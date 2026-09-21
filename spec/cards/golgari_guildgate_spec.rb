@@ -16,6 +16,7 @@ RSpec.describe Magic::Cards::GolgariGuildgate do
   end
 
   it "taps for either black or green" do
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:black)
     end

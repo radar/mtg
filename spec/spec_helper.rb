@@ -7,13 +7,19 @@ module CardHelper
     Magic::Cards.const_get(name.gsub("\sof\s", "Of").gsub(/[^a-z]/i, "").gsub(/\s(a-z)/) { $1.upcase }).new(game: game, owner:, **args)
   end
 
-  def Permanent(name, **args)
-    Magic::Permanent.new(game: game, card: Card(name), **args)
+  # Permanents built by the spec helpers count as having been on the battlefield since before the
+  # game's first turn, so they are not summoning sick. Pass summoning_sick: true to opt out.
+  def Permanent(name, summoning_sick: false, **args)
+    permanent = Magic::Permanent.new(game: game, card: Card(name), **args)
+    permanent.controlled_since_turn = 0 unless summoning_sick
+    permanent
   end
 
-  def ResolvePermanent(name, **args)
+  def ResolvePermanent(name, summoning_sick: false, **args)
     card = Card(name)
-    Magic::Permanent.resolve(game: game, card: card, **args)
+    permanent = Magic::Permanent.resolve(game: game, card: card, **args)
+    permanent.controlled_since_turn = 0 unless summoning_sick
+    permanent
   end
 
   def AddLand(name, **args)

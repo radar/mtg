@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::UginTheSpiritDragon do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject(:ugin) { ResolvePermanent("Ugin, The Spirit Dragon", owner: p1) }
 

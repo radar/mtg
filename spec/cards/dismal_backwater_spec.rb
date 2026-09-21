@@ -21,6 +21,7 @@ RSpec.describe Magic::Cards::DismalBackwater do
   end
 
   it "taps for blue" do
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:blue)
     end
@@ -31,6 +32,7 @@ RSpec.describe Magic::Cards::DismalBackwater do
   end
 
   it "taps for black" do
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:black)
     end
@@ -41,6 +43,7 @@ RSpec.describe Magic::Cards::DismalBackwater do
   end
 
   it "cannot tap for another color" do
+    permanent.untap!
     expect {
       p1.activate_ability(ability: permanent.activated_abilities.first) do
         _1.choose(:white)

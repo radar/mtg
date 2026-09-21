@@ -6,6 +6,7 @@ RSpec.describe Magic::Cards::SwiftfootBoots do
   it "grants hexproof and haste to an equipped creature" do
     creature = ResolvePermanent("Grizzly Bears", owner: p1)
     equipment = ResolvePermanent("Swiftfoot Boots", owner: p1)
+    equipment.untap!
     p1.add_mana(generic: 1)
     p1.activate_ability(ability: equipment.activated_abilities.first) do |ability|
       ability.targeting(creature)

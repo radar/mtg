@@ -91,6 +91,13 @@ Two independent halves.
 
 ### C1. Action legality and timing enforcement
 
+**Status (2026-09-21): done on branch `action-legality` (three commits), not yet merged.** `Action#illegal_reason`/`#legal?` plus `Turn#take_action` raising `Magic::IllegalAction`; details, gotchas and the spec-side consequences are in `CLAUDE.md` under "Action Legality". Deviations and leftovers:
+- `can_perform?` stayed as the advisory affordability check; `illegal_reason` is the new contract, because it runs after costs are paid. So timing/requirement failures can still leave mana spent or a source tapped (only `{T}` is checked as it is paid). Real fix belongs with G3 (cost framework) or A (priority), which should check legality *before* costs are paid.
+- A card with no zone (bare spec fixture) is treated as being in hand. Every spec that casts still needs a real zone before this can be strict; that is a mechanical follow-up.
+- `by_effect: true` on `Cast` is a stopgap for effect-instructed casts (rebound, Idol of Endurance); G3 should replace it with proper alternative-cost/permission objects.
+- Not covered: planeswalker abilities beyond one per turn per walker (no "additional activation" effects), attacking a planeswalker or battle vs a player, attack requirements/costs (D4), flash-granting effects ("cast as though it had flash"), the adventure half's own card type (adventures are treated as sorcery-speed, which is wrong for an instant adventure), abilities activated from non-battlefield zones, `{T}`-cost checks for `Costs::Tap`/`MultiTap`.
+- Bugs this surfaced and fixed: Oracle of Mul Daya and Radha never had a top-of-library permission, Valakut Exploration had no exile permission, `Token` lacked `additional_lands_per_turn`, Speaker of the Heavens leaked `Magic::Cards::ActivatedAbility` (order-dependent World Map failure), and about 20 specs that only passed because timing, tapped state or loyalty cost were never checked.
+
 **Problem.** Nothing stops a player casting a sorcery during combat, playing a second land, attacking with a summoning-sick or tapped creature, or activating a planeswalker ability twice in a turn. `Game::Turn#can_cast_sorcery?` exists (`turn.rb:220`) but is not enforced.
 
 **Scope.** `Action#legal?` (or make `can_perform?` a real base-class contract) that `Turn#take_action` checks, raising `Magic::IllegalAction` with a reason. Rules to enforce: sorcery-speed timing (main phase, empty stack, active player), flash/instant timing, one land per turn (already partly in `PlayLand`), summoning sickness for attack and `{T}` costs (unless haste), tapped/untapped requirements, planeswalker one-activation-per-turn, `player.spell_cast_limit`, cards must be in the correct zone, costs payable.

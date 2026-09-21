@@ -102,6 +102,7 @@ RSpec.describe Magic::Cards::ShineshadowSnarl do
   it "taps for white or black" do
     p1.hand.items.clear
     permanent = play_land(Card("Shineshadow Snarl"))
+    permanent.untap!
 
     p1.activate_ability(ability: permanent.activated_abilities.first) { _1.choose(:white) }
 

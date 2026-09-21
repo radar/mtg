@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::GristTheHungerTide do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:card) { Card("Grist, The Hunger Tide") }
   subject(:planeswalker) { Magic::Permanent.resolve(game: game, owner: p1, card: card) }

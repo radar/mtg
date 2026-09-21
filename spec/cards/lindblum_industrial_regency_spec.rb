@@ -19,6 +19,7 @@ RSpec.describe Magic::Cards::LindblumIndustrialRegency do
     end
 
     it "taps for red mana" do
+      permanent.untap!
       expect(p1).to receive(:add_mana).with(red: 1)
 
       p1.activate_ability(ability: permanent.activated_abilities.first)

@@ -5,6 +5,7 @@ RSpec.describe Magic::Cards::FesteringThicket do
 
   it "enters tapped and produces black or green" do
     land = ResolvePermanent("Festering Thicket", owner: p1)
+    land.untap!
     p1.activate_ability(ability: land.activated_abilities.first) { _1.choose(:green) }
 
     expect(land).to be_tapped

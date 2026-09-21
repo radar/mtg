@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::RepeatedReverberation do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   def cast_repeated_reverberation
     p1.add_mana(red: 4)

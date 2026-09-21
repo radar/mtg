@@ -22,6 +22,16 @@ module Magic
         ability
       end
 
+      def illegal_reason
+        return "#{player.inspect} does not control #{planeswalker.name}" if planeswalker.controller != player
+        if !ability.instant_speed? && (reason = sorcery_speed_reason)
+        return "loyalty abilities can only be activated at sorcery speed, but #{reason}"
+      end
+
+        return "#{planeswalker.name} has already activated a loyalty ability this turn" if activated_this_turn?
+        return "#{planeswalker.name} does not have enough loyalty" if planeswalker.loyalty + loyalty_change < 0
+      end
+
       def targeting(*targets)
         @targets = targets
         self
@@ -33,15 +43,19 @@ module Magic
       end
 
       def perform
-        loyalty_change = if ability.loyalty_change == :X
-          -(x_value)
-        else
-          ability.loyalty_change
-        end
-
         planeswalker.change_loyalty!(loyalty_change)
         game.notify!(Events::AbilityActivated.new(ability: ability, player: player))
         game.stack.add(self)
+      end
+
+      def loyalty_change
+        ability.loyalty_change == :X ? -(x_value.to_i) : ability.loyalty_change
+      end
+
+      def activated_this_turn?
+        game.current_turn.actions.any? do |action|
+          action.is_a?(ActivateLoyaltyAbility) && action.planeswalker == planeswalker
+        end
       end
 
       def resolve!

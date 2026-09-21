@@ -178,6 +178,33 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 **Putting a specific card on top of the library in a spec**: Use `player.library.add(card)` (default `placement: 0`, so it lands on top), not `player.library.unshift(card)`. `Zone#add` sets `card.zone = self`; `unshift` is a raw delegated Array method that skips it. A card with an unset `zone` silently fails to be removed from its zone when later moved (`move_to_hand!`/`resolve!` no-op on `from.remove` because `from` is nil), so it ends up duplicated instead of moved.
 
+## Action Legality
+
+`Turn#take_action` (so `player.cast`, `play_land`, `activate_ability`, `activate_loyalty_ability`, `declare_attacker`, `cycle`) asks `action.illegal_reason` first and raises `Magic::IllegalAction` (with `#reason`) instead of performing. `Action#legal?` is the boolean form. What is enforced:
+
+- **Cast**: sorcery timing (active player, main phase, empty stack) unless the card is an instant or has flash; zone (hand, flashback graveyard, or a permitted zone); `spell_cast_limit`.
+- **PlayLand**: same sorcery timing, zone, `player.can_play_lands?`.
+- **ActivateAbility**: activator controls the source; `source.can_activate_ability?`; `ability.requirements_met?` (default `true` on `ActivatedAbility`); a `{T}` cost needs an untapped, non-summoning-sick source (`Costs::SelfTap#unpayable_reason`, checked in `ActivateAbility#pay` as the cost is paid).
+- **ActivateLoyaltyAbility**: controller, sorcery timing unless the ability's `instant_speed?` is true (Teferi, Master of Time), one activation per planeswalker per turn, loyalty must cover a negative cost.
+- **DeclareAttacker**: declare attackers step, active player, creature you control, untapped, `can_attack?` (defender), not summoning sick. Re-declaring an already-attacking creature just retargets and skips the tapped/sickness checks. Specs that call `current_turn.declare_attacker` directly (the `CombatPhase` delegate) still bypass all of this.
+- **Cycle**: card must be in hand.
+
+`can_perform?` (on `Cast`, `PlayLand`, `Cycle`) is a separate, advisory "could this player afford/do this" check for UIs; `illegal_reason` runs after costs have been paid, so it must not check affordability. Consequence: a `{T}`/mana cost is paid before the legality check runs for timing/requirement failures, so an illegal `Cast` or `ActivateAbility` can leave the mana spent or the source tapped. Only the `{T}` cost itself is checked at payment time.
+
+**Summoning sickness**: `Permanent#summoning_sick?` is true for a non-haste creature whose `controlled_since_turn` is not before the controller's latest turn (`Game#latest_turn_number_of`). `Permanent#controller=` resets it. Grant haste with `grant_haste!` **and `game.tick!`** — the keyword only shows up once continuous effects are recalculated.
+
+**Zone permissions**: a card may be cast/played from the top of the library, exile or graveyard only if some battlefield static ability defines `permits_casting_from_top?(card)` / `permits_casting_from_exile?(card)` returning true (these also gate `PlayLand`, so a "play lands from the top of your library" card needs `card.land?` in its check), or an emblem defines `permits_casting_from_graveyard?`. A cast an effect instructs (rebound, "you may cast it" on resolution) passes `by_effect: true` to skip zone and timing checks (rule 608.2g). Cards exiled on an adventure carry `card.on_adventure` (cleared when they leave exile). A card with **no zone at all** (a bare `Card(...)` fixture) is treated as being in hand; every other zone is checked for real.
+
+**Spec consequences** (the shared "two player game" context leaves turn 1 in the `beginning` step):
+
+- Anything sorcery-speed (creatures without flash, sorceries, enchantments, artifacts, lands, loyalty abilities) needs `before { go_to_main_phase! }`. `go_to_main_phase!` is idempotent and steps through the draw step, so the library's top card shifts by one.
+- The opponent casting a sorcery-speed spell needs their own turn: `go_to_main_phase_for!(p2)` (repeats `game.next_turn` until `p2` is active). Instants and flash creatures are fine any time.
+- Two sorcery-speed casts in a row need `game.stack.resolve!` between them (the stack must be empty).
+- `ResolvePermanent`/`Permanent` in specs backdate the permanent (`controlled_since_turn = 0`) so it is not summoning sick; pass `summoning_sick: true` to test sickness. Creatures that enter via `p1.cast` + `game.stack.resolve!` are sick for real.
+- Lands with "enters tapped" need `permanent.untap!` before you activate their mana ability, and a mana source needs `untap!` between two activations.
+- A loyalty ability that costs more than the planeswalker has needs `planeswalker.change_loyalty!(n)` first. Two copies of a legendary planeswalker trigger a pending legend-rule choice that blocks all stack resolution.
+- **DSL-block leak**: a `class Foo` written inside a `Creature("Name") do ... end` block lands in `Magic::Cards::Foo`, and a bare `ActivatedAbility` in *any* other card then resolves to whichever leaked `Magic::Cards::ActivatedAbility` loaded last. It showed up as a spec that passed alone and failed in the full suite (`Speaker of the Heavens`, fixed). Put nested classes in a class reopening.
+
 ## Card Ability Patterns
 
 Moved to `docs/card_patterns.md` (Common Card Ability Patterns, TriggeredAbility Subclasses, Static Ability Subclasses, CardList Helper Methods) — kept out of this file since it only matters when implementing a card; `implement-card` skill reads it directly.

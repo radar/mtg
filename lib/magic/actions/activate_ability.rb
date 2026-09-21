@@ -22,6 +22,14 @@ module Magic
         ability
       end
 
+      def illegal_reason
+        source = ability.source
+        return "#{player.inspect} does not control #{source.name}" if source.respond_to?(:controller) && source.controller != player
+        return "#{source.name}'s ability cannot be activated" if source.respond_to?(:can_activate_ability?) && !source.can_activate_ability?(ability)
+
+        "the requirements to activate #{source.name}'s ability are not met" unless ability.requirements_met?
+      end
+
       def valid_targets?(*targets)
         ability.valid_targets?(*targets)
       end
@@ -99,6 +107,7 @@ module Magic
 
         cost = costs.find { |cost| cost.is_a?(cost_type) }
         raise "Unknown cost: #{cost_type}" if cost.nil?
+        raise IllegalAction.new(self, cost.unpayable_reason) if cost.respond_to?(:unpayable_reason) && cost.unpayable_reason
 
         if cost.is_a?(Costs::Mana) && (any_color_for_creature_activations? || any_color_for_any_cost?)
           cost.treat_any_color_as_any!

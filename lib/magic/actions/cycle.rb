@@ -21,6 +21,10 @@ module Magic
         card.zone.hand? && mana_cost.can_pay?(player)
       end
 
+      def illegal_reason
+        "#{card.name} is not in hand" unless in_permitted_zone?(card) && (card.zone.nil? || card.zone.hand?)
+      end
+
       def perform
         mana_cost.finalize!(player)
         card.discard!

@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::TeferiMasterOfTime do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject(:planeswalker) { ResolvePermanent("Teferi, Master Of Time") }
 
@@ -63,6 +64,8 @@ RSpec.describe Magic::Cards::TeferiMasterOfTime do
     let(:ability) { planeswalker.loyalty_abilities[2] }
 
     it "take two additional turns" do
+
+      planeswalker.change_loyalty!(10)
       p1.activate_loyalty_ability(ability: ability)
 
       game.stack.resolve!

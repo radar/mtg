@@ -24,6 +24,7 @@ RSpec.describe Magic::Cards::TempleOfMystery do
   end
 
   it "taps for blue" do
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:blue)
     end
@@ -32,6 +33,7 @@ RSpec.describe Magic::Cards::TempleOfMystery do
   end
 
   it "taps for green" do
+    permanent.untap!
     p1.activate_ability(ability: permanent.activated_abilities.first) do
       _1.choose(:green)
     end
@@ -40,6 +42,7 @@ RSpec.describe Magic::Cards::TempleOfMystery do
   end
 
   it "cannot tap for another color" do
+    permanent.untap!
     expect {
       p1.activate_ability(ability: permanent.activated_abilities.first) do
         _1.choose(:black)
