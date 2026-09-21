@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::OracleOfMulDaya do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "reveals the top card of its controller's library" do
     ResolvePermanent("Oracle of Mul Daya", owner: p1)

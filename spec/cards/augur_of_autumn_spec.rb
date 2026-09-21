@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::AugurOfAutumn do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "reveals the top card and allows a top land to be played" do
     ResolvePermanent("Augur of Autumn", owner: p1)

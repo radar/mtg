@@ -229,6 +229,7 @@ module Magic
 
         if @adventure
           card.exile!
+          card.on_adventure = true
         elsif card.sorcery? || card.instant?
           if @flashback
             card.exile!
@@ -247,26 +248,7 @@ module Magic
       private
 
       def castable_from_current_zone?
-        zone = card.zone
-        return true unless zone # a card that was never placed in a zone (bare spec fixture) is treated as being in hand
-        return zone.graveyard? if @flashback && zone.graveyard?
-        return true if zone.hand? && !@flashback
-
-        (zone.library? && card == player.library.first && permitted_by_static_ability?(:permits_casting_from_top?)) ||
-          (zone.exile? && permitted_by_static_ability?(:permits_casting_from_exile?)) ||
-          (zone.graveyard? && permitted_by_emblem?(:permits_casting_from_graveyard?))
-      end
-
-      def permitted_by_static_ability?(permission)
-        game.battlefield.static_abilities.any? do |ability|
-          ability.respond_to?(permission) && ability.public_send(permission, card)
-        end
-      end
-
-      def permitted_by_emblem?(permission)
-        game.emblems.any? do |emblem|
-          emblem.owner == player && emblem.respond_to?(permission) && emblem.public_send(permission, card)
-        end
+        in_permitted_zone?(card, flashback: @flashback)
       end
     end
   end

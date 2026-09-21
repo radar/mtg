@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::ShineshadowSnarl do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   context "without a Plains or Swamp in hand" do
     before { p1.hand.items.clear }

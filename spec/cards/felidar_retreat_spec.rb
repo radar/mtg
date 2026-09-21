@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::FelidarRetreat do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:retreat) { ResolvePermanent("Felidar Retreat", owner: p1) }
   let(:forest) { Card("Forest", owner: p1) }

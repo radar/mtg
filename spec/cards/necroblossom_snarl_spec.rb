@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::NecroblossomSnarl do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   context "without a Swamp or Forest in hand" do
     before { p1.hand.items.clear }

@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::ScuteSwarm do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject { ResolvePermanent("Scute Swarm", owner: p1) }
   let(:forest) { Card("Forest") }

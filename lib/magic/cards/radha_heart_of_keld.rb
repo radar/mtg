@@ -29,7 +29,13 @@ module Magic
         end
       end
 
-      def static_abilities = [FirstStrikeGrant]
+      class TopLibraryPermission < StaticAbility
+        def permits_casting_from_top?(card)
+          card == controller.library.first && card.land?
+        end
+      end
+
+      def static_abilities = [FirstStrikeGrant, TopLibraryPermission]
       def activated_abilities = [PumpAbility]
     end
   end

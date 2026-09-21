@@ -2,6 +2,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::Spelunking do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   it "draws a card and puts a land from hand onto the battlefield" do
     land = Card("Forest", owner: p1)

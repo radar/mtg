@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::SazhsChocobo do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let!(:permanent) { ResolvePermanent("Sazh's Chocobo") }
 

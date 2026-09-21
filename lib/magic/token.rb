@@ -9,6 +9,8 @@ module Magic
     KEYWORDS = []
     PROTECTIONS = []
 
+    def additional_lands_per_turn = 0
+
     class << self
       def create(name, &block)
         token = Class.new(Token, &block)

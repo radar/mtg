@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::Panharmonicon do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   subject!(:panharmonicon) { ResolvePermanent("Panharmonicon", owner: p1) }
 

@@ -14,7 +14,9 @@ module Magic
     attr_accessor :chosen_color
     attr_accessor :tapped
 
-    attr_accessor :zone
+    attr_reader :zone
+    # True while this card sits in exile as an adventure, from where its owner may cast it later.
+    attr_accessor :on_adventure
 
     COST = {}
     KICKER_COST = {}
@@ -190,6 +192,11 @@ module Magic
 
     def move_to_graveyard!(target_controller = controller)
       move_zone!(to: target_controller.graveyard)
+    end
+
+    def zone=(zone)
+      @on_adventure = false unless zone&.exile?
+      @zone = zone
     end
 
     def move_zone!(to:)

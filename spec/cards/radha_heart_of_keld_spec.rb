@@ -4,6 +4,7 @@ require "spec_helper"
 
 RSpec.describe Magic::Cards::RadhaHeartOfKeld do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   let(:radha) { ResolvePermanent("Radha, Heart Of Keld") }
 
@@ -25,6 +26,7 @@ RSpec.describe Magic::Cards::RadhaHeartOfKeld do
 
   context "play lands from top of library" do
     before do
+      radha
       p1.library.add(Card("Forest"))
     end
 

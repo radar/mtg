@@ -2,6 +2,7 @@ require 'spec_helper'
 
 RSpec.describe Magic::Cards::Bloodghast do
   include_context "two player game"
+  before { go_to_main_phase! }
 
   context "on the battlefield" do
     let(:bloodghast) { ResolvePermanent("Bloodghast") }

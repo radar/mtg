@@ -10,6 +10,15 @@ module Magic
     class OracleOfMulDaya < Creature
       def additional_lands_per_turn = 1
 
+      class TopLibraryPermission < StaticAbility
+        def permits_casting_from_top?(card)
+          card == controller.library.first && card.land?
+        end
+      end
+
+
+      def static_abilities = [TopLibraryPermission]
+
       class TopCardRevealTrigger < TriggeredAbility
         def should_perform?
           (event.is_a?(Events::CardDraw) && event.player == controller) ||
