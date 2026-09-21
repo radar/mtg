@@ -80,23 +80,25 @@ module Magic
       end
 
       def can_perform?
-        from_top_of_library = card.zone&.library? && card == player.library.first &&
-          game.battlefield.static_abilities.any? do |ability|
-            ability.respond_to?(:permits_casting_from_top?) && ability.permits_casting_from_top?(card)
-          end
-        from_exile = card.zone&.exile? &&
-          game.battlefield.static_abilities.any? do |ability|
-            ability.respond_to?(:permits_casting_from_exile?) && ability.permits_casting_from_exile?(card)
-          end
-        from_graveyard = card.zone&.graveyard? &&
-          game.emblems.any? do |emblem|
-            emblem.owner == player &&
-              emblem.respond_to?(:permits_casting_from_graveyard?) && emblem.permits_casting_from_graveyard?(card)
-          end
-        return false unless from_top_of_library || from_exile || from_graveyard || (@flashback ? card.zone.graveyard? : card.zone.hand?)
+        return false unless castable_from_current_zone?
         return true if mana_cost.zero?
 
         mana_cost.can_pay?(player)
+      end
+
+      def illegal_reason
+        return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
+
+        if !instant_speed? && (reason = sorcery_speed_reason)
+          return "#{card.name} can only be cast at sorcery speed, but #{reason}"
+        end
+
+        "#{player.inspect} cannot cast any more spells this turn" if player.spell_cast_limit_reached?
+      end
+
+      # Instants and spells with flash can be cast any time the player has priority.
+      def instant_speed?
+        card.instant? || card.flash?
       end
 
       def target_choices
@@ -238,6 +240,10 @@ module Magic
             card.move_to_graveyard!(player)
           end
         end
+      end
+
+      def castable_from_current_zone?
+
       end
     end
   end
