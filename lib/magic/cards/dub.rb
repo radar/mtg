@@ -4,6 +4,8 @@ module Magic
       card_name "Dub"
       cost "{2}{W}"
 
+      enchant "Creature"
+
       def target_choices
         battlefield.creatures
       end

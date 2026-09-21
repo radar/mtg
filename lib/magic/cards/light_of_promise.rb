@@ -6,6 +6,8 @@ module Magic
 
       # ...
 
+      enchant "Creature"
+
       def target_choices
         battlefield.creatures
       end

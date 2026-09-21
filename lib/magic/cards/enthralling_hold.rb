@@ -10,6 +10,8 @@ module Magic
       NAME = "Enthralling Hold"
       COST = { generic: 3, blue: 2 }
 
+      enchant "Creature"
+
       def target_choices
         battlefield.creatures.tapped
       end

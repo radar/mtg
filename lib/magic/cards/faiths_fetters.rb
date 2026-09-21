@@ -4,6 +4,8 @@ module Magic
       NAME = "Faith's Fetters"
       COST = { generic: 3, white: 1 }
 
+      enchant :permanent
+
       def target_choices
         battlefield.permanents
       end

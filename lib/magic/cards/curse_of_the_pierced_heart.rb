@@ -6,6 +6,8 @@ module Magic
     end
 
     class CurseOfThePiercedHeart < Aura
+      enchant :player
+
       def target_choices
         game.players
       end

@@ -4,6 +4,8 @@ module Magic
       card_name "Crown of Skemfar"
       cost "{2}{G}{G}"
 
+      enchant "Creature"
+
       def target_choices
         battlefield.creatures
       end

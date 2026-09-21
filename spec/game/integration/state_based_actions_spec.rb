@@ -218,6 +218,73 @@ RSpec.describe "State-based actions (rule 704)" do
 
       expect(fetters.zone).not_to be_nil
     end
+
+    context "enchant restrictions" do
+      let!(:forest) { ResolvePermanent("Forest", owner: p1) }
+
+      it "puts an Aura with 'enchant creature' into the graveyard when it is on a non-creature" do
+        dub = ResolvePermanent("Dub", owner: p1)
+        dub.attach_to!(forest)
+        game.check_state_based_actions!
+
+        expect(dub.zone).to be_nil
+        expect(dub.card.zone).to eq(p1.graveyard)
+      end
+
+      it "keeps an Aura with 'enchant creature' on any creature, whoever controls it" do
+        dub = ResolvePermanent("Dub", owner: p1)
+        dub.attach_to!(ResolvePermanent("Grizzly Bears", owner: p2))
+        game.check_state_based_actions!
+
+        expect(dub.zone).not_to be_nil
+      end
+
+      it "puts an Aura with 'enchant creature you control' into the graveyard on an opponent's creature" do
+        training = ResolvePermanent("Setessan Training", owner: p1)
+        game.choices.clear
+        training.attach_to!(ResolvePermanent("Grizzly Bears", owner: p2))
+        game.check_state_based_actions!
+
+        expect(training.zone).to be_nil
+      end
+
+      it "keeps an Aura with 'enchant creature you control' on its controller's creature" do
+        training = ResolvePermanent("Setessan Training", owner: p1)
+        training.attach_to!(bears)
+        game.check_state_based_actions!
+
+        expect(training.zone).not_to be_nil
+      end
+
+      it "enforces 'enchant Forest'" do
+        sprawl = ResolvePermanent("Utopia Sprawl", owner: p1)
+        game.choices.clear
+        sprawl.attach_to!(forest)
+        game.check_state_based_actions!
+        expect(sprawl.zone).not_to be_nil
+
+        sprawl.attach_to!(ResolvePermanent("Mountain", owner: p1))
+        game.check_state_based_actions!
+        expect(sprawl.zone).to be_nil
+      end
+    end
+
+    it "puts an Aura into the graveyard when its host gains protection from it" do
+      dub = ResolvePermanent("Dub", owner: p1)
+      dub.attach_to!(bears)
+      bears.gains_protection_from_color(:white, until_eot: false)
+      game.check_state_based_actions!
+
+      expect(dub.zone).to be_nil
+    end
+
+    it "keeps an Aura on a player (a Curse)" do
+      curse = ResolvePermanent("Curse Of The Pierced Heart", owner: p1)
+      curse.attach_to!(p2)
+      game.check_state_based_actions!
+
+      expect(curse.zone).not_to be_nil
+    end
   end
 
   describe "704.5n: Equipment attached to something illegal becomes unattached" do

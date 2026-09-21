@@ -5,6 +5,8 @@ module Magic
       COST = { generic: 3, white: 1 }
       keywords :flash
 
+      enchant "Creature"
+
       def target_choices
         battlefield.creatures
       end

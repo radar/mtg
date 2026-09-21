@@ -67,11 +67,11 @@ module Magic
         planeswalkers.any?
       end
 
-      # Rule 704.5m: an Aura attached to nothing, or to something no longer on the battlefield.
-      # Enchant restrictions (e.g. "enchant creature") are not re-checked.
+      # Rule 704.5m: an Aura attached to nothing, to something that has left the battlefield, to
+      # something that has protection from it, or to something its "enchant" restriction doesn't allow.
       def put_illegally_attached_auras_into_graveyard
         auras = game.battlefield.permanents.select do |permanent|
-          aura?(permanent) && !attached_to_legal_host?(permanent)
+          aura?(permanent) && !legally_enchanting?(permanent)
         end
         auras.each(&:put_into_graveyard!)
         auras.any?
@@ -140,6 +140,15 @@ module Magic
 
       def equipment?(permanent)
         permanent.card.is_a?(Cards::Equipment) || permanent.type?("Equipment")
+      end
+
+      def legally_enchanting?(aura)
+        return false unless attached_to_legal_host?(aura)
+
+        host = aura.attached_to
+        return false if host.protected_from?(aura)
+
+        !aura.card.respond_to?(:can_enchant?) || aura.card.can_enchant?(host, aura: aura)
       end
 
       # An attachment's host is legal while it is a player (e.g. a Curse) or still on the battlefield.

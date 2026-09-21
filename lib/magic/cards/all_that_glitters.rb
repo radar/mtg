@@ -5,6 +5,8 @@ module Magic
     end
 
     class AllThatGlitters < Aura
+      enchant "Creature"
+
       def target_choices
         battlefield.controlled_by(controller).creatures
       end

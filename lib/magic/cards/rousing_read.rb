@@ -10,6 +10,8 @@ module Magic
     end
 
     class RousingRead < Aura
+      enchant "Creature"
+
       def target_choices
         battlefield.creatures
       end

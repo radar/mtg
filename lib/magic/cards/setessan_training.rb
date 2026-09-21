@@ -9,6 +9,8 @@ module Magic
     end
 
     class SetessanTraining < Aura
+      enchant "Creature", you_control: true
+
       def target_choices
         battlefield.controlled_by(controller).creatures
       end

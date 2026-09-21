@@ -35,6 +35,8 @@ module Magic
         end
       end
 
+      enchant "Forest"
+
       def target_choices
         battlefield.controlled_by(controller).lands.by_any_type("Forest")
       end

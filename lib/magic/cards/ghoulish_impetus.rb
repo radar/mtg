@@ -5,6 +5,8 @@ module Magic
     end
 
     class GhoulishImpetus < Aura
+      enchant "Creature"
+
       def target_choices
         battlefield.creatures
       end
