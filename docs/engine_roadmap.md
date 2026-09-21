@@ -66,7 +66,7 @@ Five files get touched by nearly every workstream. Agree on an owner per wave to
 
 ## B. State-based actions (rule 704)
 
-**Status (2026-09-21): B1–B3 done on branch `state-based-actions` (four commits), not yet merged.** `Game::StateBasedActions` covers 704.5a–d, f–j, m, n and q. Deviations from the plan below: SBAs also run after each `take_action`, stack resolution and choice resolution (skipped while a choice is pending); `Game#tick!` is kept as an alias so specs did not need rewriting (B3 reduced to fixing two specs that relied on the old behaviour: `sublime_epiphany_spec`, `auras_sent_to_graveyards_spec`). Follow-ups found along the way and also done: `Permanent#destroy!` now respects indestructible (raw move is `put_into_graveyard!`); Auras declare `enchant ...` restrictions that SBAs enforce, along with protection; `Game#over?`/`#drawn?`/`#winner`. Still open: nothing stops a game that is over (belongs with A/C2), and the rest of 704.5 that this pass doesn't cover (e.g. the saga, battle, and Role rules) hasn't been audited.
+**Status (2026-09-21): B1–B3 done and merged to `master`.** `Game::StateBasedActions` covers 704.5a–d, f–j, m, n and q. Deviations from the plan below: SBAs also run after each `take_action`, stack resolution and choice resolution (skipped while a choice is pending); `Game#tick!` is kept as an alias so specs did not need rewriting (B3 reduced to fixing two specs that relied on the old behaviour: `sublime_epiphany_spec`, `auras_sent_to_graveyards_spec`). Follow-ups found along the way and also done: `Permanent#destroy!` now respects indestructible (raw move is `put_into_graveyard!`); Auras declare `enchant ...` restrictions that SBAs enforce, along with protection; `Game#over?`/`#drawn?`/`#winner`. Still open: nothing stops a game that is over (belongs with A/C2), and the rest of 704.5 that this pass doesn't cover (e.g. the saga, battle, and Role rules) hasn't been audited.
 
 **Problem.** `Game#tick!` is a partial, ad-hoc SBA pass called from two places. Most of rule 704.5 is missing, and SBAs are not checked after stack resolution or between game actions.
 
@@ -91,7 +91,7 @@ Two independent halves.
 
 ### C1. Action legality and timing enforcement
 
-**Status (2026-09-21): done on branch `action-legality` (three commits), not yet merged.** `Action#illegal_reason`/`#legal?` plus `Turn#take_action` raising `Magic::IllegalAction`; details, gotchas and the spec-side consequences are in `CLAUDE.md` under "Action Legality". Deviations and leftovers:
+**Status (2026-09-21): done and merged to `master` (local, not yet pushed).** `Action#illegal_reason`/`#legal?` plus `Turn#take_action` raising `Magic::IllegalAction`; details, gotchas and the spec-side consequences are in `CLAUDE.md` under "Action Legality". Deviations and leftovers:
 - `can_perform?` stayed as the advisory affordability check; `illegal_reason` is the new contract, because it runs after costs are paid. So timing/requirement failures can still leave mana spent or a source tapped (only `{T}` is checked as it is paid). Real fix belongs with G3 (cost framework) or A (priority), which should check legality *before* costs are paid.
 - A card with no zone (bare spec fixture) is treated as being in hand. Every spec that casts still needs a real zone before this can be strict; that is a mechanical follow-up.
 - `by_effect: true` on `Cast` is a stopgap for effect-instructed casts (rebound, Idol of Endurance); G3 should replace it with proper alternative-cost/permission objects.
