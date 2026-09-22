@@ -128,6 +128,10 @@ Two independent halves.
 
 ## A. Priority passing, the stack, and triggers
 
+**Status (2026-09-23): A1 done and merged to `master`.** `Game.new(queue_triggers: true)` (default `false`, so the whole existing suite is untouched) makes `Permanent#perform_trigger!` push `TriggeredAbility` instances onto `Game#pending_triggers` instead of calling them, and drains that queue onto `game.stack` at the same checkpoints B already added (`Game#state_based_actions_checkpoint!` — there's no real priority loop yet, so this is the closest available stand-in for "the next time a player would receive priority" until A2/A3 land). APNAP ordering falls out of `Game#players` already being active-player-first; a player's own 2+ simultaneous triggers get a new `Choice::OrderTriggers` (`lib/magic/choice/order_triggers.rb`), a lone one skips the choice via the existing single-choice auto-resolve. Details, gotchas (mid-resolution nested triggers spawning a new ordering choice; specs need a manual checkpoint call after a bare turn-step transition) and the `settle!`-to-quiescence spec pattern are in `CLAUDE.md` under "Trigger Queue". `TriggeredAbility::OncePerTurn` needed a small refactor along the way — its "mark as triggered" bookkeeping moved from an overridden `perform!` into a new `trigger!` hook (default: `should_perform?`), since `perform_trigger!` now needs to decide *that* an ability triggers (and do that bookkeeping) without also executing its effect immediately.
+
+Still open, and explicitly deferred (not part of A1): flipping the suite-wide default to `true` and migrating any card that turns out to be incompatible; A2 (real priority model) and A3 (one-item-at-a-time stack resolution) next, which is what turns this from "an approximation of a priority checkpoint" into the real thing.
+
 **Problem.** The single biggest gap. Players cannot respond. Triggered abilities resolve during event dispatch instead of going on the stack, so there is no APNAP ordering and no way to respond to a trigger. Split second, "can't be countered while X", and "in response to" effects are impossible.
 
 **Scope.**

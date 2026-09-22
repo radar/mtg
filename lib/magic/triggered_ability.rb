@@ -89,8 +89,28 @@ module Magic
       raise NotImplementedError, "#{self.class} must implement #call"
     end
 
+    # Whether this ability triggers right now: `should_perform?` plus any
+    # trigger-time bookkeeping (e.g. TriggeredAbility::OncePerTurn's marking). Split
+    # out from `perform!` so Permanent#perform_trigger! can decide *that* an ability
+    # triggers, and do any such bookkeeping, without executing its effect immediately
+    # (see Game#queue_triggers?) -- the effect itself is `call`, invoked later via
+    # `resolve!` once queued, or immediately below via `perform!` when not queuing.
+    def trigger!
+      should_perform?
+    end
+
     def perform!
-      return unless should_perform?
+      return unless trigger!
+      call
+    end
+
+    # Lets a queued instance sit on Stack like Actions::Cast/ActivateAbility do
+    # (see Game#queue_triggers?/#put_pending_triggers_on_stack!).
+    def name
+      self.class.name
+    end
+
+    def resolve!
       call
     end
   end

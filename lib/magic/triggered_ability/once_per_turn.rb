@@ -1,10 +1,10 @@
 module Magic
   class TriggeredAbility
     class OncePerTurn < TriggeredAbility
-      def perform!
-        return unless should_perform? && !triggered_this_turn?
+      def trigger!
+        return false unless should_perform? && !triggered_this_turn?
         mark_triggered_this_turn!
-        call
+        true
       end
 
       private

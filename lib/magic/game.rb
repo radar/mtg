@@ -42,7 +42,8 @@ module Magic
       effects: [],
       players: [],
       stack: nil,
-      logger: nil
+      logger: nil,
+      queue_triggers: false
     )
       @logger = Logger.new(STDOUT)
       @battlefield = battlefield
@@ -56,7 +57,21 @@ module Magic
       @turns = []
       @event_listeners = []
       @monarch = nil
+      @queue_triggers = queue_triggers
+      @pending_triggers = []
       subscribe(self)
+    end
+
+    def queue_triggers?
+      @queue_triggers
+    end
+
+    def pending_triggers
+      @pending_triggers
+    end
+
+    def queue_trigger!(ability)
+      @pending_triggers << ability
     end
 
     def add_players(*players)
@@ -218,7 +233,10 @@ module Magic
       begin
         loop do
           battlefield.map(&:apply_continuous_effects!)
-          break unless StateBasedActions.new(game: self).perform!
+          sba_changed = StateBasedActions.new(game: self).perform!
+          triggers_changed = queue_triggers? && put_pending_triggers_on_stack!
+          break if stack.pending_choices?
+          break unless sba_changed || triggers_changed
         end
         check_for_state_triggered_abilities
       ensure
@@ -248,6 +266,28 @@ module Magic
     end
 
     private
+
+    # Rule 603.3b: each player, in APNAP order, puts the triggered abilities they
+    # control on the stack (choosing their own order for simultaneous ones). +players+
+    # is already active-player-first (see #next_active_player), so no separate APNAP
+    # ordering is needed. Only one player's batch is placed per call: a player with
+    # 2+ pending triggers gets a Choice::OrderTriggers, which pauses further draining
+    # (via the pending_choices? check in #check_state_based_actions!) until resolved.
+    def put_pending_triggers_on_stack!
+      player = players.find { |p| pending_triggers.any? { |ability| ability.controller == p } }
+      return false unless player
+
+      triggers = pending_triggers.select { |ability| ability.controller == player }
+
+      if triggers.one?
+        pending_triggers.delete(triggers.first)
+        stack.add(triggers.first)
+      else
+        add_choice(Choice::OrderTriggers.new(player: player, triggers: triggers))
+      end
+
+      true
+    end
 
     def replacement_effect_chooser_for(effect, replacement_context = nil)
       if replacement_context&.affected_controller
