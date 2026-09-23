@@ -8,8 +8,11 @@ module Magic
     class EffectList < Data.define(:effects)
       SENTENCE = /(?<=\.)\s+|,? then /i
 
-      # Every sentence of `text` as an effect, or nil unless all of them parse.
+      # `text` as one effect (some span two sentences), else every sentence as an
+      # effect; nil unless all of them parse.
       def self.parse(text)
+        effect = Effect.parse(text) and return new(effects: [effect])
+
         effects = text.split(SENTENCE).map { |sentence| Effect.parse(sentence[0].upcase + sentence[1..]) }
         new(effects:) if effects.any? && effects.all?
       end
@@ -32,16 +35,18 @@ module Magic
         sections = definitions
         sections << choice_class(choice, later) if choice
         sections << "def target_choices\n  #{targeted.target_choices}\nend\n" if targeted
-        sections << method("resolve!#{'(target:)' if targeted}", statements(now) + [add_choice(choice, "self")].compact)
+        sections << method("resolve!#{'(target:)' if targeted}", statements(now) + add_choice(choice, "self"))
         sections.join("\n")
       end
 
-      # Class body for a triggered ability. Targets are chosen with a Choice.
-      def trigger_source
+      # Class body for a triggered or chapter ability, whose `entry` method runs
+      # the effects. Targets are chosen with a Choice; with none to choose from,
+      # the ability does nothing from the targeted effect on.
+      def trigger_source(entry: "call")
         now, choice, later = split { _1.choice_base || _1.target_choices }
         sections = definitions
         sections << choice_class(choice, later) if choice
-        sections << method("call", statements(now) + [add_choice(choice, "actor")].compact)
+        sections << method(entry, statements(now) + add_choice(choice, "actor"))
         sections.join("\n")
       end
 
@@ -56,7 +61,7 @@ module Magic
         [effects[...index], effects[index], later]
       end
 
-      def definitions = effects.flat_map(&:definitions).uniq
+      def definitions = effects.filter_map(&:definitions).uniq
 
       def statements(effects) = effects.map(&:resolve_call)
 
@@ -65,17 +70,17 @@ module Magic
           body = method("resolve!(**args)", ["super(**args)", *statements(later)])
           "class #{choice.choice_class_name} < #{choice.choice_base}\n#{indent(body)}\nend\n"
         else
-          body = [method("choices", [choice.target_choices]), method("resolve!(target:)", statements([choice, *later]))].join("\n")
+          body = [method("choices", [choice.target_choices]), "def choice_amount = 1\n",
+                  method("resolve!(target:)", statements([choice, *later]))].join("\n")
           "class TargetChoice < Magic::Choice::Targeted\n#{indent(body)}\nend\n"
         end
       end
 
       def add_choice(choice, actor)
-        return unless choice
+        return [] unless choice
+        return ["game.choices.add(#{choice.choice_class_name}.new(#{["actor: #{actor}", *choice.choice_args].join(', ')}))"] if choice.choice_base
 
-        name = choice.choice_base ? choice.choice_class_name : "TargetChoice"
-        args = ["actor: #{actor}", *(choice.choice_args if choice.choice_base)].join(", ")
-        "game.choices.add(#{name}.new(#{args}))"
+        ["choice = TargetChoice.new(actor: #{actor})", "game.add_choice(choice) if choice.choices.any?"]
       end
 
       def method(signature, lines)

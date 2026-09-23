@@ -35,7 +35,7 @@ RSpec.describe Magic::CardParser::Rules::EntersTrigger do
     source = described_class.parse("When ~ enters, it deals 2 damage to any target. You gain 1 life.").class_source("EntersTrigger")
     expect(source).to include("class TargetChoice < Magic::Choice::Targeted", "game.any_target",
                               "def resolve!(target:)\n      trigger_effect(:deal_damage, target: target, damage: 2)\n      trigger_effect(:gain_life",
-                              "def call\n    game.choices.add(TargetChoice.new(actor: actor))")
+                              "def call\n    choice = TargetChoice.new(actor: actor)\n    game.add_choice(choice) if choice.choices.any?")
   end
 
   it "rejects a target and a scry in one trigger" do

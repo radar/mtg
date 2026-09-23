@@ -145,7 +145,7 @@ module Magic
     end
 
     # Kinds whose Oracle text always includes a particular line.
-    REQUIRED_RULE = { equipment: "Equip", aura: "Enchant", instant: "SpellEffect", sorcery: "SpellEffect" }.freeze
+    REQUIRED_RULE = { equipment: "Equip", aura: "Enchant", instant: "SpellEffect", sorcery: "SpellEffect", saga: "Chapter" }.freeze
 
     def require_rule(kind)
       name = REQUIRED_RULE[kind] or return

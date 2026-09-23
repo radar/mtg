@@ -42,6 +42,13 @@ RSpec.describe "CardParser generated effects in play" do
     expect(p1.life).to eq(21)
   end
 
+  it "does nothing from the targeted effect on when there is no legal target" do
+    load_card("Parsed Raider {2}{B}\nCreature — Rogue\nWhen Parsed Raider enters, destroy target creature an opponent controls. You gain 2 life.\n2/2\n")
+    ResolvePermanent("Parsed Raider", owner: p1)
+    expect(game.choices).to be_empty
+    expect(p1.life).to eq(20)
+  end
+
   it "scries then draws when a generated creature enters" do
     load_card("Parsed Seer {1}{U}\nCreature — Wizard\nWhen Parsed Seer enters, scry 1, then draw a card.\n1/1\n")
     ResolvePermanent("Parsed Seer", owner: p1)

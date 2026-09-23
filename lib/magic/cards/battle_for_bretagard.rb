@@ -1,7 +1,7 @@
 module Magic
   module Cards
     BattleForBretagard = Saga("Battle for Bretagard") do
-      cost generic: 1, white: 1, green: 1
+      cost generic: 1, green: 1, white: 1
     end
 
     class BattleForBretagard < Saga
@@ -14,7 +14,7 @@ module Magic
         end
 
         def resolve!
-          actor.trigger_effect(:create_token, token_class: HumanWarriorToken)
+          trigger_effect(:create_token, token_class: HumanWarriorToken)
         end
       end
 
@@ -27,15 +27,13 @@ module Magic
         end
 
         def resolve!
-          actor.trigger_effect(:create_token, token_class: ElfWarriorToken)
+          trigger_effect(:create_token, token_class: ElfWarriorToken)
         end
       end
 
       class Chapter3 < Saga::ChapterAbility
         def resolve!
-          actor.controller.creatures.each do |creature|
-            actor.trigger_effect(:grant_keyword, keyword: :deathtouch, target: creature)
-          end
+          game.add_choice(Magic::Choice::CopyTokens.new(actor: self))
         end
       end
 

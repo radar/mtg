@@ -2,9 +2,15 @@ module Magic
   module Cards
     class Saga < Card
       class ChapterAbility
+        include BattlefieldFilters
+
         attr_reader :actor
         def initialize(actor:)
           @actor = actor
+        end
+
+        def trigger_effect(effect, **args)
+          actor.trigger_effect(effect, **args)
         end
 
         def resolve!
