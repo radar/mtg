@@ -139,5 +139,26 @@ RSpec.describe Magic::CardParser do
         expect { p1.cast(card: elf) { |a| a.pay_mana(green: 1) } }.to change { draws.call }.by(1)
       end
     end
+
+    context "when a generated per-creature mana ability is loaded" do
+      include_context "two player game"
+
+      before do
+        next if Magic::Cards.const_defined?(:ParsedCreatureDruid)
+
+        text = "Parsed Creature Druid {G}\nCreature — Elf Druid\n{T}: Add {G} for each creature you control.\n1/1"
+        # rubocop:disable Security/Eval
+        eval(Magic::CardGenerator.generate(described_class.parse(text)))
+        # rubocop:enable Security/Eval
+      end
+
+      it "adds one mana per creature you control" do
+        druid = ResolvePermanent("Parsed Creature Druid", owner: p1)
+        ResolvePermanent("Elvish Mystic", owner: p1)
+        ResolvePermanent("Elvish Mystic", owner: p2)
+        p1.activate_ability(ability: druid.activated_abilities.first)
+        expect(p1.mana_pool[:green]).to eq(2)
+      end
+    end
   end
 end
