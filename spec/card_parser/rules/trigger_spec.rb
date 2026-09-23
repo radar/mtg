@@ -62,6 +62,22 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     expect(parse("When the last widget counter is removed from ~, draw a card.")).to be_nil
   end
 
+  it "parses creatures being exiled from the battlefield" do
+    rule = parse("Whenever a creature is exiled from the battlefield, put a +1/+1 counter on ~.")
+    expect([rule.class_base_name, rule.handled_event, rule.condition])
+      .to eq(["CreatureExiledTrigger", "Events::LeftTheBattlefield", "event.permanent.creature? && event.to.exile?"])
+    expect(parse("Whenever another creature is exiled from the battlefield, draw a card.").condition)
+      .to end_with("&& event.permanent != actor")
+  end
+
+  it "keeps a one-effect sentence with \", then\" together, and splits two effects" do
+    one = parse("At the beginning of your end step, you may exile another target creature you control, " \
+                "then return that card to the battlefield under its owner's control.").effect_list.effects
+    expect(one.map(&:class)).to eq([Magic::CardParser::OptionalEffect])
+    expect(one.first.effect).to be_a(Magic::CardParser::Effects::Flicker)
+    expect(parse("When ~ enters, draw a card, then discard a card.").effect_list.effects.size).to eq(2)
+  end
+
   it "treats When and Whenever alike" do
     expect(parse("Whenever ~ enters, draw a card.").class_base_name).to eq("EntersTrigger")
     expect(parse("When ~ attacks, draw a card.").class_base_name).to eq("AttacksTrigger")
@@ -112,7 +128,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     source = parse("When ~ enters, you may destroy target artifact.").class_source("EntersTrigger")
     expect(source).to include("class MayChoice < Magic::Choice::May\n    class TargetChoice < Magic::Choice::Targeted",
                               "def resolve!\n      choice = TargetChoice.new(actor: actor)",
-                              "def call\n    return if (battlefield.artifacts).none?\n    game.choices.add(MayChoice.new(actor: actor))")
+                              "def call\n    return if battlefield.artifacts.none?\n    game.choices.add(MayChoice.new(actor: actor))")
   end
 
   it "adapts the cast trigger to the spell type, with a or an" do
@@ -163,7 +179,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
   it "nests a target choice inside a scry choice, doing nothing without a target" do
     source = parse("When ~ enters, scry 1. Destroy target creature.").class_source("EntersTrigger")
     expect(source).to include("class ScryChoice < Magic::Choice::Scry\n    class TargetChoice < Magic::Choice::Targeted",
-                              "def call\n    return if (battlefield.creatures).none?\n    game.choices.add(ScryChoice.new(actor: actor, amount: 1))")
+                              "def call\n    return if battlefield.creatures.none?\n    game.choices.add(ScryChoice.new(actor: actor, amount: 1))")
   end
 
   it "runs the effects after an optional one whether or not it is accepted" do

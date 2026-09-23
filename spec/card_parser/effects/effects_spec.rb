@@ -148,6 +148,25 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("sacrifice it.".capitalize)).to eq(e.const_get(:SacrificeSelf).new)
   end
 
+  it "puts counters on ~ itself, untargeted" do
+    own = described_class.parse("Put a +1/+1 counter on ~.")
+    expect(own.target_choices).to be_nil
+    expect(own.resolve_call).to eq("trigger_effect(:add_counter, counter_type: \"+1/+1\", target: #{Magic::CardParser::Effect::THIS}, amount: 1)")
+  end
+
+  it "targets another permanent, leaving itself out" do
+    expect(described_class.parse("Destroy another target creature.").target_choices)
+      .to eq("(battlefield.creatures - [#{Magic::CardParser::Effect::THIS}])")
+  end
+
+  it "parses flickering a target back under its owner's control" do
+    flicker = described_class.parse("Exile another target creature you control, then return that card to the battlefield under its owner's control.")
+    expect(flicker.target_choices).to eq("(battlefield.controlled_by(controller).creatures - [#{Magic::CardParser::Effect::THIS}])")
+    expect(flicker.resolve_call).to include("trigger_effect(:exile, target: target)", "Permanent.resolve(", "cast: false",
+                                            "card.move_zone!(to: game.battlefield)")
+    expect(described_class.parse("Exile target creature, then return it to the battlefield under your control.")).to be_nil
+  end
+
   it "has no targets for untargeted effects" do
     expect(e.const_get(:DrawCards).new(1).target_choices).to be_nil
   end

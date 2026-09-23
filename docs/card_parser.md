@@ -20,7 +20,8 @@ Instants and sorceries need effect lines or a modal block. Other type lines/subt
 raise `UnsupportedCard`.
 
 Parenthesised reminder text is stripped before parsing, and the card's own name in
-rules text is replaced with `~`.
+rules text is replaced with `~`, as is "this creature" / "this artifact" / "this
+permanent" etc., which current card text uses instead of the name.
 
 ## Rules (one per rules-text pattern)
 
@@ -56,7 +57,8 @@ What the rules cover:
   `should_perform?` condition, allowed card kinds). "When" and "Whenever" are
   interchangeable. Rows: ~ enters, ~ enters or attacks (`merge` splits it into an enters
   trigger and an attacks trigger with the same effects), ~ dies, ~ leaves the
-  battlefield, a/another creature [you control / an opponent controls] dies, another
+  battlefield, a/another creature [you control / an opponent controls] dies, a/another
+  creature is exiled from the battlefield (`Events::LeftTheBattlefield` to exile), another
   creature you control enters, landfall, your upkeep, beginning of combat on your turn
   (`Events::BeginningOfCombat`), your end step, each end step, ~ attacks, you attack
   (`event.active_player == controller && event.attacks.any?`), ~ deals combat damage
@@ -93,8 +95,11 @@ One-sentence game effects are reusable classes in `lib/magic/card_parser/effects
 (`include Effect`; `.parse(text)`, `target_choices`, `resolve_call`; `definitions`
 returns Ruby for a constant the call needs, e.g. `CreateToken`'s `Token.create`
 class). Current effects: damage to a target or each opponent, draw, gain/lose life,
-destroy/exile target (`PermanentTarget`: creature/artifact/enchantment/land, [you
-control / an opponent controls]), discard, +1/+1 counters, until-end-of-turn pumps and
+destroy/exile target (`PermanentTarget`: [another] target
+creature/artifact/enchantment/land [you control / an opponent controls]; "another"
+leaves out `Effect::THIS`), flicker ("exile <target>, then return that card to the
+battlefield under its owner's control"), discard, +1/+1 counters on a target, each
+creature you control or ~, until-end-of-turn pumps and
 keyword grants for ~ / a target creature / [other] creatures you control (`Pump`),
 return target [type] card from your graveyard to your hand, remove N <type> counters
 from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens, copy tokens,
@@ -115,7 +120,9 @@ isn't supported.
 ## EffectList
 
 Turns effect text into Ruby: the whole text as one effect if that parses (`CopyTokens`
-spans two sentences), else each sentence (also split on ", then" and ", and you"). A
+spans two sentences), else each sentence, and a sentence that isn't one effect as a
+whole is split into clauses on ", then" and ", and you" ("exile it, then return it"
+stays one effect; "draw a card, then discard a card" is two). A
 "you may <effect>" sentence becomes an `OptionalEffect` (also tried with an implied
 "You"), and following "If you do, <effect>" sentences join it.
 
@@ -149,11 +156,17 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
 - String-only specs of generated code miss runtime errors (`battlefield.artifacts`
   didn't exist until a modal spec cast one), so give each new effect or rule an
   in-game spec in `spec/card_parser/generated_*_spec.rb`.
+- Returning a card from exile: `Permanent.resolve` creates the permanent but doesn't
+  move the card out of exile; also call `card.move_zone!(to: game.battlefield)`, as
+  `Card#resolve!` does (`Effects::Flicker`).
 - `lib/magic/cards/opt.rb` is parser output: after changing `EffectList`, regenerate it
   and diff.
 - To check a pattern against real behaviour, generate an existing hand-written card
   into `lib/magic/cards/`, run its spec, then restore the original. Cards checked this
   way: Temple of Mystery, Jungle Hollow, Dismal Backwater, Mind Stone, Enchantress's
   Presence, Phyrexian Arena, Beast Whisperer, Firebrand Archer, Kessig Flamebreather,
-  Glorious Anthem, Titanic Growth. Generate from the card's exact text (cost, P/T):
+  Glorious Anthem, Titanic Growth. Soulherder is covered by
+  `spec/card_parser/generated_soulherder_spec.rb` instead: its hand-written spec names
+  its own choice classes and expects a lone target to be offered rather than chosen
+  automatically (`game.add_choice`). Generate from the card's exact text (cost, P/T):
   a mismatch there fails the card's spec for reasons unrelated to the parser.

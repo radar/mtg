@@ -11,7 +11,10 @@ module Magic
     # the choice point are rendered the same way inside that class, so choices
     # nest (a MayChoice holding a TargetChoice).
     class EffectList < Data.define(:effects)
-      SENTENCE = /(?<=\.)\s+|,? then |,? and (?=you )/i
+      SENTENCE = /(?<=\.)\s+/
+      # Clauses of one sentence, when the sentence isn't one effect as a whole
+      # ("exile it, then return it" is one effect; "draw a card, then discard a card" two).
+      CLAUSE = /,? then |,? and (?=you )/i
       MAY = /\Ayou may /i
       IF_YOU_DO = /\AIf you do, /i
 
@@ -21,13 +24,16 @@ module Magic
       Context = Data.define(:this, :targets_in_scope)
       INSIDE_CHOICE = Context.new(this: "actor", targets_in_scope: false)
 
-      # `text` as one effect (some span two sentences), else every sentence as an
-      # effect; nil unless all of them parse.
+      # `text` as one effect (some span two sentences), else every sentence (or,
+      # failing that, every clause of it) as an effect; nil unless all of them parse.
       def self.parse(text)
         effect = Effect.parse(text) and return new(effects: [effect])
 
         effects = []
-        text.split(SENTENCE).each do |sentence|
+        clauses = text.split(SENTENCE).flat_map do |sentence|
+          parse_sentence(sentence.sub(IF_YOU_DO, "").sub(MAY, "")) ? [sentence] : sentence.split(CLAUSE)
+        end
+        clauses.each do |sentence|
           if IF_YOU_DO.match?(sentence)
             return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DO, "")))
 
@@ -75,7 +81,11 @@ module Magic
       def trigger_source(entry: "call")
         targeted = leaves(effects).find(&:target_choices)
         choices, statements = render(effects, INSIDE_CHOICE)
-        statements.unshift("return if (#{expand(targeted.target_choices, 'actor')}).none?") if targeted && !effects.first.equal?(targeted)
+        if targeted && !effects.first.equal?(targeted)
+          targets = expand(targeted.target_choices, "actor")
+          targets = "(#{targets})" unless targets.match?(/\A\(.*\)\z/) || targets.match?(/\A[\w.()]+\z/)
+          statements.unshift("return if #{targets}.none?")
+        end
         (definitions + choices + [method(entry, statements)]).join("\n")
       end
 

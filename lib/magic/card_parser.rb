@@ -36,6 +36,8 @@ module Magic
 
     SUPERTYPES = %w[Legendary Basic Snow World].freeze
     NAME_AND_COST = /\A(?<name>.+?)(?:\s+(?<cost>(?:\{[^}]+\})+))?\z/
+    # Current card text says "this creature" where older text used the card's name.
+    THIS_OBJECT = /\b[Tt]his (?:creature|artifact|enchantment|land|permanent|Equipment|Aura|Saga|spell|card)\b/
     PT = %r{\A(?<power>-?\d+)/(?<toughness>-?\d+)\z}
 
     # Every class in lib/magic/card_parser/<dir>/, so a new file needs no registration.
@@ -59,7 +61,7 @@ module Magic
 
       header, type_line, *rest = @lines
       pt_line = rest.pop if rest.last&.match?(PT)
-      rules = parse_rules(rest.map { |line| line.gsub(@name, "~") })
+      rules = parse_rules(rest.map { |line| line.gsub(@name, "~").gsub(THIS_OBJECT, "~") })
 
       header_match = NAME_AND_COST.match(header) or raise ParseError, "bad name line: #{header}"
       supertypes, types, subtypes = parse_type_line(type_line)

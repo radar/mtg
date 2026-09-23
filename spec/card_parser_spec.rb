@@ -67,6 +67,11 @@ RSpec.describe Magic::CardParser do
       expect(mana).to be_a(described_class::Rules::TapForMana)
     end
 
+    it "reads \"this creature\" (current card text) as the card itself" do
+      result = described_class.parse("Herder {1}{W}\nCreature — Spirit\nWhen this creature enters, put a +1/+1 counter on this creature.\n1/1")
+      expect(result.abilities.first.effect_list.effects.first.who).to eq(:self)
+    end
+
     it "rejects rules text no rule recognises" do
       expect { described_class.parse("Bear {1}{G}\nCreature — Bear\nWhenever Bear becomes blocked, draw a card.\n2/2") }
         .to raise_error(described_class::UnsupportedCard)
