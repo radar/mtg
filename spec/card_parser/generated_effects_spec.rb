@@ -58,6 +58,36 @@ RSpec.describe "CardParser generated effects in play" do
   context "with generated spells" do
     before { go_to_main_phase! }
 
+    context "with an optional draw, a cost if you do, and life gain either way" do
+      before do
+        load_card("Parsed Offer {1}{B}\nSorcery\nYou may draw a card. If you do, you lose 1 life. You gain 2 life.\n")
+        cast("Parsed Offer", :black, 1)
+      end
+
+      it "draws, loses 1 and gains 2 when accepted" do
+        expect { game.resolve_choice! }.to change { p1.hand.count }.by(1)
+        expect(p1.life).to eq(21)
+      end
+
+      it "only gains 2 when declined" do
+        expect { game.skip_choice! }.not_to(change { p1.hand.count })
+        expect(p1.life).to eq(22)
+      end
+    end
+
+    it "pumps each creature you control until end of turn" do
+      load_card("Parsed Rally {1}{W}\nSorcery\nCreatures you control get +1/+1 until end of turn.\n")
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      theirs = ResolvePermanent("Grizzly Bears", owner: p2)
+      cast("Parsed Rally", :white, 1)
+      game.tick!
+
+      expect([bears.power, bears.toughness, theirs.power]).to eq([3, 3, 2])
+      bears.cleanup!
+      game.tick!
+      expect(bears.power).to eq(2)
+    end
+
     it "creates tokens, then puts counters on each creature you control" do
       load_card("Parsed Watch {2}{W}\nSorcery\nCreate two 1/1 white Soldier creature tokens with vigilance.\n" \
                 "Put a +1/+1 counter on each creature you control.\n")

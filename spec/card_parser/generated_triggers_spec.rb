@@ -117,6 +117,31 @@ RSpec.describe "CardParser generated triggers in play" do
     expect(stone.card.zone).to be_graveyard
   end
 
+  it "doesn't ask about an optional targeted trigger with nothing to target" do
+    load_card("Parsed Wrecker {2}{R}\nCreature — Goblin\nWhen Parsed Wrecker enters, you may destroy target artifact an opponent controls.\n2/2\n")
+    ResolvePermanent("Parsed Wrecker", owner: p1)
+    expect(game.choices).to be_empty
+  end
+
+  it "scries, then asks for a target, for a trigger with both" do
+    load_card("Parsed Seer {2}{B}\nCreature — Wizard\nWhen Parsed Seer enters, scry 1. Destroy target creature an opponent controls.\n1/1\n")
+    bears = ResolvePermanent("Grizzly Bears", owner: p2)
+    ResolvePermanent("Grizzly Bears", owner: p2)
+    ResolvePermanent("Parsed Seer", owner: p1)
+
+    game.resolve_choice!(top: [p1.library.first])
+    game.resolve_choice!(target: bears)
+    expect(bears.card.zone).to be_graveyard
+  end
+
+  it "shrinks the opponent's creature to death on entering" do
+    load_card("Parsed Blight {2}{B}\nCreature — Horror\nWhen Parsed Blight enters, target creature an opponent controls gets -2/-2 until end of turn.\n2/2\n")
+    bears = ResolvePermanent("Grizzly Bears", owner: p2)
+    ResolvePermanent("Parsed Blight", owner: p1)
+    game.tick!
+    expect(bears.card.zone).to be_graveyard
+  end
+
   context "with upkeep and end step triggers" do
     before do
       load_card("Parsed Shrine {2}{W}\nEnchantment\nAt the beginning of your upkeep, you gain 1 life.\n" \

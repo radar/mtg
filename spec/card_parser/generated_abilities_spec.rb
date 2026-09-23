@@ -49,6 +49,28 @@ RSpec.describe "CardParser generated activated abilities in play" do
     expect(elves.card.zone).to be_graveyard
   end
 
+  it "pumps itself" do
+    load_card("Parsed Brute {1}{R}\nCreature — Ogre\n{R}: Parsed Brute gets +1/+0 until end of turn.\n2/2\n")
+    brute = ResolvePermanent("Parsed Brute", owner: p1)
+    p1.add_mana(red: 2)
+    2.times do
+      p1.activate_ability(ability: ability_of(brute)) { _1.pay_mana(red: 1) }
+      game.stack.resolve!
+    end
+    game.tick!
+    expect([brute.power, brute.toughness]).to eq([4, 2])
+  end
+
+  it "asks before an optional effect" do
+    load_card("Parsed Pry Bar {2}\nArtifact\n{T}: You may draw a card. If you do, you lose 1 life.\n")
+    bar = ResolvePermanent("Parsed Pry Bar", owner: p1)
+    p1.activate_ability(ability: ability_of(bar))
+    game.stack.resolve!
+
+    expect { game.resolve_choice! }.to change { p1.hand.count }.by(1)
+    expect(p1.life).to eq(19)
+  end
+
   context "with a sorcery-speed ability that scries then draws" do
     let!(:font) do
       load_card("Parsed Font {1}{U}\nEnchantment\n{2}{U}: Scry 1, then draw a card. Activate only as a sorcery.\n")

@@ -37,7 +37,40 @@ RSpec.describe Magic::CardParser::Rules::SpellEffect do
   it "rejects combinations it cannot generate" do
     expect { spell("Destroy target creature.", "Destroy target artifact.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard)
     expect { spell("Scry 1.", "Destroy target creature.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard)
-    expect { spell("Scry 1.", "Scry 2.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard)
-    expect { spell("You may draw a card.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard, /you may/)
+    expect { spell("Draw a card. You may destroy target creature.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard)
+  end
+
+  it "nests one choice inside another" do
+    source = spell("Scry 1.", "Scry 2.").body_source
+    expect(source).to include("class ScryChoice < Magic::Choice::Scry", "super(**args)\n    game.choices.add(Magic::Choice::Scry.new(actor: actor, amount: 2))",
+                              "def resolve!\n  game.choices.add(ScryChoice.new(actor: self, amount: 1))")
+  end
+
+  it "asks with a MayChoice for an optional effect, running what follows either way" do
+    source = spell("You may draw a card. If you do, you lose 1 life. You gain 2 life.").body_source
+    expect(source).to eq(<<~RUBY)
+      class MayChoice < Magic::Choice::May
+        def resolve!
+          trigger_effect(:draw_cards, number_to_draw: 1)
+          trigger_effect(:lose_life, target: controller, life: 1)
+          finish
+        end
+
+        def decline! = finish
+
+        def finish
+          trigger_effect(:gain_life, target: controller, life: 2)
+        end
+      end
+
+      def resolve!
+        game.choices.add(MayChoice.new(actor: self))
+      end
+    RUBY
+  end
+
+  it "keeps effects before an optional one in resolve!" do
+    source = spell("Draw a card, then you may discard a card.").body_source
+    expect(source).to include("def resolve!\n  trigger_effect(:draw_cards, number_to_draw: 1)\n  game.choices.add(MayChoice.new(actor: self))")
   end
 end

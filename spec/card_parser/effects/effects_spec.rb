@@ -96,7 +96,22 @@ RSpec.describe Magic::CardParser::Effect do
   it "parses copying tokens" do
     text = "Choose any number of artifact tokens and/or creature tokens you control with different names. " \
            "For each of them, create a token that's a copy of it."
-    expect(described_class.parse(text).resolve_call).to eq("game.add_choice(Magic::Choice::CopyTokens.new(actor: self))")
+    expect(described_class.parse(text).resolve_call).to eq("game.add_choice(Magic::Choice::CopyTokens.new(actor: #{Magic::CardParser::Effect::THIS}))")
+  end
+
+  it "parses pumps of itself, a target and creatures you control" do
+    this = Magic::CardParser::Effect::THIS
+    own = described_class.parse("~ gets +1/+0 until end of turn.")
+    expect([own.target_choices, own.resolve_call]).to eq([nil, "trigger_effect(:modify_power_toughness, target: #{this}, power: 1, toughness: 0)"])
+    shrink = described_class.parse("Target creature an opponent controls gets -2/-2 until end of turn.")
+    expect(shrink.target_choices).to eq("battlefield.not_controlled_by(controller).creatures")
+    expect(shrink.resolve_call).to eq("trigger_effect(:modify_power_toughness, target: target, power: -2, toughness: -2)")
+    expect(described_class.parse("Creatures you control get +1/+1 until end of turn.").resolve_call)
+      .to start_with("battlefield.controlled_by(controller).creatures.each")
+    expect(described_class.parse("Other creatures you control get +1/+1 until end of turn.").resolve_call)
+      .to start_with("(battlefield.controlled_by(controller).creatures - [#{this}]).each")
+    expect(described_class.parse("Target artifact gets +1/+1 until end of turn.")).to be_nil
+    expect(described_class.parse("~ gets +1/+1.")).to be_nil
   end
 
   it "has no targets for untargeted effects" do

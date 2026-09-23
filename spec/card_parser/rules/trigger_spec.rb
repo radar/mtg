@@ -73,8 +73,9 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
 
   it "asks before choosing targets for an optional targeted effect" do
     source = parse("When ~ enters, you may destroy target artifact.").class_source("EntersTrigger")
-    expect(source).to include("class TargetChoice < Magic::Choice::Targeted",
-                              "class MayChoice < Magic::Choice::May\n    def resolve!\n      choice = TargetChoice.new(actor: actor)")
+    expect(source).to include("class MayChoice < Magic::Choice::May\n    class TargetChoice < Magic::Choice::Targeted",
+                              "def resolve!\n      choice = TargetChoice.new(actor: actor)",
+                              "def call\n    return if (battlefield.artifacts).none?\n    game.choices.add(MayChoice.new(actor: actor))")
   end
 
   it "adapts the cast trigger to the spell type, with a or an" do
@@ -95,7 +96,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
 
   it "ignores other lines and unknown effects" do
     expect(parse("Whenever ~ becomes blocked, draw a card.")).to be_nil
-    expect(parse("Whenever you cast a creature spell, you may draw a card. You gain 1 life.")).to be_nil
+    expect(parse("Whenever you cast a creature spell, if you do, draw a card.")).to be_nil
     expect(parse("When ~ enters, return target card from your graveyard to your hand.")).to be_nil
   end
 
@@ -122,8 +123,19 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
                               "def call\n    choice = TargetChoice.new(actor: actor)\n    game.add_choice(choice) if choice.choices.any?")
   end
 
-  it "rejects a target and a scry in one trigger" do
-    expect { parse("When ~ enters, scry 1. Destroy target creature.").class_source("X") }
-      .to raise_error(Magic::CardParser::UnsupportedCard)
+  it "nests a target choice inside a scry choice, doing nothing without a target" do
+    source = parse("When ~ enters, scry 1. Destroy target creature.").class_source("EntersTrigger")
+    expect(source).to include("class ScryChoice < Magic::Choice::Scry\n    class TargetChoice < Magic::Choice::Targeted",
+                              "def call\n    return if (battlefield.creatures).none?\n    game.choices.add(ScryChoice.new(actor: actor, amount: 1))")
+  end
+
+  it "runs the effects after an optional one whether or not it is accepted" do
+    source = parse("When ~ dies, you may draw a card. If you do, discard a card. You gain 1 life.").class_source("DiesTrigger")
+    expect(source).to include("trigger_effect(:draw_cards, number_to_draw: 1)\n      game.add_choice(Magic::Choice::Discard.new(player: controller))\n      finish",
+                              "def decline! = finish", "def finish\n      trigger_effect(:gain_life")
+  end
+
+  it "rejects effects after an optional effect that makes its own choice" do
+    expect { parse("When ~ enters, you may scry 1. Draw a card.").class_source("X") }.to raise_error(Magic::CardParser::UnsupportedCard)
   end
 end

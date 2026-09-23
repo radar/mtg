@@ -2,27 +2,45 @@
 
 module Magic
   class CardParser
-    # The effects of one spell or ability, in order, rendered as Ruby. Effects
-    # after a choice point (a scry, or a target in a triggered ability) run
-    # once that choice resolves, in a Choice subclass generated alongside.
-    # An optional ("you may ...") triggered ability asks first, with a MayChoice.
-    class EffectList < Data.define(:effects, :optional)
+    # The effects of one spell or ability, in order, rendered as Ruby.
+    #
+    # Rendering walks the effects up to the first *choice point* — a "you may"
+    # (OptionalEffect), a choice effect (scry), or, in a triggered ability, a
+    # targeted effect — and puts everything from there on into a generated
+    # Choice subclass that runs once the player has chosen. The effects after
+    # the choice point are rendered the same way inside that class, so choices
+    # nest (a MayChoice holding a TargetChoice).
+    class EffectList < Data.define(:effects)
       SENTENCE = /(?<=\.)\s+|,? then |,? and (?=you )/i
       MAY = /\Ayou may /i
+      IF_YOU_DO = /\AIf you do, /i
+
+      # Where effects are rendered: `this` is Ruby for the card or permanent the
+      # effects belong to (and the actor of any Choice they add); a spell has its
+      # target in scope, so targets aren't choice points there.
+      Context = Data.define(:this, :targets_in_scope)
+      INSIDE_CHOICE = Context.new(this: "actor", targets_in_scope: false)
 
       # `text` as one effect (some span two sentences), else every sentence as an
-      # effect; nil unless all of them parse. "you may <effect>" is one optional
-      # effect.
+      # effect; nil unless all of them parse.
       def self.parse(text)
-        if MAY.match?(text)
-          effect = parse_sentence(text.sub(MAY, "")) or return
-          return new(effects: [effect], optional: true)
-        end
-
         effect = Effect.parse(text) and return new(effects: [effect])
 
-        effects = text.split(SENTENCE).map { parse_sentence(_1) }
-        new(effects:) if effects.any? && effects.all?
+        effects = []
+        text.split(SENTENCE).each do |sentence|
+          if IF_YOU_DO.match?(sentence)
+            return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DO, "")))
+
+            effects[-1] = effects.last.with(if_you_do: effects.last.if_you_do + [effect])
+          elsif MAY.match?(sentence)
+            effect = parse_sentence(sentence.sub(MAY, "")) or return
+            effects << OptionalEffect.new(effect:, if_you_do: [])
+          else
+            effect = parse_sentence(sentence) or return
+            effects << effect
+          end
+        end
+        new(effects:) if effects.any?
       end
 
       # One sentence, capitalised; after "you may", also with its implied "You"
@@ -31,94 +49,113 @@ module Magic
         Effect.parse(sentence[0].upcase + sentence[1..]) || Effect.parse("You #{sentence}")
       end
 
-      def initialize(effects:, optional: false)
-        raise UnsupportedCard, "only one targeted effect per ability is supported" if effects.count(&:target_choices) > 1
+      def initialize(effects:)
+        raise UnsupportedCard, "only one targeted effect per ability is supported" if leaves(effects).count(&:target_choices) > 1
 
         super
       end
 
-      def +(other)
-        raise UnsupportedCard, "optional effects can't be combined" if optional || other.optional
+      def +(other) = self.class.new(effects: effects + other.effects)
 
-        self.class.new(effects: effects + other.effects)
-      end
-
-      # Class body for an instant, sorcery or activated ability: target_choices
-      # and resolve!(target:) when targeted, a choice class for a scry.
-      def spell_source
-        raise UnsupportedCard, "\"you may\" is only supported in triggered abilities" if optional
-
-        now, choice, later = split(&:choice_base)
-        raise UnsupportedCard, "targeted effects after a choice are not supported" if later.any?(&:target_choices)
-
-        targeted = effects.find(&:target_choices)
-        sections = definitions
-        sections.concat(choice_class(choice, later)) if choice
-        sections << "def target_choices\n  #{targeted.target_choices}\nend\n" if targeted
-        sections << method("resolve!#{'(target:)' if targeted}", statements(now) + add_choice(choice, "self", later))
+      # Class body for an instant or sorcery (`this` = "self") or an activated
+      # ability (`this` = "source"): target_choices and resolve!(target:) when
+      # targeted. The target is chosen on casting, so it must come before any
+      # choice point.
+      def spell_source(this: "self")
+        targeted = leaves(effects).find(&:target_choices)
+        choices, statements = render(effects, Context.new(this:, targets_in_scope: true))
+        sections = definitions + choices
+        sections << "def target_choices\n  #{expand(targeted.target_choices, this)}\nend\n" if targeted
+        sections << method("resolve!#{'(target:)' if targeted}", statements)
         sections.join("\n")
       end
 
       # Class body for a triggered or chapter ability, whose `entry` method runs
-      # the effects (or, when optional, asks with a MayChoice that runs them).
-      # Targets are chosen with a Choice; with none to choose from, the ability
-      # does nothing from the targeted effect on.
+      # the effects. A targeted ability with no legal target does nothing.
       def trigger_source(entry: "call")
-        now, choice, later = split { _1.choice_base || _1.target_choices }
-        sections = definitions
-        sections.concat(choice_class(choice, later)) if choice
-        body = statements(now) + add_choice(choice, "actor", later)
-        if optional
-          sections << "class MayChoice < Magic::Choice::May\n#{indent(method('resolve!', body))}\nend\n"
-          body = ["game.choices.add(MayChoice.new(actor: actor))"]
-        end
-        sections << method(entry, body)
-        sections.join("\n")
+        targeted = leaves(effects).find(&:target_choices)
+        choices, statements = render(effects, INSIDE_CHOICE)
+        statements.unshift("return if (#{expand(targeted.target_choices, 'actor')}).none?\n") if targeted && !effects.first.equal?(targeted)
+        (definitions + choices + [method(entry, statements)]).join("\n")
       end
 
       private
 
-      # [effects before the first choice point, that effect, effects after it]
-      def split(&choice_point)
-        index = effects.index(&choice_point) or return [effects, nil, []]
-        later = effects[(index + 1)..]
-        raise UnsupportedCard, "only one choice per ability is supported" if later.any?(&choice_point)
+      # Effects with optional ones opened up.
+      def leaves(list) = list.flat_map { _1.is_a?(OptionalEffect) ? _1.effects : [_1] }
 
-        [effects[...index], effects[index], later]
+      def definitions = leaves(effects).filter_map(&:definitions).uniq
+
+      def choice_point?(effect, context)
+        effect.is_a?(OptionalEffect) || effect.choice_base || (!context.targets_in_scope && effect.target_choices)
       end
 
-      def definitions = effects.filter_map(&:definitions).uniq
+      # [choice classes, statements] for `list` in `context`.
+      def render(list, context)
+        index = list.index { choice_point?(_1, context) } or return [[], calls(list, context)]
 
-      def statements(effects) = effects.map(&:resolve_call)
-
-      # The Choice subclass that runs the effects after a choice point; none
-      # for a choice effect with nothing after it (its base class will do).
-      def choice_class(choice, later)
-        if choice.choice_base
-          return [] if later.empty?
-
-          body = method("resolve!(**args)", ["super(**args)", *statements(later)])
-          ["class #{choice.choice_class_name} < #{choice.choice_base}\n#{indent(body)}\nend\n"]
-        else
-          body = [method("choices", [choice.target_choices]), "def choice_amount = 1\n",
-                  method("resolve!(target:)", statements([choice, *later]))].join("\n")
-          ["class TargetChoice < Magic::Choice::Targeted\n#{indent(body)}\nend\n"]
+        point, rest = list[index], list[(index + 1)..]
+        if context.targets_in_scope && leaves([point, *rest]).any?(&:target_choices)
+          raise UnsupportedCard, "targeted effects after a choice are not supported in spells and activated abilities"
         end
+
+        klass, adds = case point
+                      in OptionalEffect then may_choice(point, rest, context)
+                      in _ if point.choice_base then effect_choice(point, rest, context)
+                      else target_choice(point, rest, context)
+                      end
+        [Array(klass), calls(list[...index], context) + adds]
       end
 
-      def add_choice(choice, actor, later)
-        return [] unless choice
-
-        if choice.choice_base
-          klass = later.empty? ? choice.choice_base : choice.choice_class_name
-          return ["game.choices.add(#{klass}.new(#{["actor: #{actor}", *choice.choice_args].join(', ')}))"]
+      # Asks first; accepted runs the optional effects, and the effects after
+      # them run either way.
+      def may_choice(point, rest, context)
+        accepted_classes, accepted = render(point.effects, INSIDE_CHOICE)
+        rest_classes, after = render(rest, INSIDE_CHOICE)
+        # They would run before that choice resolved.
+        if after.any? && point.effects.any? { choice_point?(_1, INSIDE_CHOICE) }
+          raise UnsupportedCard, "effects after an optional effect that makes a choice are not supported"
         end
 
-        ["choice = TargetChoice.new(actor: #{actor})", "game.add_choice(choice) if choice.choices.any?"]
+        methods = if after.empty?
+                    [method("resolve!", accepted)]
+                  else
+                    [method("resolve!", accepted + ["finish"]), "def decline! = finish\n", method("finish", after)]
+                  end
+        [class_source("MayChoice", "Magic::Choice::May", accepted_classes + rest_classes + methods),
+         ["game.choices.add(MayChoice.new(actor: #{context.this}))"]]
+      end
+
+      # A scry: its own Choice class, subclassed when effects follow it.
+      def effect_choice(point, rest, context)
+        args = ["actor: #{context.this}", *point.choice_args].join(", ")
+        return [nil, ["game.choices.add(#{point.choice_base}.new(#{args}))"]] if rest.empty?
+
+        classes, after = render(rest, INSIDE_CHOICE)
+        [class_source(point.choice_class_name, point.choice_base, classes + [method("resolve!(**args)", ["super(**args)", *after])]),
+         ["game.choices.add(#{point.choice_class_name}.new(#{args}))"]]
+      end
+
+      # A target chosen on resolution (triggered abilities).
+      def target_choice(point, rest, context)
+        classes, after = render(rest, INSIDE_CHOICE)
+        body = [method("choices", [expand(point.target_choices, "actor")]), "def choice_amount = 1\n", *classes,
+                method("resolve!(target:)", [expand(point.resolve_call, "actor"), *after])]
+        [class_source("TargetChoice", "Magic::Choice::Targeted", body),
+         ["choice = TargetChoice.new(actor: #{context.this})", "game.add_choice(choice) if choice.choices.any?"]]
+      end
+
+      def calls(list, context) = list.map { expand(_1.resolve_call, context.this) }
+
+      # Effects refer to the card or permanent they belong to as Effect::THIS.
+      def expand(ruby, this) = ruby.gsub(Effect::THIS, this)
+
+      def class_source(name, base, sections)
+        "class #{name} < #{base}\n#{indent(sections.join("\n"))}\nend\n"
       end
 
       def method(signature, lines)
-        "def #{signature}\n#{lines.map { "  #{_1}\n" }.join}end\n"
+        "def #{signature}\n#{lines.map { "  #{_1.chomp}\n" }.join}end\n"
       end
 
       def indent(source) = source.gsub(/^(?=.)/, "  ").chomp

@@ -14,7 +14,7 @@ module Magic
           new if LINE.match?(text)
         end
 
-        def resolve_call = "game.add_choice(Magic::Choice::CopyTokens.new(actor: self))"
+        def resolve_call = "game.add_choice(Magic::Choice::CopyTokens.new(actor: #{THIS}))"
       end
     end
   end

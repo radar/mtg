@@ -21,7 +21,7 @@ RSpec.describe Magic::CardParser::Rules::ActivatedAbility do
     expect(described_class.parse("{T}: Add {G}.")).to be_nil
     expect(described_class.parse("{X}{R}: ~ deals X damage to any target.")).to be_nil
     expect(described_class.parse("Remove a +1/+1 counter from ~: Draw a card.")).to be_nil
-    expect(described_class.parse("{1}: ~ gets +1/+0 until end of turn.")).to be_nil
+    expect(described_class.parse("{1}: ~ gains flying until end of turn.")).to be_nil
   end
 
   it "renders a targeted ability like a spell" do

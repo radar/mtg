@@ -9,12 +9,16 @@ module Magic
     #   Effect.parse(text)  -> effect instance, or nil
     #   #target_choices     -> Ruby expression for the legal targets, or nil when untargeted
     #   #resolve_call       -> Ruby statement that does the effect (`target` is in scope when targeted;
-    #                          `self` is the spell, ability or choice running it, usable as a Choice's actor)
+    #                          Effect::THIS stands for the card/permanent, e.g. as a Choice's actor)
     #   #definitions        -> Ruby defining constants resolve_call needs (a token class), or nil
     #   #choice_base        -> Choice class the effect adds (e.g. scry), or nil; the
     #                          effects after it run in a subclass named #choice_class_name,
     #                          created with #choice_args (see EffectList)
     module Effect
+      # Placeholder in resolve_call/target_choices for the card or permanent the
+      # effect belongs to ("~ gets +1/+1"); EffectList swaps in Ruby for it.
+      THIS = "__this__"
+
       def self.all
         CardParser.load_all("effects", Effects)
       end
