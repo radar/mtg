@@ -53,6 +53,8 @@ module Magic
       @game = game
     end
 
+    def entering_counters = {}
+
     def zone=(zone)
       @zone = zone
     end

@@ -145,13 +145,15 @@ module Magic
     end
 
     # Kinds whose Oracle text always includes a particular line.
-    REQUIRED_RULE = { equipment: "Equip", aura: "Enchant", instant: "SpellEffect", sorcery: "SpellEffect", saga: "Chapter" }.freeze
+    REQUIRED_RULE = {
+      equipment: %w[Equip], aura: %w[Enchant], instant: %w[SpellEffect Modal], sorcery: %w[SpellEffect Modal], saga: %w[Chapter]
+    }.freeze
 
     def require_rule(kind)
-      name = REQUIRED_RULE[kind] or return
-      return if @result.rules.any? { _1.class.name.split("::").last == name }
+      names = REQUIRED_RULE[kind] or return
+      return if @result.rules.any? { names.include?(_1.class.name.split("::").last) }
 
-      raise CardParser::ParseError, "#{kind} needs an #{name} line"
+      raise CardParser::ParseError, "#{kind} needs an #{names.join(' or ')} line"
     end
 
     # Sections for the class body: rule-provided bodies, then nested classes per hook.

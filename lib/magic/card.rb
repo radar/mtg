@@ -108,6 +108,11 @@ module Magic
         end
       end
 
+      # "~ enters with two +1/+1 counters on it."
+      def enters_with_counters(counter_type, amount)
+        define_method(:entering_counters) { { counter_type => amount } }
+      end
+
       def additional_lands_per_turn(amount)
         define_method(:additional_lands_per_turn) do
           amount
@@ -261,6 +266,11 @@ module Magic
 
     def enters_tapped?
       false
+    end
+
+    # Counters the permanent enters with ({ "+1/+1" => 2 }).
+    def entering_counters
+      {}
     end
 
     def activated_abilities

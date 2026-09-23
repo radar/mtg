@@ -3,7 +3,7 @@ module Magic
     class Battlefield < Zone
       extend Forwardable
 
-      def_delegators :items, :creatures, :planeswalkers, :not_controlled_by, :controlled_by, :phased_out, :nonland, :nontoken
+      def_delegators :items, :creatures, :planeswalkers, :artifacts, :not_controlled_by, :controlled_by, :phased_out, :nonland, :nontoken
 
       def battlefield?
         true

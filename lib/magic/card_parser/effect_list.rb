@@ -75,7 +75,7 @@ module Magic
       def trigger_source(entry: "call")
         targeted = leaves(effects).find(&:target_choices)
         choices, statements = render(effects, INSIDE_CHOICE)
-        statements.unshift("return if (#{expand(targeted.target_choices, 'actor')}).none?\n") if targeted && !effects.first.equal?(targeted)
+        statements.unshift("return if (#{expand(targeted.target_choices, 'actor')}).none?") if targeted && !effects.first.equal?(targeted)
         (definitions + choices + [method(entry, statements)]).join("\n")
       end
 
@@ -154,8 +154,9 @@ module Magic
         "class #{name} < #{base}\n#{indent(sections.join("\n"))}\nend\n"
       end
 
+      # Statements may span several lines (a do...end block).
       def method(signature, lines)
-        "def #{signature}\n#{lines.map { "  #{_1.chomp}\n" }.join}end\n"
+        "def #{signature}\n#{lines.join("\n").lines.map { "  #{_1.chomp}\n" }.join}end\n"
       end
 
       def indent(source) = source.gsub(/^(?=.)/, "  ").chomp

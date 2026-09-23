@@ -56,6 +56,7 @@ module Magic
       )
 
       permanent.tap! if enters_tapped
+      card.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       add_additional_counters_for_entering(game:, permanent:) if card.creature?
       permanent

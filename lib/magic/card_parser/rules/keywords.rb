@@ -15,6 +15,13 @@ module Magic
           new(keywords: words.map(&:to_sym)) if words.all? { |word| KNOWN.include?(word) }
         end
 
+        # "flying", "flying and first strike", "flying, trample, and haste" =>
+        # [:flying, ...], or nil unless every word is a known keyword.
+        def self.phrase(text)
+          words = text.split(/,\s*(?:and\s+)?|\s+and\s+/).map { _1.strip.downcase.tr(" ", "_") }
+          words.map(&:to_sym) if words.any? && words.all? { KNOWN.include?(_1) }
+        end
+
         def self.merge(rules)
           rules.empty? ? [] : [new(keywords: rules.flat_map(&:keywords))]
         end

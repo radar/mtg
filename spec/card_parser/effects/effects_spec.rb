@@ -114,6 +114,29 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("~ gets +1/+1.")).to be_nil
   end
 
+  it "parses keyword grants until end of turn, alone or with a pump" do
+    this = Magic::CardParser::Effect::THIS
+    expect(described_class.parse("~ gains flying until end of turn.").resolve_call)
+      .to eq("trigger_effect(:grant_keyword, target: #{this}, keyword: :flying)")
+    both = described_class.parse("Target creature gets +2/+0 and gains first strike and trample until end of turn.")
+    expect(both.target_choices).to eq("battlefield.creatures")
+    expect(both.resolve_call).to eq(<<~RUBY.chomp)
+      trigger_effect(:modify_power_toughness, target: target, power: 2, toughness: 0)
+      trigger_effect(:grant_keyword, target: target, keyword: :first_strike)
+      trigger_effect(:grant_keyword, target: target, keyword: :trample)
+    RUBY
+    expect(described_class.parse("Creatures you control gain haste until end of turn.").resolve_call)
+      .to eq("battlefield.controlled_by(controller).creatures.each { |creature| trigger_effect(:grant_keyword, target: creature, keyword: :haste) }")
+    expect(described_class.parse("~ gains protection from red until end of turn.")).to be_nil
+  end
+
+  it "parses returning a card from your graveyard" do
+    creature = described_class.parse("Return target creature card from your graveyard to your hand.")
+    expect(creature.target_choices).to eq('controller.graveyard.cards.select { _1.type?("Creature") }')
+    expect(creature.resolve_call).to eq("target.move_to_hand!")
+    expect(described_class.parse("Return target card from your graveyard to your hand.").target_choices).to eq("controller.graveyard.cards.to_a")
+  end
+
   it "has no targets for untargeted effects" do
     expect(e.const_get(:DrawCards).new(1).target_choices).to be_nil
   end
