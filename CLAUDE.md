@@ -205,6 +205,10 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 - A loyalty ability that costs more than the planeswalker has needs `planeswalker.change_loyalty!(n)` first. Two copies of a legendary planeswalker trigger a pending legend-rule choice that blocks all stack resolution.
 - **DSL-block leak**: a `class Foo` written inside a `Creature("Name") do ... end` block lands in `Magic::Cards::Foo`, and a bare `ActivatedAbility` in *any* other card then resolves to whichever leaked `Magic::Cards::ActivatedAbility` loaded last. It showed up as a spec that passed alone and failed in the full suite (`Speaker of the Heavens`, fixed). Put nested classes in a class reopening.
 
+## Card Parser
+
+`printf 'Name {cost}\nType — Sub\nrules\nP/T\n' | bundle exec rake parse_card` writes `lib/magic/cards/<name>.rb` from plain card text (`Magic::CardParser` → `Magic::CardGenerator`). Header, type line and P/T live in `card_parser.rb`; each rules-text pattern is one file in `lib/magic/card_parser/rules/` (`Data.define` class that `include Rule`; found by glob, no registration). A rule implements `.parse(line)` (instance or nil) and, for nested classes, `hook` (`:static_abilities`/`:activated_abilities`/`:event_handlers`), `class_base_name`, `class_source(name)` (plus `handled_event` for event handlers). Add a mechanic = one rule file + `spec/card_parser/rules/<rule>_spec.rb`. Write rule classes as `class X < Data.define(...)`, not `X = Data.define do ... end` — constants in a `Data.define` block leak to the enclosing `Rules` module. Unrecognised rules text raises `UnsupportedCard`.
+
 ## Card Ability Patterns
 
 Moved to `docs/card_patterns.md` (Common Card Ability Patterns, TriggeredAbility Subclasses, Static Ability Subclasses, CardList Helper Methods) — kept out of this file since it only matters when implementing a card; `implement-card` skill reads it directly.

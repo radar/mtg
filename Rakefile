@@ -33,3 +33,12 @@ task :search_cards, :fragment do |task, args|
   names = Magic::Oracle.new.search_cards(args[:fragment])
   puts names.inspect
 end
+
+desc "Generate lib/magic/cards/<name>.rb from card text on stdin (see Magic::CardParser)"
+task :parse_card do
+  result = Magic::CardParser.parse($stdin.read)
+  path = "lib/magic/cards/#{Magic::CardGenerator.snake_name(result.name)}.rb"
+  abort "Already exists: #{path}" if File.exist?(path)
+  File.write(path, Magic::CardGenerator.generate(result))
+  puts "Created #{path}"
+end
