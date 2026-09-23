@@ -1,19 +1,11 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative "card_parser_helpers"
 
 RSpec.describe "CardParser generated effects in play" do
+  include CardParserHelpers
   include_context "two player game"
-
-  def load_card(text)
-    result = Magic::CardParser.parse(text)
-    const = Magic::CardGenerator.const_name(result.name)
-    Magic::Cards.send(:remove_const, const) if Magic::Cards.const_defined?(const, false)
-    # rubocop:disable Security/Eval
-    eval(Magic::CardGenerator.generate(result))
-    # rubocop:enable Security/Eval
-    Magic::Cards.const_get(const)
-  end
 
   # Pays a {N}{C} cost with mana of colour C only.
   def cast(name, color, generic)

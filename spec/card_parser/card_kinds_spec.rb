@@ -1,21 +1,10 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require_relative "card_parser_helpers"
 
 RSpec.describe "CardParser card kinds" do
-  def generate(text)
-    Magic::CardGenerator.generate(Magic::CardParser.parse(text))
-  end
-
-  def load_card(text)
-    name = text.lines.first[/\A[^{\n]+/].strip
-    const = Magic::CardGenerator.const_name(name)
-    Magic::Cards.send(:remove_const, const) if Magic::Cards.const_defined?(const, false)
-    # rubocop:disable Security/Eval
-    eval(generate(text))
-    # rubocop:enable Security/Eval
-    Magic::Cards.const_get(const)
-  end
+  include CardParserHelpers
 
   it "generates an instant with its effect" do
     source = generate("Lightning Bolt {R}\nInstant\nLightning Bolt deals 3 damage to any target.\n")
@@ -106,6 +95,18 @@ RSpec.describe "CardParser card kinds" do
       land = ResolvePermanent("Parsed Grove", owner: p1)
       p1.activate_ability(ability: land.activated_abilities.first)
       expect(p1.mana_pool[:green]).to eq(1)
+    end
+
+    it "plays a generated tapped tri-land that taps for a chosen colour" do
+      go_to_main_phase!
+      load_card("Parsed Shrine\nLand\nParsed Shrine enters tapped.\n{T}: Add {R}, {G}, or {W}.\n")
+      p1.play_land(land: Card("Parsed Shrine", owner: p1))
+      shrine = p1.permanents.by_name("Parsed Shrine").first
+      expect(shrine).to be_tapped
+
+      shrine.untap!
+      p1.activate_ability(ability: shrine.activated_abilities.first) { _1.choose(:white) }
+      expect(p1.mana_pool[:white]).to eq(1)
     end
 
     it "resolves a generated equipment with an equip ability" do
