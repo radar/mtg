@@ -18,13 +18,18 @@ RSpec.describe Magic::CardParser::Rules::Chapter do
   end
 
   it "rejects chapters with unsupported effects" do
-    expect { described_class.parse("I — Scry 2.") }.to raise_error(Magic::CardParser::UnsupportedCard, /Scry 2/)
+    expect { described_class.parse("I — Mill two cards.") }.to raise_error(Magic::CardParser::UnsupportedCard, /Mill two cards/)
   end
 
   it "merges a card's chapters, requiring them in order" do
     lines = ["I — Draw a card.", "II, III — You gain 2 life."].map { described_class.parse(_1) }
     expect(described_class.merge(lines).map { _1.chapters.keys }).to eq([[1, 2, 3]])
     expect { described_class.merge([described_class.parse("II — Draw a card.")]) }.to raise_error(Magic::CardParser::ParseError, /without gaps/)
+  end
+
+  it "renders a choice effect's choice class inside the chapter" do
+    source = described_class.new({ 1 => Magic::CardParser::Effects::Scry.new(2) }).body_source
+    expect(source).to include("class ScryChoice < Magic::Choice::Scry; end", "ScryChoice.new(actor: self, amount: 2)")
   end
 
   it "renders chapter abilities, a targeted one as a choice" do

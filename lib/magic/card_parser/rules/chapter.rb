@@ -39,7 +39,8 @@ module Magic
         private
 
         def chapter_source(number, effect)
-          body = [effect.definitions, *(effect.target_choices ? targeted_source(effect) : untargeted_source(effect))].compact
+          choice_class = "class #{effect.choice_class_name} < #{effect.choice_base}; end\n" if effect.choice_base
+          body = [effect.definitions, choice_class, *(effect.target_choices ? targeted_source(effect) : untargeted_source(effect))].compact
           "class Chapter#{number} < Saga::ChapterAbility\n#{body.join("\n").gsub(/^(?=.)/, '  ')}end\n"
         end
 
