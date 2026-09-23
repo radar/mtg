@@ -8,7 +8,9 @@ module Magic
     #
     #   Effect.parse(text)  -> effect instance, or nil
     #   #target_choices     -> Ruby expression for the legal targets, or nil when untargeted
-    #   #resolve_call       -> Ruby statement that does the effect (`target` is in scope when targeted)
+    #   #resolve_call       -> Ruby statement that does the effect (`target` is in scope when targeted;
+    #                          `self` is the spell or chapter ability, usable as a Choice's actor)
+    #   #definitions        -> Ruby defining constants resolve_call needs (a token class), or nil
     module Effect
       def self.all
         CardParser.load_all("effects", Effects)
@@ -19,6 +21,7 @@ module Magic
       end
 
       def target_choices = nil
+      def definitions = nil
     end
   end
 end

@@ -58,14 +58,29 @@ RSpec.describe Magic::Cards::BattleForBretagard do
         game.tick!
       end
 
-      it "triggers Chapter 3 (grants deathtouch to all creatures) and sacrifices itself" do
+      it "triggers Chapter 3 (copies tokens with different names) and sacrifices itself" do
         human_warrior = game.battlefield.creatures.by_name("Human Warrior").first
         elf_warrior = game.battlefield.creatures.by_name("Elf Warrior").first
 
-        expect(human_warrior).to have_keyword(:deathtouch)
-        expect(elf_warrior).to have_keyword(:deathtouch)
+        choice = game.choices.last
+        expect(choice).to be_a(Magic::Choice::CopyTokens)
+        expect(choice.choices).to contain_exactly(human_warrior, elf_warrior)
 
+        game.resolve_choice!(targets: [human_warrior, elf_warrior])
+
+        expect(game.battlefield.creatures.by_name("Human Warrior").count).to eq(2)
+        expect(game.battlefield.creatures.by_name("Elf Warrior").count).to eq(2)
+        expect(game.battlefield.creatures.by_name("Elf Warrior").map(&:controller)).to all(eq(p1))
         expect(saga_card.zone).to be_graveyard
+      end
+
+      it "does not copy two tokens with the same name" do
+        ResolvePermanent("Elvish Mystic", owner: p1)
+        elf_warriors = [game.battlefield.creatures.by_name("Elf Warrior").first]
+        elf_warriors << Magic::Cards::BattleForBretagard::Chapter2::ElfWarriorToken.new(game: game, owner: p1).resolve!
+
+        expect(game.choices.last.choices).not_to include(game.battlefield.by_name("Elvish Mystic").first)
+        expect { game.resolve_choice!(targets: elf_warriors) }.to raise_error(ArgumentError, /different names/)
       end
     end
   end

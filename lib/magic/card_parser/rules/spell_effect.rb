@@ -16,6 +16,12 @@ module Magic
         def kinds = %i[instant sorcery]
 
         def body_source
+          [effect.definitions, resolve_source].compact.join("\n")
+        end
+
+        private
+
+        def resolve_source
           return "def resolve!\n  #{effect.resolve_call}\nend\n" unless effect.target_choices
 
           <<~RUBY
