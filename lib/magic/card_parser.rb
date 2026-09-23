@@ -38,11 +38,19 @@ module Magic
     NAME_AND_COST = /\A(?<name>.+?)(?:\s+(?<cost>(?:\{[^}]+\})+))?\z/
     PT = %r{\A(?<power>-?\d+)/(?<toughness>-?\d+)\z}
 
+    # Every class in lib/magic/card_parser/<dir>/, so a new file needs no registration.
+    def self.load_all(dir, namespace)
+      Dir[File.join(__dir__, "card_parser", dir, "*.rb")].sort.map do |path|
+        namespace.const_get(File.basename(path, ".rb").split("_").map(&:capitalize).join)
+      end
+    end
+
     def self.parse(text)
       new(text).parse
     end
 
     def initialize(text)
+      @name = text.strip.lines.first.to_s[/\A[^{\n]+/].to_s.strip
       @lines = text.strip.lines.map { |line| line.gsub(/\s*\([^)]*\)/, "").strip }.reject(&:empty?)
     end
 
@@ -51,7 +59,7 @@ module Magic
 
       header, type_line, *rest = @lines
       pt_line = rest.pop if rest.last&.match?(PT)
-      rules = parse_rules(rest)
+      rules = parse_rules(rest.map { |line| line.gsub(@name, "~") })
 
       header_match = NAME_AND_COST.match(header) or raise ParseError, "bad name line: #{header}"
       supertypes, types, subtypes = parse_type_line(type_line)

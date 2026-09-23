@@ -17,14 +17,24 @@ RSpec.describe "CardParser card kinds" do
     Magic::Cards.const_get(const)
   end
 
-  it "generates an instant" do
-    expect(generate("Zap {R}\nInstant\n")).to include('Zap = Instant("Zap") do', "cost red: 1")
+  it "generates an instant with its effect" do
+    source = generate("Lightning Bolt {R}\nInstant\nLightning Bolt deals 3 damage to any target.\n")
+    expect(source).to include('LightningBolt = Instant("Lightning Bolt") do', "cost red: 1", "class LightningBolt < Instant",
+                              "game.any_target", "trigger_effect(:deal_damage, target: target, damage: 3)")
   end
 
   it "generates a sorcery, enchantment and artifact" do
-    expect(generate("Rite {1}{B}\nSorcery\n")).to include('Sorcery("Rite")')
+    expect(generate("Rite {1}{B}\nSorcery\nYou gain 3 life.\n")).to include('Sorcery("Rite")', "trigger_effect(:gain_life")
     expect(generate("Aura Of Calm {2}{W}\nEnchantment\n")).to include('Enchantment("Aura Of Calm")')
     expect(generate("Baubles {2}\nArtifact\n")).to include('Artifact("Baubles")')
+  end
+
+  it "requires an effect on instants and sorceries" do
+    expect { generate("Zap {R}\nInstant\n") }.to raise_error(Magic::CardParser::ParseError, /SpellEffect/)
+  end
+
+  it "rejects spell effects on other kinds" do
+    expect { generate("Baubles {2}\nArtifact\nDraw a card.\n") }.to raise_error(Magic::CardParser::UnsupportedCard)
   end
 
   it "generates a legendary artifact" do
@@ -70,6 +80,16 @@ RSpec.describe "CardParser card kinds" do
 
   context "when the generated cards are loaded" do
     include_context "two player game"
+
+    it "casts a generated Lightning Bolt at a player" do
+      load_card("Parsed Bolt {R}\nInstant\nParsed Bolt deals 3 damage to any target.\n")
+      bolt = Card("Parsed Bolt", owner: p1)
+      p1.hand.add(bolt)
+      p1.add_mana(red: 1)
+      p1.cast(card: bolt) { |a| a.pay_mana(red: 1); a.targeting(p2) }
+      game.stack.resolve!
+      expect(p2.life).to eq(17)
+    end
 
     it "puts a generated land on the battlefield and taps it for mana" do
       load_card("Parsed Grove\nLand\n{T}: Add {G}.\n")

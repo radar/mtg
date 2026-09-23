@@ -20,9 +20,7 @@ module Magic
       HOOKS = %i[static_abilities activated_abilities event_handlers].freeze
 
       def self.all
-        Dir[File.join(__dir__, "rules", "*.rb")].sort.map do |path|
-          Rules.const_get(File.basename(path, ".rb").split("_").map(&:capitalize).join)
-        end
+        CardParser.load_all("rules", Rules)
       end
 
       def self.included(base)
@@ -34,6 +32,8 @@ module Magic
         def merge(rules) = rules
       end
 
+      # Kinds of card (:instant, :creature, ...) this rule may appear on; nil means any.
+      def kinds = nil
       def dsl_lines = []
       def hook = nil
       def body_source = nil

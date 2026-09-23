@@ -78,6 +78,7 @@ module Magic
     def builder_source
       kind = self.kind
       require_rule(kind)
+      check_rule_kinds(kind)
       lines = []
       lines << "cost #{cost_args}" if @result.mana_cost.any?
       lines.concat(type_lines(kind))
@@ -134,8 +135,20 @@ module Magic
       end
     end
 
+    # A rule that only makes sense on some kinds (spell effects on instants/sorceries).
+    def check_rule_kinds(kind)
+      @result.rules.each do |rule|
+        next if rule.kinds.nil? || rule.kinds.include?(kind)
+
+        raise CardParser::UnsupportedCard, "#{rule.class.name.split('::').last} not supported on #{kind}"
+      end
+      return unless @result.rules.count { _1.is_a?(CardParser::Rules::SpellEffect) } > 1
+
+      raise CardParser::UnsupportedCard, "only one spell effect per card is supported"
+    end
+
     # Kinds whose Oracle text always includes a particular line.
-    REQUIRED_RULE = { equipment: "Equip", aura: "Enchant" }.freeze
+    REQUIRED_RULE = { equipment: "Equip", aura: "Enchant", instant: "SpellEffect", sorcery: "SpellEffect" }.freeze
 
     def require_rule(kind)
       name = REQUIRED_RULE[kind] or return
