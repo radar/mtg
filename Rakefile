@@ -36,7 +36,7 @@ end
 
 desc "Generate lib/magic/cards/<name>.rb from card text on stdin (see Magic::CardParser)"
 task :parse_card do
-  result = Magic::CardParser.parse($stdin.read)
+  result = Magic::CardParser.parse($stdin.read.force_encoding(Encoding::UTF_8))
   path = "lib/magic/cards/#{Magic::CardGenerator.snake_name(result.name)}.rb"
   abort "Already exists: #{path}" if File.exist?(path)
   File.write(path, Magic::CardGenerator.generate(result))

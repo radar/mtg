@@ -55,8 +55,13 @@ RSpec.describe "CardParser card kinds" do
     expect(source).to include('Aura("Big Rune")', 'enchant "Creature", you_control: true', "battlefield.controlled_by(controller).creatures")
   end
 
-  it "generates a saga" do
-    expect(generate("Old Tale {2}{G}\nEnchantment — Saga\n")).to include('Saga("Old Tale")')
+  it "generates a saga with its chapters" do
+    source = generate("Old Tale {2}{G}\nEnchantment — Saga\n(Reminder.)\nI — Draw a card.\nII — You gain 2 life.\n")
+    expect(source).to include('Saga("Old Tale")', "class OldTale < Saga", "class Chapter2 < Saga::ChapterAbility", "[Chapter1, Chapter2]")
+  end
+
+  it "generates token definitions for spells" do
+    expect(generate("Raise {W}\nSorcery\nCreate a 1/1 white Soldier creature token.\n")).to include("SoldierToken = Token.create")
   end
 
   it "generates a land with a mana ability" do
@@ -71,6 +76,11 @@ RSpec.describe "CardParser card kinds" do
   it "requires equip and enchant lines" do
     expect { generate("Sword {3}\nArtifact — Equipment\n") }.to raise_error(Magic::CardParser::ParseError, /Equip/)
     expect { generate("Rune {1}\nEnchantment — Aura\n") }.to raise_error(Magic::CardParser::ParseError, /Enchant/)
+    expect { generate("Old Tale {1}\nEnchantment — Saga\n") }.to raise_error(Magic::CardParser::ParseError, /Chapter/)
+  end
+
+  it "rejects chapters outside sagas" do
+    expect { generate("Baubles {2}\nEnchantment\nI — Draw a card.\n") }.to raise_error(Magic::CardParser::UnsupportedCard, /Chapter/)
   end
 
   it "rejects unsupported type lines" do
@@ -103,6 +113,17 @@ RSpec.describe "CardParser card kinds" do
       blade = ResolvePermanent("Parsed Blade", owner: p1)
       expect(blade.card.types).to include("Artifact", "Equipment")
       expect(blade.activated_abilities.size).to eq(1)
+    end
+
+    it "resolves a generated saga's chapters, including a targeted one" do
+      load_card("Parsed Tale {1}\nEnchantment — Saga\nI — Create a 2/2 green Wolf creature token.\nII — Parsed Tale deals 3 damage to any target.\n")
+      saga = ResolvePermanent("Parsed Tale", owner: p1)
+      expect(game.battlefield.creatures.by_name("Wolf").map(&:power)).to eq([2])
+
+      saga.trigger_effect(:add_counter, counter_type: "lore", target: saga)
+      game.resolve_choice!(target: p2)
+      expect(p2.life).to eq(17)
+      expect(saga.card.zone).to be_graveyard
     end
 
     it "restricts a generated aura to creatures you control" do

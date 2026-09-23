@@ -26,7 +26,7 @@ module Magic
           index = effects.index(&:choice_base) || effects.size
           now = effects[..index]
           later = effects[(index + 1)..]
-          [*choice_class(effects[index], later), resolve_source(now, targeted.first)].join("\n")
+          [*effects.filter_map(&:definitions), *choice_class(effects[index], later), resolve_source(now, targeted.first)].join("\n")
         end
 
         private
