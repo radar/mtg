@@ -142,6 +142,6 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
 - To check a pattern against real behaviour, generate an existing hand-written card
   into `lib/magic/cards/`, run its spec, then restore the original. Cards checked this
   way: Temple of Mystery, Jungle Hollow, Dismal Backwater, Mind Stone, Enchantress's
-  Presence, Phyrexian Arena, Firebrand Archer, Kessig Flamebreather, Glorious Anthem,
-  Titanic Growth (Beast Whisperer's triggers too; the repo has it as a 2/3, and
-  Titanic Growth at {1}{G}).
+  Presence, Phyrexian Arena, Beast Whisperer, Firebrand Archer, Kessig Flamebreather,
+  Glorious Anthem, Titanic Growth. Generate from the card's exact text (cost, P/T):
+  a mismatch there fails the card's spec for reasons unrelated to the parser.
