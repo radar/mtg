@@ -16,7 +16,7 @@ module Magic
 
         def choice_base = "Magic::Choice::Scry"
         def choice_class_name = "ScryChoice"
-        def resolve_call = "game.choices.add(ScryChoice.new(actor: self, amount: #{amount}))"
+        def choice_args = "amount: #{amount}"
       end
     end
   end

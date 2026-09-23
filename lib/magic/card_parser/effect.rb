@@ -10,7 +10,9 @@ module Magic
     #   #target_choices     -> Ruby expression for the legal targets, or nil when untargeted
     #   #resolve_call       -> Ruby statement that does the effect (`target` is in scope when targeted)
     #   #choice_base        -> Choice class the effect adds (e.g. scry), or nil; the
-    #                          effects after it run in a subclass named #choice_class_name
+    #                          effects after it run in a subclass named #choice_class_name,
+    #                          created with #choice_args (see EffectList)
+    #   #definitions        -> Ruby the effect needs alongside it (a token class), as a list
     module Effect
       def self.all
         CardParser.load_all("effects", Effects)
@@ -22,6 +24,7 @@ module Magic
 
       def target_choices = nil
       def choice_base = nil
+      def definitions = []
     end
   end
 end

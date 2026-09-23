@@ -7,7 +7,7 @@ module Magic
       class DealDamage < Data.define(:amount, :targets)
         include Effect
 
-        LINE = /\A~ deals (?<amount>\d+|\w+) damage to (?<targets>[\w ]+?)\.?\z/
+        LINE = /\A(?:~|It) deals (?<amount>\d+|\w+) damage to (?<targets>[\w ]+?)\.?\z/
         TARGETS = {
           "any target" => "game.any_target",
           "target creature" => "battlefield.creatures",

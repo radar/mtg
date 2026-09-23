@@ -3,18 +3,18 @@
 module Magic
   class CardParser
     module Effects
-      # "Destroy target creature." / "Destroy target artifact an opponent controls."
-      class DestroyTarget < Data.define(:targets)
+      # "Exile target creature." / "Exile target enchantment an opponent controls."
+      class ExileTarget < Data.define(:targets)
         include Effect
 
-        LINE = /\ADestroy #{PermanentTarget::PATTERN}\.?\z/i
+        LINE = /\AExile #{PermanentTarget::PATTERN}\.?\z/i
 
         def self.parse(text)
           new(targets: PermanentTarget.choices($~)) if LINE.match(text)
         end
 
         def target_choices = targets
-        def resolve_call = "trigger_effect(:destroy_target, target: target)"
+        def resolve_call = "trigger_effect(:exile, target: target)"
       end
     end
   end
