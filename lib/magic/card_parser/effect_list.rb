@@ -6,7 +6,7 @@ module Magic
     # after a choice point (a scry, or a target in a triggered ability) run
     # once that choice resolves, in a Choice subclass generated alongside.
     class EffectList < Data.define(:effects)
-      SENTENCE = /(?<=\.)\s+|,? then /i
+      SENTENCE = /(?<=\.)\s+|,? then |,? and (?=you )/i
 
       # `text` as one effect (some span two sentences), else every sentence as an
       # effect; nil unless all of them parse.

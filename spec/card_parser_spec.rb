@@ -40,7 +40,7 @@ RSpec.describe Magic::CardParser do
   end
 
   it "rejects other rules text" do
-    expect { described_class.parse("Bear {1}{G}\nCreature — Bear\nWhen Bear dies, draw a card.\n2/2") }
+    expect { described_class.parse("Bear {1}{G}\nCreature — Bear\nWhen Bear leaves the battlefield, draw a card.\n2/2") }
       .to raise_error(described_class::UnsupportedCard)
   end
 
@@ -68,7 +68,7 @@ RSpec.describe Magic::CardParser do
     end
 
     it "rejects rules text no rule recognises" do
-      expect { described_class.parse("Bear {1}{G}\nCreature — Bear\nWhen Bear dies, draw a card.\n2/2") }
+      expect { described_class.parse("Bear {1}{G}\nCreature — Bear\nWhen Bear leaves the battlefield, draw a card.\n2/2") }
         .to raise_error(described_class::UnsupportedCard)
     end
 
