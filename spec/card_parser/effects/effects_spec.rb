@@ -137,6 +137,17 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Return target card from your graveyard to your hand.").target_choices).to eq("controller.graveyard.cards.to_a")
   end
 
+  it "parses removing counters from itself and sacrificing itself" do
+    this = Magic::CardParser::Effect::THIS
+    expect(described_class.parse("Remove a time counter from ~.").resolve_call).to eq(
+      "trigger_effect(:remove_counter, counter_type: Counters::Time, target: #{this}, amount: 1) " \
+      "if #{this}.counters.of_type(Counters::Time).count >= 1"
+    )
+    expect(described_class.parse("Remove a widget counter from ~.")).to be_nil
+    expect(described_class.parse("Sacrifice ~.").resolve_call).to eq("trigger_effect(:sacrifice, target: #{this})")
+    expect(described_class.parse("sacrifice it.".capitalize)).to eq(e.const_get(:SacrificeSelf).new)
+  end
+
   it "has no targets for untargeted effects" do
     expect(e.const_get(:DrawCards).new(1).target_choices).to be_nil
   end

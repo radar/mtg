@@ -12,6 +12,7 @@ module Magic
       when "blessing" then Blessing
       when "stun" then Stun
       when "hatchling" then Hatchling
+      when "time" then Time
       else
         raise "Unknown counter type: #{counter_type}"
       end

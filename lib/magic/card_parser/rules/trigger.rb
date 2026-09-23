@@ -10,6 +10,7 @@ module Magic
       #   Landfall — Whenever a land you control enters, you gain 1 life.
       #   Whenever you cast an instant or sorcery spell, scry 1.
       #   Whenever another creature you control dies, you may draw a card.
+      #   Whenever ~ enters or attacks, create a 1/1 white Soldier creature token.
       class Trigger < Data.define(:kind, :condition, :effect_list)
         include Rule
 
@@ -27,26 +28,49 @@ module Magic
           "a creature" => nil
         }.freeze
         ENTERS_UNDER_YOUR_CONTROL = "(?:you control enters|enters(?: the battlefield)? under your control)"
+        # "When" and "Whenever" are interchangeable here.
+        WHEN = "When(?:ever)?"
+
+        # "When ~ enters or attacks" (see merge).
+        ENTERS_OR_ATTACKS = "EntersOrAttacksTrigger"
+
         KINDS = [
-          Kind.new(/When ~ enters(?: the battlefield)?/, "EntersTrigger", "TriggeredAbility::EnterTheBattlefield",
+          Kind.new(/#{WHEN} ~ enters(?: the battlefield)?/, "EntersTrigger", "TriggeredAbility::EnterTheBattlefield",
                    :etb_triggers, nil, nil, PERMANENT_KINDS),
-          Kind.new(/When ~ dies/, "DiesTrigger", "TriggeredAbility::Death", :death_triggers, nil, nil, %i[creature]),
-          Kind.new(/When ~ leaves the battlefield/, "LeavesTrigger", "TriggeredAbility::LeaveTheBattlefield",
+          Kind.new(/#{WHEN} ~ enters(?: the battlefield)? or attacks/, ENTERS_OR_ATTACKS, nil, nil, nil, nil, %i[creature]),
+          Kind.new(/#{WHEN} ~ dies/, "DiesTrigger", "TriggeredAbility::Death", :death_triggers, nil, nil, %i[creature]),
+          Kind.new(/#{WHEN} ~ leaves the battlefield/, "LeavesTrigger", "TriggeredAbility::LeaveTheBattlefield",
                    :ltb_triggers, nil, nil, PERMANENT_KINDS),
-          Kind.new(/Whenever (?<who>#{CREATURE_DIES.keys.join('|')}) dies/, "CreatureDiesTrigger", "TriggeredAbility",
+          Kind.new(/#{WHEN} (?<who>#{CREATURE_DIES.keys.join('|')}) dies/, "CreatureDiesTrigger", "TriggeredAbility",
                    :event_handlers, "Events::CreatureDied", ->(m) { CREATURE_DIES.fetch(m[:who]) }, PERMANENT_KINDS),
-          Kind.new(/Whenever another creature #{ENTERS_UNDER_YOUR_CONTROL}/, "CreatureEntersTrigger",
+          Kind.new(/#{WHEN} another creature #{ENTERS_UNDER_YOUR_CONTROL}/, "CreatureEntersTrigger",
                    "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
                    "another_creature? && under_your_control?", PERMANENT_KINDS),
-          Kind.new(/Whenever a land #{ENTERS_UNDER_YOUR_CONTROL}/, "LandfallTrigger", "TriggeredAbility::Landfall",
+          Kind.new(/#{WHEN} a land #{ENTERS_UNDER_YOUR_CONTROL}/, "LandfallTrigger", "TriggeredAbility::Landfall",
                    :event_handlers, "Events::Landfall", "you?", PERMANENT_KINDS),
           Kind.new(/At the beginning of your upkeep/, "UpkeepTrigger", "TriggeredAbility::BeginningOfYourUpkeep",
                    :event_handlers, "Events::BeginningOfUpkeep", nil, PERMANENT_KINDS),
+          Kind.new(/At the beginning of combat on your turn/, "BeginningOfCombatTrigger", "TriggeredAbility",
+                   :event_handlers, "Events::BeginningOfCombat", "event.active_player == controller", PERMANENT_KINDS),
           Kind.new(/At the beginning of your end step/, "EndStepTrigger", "TriggeredAbility::BeginningOfEndStep",
                    :event_handlers, "Events::BeginningOfEndStep", "controllers_end_step?", PERMANENT_KINDS),
-          Kind.new(/Whenever ~ attacks/, "AttacksTrigger", "TriggeredAbility", :event_handlers,
+          Kind.new(/At the beginning of each end step/, "EachEndStepTrigger", "TriggeredAbility::BeginningOfEndStep",
+                   :event_handlers, "Events::BeginningOfEndStep", nil, PERMANENT_KINDS),
+          Kind.new(/#{WHEN} ~ attacks/, "AttacksTrigger", "TriggeredAbility", :event_handlers,
                    "Events::FinalAttackersDeclared", "event.attacks.any? { _1.attacker == actor }", %i[creature]),
-          Kind.new(/Whenever you cast an? (?<types>[\w-]+(?: or [\w-]+)?) spell/, "SpellCastTrigger", "TriggeredAbility::SpellCast",
+          Kind.new(/#{WHEN} you attack/, "YouAttackTrigger", "TriggeredAbility", :event_handlers,
+                   "Events::FinalAttackersDeclared", "event.active_player == controller && event.attacks.any?", PERMANENT_KINDS),
+          Kind.new(/#{WHEN} ~ deals combat damage to (?:a player|an opponent)/, "CombatDamageTrigger", "TriggeredAbility",
+                   :event_handlers, "Events::CombatDamageDealt", "event.source == actor && event.target.is_a?(Magic::Player)",
+                   %i[creature]),
+          Kind.new(%r{#{WHEN} the last (?<counter>[\w+/-]+) counter is removed from ~}, "LastCounterRemovedTrigger",
+                   "TriggeredAbility", :event_handlers, "Events::CounterRemoved",
+                   lambda { |m|
+                     counter = "Counters::#{Magic::Counters[m[:counter].downcase].name.split('::').last}"
+                     "event.permanent == actor && Counters[event.counter_type] == #{counter} && actor.counters.of_type(#{counter}).none?"
+                   },
+                   PERMANENT_KINDS),
+          Kind.new(/#{WHEN} you cast an? (?<types>[\w-]+(?: or [\w-]+)?) spell/, "SpellCastTrigger", "TriggeredAbility::SpellCast",
                    :event_handlers, "Events::SpellCast",
                    lambda { |m|
                      types = m[:types].split(" or ").map do |type|
@@ -70,7 +94,20 @@ module Magic
             return new(kind:, condition:, effect_list:)
           end
           nil
+        rescue RuntimeError => e
+          raise unless e.message.start_with?("Unknown counter type")
         end
+
+        # "When ~ enters or attacks" is two triggers with the same effects.
+        def self.merge(rules)
+          rules.flat_map do |rule|
+            next [rule] unless rule.kind.name == ENTERS_OR_ATTACKS
+
+            [rule.with(kind: kind_named("EntersTrigger")), rule.with(kind: kind_named("AttacksTrigger"), condition: kind_named("AttacksTrigger").condition)]
+          end
+        end
+
+        def self.kind_named(name) = KINDS.find { _1.name == name }
 
         def kinds = kind.kinds
         def hook = kind.hook

@@ -53,11 +53,19 @@ What the rules cover:
   and `modes Mode1, ...`. How many modes may be chosen ("one or both") isn't enforced.
 - `Trigger`: "<trigger>, <effects>" from its `KINDS` table, one `Kind` row per
   trigger (pattern, class name, `TriggeredAbility` base, hook, event,
-  `should_perform?` condition, allowed card kinds): When ~ enters, When ~ dies, When ~
-  leaves the battlefield, a/another creature [you control / an opponent controls]
-  dies, another creature you control enters, landfall, your upkeep, your end step,
-  ~ attacks, and you cast a <type>[ or <type>] spell (`non<type>` → `!spell.type?`).
-  A new trigger is one row. A leading ability word ("Landfall — ") is dropped.
+  `should_perform?` condition, allowed card kinds). "When" and "Whenever" are
+  interchangeable. Rows: ~ enters, ~ enters or attacks (`merge` splits it into an enters
+  trigger and an attacks trigger with the same effects), ~ dies, ~ leaves the
+  battlefield, a/another creature [you control / an opponent controls] dies, another
+  creature you control enters, landfall, your upkeep, beginning of combat on your turn
+  (`Events::BeginningOfCombat`), your end step, each end step, ~ attacks, you attack
+  (`event.active_player == controller && event.attacks.any?`), ~ deals combat damage
+  to a player (`Events::CombatDamageDealt`), the last <type> counter is removed from ~
+  (`Events::CounterRemoved`; the type must be one `Magic::Counters[]` knows), and you
+  cast a <type>[ or <type>] spell (`non<type>` → `!spell.type?`). A new trigger is one
+  row. A leading ability word ("Landfall — ") is dropped. "When ~ is turned face up"
+  isn't supported: the engine has no face-down permanents (morph, disguise,
+  manifest).
 - `Chapter`: saga chapters (`I — ...`, `II, III — ...`), merged into
   `ChapterN < Saga::ChapterAbility` classes and `def chapters`; chapters must be
   I, II, III... without gaps.
@@ -69,7 +77,8 @@ What the rules cover:
 - `Anthem`: "[Other] creatures you control get +N/+N[ and have <keywords>]." /
   "... have <keywords>." → `PowerAndToughnessModification` / `KeywordGrant` static
   abilities. `TribalLord` handles "Other <type>s you control get +N/+N."
-- `EntersWithCounters`: "~ enters with N +1/+1 counters on it." → the
+- `EntersWithCounters`: "~ enters with N <type> counters on it." (+1/+1 on creatures,
+  or any type `Magic::Counters[]` knows, e.g. time) → the
   `enters_with_counters "+1/+1", N` class macro (`Card#entering_counters`, added by
   `Permanent.resolve` before the permanent enters).
 - Lands: `EntersTapped` (→ `enters_tapped`), `TapForMana`, `TapForManaPerPermanent`,
@@ -87,8 +96,11 @@ class). Current effects: damage to a target or each opponent, draw, gain/lose li
 destroy/exile target (`PermanentTarget`: creature/artifact/enchantment/land, [you
 control / an opponent controls]), discard, +1/+1 counters, until-end-of-turn pumps and
 keyword grants for ~ / a target creature / [other] creatures you control (`Pump`),
-return target [type] card from your graveyard to your hand, creature tokens, copy
-tokens, scry.
+return target [type] card from your graveyard to your hand, remove N <type> counters
+from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens, copy tokens,
+scry. Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
+last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
+isn't supported.
 
 - An effect refers to its own card/permanent as `Effect::THIS`, which `EffectList`
   expands per context (`self` in a spell, `source` in an activated ability, `card` in a

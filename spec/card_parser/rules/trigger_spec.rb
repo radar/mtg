@@ -42,6 +42,43 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     end
   end
 
+  it "parses the combat, end step, attack and counter triggers" do
+    kinds = {
+      "Whenever ~ deals combat damage to a player, draw a card." =>
+        ["CombatDamageTrigger", "Events::CombatDamageDealt", "event.source == actor && event.target.is_a?(Magic::Player)"],
+      "At the beginning of combat on your turn, draw a card." =>
+        ["BeginningOfCombatTrigger", "Events::BeginningOfCombat", "event.active_player == controller"],
+      "At the beginning of each end step, draw a card." => ["EachEndStepTrigger", "Events::BeginningOfEndStep", nil],
+      "Whenever you attack, draw a card." =>
+        ["YouAttackTrigger", "Events::FinalAttackersDeclared", "event.active_player == controller && event.attacks.any?"],
+      "When the last time counter is removed from ~, draw a card." =>
+        ["LastCounterRemovedTrigger", "Events::CounterRemoved",
+         "event.permanent == actor && Counters[event.counter_type] == Counters::Time && actor.counters.of_type(Counters::Time).none?"]
+    }
+    kinds.each do |line, (name, event, condition)|
+      rule = parse(line)
+      expect([rule.class_base_name, rule.handled_event, rule.condition]).to eq([name, event, condition]), line
+    end
+    expect(parse("When the last widget counter is removed from ~, draw a card.")).to be_nil
+  end
+
+  it "treats When and Whenever alike" do
+    expect(parse("Whenever ~ enters, draw a card.").class_base_name).to eq("EntersTrigger")
+    expect(parse("When ~ attacks, draw a card.").class_base_name).to eq("AttacksTrigger")
+  end
+
+  it "splits enters-or-attacks into an enters trigger and an attacks trigger" do
+    rules = described_class.merge([parse("Whenever ~ enters or attacks, draw a card.")])
+    expect(rules.map { [_1.class_base_name, _1.hook, _1.condition] }).to eq(
+      [["EntersTrigger", :etb_triggers, nil], ["AttacksTrigger", :event_handlers, "event.attacks.any? { _1.attacker == actor }"]]
+    )
+    expect(rules.map(&:effect_list).uniq.size).to eq(1)
+  end
+
+  it "doesn't parse face-down triggers, which the engine can't do" do
+    expect(parse("When ~ is turned face up, draw a card.")).to be_nil
+  end
+
   it "parses leaves-the-battlefield triggers" do
     rule = parse("When ~ leaves the battlefield, draw a card.")
     expect([rule.class_base_name, rule.hook]).to eq(["LeavesTrigger", :ltb_triggers])
