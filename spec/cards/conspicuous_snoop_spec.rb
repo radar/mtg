@@ -20,6 +20,7 @@ RSpec.describe Magic::Cards::ConspicuousSnoop do
 
   it "reveals the new top card of your library after you draw" do
     p1.draw!
+    game.settle!
     new_top_card = p1.library.first
     expect(new_top_card.revealed?).to eq(true)
   end

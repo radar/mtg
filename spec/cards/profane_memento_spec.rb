@@ -32,7 +32,10 @@ RSpec.describe Magic::Cards::ProfaneMemento do
       end
 
       it "gains life" do
-        expect { subject.receive_event(event) }.to(change { p1.life }.by(1))
+        expect {
+          subject.receive_event(event)
+          game.settle!
+        }.to(change { p1.life }.by(1))
       end
     end
 

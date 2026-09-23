@@ -25,6 +25,7 @@ RSpec.describe Magic::Cards::ConclaveMentor do
     )
 
     game.add_effect(effect)
+    game.settle!
 
     expect(p1.life).to eq(22)
   end

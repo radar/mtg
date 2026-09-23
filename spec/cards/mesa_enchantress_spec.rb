@@ -15,7 +15,7 @@ RSpec.describe Magic::Cards::MesaEnchantress do
         _1.pay_mana(green: 1, generic: { green: 4 })
       end
 
-      game.tick!
+      game.settle!
 
       expect(p1).to receive(:draw!)
       expect(game.choices.last).to be_a(Magic::Cards::MesaEnchantress::Choice)

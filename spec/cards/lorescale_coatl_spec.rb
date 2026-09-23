@@ -14,6 +14,7 @@ RSpec.describe Magic::Cards::LorescaleCoatl do
     expect(lorescale_coatl.toughness).to eq(2)
 
     p1.draw!
+    game.settle!
     expect(lorescale_coatl.counters.of_type(Magic::Counters::Plus1Plus1).count).to eq(1)
   end
 end

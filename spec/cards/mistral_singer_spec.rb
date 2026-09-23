@@ -27,7 +27,7 @@ RSpec.describe Magic::Cards::MistralSinger do
       action = cast_action(player: p2, card: Card("Revitalize", owner: p2))
         .pay_mana(white: 1, generic: { blue: 1 })
         .perform
-      game.tick!
+      game.settle!
     end
 
     it "has a boosted power + toughness" do
@@ -43,7 +43,7 @@ RSpec.describe Magic::Cards::MistralSinger do
       action = cast_action(player: p2, card: Card("Onakke Ogre"))
         .pay_mana(red: 1, generic: { red: 1, black: 1 })
         .perform
-      game.tick!
+      game.settle!
     end
 
     it "has a regular power and toughness" do

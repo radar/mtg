@@ -13,6 +13,7 @@ RSpec.describe Magic::Cards::SazhsChocobo do
   describe "landfall ability" do
     it "triggers when you play a land" do
       p1.play_land(land: p1.hand.cards.by_name("Forest").first)
+      game.settle!
 
       expect(permanent.counters.count).to eq(1)
       expect(permanent.counters.of_type(Magic::Counters["+1/+1"]).count).to eq(1)

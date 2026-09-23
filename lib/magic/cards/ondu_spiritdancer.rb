@@ -16,8 +16,18 @@ module Magic
             end
         end
 
-        def call
+        # The "once per turn" mark must happen here, not in #call: #call is deferred
+        # (queued triggers), so the token this creates enters -- and re-dispatches
+        # EnteredTheBattlefield to every Spiritdancer, including this one and any
+        # other still-pending one -- before #call would otherwise get a chance to
+        # record that this Spiritdancer already copied this turn.
+        def trigger!
+          return false unless should_perform?
           game.current_turn.events << Events::OnduSpiritdancerCopied.new(actor: actor)
+          true
+        end
+
+        def call
           Permanent.resolve(
             game: game,
             owner: controller,

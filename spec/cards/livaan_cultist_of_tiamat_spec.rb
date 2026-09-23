@@ -19,7 +19,7 @@ RSpec.describe Magic::Cards::LivaanCultistOfTiamat do
       .pay_mana(red: 1)
       .targeting(p2)
       .perform
-    game.tick!
+    game.settle!
 
     expect(game.choices).to be_empty
     expect(livaan.power).to eq(2)
@@ -34,11 +34,11 @@ RSpec.describe Magic::Cards::LivaanCultistOfTiamat do
       .pay_mana(red: 1)
       .targeting(p2)
       .perform
-    game.tick!
+    game.settle!
 
     expect(game.choices).not_to be_empty
     game.resolve_choice!(target: bear)
-    game.tick!
+    game.settle!
 
     expect(bear.power).to eq(3)
     expect(bear.toughness).to eq(2)
@@ -50,7 +50,7 @@ RSpec.describe Magic::Cards::LivaanCultistOfTiamat do
     cast_action(player: p1, card: Card("Grizzly Bears", owner: p1))
       .pay_mana(generic: { green: 1 }, green: 1)
       .perform
-    game.tick!
+    game.settle!
 
     expect(game.choices).to be_empty
     expect(livaan.power).to eq(1)

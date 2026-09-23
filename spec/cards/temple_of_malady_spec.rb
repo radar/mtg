@@ -8,11 +8,11 @@ RSpec.describe Magic::Cards::TempleOfMalady do
 
   let!(:permanent) do
     p1.play_land(land: card)
+    game.settle!
     p1.permanents.by_name("Temple of Malady").first
   end
 
   it "enters the battlefield tapped" do
-    game.stack.resolve!
     expect(permanent).to be_tapped
   end
 

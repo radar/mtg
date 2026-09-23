@@ -8,6 +8,7 @@ RSpec.describe Magic::Cards::NarciFableSinger do
     enchantment = ResolvePermanent("Spirited Companion", owner: p1)
     hand_size = p1.hand.count
     enchantment.sacrifice!
+    game.settle!
 
     expect(p1.hand.count).to eq(hand_size + 1)
   end

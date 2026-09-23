@@ -10,6 +10,7 @@ RSpec.describe Magic::Cards::AdventurersInn do
 
   let!(:permanent) do
     p1.play_land(land: card)
+    game.settle!
     p1.permanents.by_name("Adventurer's Inn").first
   end
 

@@ -253,8 +253,9 @@ RSpec.describe "State-based actions (rule 704)" do
       end
 
       it "keeps an Aura with 'enchant creature' on any creature, whoever controls it" do
+        opponents_bears = ResolvePermanent("Grizzly Bears", owner: p2)
         dub = ResolvePermanent("Dub", owner: p1)
-        dub.attach_to!(ResolvePermanent("Grizzly Bears", owner: p2))
+        dub.attach_to!(opponents_bears)
         game.check_state_based_actions!
 
         expect(dub.zone).not_to be_nil

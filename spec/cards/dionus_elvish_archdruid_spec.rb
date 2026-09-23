@@ -21,7 +21,7 @@ RSpec.describe Magic::Cards::DionusElvishArchdruid do
     it "untaps it and puts a +1/+1 counter on it" do
       ability = llanowar_elves.activated_abilities.first
       p1.activate_ability(ability: ability)
-      game.tick!
+      game.settle!
 
       expect(llanowar_elves.tapped?).to be false
       expect(llanowar_elves.power).to eq(2)
@@ -31,9 +31,9 @@ RSpec.describe Magic::Cards::DionusElvishArchdruid do
     it "triggers only once each turn" do
       ability = llanowar_elves.activated_abilities.first
       p1.activate_ability(ability: ability)
-      game.tick!
+      game.settle!
       p1.activate_ability(ability: ability)
-      game.tick!
+      game.settle!
 
       expect(llanowar_elves.power).to eq(2)
       expect(llanowar_elves.toughness).to eq(2)
@@ -42,7 +42,7 @@ RSpec.describe Magic::Cards::DionusElvishArchdruid do
     it "applies to Dionus itself, since it is an Elf" do
       action = Magic::Actions::TapPermanent.new(game: game, player: p1, permanent: dionus)
       game.take_action(action)
-      game.tick!
+      game.settle!
 
       expect(dionus.tapped?).to be false
       expect(dionus.power).to eq(4)
@@ -56,7 +56,7 @@ RSpec.describe Magic::Cards::DionusElvishArchdruid do
     it "does not untap it or add a counter" do
       action = Magic::Actions::TapPermanent.new(game: game, player: p1, permanent: grizzly_bears)
       game.take_action(action)
-      game.tick!
+      game.settle!
 
       expect(grizzly_bears.tapped?).to be true
       expect(grizzly_bears.power).to eq(2)
@@ -70,7 +70,7 @@ RSpec.describe Magic::Cards::DionusElvishArchdruid do
     it "does not untap it or add a counter" do
       action = Magic::Actions::TapPermanent.new(game: game, player: p2, permanent: opponent_elves)
       game.take_action(action)
-      game.tick!
+      game.settle!
 
       expect(opponent_elves.tapped?).to be true
       expect(opponent_elves.power).to eq(1)
@@ -86,7 +86,7 @@ RSpec.describe Magic::Cards::DionusElvishArchdruid do
 
       action = Magic::Actions::TapPermanent.new(game: game, player: p1, permanent: llanowar_elves)
       game.take_action(action)
-      game.tick!
+      game.settle!
 
       expect(llanowar_elves.tapped?).to be true
       expect(llanowar_elves.power).to eq(1)

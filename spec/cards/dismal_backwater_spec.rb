@@ -8,6 +8,7 @@ RSpec.describe Magic::Cards::DismalBackwater do
 
   let!(:permanent) do
     p1.play_land(land: card)
+    game.settle!
     p1.permanents.by_name("Dismal Backwater").first
   end
 

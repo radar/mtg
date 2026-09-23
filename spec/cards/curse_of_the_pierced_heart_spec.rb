@@ -23,6 +23,7 @@ RSpec.describe Magic::Cards::CurseOfThePiercedHeart do
 
     expect {
       game.notify!(Magic::Events::BeginningOfUpkeep.new(player: p2))
+      game.settle!
     }.to change { p2.life }.by(-1)
   end
 
@@ -39,6 +40,7 @@ RSpec.describe Magic::Cards::CurseOfThePiercedHeart do
     planeswalker = ResolvePermanent("Basri Ket", owner: p2)
 
     game.notify!(Magic::Events::BeginningOfUpkeep.new(player: p2))
+    game.settle!
     game.resolve_choice!(target: planeswalker)
 
     expect(planeswalker.loyalty).to eq(2)

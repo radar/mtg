@@ -43,7 +43,7 @@ module Magic
       players: [],
       stack: nil,
       logger: nil,
-      queue_triggers: false
+      queue_triggers: true
     )
       @logger = Logger.new(STDOUT)
       @battlefield = battlefield
@@ -234,8 +234,24 @@ module Magic
         loop do
           battlefield.map(&:apply_continuous_effects!)
           sba_changed = StateBasedActions.new(game: self).perform!
+
+          if stack.pending_choices?
+            # Choice::OrderTriggers is pure queuing plumbing (there's no real agent yet
+            # to make this decision), so it auto-resolves transparently here rather than
+            # blocking every checkpoint call site on it. Any other pending choice is a
+            # real decision and stops the loop for the caller to resolve. Checked before
+            # #put_pending_triggers_on_stack! below (not just after) so a still-pending
+            # OrderTriggers choice for a player's remaining triggers is resolved before
+            # any more of that player's (or another player's) triggers are queued --
+            # otherwise a second call could re-batch the same not-yet-placed triggers
+            # into a duplicate choice, corrupting resolution order.
+            choice = choices.first
+            break unless choice.is_a?(Choice::OrderTriggers)
+            resolve_choice!(target: choice.target_choices.first)
+            next
+          end
+
           triggers_changed = queue_triggers? && put_pending_triggers_on_stack!
-          break if stack.pending_choices?
           break unless sba_changed || triggers_changed
         end
         check_for_state_triggered_abilities
@@ -249,6 +265,20 @@ module Magic
     # receive priority, so they wait while a choice is still pending (resolution is not finished yet).
     def state_based_actions_checkpoint!
       check_state_based_actions! unless stack.pending_choices?
+    end
+
+    # Resolves the stack (and, transitively, the trigger queue) to quiescence, for
+    # callers -- mainly specs, and raw engine calls made outside Turn#take_action --
+    # that skip the normal checkpoints and want "let everything that's already queued
+    # fully resolve" without simulating real priority passes. Stops as soon as a real
+    # (non-OrderTriggers) choice is pending, leaving it for the caller to resolve.
+    def settle!
+      loop do
+        check_state_based_actions!
+        break if stack.pending_choices?
+        break if stack.empty?
+        stack.resolve!
+      end
     end
 
     # Rule 603.8

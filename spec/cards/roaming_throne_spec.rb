@@ -42,6 +42,7 @@ RSpec.describe Magic::Cards::RoamingThrone do
         action.pay_mana(red: 1)
         action.targeting(throne)
         game.take_action(action)
+        game.settle!
 
         game.resolve_choice!(payment: { colorless: 2 })
       end
@@ -66,6 +67,7 @@ RSpec.describe Magic::Cards::RoamingThrone do
         action.pay_mana(red: 1)
         action.targeting(throne)
         game.take_action(action)
+        game.settle!
 
         game.resolve_choice!(payment: {})
       end

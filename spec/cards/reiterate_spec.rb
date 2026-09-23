@@ -32,13 +32,16 @@ RSpec.describe Magic::Cards::Reiterate do
   end
 
   it "lets you choose a new target for the copy" do
+    # Created before casting Shock -- ResolvePermanent settles the stack as it
+    # enters, which would otherwise resolve (and remove) the still-on-the-stack
+    # Shock before Reiterate gets a chance to target it.
+    bear = ResolvePermanent("Grizzly Bears", owner: p2)
+
     p1.add_mana(red: 4)
     shock_action = cast_action(player: p1, card: Card("Shock", owner: p1))
       .pay_mana(red: 1)
       .targeting(p2)
     shock_action.perform
-
-    bear = ResolvePermanent("Grizzly Bears", owner: p2)
 
     reiterate = Card("Reiterate", owner: p1)
     p1.hand.add(reiterate)

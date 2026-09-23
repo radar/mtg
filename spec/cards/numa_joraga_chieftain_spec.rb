@@ -14,7 +14,10 @@ RSpec.describe Magic::Cards::NumaJoragaChieftain do
   end
 
   context "at the beginning of combat on the controller's turn" do
-    before { game.notify!(Magic::Events::BeginningOfCombat.new(active_player: p1)) }
+    before do
+      game.notify!(Magic::Events::BeginningOfCombat.new(active_player: p1))
+      game.settle!
+    end
 
     it "offers to pay {X}{X}" do
       choice = game.choices.last

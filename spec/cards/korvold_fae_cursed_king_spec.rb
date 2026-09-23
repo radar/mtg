@@ -9,6 +9,7 @@ RSpec.describe Magic::Cards::KorvoldFaeCursedKing do
     hand_size = p1.hand.count
     korvold = ResolvePermanent("Korvold, Fae-Cursed King", owner: p1)
     game.resolve_choice!(target: target)
+    game.settle!
 
     expect(target.card.zone).to be_graveyard
     expect(korvold.counters.of_type(Magic::Counters::Plus1Plus1).count).to eq(1)

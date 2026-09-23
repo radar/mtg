@@ -37,6 +37,7 @@ RSpec.describe Magic::Cards::GibberingFiend do
 
       expect {
         game.notify!(Magic::Events::BeginningOfUpkeep.new(player: p2))
+        game.settle!
       }.to change { p2.life }.by(-1)
     end
 

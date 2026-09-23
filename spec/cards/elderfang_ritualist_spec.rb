@@ -15,6 +15,7 @@ RSpec.describe Magic::Cards::ElderfangRitualist do
 
       it "brings back wood elves" do
         elderfang_ritualist.destroy!
+        game.settle!
         expect(wood_elves.zone).to eq(p1.hand)
       end
     end

@@ -5,7 +5,7 @@ module Magic
 
       attr_reader :active_player, :number, :events, :combat, :actions
 
-      def_delegators :@game, :logger, :battlefield, :emblems, :players
+      def_delegators :@game, :logger, :battlefield, :emblems, :players, :settle!
       def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks, :attacking?
 
       state_machine :step, initial: :beginning do
@@ -26,6 +26,7 @@ module Magic
           turn.notify!(
             Events::BeginningOfUpkeep.new(player: turn.active_player)
           )
+          turn.settle!
         end
 
         after_transition to: :draw do |turn|
@@ -33,18 +34,21 @@ module Magic
             Events::DrawStep.new
           )
           turn.active_player.draw!
+          turn.settle!
         end
 
         after_transition to: :first_main do |turn|
           turn.notify!(
             Events::FirstMainPhase.new(active_player: turn.active_player)
           )
+          turn.settle!
         end
 
         after_transition to: :beginning_of_combat do |turn|
           turn.notify!(
             Events::BeginningOfCombat.new(active_player: turn.active_player)
           )
+          turn.settle!
         end
 
         after_transition to: :combat_damage do |turn|
@@ -67,6 +71,7 @@ module Magic
           turn.notify!(
             Events::BeginningOfEndStep.new(active_player: turn.active_player)
           )
+          turn.settle!
         end
 
         after_transition to: :cleanup do |turn|
@@ -184,7 +189,7 @@ module Magic
           turn: number,
           attacks: attacks,
         ))
-
+        settle!
 
         if combat.attackers_without_targets?
           finalize_attackers!
@@ -200,13 +205,14 @@ module Magic
           attacks: attacks,
         ))
           game.notify!(*attacks.map { Events::CreatureAttacked.new(attacker: _1.attacker, target: _1.target) })
+          settle!
       end
 
       def deal_combat_damage
         combat.deal_first_strike_damage
-        game.check_state_based_actions!
+        game.settle!
         combat.deal_combat_damage
-        game.check_state_based_actions!
+        game.settle!
       end
 
       def notify!(*events)

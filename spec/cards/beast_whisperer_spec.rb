@@ -27,6 +27,7 @@ RSpec.describe Magic::Cards::BeastWhisperer do
 
       expect {
         p1.cast(card: spell) { |a| a.pay_mana(green: 1) }
+        game.settle!
       }.to change { card_draws_for(p1).count }.by(1)
     end
   end

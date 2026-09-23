@@ -15,6 +15,7 @@ RSpec.describe Magic::Cards::WolverineRiders do
 
   it "creates a 1/1 green Elf Warrior token at the beginning of each upkeep" do
     game.notify!(Magic::Events::BeginningOfUpkeep.new(player: p1))
+    game.settle!
 
     tokens = p1.creatures.select { |c| c.name == "Elf Warrior" && c.token? }
     expect(tokens.count).to eq(1)
@@ -22,6 +23,7 @@ RSpec.describe Magic::Cards::WolverineRiders do
 
   it "also triggers on the opponent's upkeep" do
     game.notify!(Magic::Events::BeginningOfUpkeep.new(player: p2))
+    game.settle!
 
     tokens = p1.creatures.select { |c| c.name == "Elf Warrior" && c.token? }
     expect(tokens.count).to eq(1)

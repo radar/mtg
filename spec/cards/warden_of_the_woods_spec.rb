@@ -21,6 +21,7 @@ RSpec.describe Magic::Cards::WardenOfTheWoods do
       action.pay_mana(red: 1)
       action.targeting(warden)
       game.take_action(action)
+      game.settle!
     end
 
     it "the controller draws 2 cards" do
@@ -51,6 +52,7 @@ RSpec.describe Magic::Cards::WardenOfTheWoods do
       p2.activate_ability(ability: ability) do
         _1.targeting(warden).pay_mana(generic: { black: 4 }).pay(:self_sacrifice, silent_dart)
       end
+      game.settle!
     end
 
     it "the controller draws 2 cards" do

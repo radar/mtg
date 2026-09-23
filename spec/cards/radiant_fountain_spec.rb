@@ -8,6 +8,7 @@ RSpec.describe Magic::Cards::RadiantFountain do
 
   let!(:permanent) do
     p1.play_land(land: card)
+    game.settle!
     p1.permanents.by_name("Radiant Fountain").first
   end
 

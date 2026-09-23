@@ -54,6 +54,7 @@ RSpec.describe Magic::Cards::MorcantsLoyalist do
 
       it "returns it to hand" do
         subject.destroy!
+        game.settle!
 
         expect(wood_elves.zone).to eq(p1.hand)
       end
@@ -70,6 +71,7 @@ RSpec.describe Magic::Cards::MorcantsLoyalist do
 
       it "lets the controller choose which one to return" do
         subject.destroy!
+        game.settle!
         game.resolve_choice!(target: elvish_archdruid)
 
         expect(elvish_archdruid.zone).to eq(p1.hand)

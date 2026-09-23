@@ -17,6 +17,7 @@ RSpec.describe Magic::Cards::TitaniaProtectorOfArgoth do
     ResolvePermanent("Titania, Protector Of Argoth", owner: p1)
     land = ResolvePermanent("Forest", owner: p1)
     land.sacrifice!
+    game.settle!
 
     expect(p1.creatures.by_name("Elemental").count).to eq(1)
   end

@@ -9,8 +9,10 @@ module Magic
 
     class ElderfangRitualist < Creature
       class Choice < Choice::SearchGraveyard
+        # Oracle: "return ANOTHER target Elf card" -- exclude this card's own,
+        # already-in-the-graveyard-by-now, card.
         def choices
-          controller.graveyard.cards.all("Elf")
+          controller.graveyard.cards.all("Elf") - [actor.card]
         end
 
         def choice_amount

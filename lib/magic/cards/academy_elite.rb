@@ -8,14 +8,19 @@ module Magic
     end
 
     class AcademyElite < Creature
-      class ETB < TriggeredAbility::EnterTheBattlefield
-        def call
-          counters = game.graveyard_cards.by_any_type(T::Instant, T::Sorcery).count
-          actor.trigger_effect(:add_counter, target: actor, counter_type: "+1/+1", amount: counters)
+      # Oracle text: "This creature enters with X +1/+1 counters on it..." -- a
+      # replacement effect, not a triggered ability. Matters because it's a 0/0: a
+      # triggered-ability implementation dies to state-based actions (0 toughness)
+      # before its own ETB trigger ever gets a chance to resolve and add counters.
+      class EntryCounters < Abilities::Static::AdditionalCountersForEntering
+        def additional_counters_for_entering(permanent)
+          return 0 unless permanent == source
+
+          game.graveyard_cards.by_any_type(T::Instant, T::Sorcery).count
         end
       end
 
-      def etb_triggers = [ETB]
+      def static_abilities = [EntryCounters]
 
       class ActivatedAbility < ActivatedAbility
         def costs

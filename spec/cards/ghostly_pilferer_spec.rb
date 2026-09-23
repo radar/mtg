@@ -16,6 +16,7 @@ RSpec.describe Magic::Cards::GhostlyPilferer do
     it "cost is paid, draws a card" do
       ghostly_pilferer.tap!
       ghostly_pilferer.untap!
+      game.settle!
 
       p1.add_mana(blue: 2)
       expect(p1).to receive(:draw!)
@@ -42,6 +43,7 @@ RSpec.describe Magic::Cards::GhostlyPilferer do
     it "cost is not paid, no card draw" do
       ghostly_pilferer.tap!
       ghostly_pilferer.untap!
+      game.settle!
 
       p1.add_mana(blue: 2)
       expect(p1).not_to receive(:draw!)

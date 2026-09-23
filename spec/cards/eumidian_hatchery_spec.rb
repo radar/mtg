@@ -11,6 +11,7 @@ RSpec.describe Magic::Cards::EumidianHatchery do
       p1.activate_ability(ability: hatchery.activated_abilities.first)
     end
     hatchery.sacrifice!
+    game.settle!
 
     expect(p1.creatures.by_name("Insect").count).to eq(2)
     expect(p1.creatures.by_name("Insect").all? { |insect| insect.has_keyword?(:flying) }).to be(true)

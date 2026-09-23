@@ -19,7 +19,7 @@ RSpec.describe Magic::Cards::MonasterySwiftspear do
       .pay_mana(red: 1)
     action.targeting(p2)
     action.perform
-    game.tick!
+    game.settle!
 
     expect(swiftspear.power).to eq(2)
     expect(swiftspear.toughness).to eq(3)
@@ -31,7 +31,7 @@ RSpec.describe Magic::Cards::MonasterySwiftspear do
     action = cast_action(player: p1, card: Card("Grizzly Bears", owner: p1))
       .pay_mana(generic: { green: 1 }, green: 1)
     action.perform
-    game.tick!
+    game.settle!
 
     expect(swiftspear.power).to eq(1)
     expect(swiftspear.toughness).to eq(2)

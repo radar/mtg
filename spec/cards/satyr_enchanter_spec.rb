@@ -16,7 +16,7 @@ RSpec.describe Magic::Cards::SatyrEnchanter do
         _1.pay_mana(green: 1, generic: { green: 4 })
       end
 
-      game.tick!
+      game.settle!
     end
   end
 end

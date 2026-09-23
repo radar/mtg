@@ -13,6 +13,7 @@ RSpec.describe Magic::Cards::ExquisiteBlood do
           life: 6
         )
       )
+      game.settle!
 
       expect(p1.life).to eq(26)
     end

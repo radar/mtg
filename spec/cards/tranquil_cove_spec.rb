@@ -8,6 +8,7 @@ RSpec.describe Magic::Cards::TranquilCove do
 
   let!(:permanent) do
     p1.play_land(land: card)
+    game.settle!
     p1.permanents.by_name("Tranquil Cove").first
   end
 

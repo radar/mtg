@@ -25,6 +25,7 @@ RSpec.describe Magic::Cards::Panharmonicon do
       land = Card("Forest", owner: p1)
       p1.hand.add(land)
       p1.play_land(land: land)
+      game.settle!
 
       expect(p1.permanents.select { |permanent| permanent.name == "Clue" }.count).to eq(1)
     end

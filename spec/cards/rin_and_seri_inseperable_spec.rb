@@ -12,6 +12,7 @@ RSpec.describe Magic::Cards::RinAndSeriInseperable do
       p1.cast(card: Card("Igneous Cur")) do
         _1.pay_mana(red: 1, generic: { red: 1 })
       end
+      resolve_spell_cast_trigger!
 
       expect(creatures.count).to eq(2)
       cat = creatures.by_name("Cat").first
@@ -27,6 +28,7 @@ RSpec.describe Magic::Cards::RinAndSeriInseperable do
       p1.cast(card: Card("Healer Of The Pride")) do
         _1.pay_mana(white: 1, generic: { white: 3 })
       end
+      resolve_spell_cast_trigger!
 
       expect(creatures.count).to eq(2)
       dog = creatures.by_name("Dog").first
@@ -51,5 +53,12 @@ RSpec.describe Magic::Cards::RinAndSeriInseperable do
       expect(p2.life).to eq(19)
       expect(p1.life).to eq(21)
     end
+  end
+
+  # Resolves only the SpellCastTrigger sitting on top of the stack -- the spell itself
+  # (below it) is deliberately left unresolved, matching what these specs assert.
+  def resolve_spell_cast_trigger!
+    game.check_state_based_actions!
+    game.stack.first.resolve!
   end
 end

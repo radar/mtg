@@ -74,6 +74,7 @@ RSpec.describe Magic::Cards::CacophonyScamp do
     it "deals damage equal to its power to any target" do
       bear = ResolvePermanent("Grizzly Bears", owner: p2)
       scamp.destroy!
+      game.settle!
 
       game.resolve_choice!(target: bear)
 
@@ -82,6 +83,7 @@ RSpec.describe Magic::Cards::CacophonyScamp do
 
     it "deals damage equal to its power to a player" do
       scamp.destroy!
+      game.settle!
 
       game.resolve_choice!(target: p2)
 

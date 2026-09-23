@@ -39,7 +39,10 @@ RSpec.describe Magic::Cards::RoilingVortex do
       action.mana_cost = {}
       action.targeting(p1)
 
-      expect { game.take_action(action) }.to change { p2.life }.by(-5)
+      expect {
+        game.take_action(action)
+        game.settle!
+      }.to change { p2.life }.by(-5)
     end
 
     it "does not deal damage when mana was spent normally" do

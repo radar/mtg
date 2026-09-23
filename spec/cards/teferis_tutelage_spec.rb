@@ -24,9 +24,11 @@ RSpec.describe Magic::Cards::TeferisTutelage do
 
     choice = game.choices.first
     game.resolve_choice!(card: choice.cards.first)
+    game.settle!
 
     choice = game.choices.first
     game.resolve_choice!(target: p2)
+    game.settle!
     expect(p2.graveyard.cards.count).to eq(2)
   end
 end

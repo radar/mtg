@@ -35,6 +35,7 @@ RSpec.describe Magic::Cards::AnnexSentry do
     expect(permanent.exiled_cards).to include(wood_elves.card)
 
     permanent.destroy!
+    game.settle!
     # Old Permanent has gone away, so new one created by card coming back.
     new_wood_elves = game.battlefield.by_name("Wood Elves").first
     expect(new_wood_elves.zone).to be_battlefield

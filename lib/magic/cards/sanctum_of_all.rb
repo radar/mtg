@@ -18,7 +18,14 @@ module Magic
 
         def call
           other_shrine_handlers_for(event.class).each do |shrine_perm, handler_class|
-            handler_class.new(actor: shrine_perm, event: event).perform!
+            ability = handler_class.new(actor: shrine_perm, event: event)
+            next unless ability.trigger!
+
+            if game.queue_triggers?
+              game.queue_trigger!(ability)
+            else
+              ability.call
+            end
           end
         end
 
