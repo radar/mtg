@@ -22,6 +22,13 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Destroy target artifact.").target_choices).to eq("battlefield.artifacts")
   end
 
+  it "parses scry as a choice" do
+    scry = described_class.parse("Scry 2.")
+    expect(scry).to eq(e.const_get(:Scry).new(2))
+    expect(scry.choice_base).to eq("Magic::Choice::Scry")
+    expect(e.const_get(:DrawCards).new(1).choice_base).to be_nil
+  end
+
   it "renders resolve calls" do
     expect(e.const_get(:DrawCards).new(2).resolve_call).to eq("trigger_effect(:draw_cards, number_to_draw: 2)")
     expect(e.const_get(:GainLife).new(4).resolve_call).to eq("trigger_effect(:gain_life, target: controller, life: 4)")

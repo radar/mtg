@@ -142,9 +142,6 @@ module Magic
 
         raise CardParser::UnsupportedCard, "#{rule.class.name.split('::').last} not supported on #{kind}"
       end
-      return unless @result.rules.count { _1.is_a?(CardParser::Rules::SpellEffect) } > 1
-
-      raise CardParser::UnsupportedCard, "only one spell effect per card is supported"
     end
 
     # Kinds whose Oracle text always includes a particular line.

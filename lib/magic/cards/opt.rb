@@ -5,17 +5,15 @@ module Magic
     end
 
     class Opt < Instant
-      class Choice < Magic::Choice::Scry
+      class ScryChoice < Magic::Choice::Scry
         def resolve!(**args)
           super(**args)
-          actor.trigger_effect(:draw_cards)
+          trigger_effect(:draw_cards, number_to_draw: 1)
         end
       end
 
       def resolve!
-        game.choices.add(Choice.new(actor: self, amount: 1))
-
-        super
+        game.choices.add(ScryChoice.new(actor: self, amount: 1))
       end
     end
   end

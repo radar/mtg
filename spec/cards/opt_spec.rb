@@ -29,7 +29,7 @@ RSpec.describe Magic::Cards::Opt do
     game.stack.resolve!
 
     choice = game.choices.last
-    expect(choice).to be_a(Magic::Cards::Opt::Choice)
+    expect(choice).to be_a(Magic::Cards::Opt::ScryChoice)
 
     game.resolve_choice!(top: [top_card])
 
@@ -47,7 +47,7 @@ RSpec.describe Magic::Cards::Opt do
     game.stack.resolve!
 
     choice = game.choices.last
-    expect(choice).to be_a(Magic::Cards::Opt::Choice)
+    expect(choice).to be_a(Magic::Cards::Opt::ScryChoice)
     game.resolve_choice!(bottom: [top_card])
     expect(opt.zone).to be_graveyard
     expect(p1.library.last).to eq(top_card)
