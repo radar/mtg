@@ -25,8 +25,8 @@ module Magic
 
       def +(other) = self.class.new(effects: effects + other.effects)
 
-      # Class body for an instant or sorcery: target_choices and resolve!(target:)
-      # for a targeted spell, a choice class for a scry.
+      # Class body for an instant, sorcery or activated ability: target_choices
+      # and resolve!(target:) when targeted, a choice class for a scry.
       def spell_source
         now, choice, later = split(&:choice_base)
         raise UnsupportedCard, "targeted effects after a choice are not supported" if later.any?(&:target_choices)

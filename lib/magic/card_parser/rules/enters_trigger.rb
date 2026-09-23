@@ -17,7 +17,7 @@ module Magic
           new(effect_list:) if effect_list
         end
 
-        def kinds = %i[creature enchantment artifact equipment aura saga land]
+        def kinds = PERMANENT_KINDS
         def hook = :etb_triggers
         def class_base_name = "EntersTrigger"
 
