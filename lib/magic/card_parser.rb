@@ -43,7 +43,7 @@ module Magic
     end
 
     def initialize(text)
-      @lines = text.strip.lines.map(&:strip).reject(&:empty?)
+      @lines = text.strip.lines.map { |line| line.gsub(/\s*\([^)]*\)/, "").strip }.reject(&:empty?)
     end
 
     def parse

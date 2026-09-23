@@ -19,38 +19,137 @@ module Magic
       @result = result
     end
 
+    BUILDERS = {
+      creature: "Creature", instant: "Instant", sorcery: "Sorcery", enchantment: "Enchantment",
+      artifact: "Artifact", equipment: "Equipment", aura: "Aura", saga: "Saga"
+    }.freeze
+
     def generate
-      raise CardParser::UnsupportedCard, "only creatures supported" unless @result.creature?
-
-      lines = []
-      lines << "cost #{cost_args}" if @result.mana_cost.any?
-      lines << "#{creature_type_method}(#{@result.subtypes.join(' ').inspect})" if @result.subtypes.any?
-      lines.concat(@result.rules.flat_map(&:dsl_lines))
-      lines << "power #{@result.power}"
-      lines << "toughness #{@result.toughness}"
-      body = lines.map { |l| "      #{l}\n" }.join
-      const = self.class.const_name(@result.name)
-
-      <<~RUBY
-        module Magic
-          module Cards
-            #{const} = Creature(#{@result.name.inspect}) do
-        #{body.chomp}
-            end
-        #{ability_class(const)}  end
-        end
-      RUBY
+      case kind
+      when :basic_land then basic_land_source
+      when :land then land_source
+      else builder_source
+      end
     end
 
     private
 
-    # Nested classes must live in a class reopening, not the DSL block.
-    def ability_class(const)
-      hooked = @result.rules.select(&:hook)
-      return "" if hooked.empty?
+    # What sort of card this is, or UnsupportedCard for type lines not handled yet.
+    def kind
+      types = @result.types
+      subtypes = @result.subtypes
+      return :creature if types.include?("Creature")
+      raise CardParser::UnsupportedCard, "unsupported type line: #{types.join(' ')}" if types.size != 1
 
-      sections = CardParser::Rule::HOOKS.filter_map { |hook| hook_section(hook, hooked.select { _1.hook == hook }) }
-      "\n    class #{const} < Creature\n#{sections.map { indent(_1) }.join("\n\n")}\n    end\n"
+      case types.first
+      when "Land" then land_kind
+      when "Enchantment" then subtypes == ["Aura"] ? :aura : subtypes == ["Saga"] ? :saga : plain(:enchantment)
+      when "Artifact" then subtypes == ["Equipment"] ? :equipment : plain(:artifact)
+      when "Instant" then plain(:instant)
+      when "Sorcery" then plain(:sorcery)
+      else raise CardParser::UnsupportedCard, "unsupported type: #{types.first}"
+      end
+    end
+
+    # Card types with no subtypes to worry about.
+    def plain(kind)
+      raise CardParser::UnsupportedCard, "subtypes not supported for #{kind}: #{@result.subtypes.join(' ')}" if @result.subtypes.any?
+
+      kind
+    end
+
+    def land_kind
+      raise CardParser::UnsupportedCard, "legendary lands not supported" if @result.legendary?
+      return :land if @result.supertypes.empty? && @result.subtypes.empty?
+      return :basic_land if @result.supertypes == ["Basic"] && @result.subtypes.size == 1
+
+      raise CardParser::UnsupportedCard, "unsupported land: #{@result.supertypes.join(' ')} #{@result.subtypes.join(' ')}"
+    end
+
+    def const
+      @const ||= self.class.const_name(@result.name)
+    end
+
+    def wrap(source)
+      "module Magic\n  module Cards\n#{source.gsub(/^(?=.)/, '    ')}  end\nend\n"
+    end
+
+    # Instant("Name") do ... end plus an optional class reopening for nested classes.
+    def builder_source
+      kind = self.kind
+      require_rule(kind)
+      lines = []
+      lines << "cost #{cost_args}" if @result.mana_cost.any?
+      lines.concat(type_lines(kind))
+      lines.concat(@result.rules.flat_map(&:dsl_lines))
+      if kind == :creature
+        lines << "power #{@result.power}"
+        lines << "toughness #{@result.toughness}"
+      end
+      base = BUILDERS.fetch(kind)
+      source = +"#{const} = #{base}(#{@result.name.inspect}) do\n"
+      lines.each { |l| source << "  #{l}\n" }
+      source << "end\n"
+      sections = class_sections
+      source << "\nclass #{const} < #{base}\n#{sections.map { indent(_1) }.join("\n\n")}\nend\n" if sections.any?
+      wrap(source)
+    end
+
+    def land_source
+      sections = class_sections
+      body = ["NAME = #{@result.name.inspect}", *sections].join("\n\n")
+      wrap("class #{const} < Land\n#{indent(body)}\nend\n")
+    end
+
+    def basic_land_source
+      subtype = @result.subtypes.first
+      wrap("class #{const} < BasicLand\n  type Types::Lands::#{subtype}\nend\n")
+    end
+
+    def type_lines(kind)
+      case kind
+      when :creature then creature_type_lines
+      when :artifact then @result.legendary? ? ["legendary_artifact"] : []
+      else
+        raise CardParser::UnsupportedCard, "legendary #{kind} not supported" if @result.legendary?
+
+        []
+      end
+    end
+
+    def creature_type_lines
+      method = creature_type_method or raise CardParser::UnsupportedCard, "unsupported creature type line"
+      @result.subtypes.empty? ? [] : ["#{method}(#{@result.subtypes.join(' ').inspect})"]
+    end
+
+    def creature_type_method
+      extras = @result.types - ["Creature"]
+      return "legendary_creature_type" if @result.legendary? && extras.empty?
+      return if @result.legendary?
+
+      case extras
+      when [] then "creature_type"
+      when ["Artifact"] then "artifact_creature_type"
+      when ["Enchantment"] then "enchantment_creature_type"
+      end
+    end
+
+    # Kinds whose Oracle text always includes a particular line.
+    REQUIRED_RULE = { equipment: "Equip", aura: "Enchant" }.freeze
+
+    def require_rule(kind)
+      name = REQUIRED_RULE[kind] or return
+      return if @result.rules.any? { _1.class.name.split("::").last == name }
+
+      raise CardParser::ParseError, "#{kind} needs an #{name} line"
+    end
+
+    # Sections for the class body: rule-provided bodies, then nested classes per hook.
+    def class_sections
+      bodies = @result.rules.filter_map(&:body_source).map(&:chomp)
+      hooked = @result.rules.select(&:hook)
+      hooks = CardParser::Rule::HOOKS.filter_map { |hook| hook_section(hook, hooked.select { _1.hook == hook }) }
+      bodies + hooks.map(&:chomp)
     end
 
     # The nested classes for one hook plus the `def hook = [...]` line.
@@ -79,11 +178,7 @@ module Magic
     end
 
     def indent(source)
-      source.lines.map { |line| line.strip.empty? ? line : "      #{line}" }.join.chomp
-    end
-
-    def creature_type_method
-      @result.legendary? ? "legendary_creature_type" : "creature_type"
+      source.lines.map { |line| line.strip.empty? ? line : "  #{line}" }.join.chomp
     end
 
     def cost_args

@@ -10,6 +10,7 @@ module Magic
     #   #hook              -> :static_abilities / :activated_abilities when the rule
     #                         needs a nested class in the class reopening
     #   #handled_event     -> event class name, for the :event_handlers hook
+    #   #body_source       -> Ruby for the class reopening's body (e.g. `enchant "Creature"`)
     #   #class_base_name   -> name for that nested class ("ManaAbility")
     #   #class_source(name)-> Ruby source of the nested class
     #
@@ -35,6 +36,7 @@ module Magic
 
       def dsl_lines = []
       def hook = nil
+      def body_source = nil
       def class_base_name = nil
       def handled_event = nil
       def class_source(_name) = nil
