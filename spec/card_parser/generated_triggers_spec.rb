@@ -60,6 +60,63 @@ RSpec.describe "CardParser generated triggers in play" do
     expect(keeper.power).to eq(3)
   end
 
+  context "with creature-dies triggers, one optional" do
+    let!(:collector) do
+      load_card("Parsed Collector {2}{B}\nCreature — Zombie\nWhenever another creature you control dies, you may draw a card.\n" \
+                "Whenever a creature an opponent controls dies, you gain 1 life.\n2/2\n")
+      ResolvePermanent("Parsed Collector", owner: p1)
+    end
+
+    it "offers a draw when another of your creatures dies, and draws if accepted" do
+      ResolvePermanent("Grizzly Bears", owner: p1).destroy!
+      expect(game.choices.last).to be_a(collector.card.class::CreatureDiesTrigger1::MayChoice)
+      expect { game.resolve_choice! }.to change { p1.hand.count }.by(1)
+    end
+
+    it "draws nothing when declined" do
+      ResolvePermanent("Grizzly Bears", owner: p1).destroy!
+      expect { game.skip_choice! }.not_to(change { p1.hand.count })
+    end
+
+    it "gains life, without asking, when an opponent's creature dies" do
+      ResolvePermanent("Grizzly Bears", owner: p2).destroy!
+      expect(game.choices).to be_empty
+      expect(p1.life).to eq(21)
+    end
+  end
+
+  it "damages each opponent when you cast a noncreature spell, not a creature spell" do
+    load_card("Parsed Archer {1}{R}\nCreature — Human Archer\nWhenever you cast a noncreature spell, Parsed Archer deals 1 damage to each opponent.\n3/1\n")
+    ResolvePermanent("Parsed Archer", owner: p1)
+
+    p1.add_mana(red: 1)
+    p1.cast(card: Card("Lightning Bolt", owner: p1)) { _1.pay_mana(red: 1).targeting(p2) }
+    expect(p2.life).to eq(19)
+    game.stack.resolve!
+    expect(p2.life).to eq(16)
+
+    go_to_main_phase!
+    p1.add_mana(green: 1)
+    p1.cast(card: Card("Llanowar Elves", owner: p1)) { _1.pay_mana(green: 1) }
+    expect(p2.life).to eq(16)
+  end
+
+  it "gains life when a generated enchantment leaves the battlefield" do
+    load_card("Parsed Gift {1}{W}\nEnchantment\nWhen Parsed Gift leaves the battlefield, you gain 3 life.\n")
+    ResolvePermanent("Parsed Gift", owner: p1).destroy!
+    expect(p1.life).to eq(23)
+  end
+
+  it "asks, then destroys the chosen target, for an optional targeted enters trigger" do
+    load_card("Parsed Shatterer {2}{R}\nCreature — Goblin\nWhen Parsed Shatterer enters, you may destroy target artifact an opponent controls.\n2/2\n")
+    stone = ResolvePermanent("Mind Stone", owner: p2)
+    ResolvePermanent("Mind Stone", owner: p1)
+    ResolvePermanent("Parsed Shatterer", owner: p1)
+
+    game.resolve_choice!
+    expect(stone.card.zone).to be_graveyard
+  end
+
   context "with upkeep and end step triggers" do
     before do
       load_card("Parsed Shrine {2}{W}\nEnchantment\nAt the beginning of your upkeep, you gain 1 life.\n" \

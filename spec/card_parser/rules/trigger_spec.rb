@@ -42,6 +42,41 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     end
   end
 
+  it "parses leaves-the-battlefield triggers" do
+    rule = parse("When ~ leaves the battlefield, draw a card.")
+    expect([rule.class_base_name, rule.hook]).to eq(["LeavesTrigger", :ltb_triggers])
+  end
+
+  it "parses creatures dying, by whose creature it is" do
+    conditions = {
+      "a creature" => nil,
+      "another creature" => "event.permanent != actor",
+      "a creature you control" => "you?",
+      "another creature you control" => "you? && event.permanent != actor",
+      "a creature an opponent controls" => "opponent?"
+    }
+    conditions.each do |who, condition|
+      rule = parse("Whenever #{who} dies, draw a card.")
+      expect([rule.class_base_name, rule.handled_event, rule.condition]).to eq(["CreatureDiesTrigger", "Events::CreatureDied", condition]), who
+    end
+  end
+
+  it "negates non<type> spells" do
+    expect(parse("Whenever you cast a noncreature spell, draw a card.").condition).to eq('you? && !spell.type?("Creature")')
+  end
+
+  it "wraps an optional effect in a MayChoice" do
+    source = parse("Whenever you cast a creature spell, you may draw a card.").class_source("SpellCastTrigger")
+    expect(source).to include("class MayChoice < Magic::Choice::May\n    def resolve!\n      trigger_effect(:draw_cards",
+                              "def call\n    game.choices.add(MayChoice.new(actor: actor))")
+  end
+
+  it "asks before choosing targets for an optional targeted effect" do
+    source = parse("When ~ enters, you may destroy target artifact.").class_source("EntersTrigger")
+    expect(source).to include("class TargetChoice < Magic::Choice::Targeted",
+                              "class MayChoice < Magic::Choice::May\n    def resolve!\n      choice = TargetChoice.new(actor: actor)")
+  end
+
   it "adapts the cast trigger to the spell type, with a or an" do
     expect(parse("Whenever you cast a creature spell, draw a card.").condition).to eq('you? && spell.type?("Creature")')
     expect(parse("Whenever you cast an Elf spell, draw a card.").condition).to eq('you? && spell.type?("Elf")')
@@ -59,8 +94,8 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
   end
 
   it "ignores other lines and unknown effects" do
-    expect(parse("When ~ leaves the battlefield, draw a card.")).to be_nil
-    expect(parse("Whenever you cast a creature spell, you may draw a card.")).to be_nil
+    expect(parse("Whenever ~ becomes blocked, draw a card.")).to be_nil
+    expect(parse("Whenever you cast a creature spell, you may draw a card. You gain 1 life.")).to be_nil
     expect(parse("When ~ enters, return target card from your graveyard to your hand.")).to be_nil
   end
 

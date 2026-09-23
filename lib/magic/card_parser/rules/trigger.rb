@@ -9,6 +9,7 @@ module Magic
       #   When ~ enters, draw a card.
       #   Landfall — Whenever a land you control enters, you gain 1 life.
       #   Whenever you cast an instant or sorcery spell, scry 1.
+      #   Whenever another creature you control dies, you may draw a card.
       class Trigger < Data.define(:kind, :condition, :effect_list)
         include Rule
 
@@ -17,11 +18,23 @@ module Magic
         # the base class's (a String, or a Proc taking the match).
         Kind = Data.define(:pattern, :name, :base, :hook, :event, :condition, :kinds)
 
+        # Whose creature dying triggers "Whenever <who> dies" -> should_perform?
+        CREATURE_DIES = {
+          "another creature you control" => "you? && event.permanent != actor",
+          "a creature you control" => "you?",
+          "a creature an opponent controls" => "opponent?",
+          "another creature" => "event.permanent != actor",
+          "a creature" => nil
+        }.freeze
         ENTERS_UNDER_YOUR_CONTROL = "(?:you control enters|enters(?: the battlefield)? under your control)"
         KINDS = [
           Kind.new(/When ~ enters(?: the battlefield)?/, "EntersTrigger", "TriggeredAbility::EnterTheBattlefield",
                    :etb_triggers, nil, nil, PERMANENT_KINDS),
           Kind.new(/When ~ dies/, "DiesTrigger", "TriggeredAbility::Death", :death_triggers, nil, nil, %i[creature]),
+          Kind.new(/When ~ leaves the battlefield/, "LeavesTrigger", "TriggeredAbility::LeaveTheBattlefield",
+                   :ltb_triggers, nil, nil, PERMANENT_KINDS),
+          Kind.new(/Whenever (?<who>#{CREATURE_DIES.keys.join('|')}) dies/, "CreatureDiesTrigger", "TriggeredAbility",
+                   :event_handlers, "Events::CreatureDied", ->(m) { CREATURE_DIES.fetch(m[:who]) }, PERMANENT_KINDS),
           Kind.new(/Whenever another creature #{ENTERS_UNDER_YOUR_CONTROL}/, "CreatureEntersTrigger",
                    "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
                    "another_creature? && under_your_control?", PERMANENT_KINDS),
@@ -36,7 +49,9 @@ module Magic
           Kind.new(/Whenever you cast an? (?<types>[\w-]+(?: or [\w-]+)?) spell/, "SpellCastTrigger", "TriggeredAbility::SpellCast",
                    :event_handlers, "Events::SpellCast",
                    lambda { |m|
-                     types = m[:types].split(" or ").map { "spell.type?(#{_1.capitalize.inspect})" }
+                     types = m[:types].split(" or ").map do |type|
+                       type.start_with?("non") ? "!spell.type?(#{type.delete_prefix('non').capitalize.inspect})" : "spell.type?(#{type.capitalize.inspect})"
+                     end
                      "you? && #{types.size == 1 ? types.first : "(#{types.join(' || ')})"}"
                    },
                    PERMANENT_KINDS)

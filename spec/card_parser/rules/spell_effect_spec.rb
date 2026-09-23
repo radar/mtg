@@ -38,5 +38,6 @@ RSpec.describe Magic::CardParser::Rules::SpellEffect do
     expect { spell("Destroy target creature.", "Destroy target artifact.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard)
     expect { spell("Scry 1.", "Destroy target creature.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard)
     expect { spell("Scry 1.", "Scry 2.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard)
+    expect { spell("You may draw a card.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard, /you may/)
   end
 end

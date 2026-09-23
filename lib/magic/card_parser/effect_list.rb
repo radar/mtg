@@ -5,29 +5,49 @@ module Magic
     # The effects of one spell or ability, in order, rendered as Ruby. Effects
     # after a choice point (a scry, or a target in a triggered ability) run
     # once that choice resolves, in a Choice subclass generated alongside.
-    class EffectList < Data.define(:effects)
+    # An optional ("you may ...") triggered ability asks first, with a MayChoice.
+    class EffectList < Data.define(:effects, :optional)
       SENTENCE = /(?<=\.)\s+|,? then |,? and (?=you )/i
+      MAY = /\Ayou may /i
 
       # `text` as one effect (some span two sentences), else every sentence as an
-      # effect; nil unless all of them parse.
+      # effect; nil unless all of them parse. "you may <effect>" is one optional
+      # effect.
       def self.parse(text)
+        if MAY.match?(text)
+          effect = parse_sentence(text.sub(MAY, "")) or return
+          return new(effects: [effect], optional: true)
+        end
+
         effect = Effect.parse(text) and return new(effects: [effect])
 
-        effects = text.split(SENTENCE).map { |sentence| Effect.parse(sentence[0].upcase + sentence[1..]) }
+        effects = text.split(SENTENCE).map { parse_sentence(_1) }
         new(effects:) if effects.any? && effects.all?
       end
 
-      def initialize(effects:)
+      # One sentence, capitalised; after "you may", also with its implied "You"
+      # ("you may gain 3 life").
+      def self.parse_sentence(sentence)
+        Effect.parse(sentence[0].upcase + sentence[1..]) || Effect.parse("You #{sentence}")
+      end
+
+      def initialize(effects:, optional: false)
         raise UnsupportedCard, "only one targeted effect per ability is supported" if effects.count(&:target_choices) > 1
 
         super
       end
 
-      def +(other) = self.class.new(effects: effects + other.effects)
+      def +(other)
+        raise UnsupportedCard, "optional effects can't be combined" if optional || other.optional
+
+        self.class.new(effects: effects + other.effects)
+      end
 
       # Class body for an instant, sorcery or activated ability: target_choices
       # and resolve!(target:) when targeted, a choice class for a scry.
       def spell_source
+        raise UnsupportedCard, "\"you may\" is only supported in triggered abilities" if optional
+
         now, choice, later = split(&:choice_base)
         raise UnsupportedCard, "targeted effects after a choice are not supported" if later.any?(&:target_choices)
 
@@ -40,13 +60,19 @@ module Magic
       end
 
       # Class body for a triggered or chapter ability, whose `entry` method runs
-      # the effects. Targets are chosen with a Choice; with none to choose from,
-      # the ability does nothing from the targeted effect on.
+      # the effects (or, when optional, asks with a MayChoice that runs them).
+      # Targets are chosen with a Choice; with none to choose from, the ability
+      # does nothing from the targeted effect on.
       def trigger_source(entry: "call")
         now, choice, later = split { _1.choice_base || _1.target_choices }
         sections = definitions
         sections.concat(choice_class(choice, later)) if choice
-        sections << method(entry, statements(now) + add_choice(choice, "actor", later))
+        body = statements(now) + add_choice(choice, "actor", later)
+        if optional
+          sections << "class MayChoice < Magic::Choice::May\n#{indent(method('resolve!', body))}\nend\n"
+          body = ["game.choices.add(MayChoice.new(actor: actor))"]
+        end
+        sections << method(entry, body)
         sections.join("\n")
       end
 

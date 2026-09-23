@@ -176,14 +176,15 @@ module Magic
       (classes + [hook_definition(hook, named)]).join("\n")
     end
 
-    # Static and activated abilities are lists; event handlers map event => ability.
+    # Abilities and lifecycle triggers are lists; event handlers map event =>
+    # ability, or => [abilities] when several handle one event.
     def hook_definition(hook, named)
       return "def #{hook} = [#{named.map(&:last).join(', ')}]\n" unless hook == :event_handlers
 
-      events = named.map { |rule, _| rule.handled_event }
-      raise CardParser::UnsupportedCard, "two rules handle #{events.tally.key(2)}" if events.uniq.size < events.size
-
-      pairs = named.map { |rule, name| "#{rule.handled_event} => #{name}" }
+      pairs = named.group_by { |rule, _| rule.handled_event }.map do |event, handlers|
+        names = handlers.map(&:last)
+        "#{event} => #{names.size == 1 ? names.first : "[#{names.join(', ')}]"}"
+      end
       "def event_handlers = { #{pairs.join(', ')} }\n"
     end
 

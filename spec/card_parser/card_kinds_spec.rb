@@ -26,6 +26,13 @@ RSpec.describe "CardParser card kinds" do
     expect { generate("Baubles {2}\nArtifact\nDraw a card.\n") }.to raise_error(Magic::CardParser::UnsupportedCard)
   end
 
+  it "lists every trigger handling an event" do
+    source = generate("Collector {2}{B}\nCreature — Zombie\nWhenever a creature you control dies, draw a card.\n" \
+                      "Whenever a creature an opponent controls dies, you gain 1 life.\nAt the beginning of your upkeep, draw a card.\n2/2\n")
+    expect(source).to include("def event_handlers = { Events::CreatureDied => [CreatureDiesTrigger1, CreatureDiesTrigger2], " \
+                              "Events::BeginningOfUpkeep => UpkeepTrigger }")
+  end
+
   it "generates a legendary artifact" do
     expect(generate("Old Shiny {3}\nLegendary Artifact\n")).to include("legendary_artifact")
   end

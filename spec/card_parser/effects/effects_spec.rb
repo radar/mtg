@@ -11,8 +11,14 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("It deals 1 damage to target player.").target_choices).to eq("game.players")
   end
 
+  it "parses damage to each opponent, untargeted" do
+    each = described_class.parse("~ deals 1 damage to each opponent.")
+    expect(each.target_choices).to be_nil
+    expect(each.resolve_call).to eq("game.opponents(controller).each { trigger_effect(:deal_damage, target: _1, damage: 1) }")
+  end
+
   it "does not parse damage to unsupported targets" do
-    expect(described_class.parse("~ deals 3 damage to each opponent.")).to be_nil
+    expect(described_class.parse("~ deals 3 damage to each creature.")).to be_nil
   end
 
   it "parses drawing and life gain" do
