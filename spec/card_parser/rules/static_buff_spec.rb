@@ -24,7 +24,7 @@ RSpec.describe Magic::CardParser::Rules::StaticBuff do
 
   it "parses a buff that counts something, for any subject" do
     blade = described_class.parse("Equipped creature gets +1/+1 for each Equipment you control.")
-    expect([blade.power, blade.toughness, blade.per]).to eq([1, 1, 'controller.permanents.count { _1.type?("Equipment") }'])
+    expect([blade.power, blade.toughness, blade.per]).to eq([1, 1, "controller.equipment.count"])
     expect(described_class.parse("~ gets +1/+1 for each other Elf you control.").subject).to eq("~")
     expect(described_class.parse("~ gets +1/+1 for each other Elf you control.").kinds).to eq(%i[creature])
     expect(described_class.parse("Equipped creature gets +1/+1 for each opponent you have.")).to be_nil

@@ -113,6 +113,10 @@ module Magic
       by_any_type(T::Artifact)
     end
 
+    def equipment
+      by_any_type("Equipment")
+    end
+
     def select(&condition)
       self.class.new(super(&condition))
     end

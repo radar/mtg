@@ -135,10 +135,10 @@ RSpec.describe Magic::CardParser::Effect do
     before = described_class.parse("Target creature gets +1/+1 for each Elf you control until end of turn.")
     after = described_class.parse("Target creature gets +1/+1 until end of turn for each Elf you control.")
     expect(before).to eq(after)
-    expect(before.resolve_call).to eq('trigger_effect(:modify_power_toughness, target: target, power: controller.permanents.count { _1.type?("Elf") }, ' \
-                                      'toughness: controller.permanents.count { _1.type?("Elf") })')
+    expect(before.resolve_call).to eq('trigger_effect(:modify_power_toughness, target: target, power: controller.permanents.by_type("Elf").count, ' \
+                                      'toughness: controller.permanents.by_type("Elf").count)')
     other = described_class.parse("~ gets +2/+0 until end of turn for each other Goblin you control.")
-    expect(other.resolve_call).to include("power: 2 * (controller.permanents - [#{this}]).count", "toughness: 0")
+    expect(other.resolve_call).to include("power: 2 * controller.permanents.by_type(\"Goblin\").except(#{this}).count", "toughness: 0")
     expect(described_class.parse("~ gains flying until end of turn for each Elf you control.")).to be_nil
     expect(described_class.parse("~ gets +1/+1 until end of turn for each opponent you have.")).to be_nil
   end
