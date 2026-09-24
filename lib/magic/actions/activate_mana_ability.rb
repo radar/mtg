@@ -2,6 +2,7 @@ module Magic
   module Actions
     class ActivateManaAbility < ActivateAbility
       def perform
+        record_activation!
         game.notify!(Events::AbilityActivated.new(ability: ability, player: player))
         resolve!
       end

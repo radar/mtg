@@ -31,6 +31,11 @@ module Magic
         )
       end
 
+      # "~ becomes red until end of turn" / "becomes all colors": replaces its colors.
+      def change_colors!(colors, until_eot: true)
+        modifiers << Color.new(colors: colors, until_eot: until_eot)
+      end
+
       def grant_keyword(keyword, until_eot: true)
         modifiers << KeywordGrant.new(keyword_grant: keyword, until_eot: until_eot)
       end

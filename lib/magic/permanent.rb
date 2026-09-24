@@ -133,8 +133,13 @@ module Magic
     def name = copiable_card.name
     def cmc = copiable_card.cmc
     def mana_value = copiable_card.mana_value
-    def colors = copiable_card.colors
-    def colorless? = copiable_card.colorless?
+    # The latest color-changing modifier ("becomes that color until end of turn") wins.
+    def colors
+      modifiers.reverse.find { _1.is_a?(Permanents::Modifications::Color) }&.colors || copiable_card.colors
+    end
+
+    def colorless? = colors.empty?
+    def multi_colored? = colors.count > 1
 
     def apply_continuous_effects!
       Magic::Permanents::ContinuousEffects.new(game: game, permanent: self).apply!
@@ -325,6 +330,19 @@ module Magic
       @triggered_once_keys_this_turn ||= []
     end
 
+    # For "activate only once each turn": the ability classes activated this turn.
+    def activated_this_turn?(ability_class)
+      abilities_activated_this_turn.include?(ability_class)
+    end
+
+    def activated_this_turn!(ability_class)
+      abilities_activated_this_turn << ability_class
+    end
+
+    def abilities_activated_this_turn
+      @abilities_activated_this_turn ||= []
+    end
+
     def untap_during_untap_step
       if @counters.of_type(Counters::Stun).any?
         @counters.remove_first(Counters::Stun)
@@ -436,6 +454,7 @@ module Magic
       @turn_triggers = {}
       @modes_chosen_this_turn = []
       @triggered_once_keys_this_turn = []
+      @abilities_activated_this_turn = []
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
       remove_until_eot_modifiers!

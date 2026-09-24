@@ -78,7 +78,8 @@ What the rules cover:
 - `ActivatedAbility`: "<costs>: <effects>[ Activate only as a sorcery.]". Costs go to
   `Costs::Parser` as a `costs "..."` string (`~` → `{this}`; only mana, `{T}`,
   `Sacrifice ~`/`a creature`, `Exile ~`, `Discard a card`); the sorcery restriction
-  becomes `requirements_met? = game.can_cast_sorcery?(controller)`. Mana abilities
+  becomes `requirements_met? = game.can_cast_sorcery?(controller)`, and "Activate only
+  once each turn." becomes `once_each_turn`. Mana abilities
   stay with the TapForMana rules, since "Add ..." isn't an effect.
 - `StaticBuff`: "[Other] creatures you control get +N/+N[ and have <keywords>]." /
   "... have <keywords>.", and the same for "Equipped creature" (Equipment only) and

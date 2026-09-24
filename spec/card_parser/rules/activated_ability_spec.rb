@@ -17,6 +17,12 @@ RSpec.describe Magic::CardParser::Rules::ActivatedAbility do
     expect(rule.sorcery_speed).to eq(true)
   end
 
+  it "parses a once-each-turn restriction" do
+    rule = described_class.parse("{1}: You gain 1 life. Activate only once each turn.")
+    expect(rule.once_each_turn).to eq(true)
+    expect(rule.class_source("ActivatedAbility")).to include("costs \"{1}\"\n\n  once_each_turn\n")
+  end
+
   it "ignores mana abilities, unknown costs and unknown effects" do
     expect(described_class.parse("{T}: Add {G}.")).to be_nil
     expect(described_class.parse("{X}{R}: ~ deals X damage to any target.")).to be_nil

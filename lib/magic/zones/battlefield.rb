@@ -22,8 +22,10 @@ module Magic
         items
       end
 
+      # Every permanent, not only creatures: an artifact that became a creature until
+      # end of turn, or a once-each-turn ability of a land, resets here too.
       def cleanup
-        creatures.each(&:cleanup!)
+        permanents.each(&:cleanup!)
       end
     end
   end

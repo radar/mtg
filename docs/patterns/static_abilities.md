@@ -59,3 +59,5 @@ Pre-built subclasses in `lib/magic/abilities/static/` — declare these on a car
 
 **Querying static abilities generically**: Use `game.battlefield.static_abilities.of_type(Abilities::Static::SomeBaseClass)` (`lib/magic/static_abilities.rb`), not `.respond_to?(:some_method)` — the latter is fragile (a class overriding the method without inheriting the right base silently no-ops, or worse, an unrelated ability happens to define a same-named method). Every hook queried this way needs a real base class under `lib/magic/abilities/static/`, even if it only has one implementation so far.
 
+
+**"Becomes <color> until end of turn" / "becomes all colors"**: `permanent.change_colors!([:blue])` adds a `Modifications::Color` (until end of turn by default); `Permanent#colors` uses the latest one, else the card's colors. Example: `ForagingWickermaw`.

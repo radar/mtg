@@ -61,6 +61,24 @@ RSpec.describe "CardParser generated activated abilities in play" do
     expect([brute.power, brute.toughness]).to eq([4, 2])
   end
 
+  it "can be activated only once each turn" do
+    load_card("Parsed Idol {2}\nArtifact\n{1}: You gain 1 life. Activate only once each turn.\n")
+    idol = ResolvePermanent("Parsed Idol", owner: p1)
+    p1.add_mana(green: 3)
+    p1.activate_ability(ability: ability_of(idol)) { _1.pay_mana(generic: { green: 1 }) }
+    game.stack.resolve!
+    expect(p1.life).to eq(21)
+
+    expect { p1.activate_ability(ability: ability_of(idol)) { _1.pay_mana(generic: { green: 1 }) } }.to raise_error(Magic::IllegalAction)
+
+    current_turn.end!
+    current_turn.cleanup!
+    game.next_turn
+    p1.activate_ability(ability: ability_of(idol)) { _1.pay_mana(generic: { green: 1 }) }
+    game.stack.resolve!
+    expect(p1.life).to eq(22)
+  end
+
   it "asks before an optional effect" do
     load_card("Parsed Pry Bar {2}\nArtifact\n{T}: You may draw a card. If you do, you lose 1 life.\n")
     bar = ResolvePermanent("Parsed Pry Bar", owner: p1)
