@@ -31,3 +31,7 @@ Zone moves, zone-check pitfalls, permanent-instance state (attr_accessors), Card
 **Gaining control until end of turn (Threaten effects)**: `target.gain_control_until_eot!(controller)`; `Permanent#cleanup!` gives it back to the controller it had before. Setting `controller=` resets summoning sickness, so these effects usually also grant haste. Example: `Goatnap`.
 
 **"Exile ... until ~ leaves the battlefield" (Oblivion Ring, Banisher Priest)**: `source.exile_until_leaves!(target)` exiles it and remembers the card; `Effects::MovePermanentZone` calls `return_cards_exiled_until_leaves!` as the source leaves the battlefield, returning each card still in exile under its owner's control (rule 610.3). It does nothing if the source has already left, and an exiled token doesn't come back. Example: `LiminalHold`.
+
+**"Loses all abilities"**: `permanent.lose_all_abilities!` — its printed keywords, activated abilities (land-type mana abilities too), triggers, static and replacement abilities, and printed attack/block restrictions stop applying; keywords granted by other effects still do. Example: `RetchedWretch`.
+
+**"When this dies, return it to the battlefield"**: a dies trigger runs while the permanent leaves, before its card is put into the graveyard (`Permanent#put_into_graveyard!` moves the permanent, then the card). Use `OnCardMoved.listen(game:, card: actor.card) { |zone| ... }` to act once the card has moved (check `zone.graveyard?`, since a replacement could exile it). Skip tokens and copies, which have no card to return. Example: `RetchedWretch`.

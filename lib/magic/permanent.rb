@@ -251,6 +251,8 @@ module Magic
     end
 
     def replacement_effect_for(context)
+      return nil if lost_all_abilities?
+
       card.replacement_effects.each do |matcher, replacement_effect|
         next unless replacement_matcher_applies?(matcher, context.effect)
 
@@ -392,7 +394,21 @@ module Magic
     end
 
     def static_abilities
+      return [] if lost_all_abilities?
+
       card.static_abilities.map { |ability| ability.new(source: self) }
+    end
+
+    # "It loses all abilities": its own keywords, activated, triggered, static and
+    # replacement abilities stop working for as long as it stays on the battlefield.
+    # Abilities other effects grant it still apply.
+    def lose_all_abilities!
+      @lost_all_abilities = true
+      apply_continuous_effects!
+    end
+
+    def lost_all_abilities?
+      !!@lost_all_abilities
     end
 
     def alive?
@@ -443,19 +459,20 @@ module Magic
     end
 
     def can_attack?
-      card.can_attack? && attachments.all?(&:can_attack?)
+      (lost_all_abilities? || card.can_attack?) && attachments.all?(&:can_attack?)
     end
 
     def can_block?(permanent)
-      !prevented_from_blocking? && card.can_block?(permanent) && attachments.all? { |attachment| attachment.can_block?(permanent) }
+      !prevented_from_blocking? && (lost_all_abilities? || card.can_block?(permanent)) &&
+        attachments.all? { |attachment| attachment.can_block?(permanent) }
     end
 
     def can_be_blocked?(blocker)
-      card.can_be_blocked?(blocker)
+      lost_all_abilities? || card.can_be_blocked?(blocker)
     end
 
     def maximum_attackers_blocked
-      card.maximum_attackers_blocked
+      lost_all_abilities? ? 1 : card.maximum_attackers_blocked
     end
 
 
@@ -575,6 +592,7 @@ module Magic
     private
 
     def dispatch_lifecycle_triggers(event)
+      return if lost_all_abilities?
       return unless event.respond_to?(:permanent) && event.permanent == self
 
       lifecycle_triggers_for(event).each do |trigger_class|
@@ -592,6 +610,8 @@ module Magic
     end
 
     def dispatch_event_handlers(event)
+      return if lost_all_abilities?
+
       Array(card.event_handlers[event.class]).each do |handler_class|
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
         perform_trigger!(handler_class, event)

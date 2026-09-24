@@ -100,3 +100,27 @@ RSpec.describe Magic::Permanent do
     end
   end
 end
+
+RSpec.describe Magic::Permanent, "losing all abilities" do
+  include_context "two player game"
+
+  it "loses its printed keywords, activated abilities and triggers, but keeps granted keywords" do
+    elves = ResolvePermanent("Llanowar Elves", owner: p1)
+    expect(elves.activated_abilities).not_to be_empty
+
+    elves.lose_all_abilities!
+    elves.grant_keyword(Magic::Keywords::FLYING)
+    game.tick!
+
+    expect(elves.activated_abilities).to be_empty
+    expect(elves).to be_flying
+    expect(elves).to be_lost_all_abilities
+  end
+
+  it "loses its keywords" do
+    skyscanner = ResolvePermanent("Skyscanner", owner: p1)
+    expect(skyscanner).to be_flying
+    skyscanner.lose_all_abilities!
+    expect(skyscanner).not_to be_flying
+  end
+end
