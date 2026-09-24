@@ -13,6 +13,7 @@ module Magic
       when "stun" then Stun
       when "hatchling" then Hatchling
       when "time" then Time
+      when "quest" then Quest
       else
         raise "Unknown counter type: #{counter_type}"
       end

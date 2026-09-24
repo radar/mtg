@@ -17,10 +17,17 @@ RSpec.describe Magic::CardParser::Rules::ActivatedAbility do
     expect(rule.sorcery_speed).to eq(true)
   end
 
+  it "parses removing counters, with \"and sacrifice it\" as a second cost" do
+    rule = described_class.parse("Remove three quest counters from ~ and sacrifice it: You gain 3 life.")
+    expect(rule.costs).to eq("Remove 3 quest counters from {this}, Sacrifice {this}")
+    expect(described_class.parse("{1}, Remove a +1/+1 counter from ~: Draw a card.").costs).to eq("{1}, Remove 1 +1/+1 counters from {this}")
+  end
+
   it "ignores mana abilities, unknown costs and unknown effects" do
     expect(described_class.parse("{T}: Add {G}.")).to be_nil
     expect(described_class.parse("{X}{R}: ~ deals X damage to any target.")).to be_nil
-    expect(described_class.parse("Remove a +1/+1 counter from ~: Draw a card.")).to be_nil
+    expect(described_class.parse("Remove a widget counter from ~: Draw a card.")).to be_nil
+    expect(described_class.parse("Pay 2 life: Draw a card.")).to be_nil
     expect(described_class.parse("{1}: ~ gains protection from red until end of turn.")).to be_nil
   end
 

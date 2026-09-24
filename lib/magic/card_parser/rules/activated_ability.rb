@@ -9,14 +9,24 @@ module Magic
       class ActivatedAbility < Data.define(:costs, :effect_list, :sorcery_speed)
         include Rule
 
-        COST = /(?:\{(?:\d+|[WUBRGC])\})+|\{T\}|Sacrifice ~|Sacrifice a creature|Exile ~|Discard a card/
+        COST = /(?:\{(?:\d+|[WUBRGC])\})+|\{T\}|Sacrifice ~|Sacrifice a creature|Exile ~|Discard a card|Remove (?:\d+|\w+) [\w+\/-]+ counters? from ~(?: and sacrifice it)?/
         LINE = /\A(?<costs>#{COST}(?:, #{COST})*): (?<effects>.+?)(?<sorcery> Activate only as a sorcery\.)?\z/
 
         def self.parse(line)
           return unless (m = LINE.match(line))
 
           effect_list = EffectList.parse(m[:effects]) or return
-          new(costs: m[:costs].gsub("~", "{this}"), effect_list:, sorcery_speed: !m[:sorcery].nil?)
+          m[:costs].scan(/Remove \w+ ([\w+\/-]+) counters? from/) { Magic::Counters[$1.downcase] } # raises for an unknown counter type
+          new(costs: costs(m[:costs]), effect_list:, sorcery_speed: !m[:sorcery].nil?)
+        rescue RuntimeError => e
+          raise unless e.message.start_with?("Unknown counter type")
+        end
+
+        # "Remove three quest counters from ~ and sacrifice it" is two costs.
+        def self.costs(text)
+          text.gsub(" and sacrifice it", ", Sacrifice ~")
+              .gsub(/Remove (\w+) ([\w+\/-]+) counters? from/) { "Remove #{Number.parse($1)} #{$2} counters from" }
+              .gsub("~", "{this}")
         end
 
         def kinds = PERMANENT_KINDS

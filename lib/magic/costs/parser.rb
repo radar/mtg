@@ -24,6 +24,8 @@ module Magic
           when /Sacrifice a creature/
             # TODO: Make this target only creatures controlled by player
             Sacrifice.new(source, source.controller.creatures)
+          when /\ARemove (?<amount>\d+) (?<type>[\w+\/-]+) counters? from {this}\z/
+            RemoveCounter.new(source, Counters[$~[:type].downcase], amount: $~[:amount].to_i)
           when /Sacrifice {this}/
             SelfSacrifice.new(source)
           when /Exile {this}/
