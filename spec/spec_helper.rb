@@ -16,7 +16,7 @@ module CardHelper
   end
 
   def ResolvePermanent(name, summoning_sick: false, **args)
-    card = Card(name)
+    card = Card(name, owner: args.fetch(:owner, p1))
     permanent = Magic::Permanent.resolve(game: game, card: card, **args)
     permanent.controlled_since_turn = 0 unless summoning_sick
     permanent

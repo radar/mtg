@@ -16,6 +16,13 @@ RSpec.describe Magic::CardParser::Rules::StaticBuff do
     expect(described_class.parse("Equipped creature has hexproof and haste.")).to eq(described_class.new("equipped creature", nil, nil, nil, %i[hexproof haste]))
   end
 
+  it "splits \"is all creature types\" on an Equipment or Aura into a method on the card" do
+    rules = described_class.merge([described_class.parse("Equipped creature gets +1/+1 and is all creature types.")])
+    expect(rules.map(&:hook)).to eq([:static_abilities, nil])
+    expect(rules.map(&:body_source)).to eq([nil, "def grants_all_creature_types? = true"])
+    expect(described_class.parse("Creatures you control get +1/+1 and is all creature types.")).to be_nil
+  end
+
   it "limits each subject to the cards it makes sense on" do
     expect(described_class.parse("Equipped creature gets +2/+0.").kinds).to eq(%i[equipment])
     expect(described_class.parse("Enchanted creature gets +2/+0.").kinds).to eq(%i[aura])

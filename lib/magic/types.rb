@@ -13,7 +13,12 @@ module Magic
     Legendary = "Legendary".freeze
 
     def type?(type)
-      types.include?(type)
+      types.include?(type) || (all_creature_types? && Creatures.values.include?(type))
+    end
+
+    # Changeling (rule 702.73) and "is all creature types": every creature type counts.
+    def all_creature_types?
+      false
     end
 
     def any_type?(*types)

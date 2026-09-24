@@ -18,6 +18,26 @@ RSpec.describe "CardParser card kinds" do
     expect(generate("Baubles {2}\nArtifact\n")).to include('Artifact("Baubles")')
   end
 
+  it "reads hybrid mana costs as Costs::Mana does" do
+    expect(Magic::CardParser::ManaCost.parse("{1}{G/U}")).to eq(generic: 1, blue_or_green: 1)
+    expect(Magic::Costs::Mana.new("{1}{G/U}").cost).to eq(generic: 1, blue_or_green: 1)
+    expect(generate("Hybrid Bear {G/U}{G/U}\nCreature — Bear\n2/2\n")).to include("cost blue_or_green: 2")
+  end
+
+  it "names cards with hyphens and apostrophes like the hand-written ones" do
+    expect(Magic::CardGenerator.const_name("Tam, Mindful First-Year")).to eq("TamMindfulFirstYear")
+    expect(Magic::CardGenerator.snake_name("Tam, Mindful First-Year")).to eq("tam_mindful_first_year")
+    expect(Magic::CardGenerator.const_name("Curse of the Pierced Heart")).to eq("CurseOfThePiercedHeart")
+    expect(Magic::CardGenerator.const_name("Riverguard's Reflexes")).to eq("RiverguardsReflexes")
+  end
+
+  it "generates Kindred cards with their creature types" do
+    expect(generate("Kin Idol {3}\nKindred Artifact — Shapeshifter\nChangeling\n"))
+      .to include('Artifact("Kin Idol")', 'type T::Kindred, T::Artifact, T::Creatures["Shapeshifter"]', "keywords :changeling")
+    expect(generate("Elf Rite {G}\nKindred Sorcery — Elf\nYou gain 3 life.\n")).to include('type T::Kindred, T::Sorcery, T::Creatures["Elf"]')
+    expect { generate("Kin Blade {1}\nKindred Artifact — Elf Equipment\nEquip {1}\n") }.to raise_error(Magic::CardParser::UnsupportedCard)
+  end
+
   it "requires an effect on instants and sorceries" do
     expect { generate("Zap {R}\nInstant\n") }.to raise_error(Magic::CardParser::ParseError, /SpellEffect/)
   end

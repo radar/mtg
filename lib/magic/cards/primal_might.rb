@@ -24,7 +24,7 @@ module Magic
 
         game.tick!
 
-        first_creature.fight(second_creature)
+        first_creature.fights!(second_creature)
       end
     end
   end

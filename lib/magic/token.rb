@@ -128,6 +128,10 @@ module Magic
       true
     end
 
+    def all_creature_types?
+      keywords.include?(Keywords::CHANGELING)
+    end
+
     def card
       self
     end

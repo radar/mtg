@@ -14,10 +14,17 @@ writes `lib/magic/cards/<name>.rb` from plain card text (`Magic::CardParser` →
 chapters parses under a C locale. Unrecognised rules text raises `UnsupportedCard`.
 
 Supported card kinds: creature (also Artifact/Enchantment Creature), instant,
-sorcery, enchantment, artifact (incl. legendary), Equipment (needs an `Equip` line),
+sorcery, enchantment, artifact (incl. legendary), Kindred artifact/enchantment/instant/
+sorcery (`type T::Kindred, T::Artifact, T::Creatures[...]`), Equipment (needs an `Equip` line),
 Aura (needs an `Enchant` line), Saga (needs chapter lines), land and basic land.
 Instants and sorceries need effect lines or a modal block. Other type lines/subtypes
 raise `UnsupportedCard`.
+
+Mana costs may use hybrid symbols: `{G/U}` → `blue_or_green: 1`, the key
+`Costs::Parsers::Mana` uses. Names with hyphens become separate words (`First-Year` →
+`FirstYear`, `first_year`), like the hand-written cards and the specs' `Card()` helper.
+
+A leading ability word on any rules line ("Vivid — ", "Landfall — ") is dropped.
 
 Parenthesised reminder text is stripped before parsing, and the card's own name in
 rules text is replaced with `~`, as is "this creature" / "this artifact" / "this
@@ -56,7 +63,7 @@ What the rules cover:
   trigger (pattern, class name, `TriggeredAbility` base, hook, event,
   `should_perform?` condition, allowed card kinds). "When" and "Whenever" are
   interchangeable. Rows: ~ enters, ~ enters or attacks (`merge` splits it into an enters
-  trigger and an attacks trigger with the same effects), ~ dies, ~ leaves the
+  trigger and an attacks trigger with the same effects), ~ becomes tapped (`Events::PermanentTapped`), ~ dies, ~ leaves the
   battlefield, a/another creature [you control / an opponent controls] dies, a/another
   creature is exiled from the battlefield (`Events::LeftTheBattlefield` to exile), another
   creature you control enters, landfall, your upkeep, beginning of combat on your turn
@@ -78,7 +85,8 @@ What the rules cover:
 - `ActivatedAbility`: "<costs>: <effects>[ Activate only as a sorcery.]". Costs go to
   `Costs::Parser` as a `costs "..."` string (`~` → `{this}`; only mana, `{T}`,
   `Sacrifice ~`/`a creature`, `Exile ~`, `Discard a card`); the sorcery restriction
-  becomes `requirements_met? = game.can_cast_sorcery?(controller)`. Mana abilities
+  becomes `requirements_met? = game.can_cast_sorcery?(controller)`, and "Activate only
+  once each turn." becomes `once_each_turn`. Mana abilities
   stay with the TapForMana rules, since "Add ..." isn't an effect.
 - `StaticBuff`: "[Other] creatures you control get +N/+N[ and have <keywords>]." /
   "... have <keywords>.", and the same for "Equipped creature" (Equipment only) and
@@ -94,6 +102,13 @@ What the rules cover:
   "[<type>] card in your graveyard") and renders `def power_modification = N * <count>`,
   recomputed with continuous effects. `TribalLord` handles
   "Other <type>s you control get +N/+N."
+- `AttachedRestriction`: "Enchanted/Equipped creature can't attack [or block] / can't
+  block / can't become untapped / doesn't untap during its controller's untap step /
+  can't have counters put on it / its activated abilities can't be activated", clauses
+  joined by "and" or commas → methods on the Attachment card (`can_attack?`,
+  `prevents_untapping?`, `prevents_counters?`, ...), which `Permanent` checks.
+- `CantBeCountered`: "This spell can't be countered." → `cant_be_countered`
+  (`Card#can_be_countered?` false, which `Effects::CounterSpell` checks).
 - `CostReduction`: "[<type>[ and <type>] / non<type>] spells you cast cost {N} less to
   cast." → a `ManaCostAdjustment` static ability.
 - `BlockingRestriction`: "~ can't block." / "~ can't be blocked." → `can_block?` /
@@ -103,6 +118,8 @@ What the rules cover:
   `enters_with_counters "+1/+1", N` class macro (`Card#entering_counters`, added by
   `Permanent.resolve` before the permanent enters).
 - Lands: `EntersTapped` (→ `enters_tapped`), `TapForMana`, `TapForManaPerPermanent`,
+  `TapForManaPerColor` ("{T}: For each color among permanents you control, add one mana
+  of that color."),
   `TapForManaChoice` ("{T}: Add {W} or {U}.", "{R}, {G}, or {W}", "one mana of any
   color" → `choices ...`).
 - `Keywords`: a line of comma-separated keywords → `keywords :flying, ...`. Keywords
@@ -117,6 +134,9 @@ What the rules cover:
   in `KNOWN` ("flying, first strike, and haste").
   Hexproof and hexproof from don't stop targeting yet (roadmap E2), so their specs only
   check that the keyword is there.
+- `changeling` is a plain keyword (`Types#type?` treats it as every creature type).
+  `StaticBuff` also reads "Equipped/Enchanted creature gets +N/+N and is all creature
+  types." (`merge` splits off `def grants_all_creature_types? = true` as a body).
 - Also: `Equip`, `Enchant`.
 
 ## Effects
@@ -125,7 +145,7 @@ One-sentence game effects are reusable classes in `lib/magic/card_parser/effects
 (`include Effect`; `.parse(text)`, `target_choices`, `resolve_call`; `definitions`
 returns Ruby for a constant the call needs, e.g. `CreateToken`'s `Token.create`
 class). Current effects: damage to a target or each opponent, draw, gain/lose life,
-destroy/exile/tap/bounce target (`PermanentTarget`: [another] target
+destroy/exile/tap/untap/bounce target (`PermanentTarget`: [another] target
 creature/artifact/enchantment/land/[nonland] permanent [you control / an opponent
 controls]; "another" leaves out `Effect::THIS`), counter target [<type>/non<type>] spell
 (targets `game.stack.spells`), mill, search your library for a basic land/land/creature
@@ -139,10 +159,26 @@ keyword grants for ~ / a target creature / [other] creatures you control, option
 return target [type] card from your graveyard to your hand, create Treasure/Food/Clue
 tokens (the engine's `Magic::Tokens::Treasure`/`Food`/`Clue`), remove N <type> counters
 from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens, copy tokens,
-scry. Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
+scry, surveil (`Choice::Surveil`, a choice point like scry), gain control of a target
+[until end of turn] (`Permanent#gain_control_until_eot!`, undone at cleanup), and "If
+that creature is a <type>, it [also] <effect on it>" (`IfTargetIsType`), and "~ /
+enchanted creature / equipped creature fights [up to one] target creature ..." (`Fight`,
+`Permanents::Creature#fights!`), and "exile [up to one] target ... until ~ leaves the
+battlefield" (`ExileUntilLeaves`, `Permanent#exile_until_leaves!`), and "~ becomes an N/N
+[<types>] creature [with <keywords>] until end of turn[. It's still a land.]"
+(`BecomeCreature`, `Permanent#become_creature!`; colours aren't supported), and "<target
+/ ~ / it> becomes all colors / colorless / <colour>[ and <colour>] until end of turn"
+(`ChangeColors`, `Permanent#change_colors!`). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 
+- "It" / "that creature" ("Untap it.", "It gains haste until end of turn.") is
+  `PermanentTarget::PRONOUN`: the effect's `earlier_target?` is true and it acts on
+  `target`, the target of an earlier effect in the same ability. `EffectList.parse`
+  rejects one with no targeted effect before it; in a multi-target spell it uses the
+  `targets[i]` of the last targeted effect before it; in a trigger it runs inside that
+  effect's `TargetChoice`. Tap, untap and pumps also take "enchanted creature" /
+  "equipped creature" (`PermanentTarget::ATTACHED`, `Effect::THIS.attached_to`).
 - An effect refers to its own card/permanent as `Effect::THIS`, which `EffectList`
   expands per context (`self` in a spell, `source` in an activated ability, `card` in a
   mode, `actor` in a trigger or inside a Choice). Never write `self`/`actor`/`source` in
@@ -189,6 +225,11 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   targeted effects make it `multi_target?` with one list of choices per target and
   `resolve!(targets:)`, each effect's `target` rewritten to its `targets[i]`
   (`ActivatedAbility#valid_targets?` checks each target against its own list).
+- "up to one target ..." (`PermanentTarget` `up_to`, an effect's `optional_target?`) is
+  only supported in triggered abilities (`spell_source` raises). Its `TargetChoice` has
+  `choice_amount = 0..1` (so `Stack#add_choice` doesn't pick a lone target for you),
+  and effects after it run in `finish`, from `resolve!`, from `decline!`
+  (`game.skip_choice!`) or straight away when there is nothing to target.
 - `trigger_source(entry:)` renders a triggered/chapter ability's `call`/`resolve!`. Each
   targeted effect is its own choice, nested in turn (`TargetChoice`, `TargetChoice2`,
   ...). Unless its only target is its first effect, it starts with

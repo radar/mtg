@@ -157,7 +157,7 @@ Zeitwerk (`lib/magic.rb`): auto-loads from `lib/magic/**/*.rb`. Define class →
 - `game`: Two-player game (p1, p2), 7-card libraries
 - `current_turn`: Turn state and phase transitions
 - Helpers: `go_to_main_phase!`, `skip_to_combat!`, `go_to_combat_damage!`
-- `ResolvePermanent(name, owner: p1)`: Create and resolve a permanent
+- `ResolvePermanent(name, owner: p1)`: Create and resolve a permanent (the card is owned by `owner` too)
 - `cast_and_resolve(card:, player:)`: Cast and resolve immediately
 
 **Card Helper**: `Card(name)` and `ResolvePermanent(name)` strip non-letter chars and look up constant. Every word must be capitalised — `"Terror Of The Peaks"` not `"Terror of the Peaks"`. Lowercase words (of, the, a) must be uppercased or lookup fails.
@@ -184,7 +184,7 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 - **Cast**: sorcery timing (active player, main phase, empty stack) unless the card is an instant or has flash; zone (hand, flashback graveyard, or a permitted zone); `spell_cast_limit`.
 - **PlayLand**: same sorcery timing, zone, `player.can_play_lands?`.
-- **ActivateAbility**: activator controls the source; `source.can_activate_ability?`; `ability.requirements_met?` (default `true` on `ActivatedAbility`); a `{T}` cost needs an untapped, non-summoning-sick source (`Costs::SelfTap#unpayable_reason`, checked in `ActivateAbility#pay` as the cost is paid).
+- **ActivateAbility**: activator controls the source; `source.can_activate_ability?`; `ability.requirements_met?` (default `true` on `ActivatedAbility`); `once_each_turn` abilities not already activated this turn; a `{T}` cost needs an untapped, non-summoning-sick source (`Costs::SelfTap#unpayable_reason`, checked in `ActivateAbility#pay` as the cost is paid).
 - **ActivateLoyaltyAbility**: controller, sorcery timing unless the ability's `instant_speed?` is true (Teferi, Master of Time), one activation per planeswalker per turn, loyalty must cover a negative cost.
 - **DeclareAttacker**: declare attackers step, active player, creature you control, untapped, `can_attack?` (defender), not summoning sick. Re-declaring an already-attacking creature just retargets and skips the tapped/sickness checks. Specs that call `current_turn.declare_attacker` directly (the `CombatPhase` delegate) still bypass all of this.
 - **Cycle**: card must be in hand.
@@ -195,7 +195,7 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 **Summoning sickness**: `Permanent#summoning_sick?` is true for a non-haste creature whose `controlled_since_turn` is not before the controller's latest turn (`Game#latest_turn_number_of`). `Permanent#controller=` resets it. Grant haste with `grant_haste!` **and `game.tick!`** — the keyword only shows up once continuous effects are recalculated.
 
-**Zone permissions**: a card may be cast/played from the top of the library, exile or graveyard only if some battlefield static ability defines `permits_casting_from_top?(card)` / `permits_casting_from_exile?(card)` returning true (these also gate `PlayLand`, so a "play lands from the top of your library" card needs `card.land?` in its check), or an emblem defines `permits_casting_from_graveyard?`. A cast an effect instructs (rebound, "you may cast it" on resolution) passes `by_effect: true` to skip zone and timing checks (rule 608.2g). Cards exiled on an adventure carry `card.on_adventure` (cleared when they leave exile). A card with **no zone at all** (a bare `Card(...)` fixture) is treated as being in hand; every other zone is checked for real.
+**Zone permissions**: a card may be cast/played from the top of the library, exile or graveyard only if some battlefield static ability defines `permits_casting_from_top?(card)` / `permits_casting_from_exile?(card)` returning true (these also gate `PlayLand`, so a "play lands from the top of your library" card needs `card.land?` in its check), or an emblem defines `permits_casting_from_graveyard?`. A permission method may take the casting player as a second argument (`permits_casting_from_exile?(card, player)`), for "you may cast it". Permissions that outlast their source ("until the end of your next turn, you may play that card", from a spell) go in `game.play_permissions.grant_until_end_of_next_turn(card:, player:)`. A static ability can also answer `any_mana_type_for?(card, player)` ("mana of any type can be spent to cast that spell") or `free_cast_from_exile?(card, player)` ("without paying its mana cost"), which `Actions::Cast` checks. Casting a card you don't own makes you its controller (`card.controller = player`, reset when it changes zone; a permanent spell enters under the caster's control), and it still goes to its owner's graveyard. A cast an effect instructs (rebound, "you may cast it" on resolution) passes `by_effect: true` to skip zone and timing checks (rule 608.2g). Cards exiled on an adventure carry `card.on_adventure` (cleared when they leave exile). A card with **no zone at all** (a bare `Card(...)` fixture) is treated as being in hand; every other zone is checked for real.
 
 **Spec consequences** (the shared "two player game" context leaves turn 1 in the `beginning` step):
 

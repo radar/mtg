@@ -10,6 +10,8 @@ module Magic
     #   #target_choices     -> Ruby expression for the legal targets, or nil when untargeted
     #   #resolve_call       -> Ruby statement that does the effect (`target` is in scope when targeted;
     #                          Effect::THIS stands for the card/permanent, e.g. as a Choice's actor)
+    #   #earlier_target?    -> true when it acts on an earlier effect's `target` ("Untap it.")
+    #   #optional_target?   -> true for "up to one target"; only triggered abilities support it
     #   #definitions        -> Ruby defining constants resolve_call needs (a token class), or nil
     #   #choice_base        -> Choice class the effect adds (e.g. scry), or nil; the
     #                          effects after it run in a subclass named #choice_class_name,
@@ -28,6 +30,10 @@ module Magic
       end
 
       def target_choices = nil
+      # True for "it" / "that creature": the effect acts on an earlier effect's target.
+      def earlier_target? = false
+      # True for "up to one target ...": the ability still resolves without a target.
+      def optional_target? = false
       def choice_base = nil
       def choice_args = nil
       def definitions = nil

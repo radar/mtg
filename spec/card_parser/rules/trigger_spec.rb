@@ -103,6 +103,20 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     end
   end
 
+  it "parses becoming tapped" do
+    rule = parse("Whenever ~ becomes tapped, draw a card, then discard a card.")
+    expect([rule.class_base_name, rule.handled_event, rule.condition]).to eq(["BecomesTappedTrigger", "Events::PermanentTapped", "event.permanent == actor"])
+    expect(rule.effect_list.effects.map(&:class).map { _1.name.split("::").last }).to eq(%w[DrawCards Discard])
+  end
+
+  it "runs the effects after an \"up to one\" target whether or not one is chosen" do
+    source = parse("When ~ enters, ~ fights up to one target creature you don't control. You gain 2 life.").class_source("EntersTrigger")
+    expect(source).to include("def choice_amount = 0..1", "def decline! = finish",
+                              "def finish\n      trigger_effect(:gain_life, target: controller, life: 2)",
+                              "choice.choices.any? ? game.add_choice(choice) : choice.finish")
+    expect(source).not_to include("return if")
+  end
+
   it "treats When and Whenever alike" do
     expect(parse("Whenever ~ enters, draw a card.").class_base_name).to eq("EntersTrigger")
     expect(parse("When ~ attacks, draw a card.").class_base_name).to eq("AttacksTrigger")

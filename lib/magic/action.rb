@@ -32,13 +32,18 @@ module Magic
       return true if zone.hand? && !flashback
 
       (zone.library? && card == player.library.first && permitted_by_static_ability?(:permits_casting_from_top?, card)) ||
-        (zone.exile? && (card.on_adventure || permitted_by_static_ability?(:permits_casting_from_exile?, card))) ||
+        (zone.exile? && (card.on_adventure || permitted_by_static_ability?(:permits_casting_from_exile?, card) ||
+                         game.play_permissions.permits?(card, player))) ||
         (zone.graveyard? && permitted_by_emblem?(:permits_casting_from_graveyard?, card))
     end
 
+    # A permission method may take the player casting the card as a second argument
+    # ("you may cast it": only its controller may).
     def permitted_by_static_ability?(permission, card)
       game.battlefield.static_abilities.any? do |ability|
-        ability.respond_to?(permission) && ability.public_send(permission, card)
+        next false unless ability.respond_to?(permission)
+
+        ability.method(permission).arity == 1 ? ability.public_send(permission, card) : ability.public_send(permission, card, player)
       end
     end
 

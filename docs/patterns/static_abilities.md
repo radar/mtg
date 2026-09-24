@@ -4,6 +4,8 @@ Keyword grants, CDA power/toughness, type changes, replacement effects, continuo
 
 **Conditional keyword (only on your turn)**: Subclass `Abilities::Static::KeywordGrant`, override `applicable_targets` to return `[source]` when `game.current_turn.active_player == controller`, else `[]`. Example: `RadhaHeartOfKeld::FirstStrikeGrant`.
 
+**Changeling / "is all creature types"**: `keywords :changeling` (cards and tokens). `Types#type?` also answers true for every creature type (`Types::Creatures`) when `all_creature_types?` is true: a card or token with changeling (printed, so it works in every zone), or a permanent whose Equipment/Aura defines `grants_all_creature_types? = true` (`Attachment` default false). `CardList#by_type`, `TriggeredAbility#type?` and `SpellCast#type?` all go through `type?`, so check types with `type?`, not `types.include?`. Example: `StalactiteDagger`.
+
 **Legendary creature DSL**: Use `legendary_creature_type "Elf Warrior"` in the DSL block instead of `creature_type`.
 
 **Aura static abilities on the attached creature**: Use `applies_to_target` (no arguments) as a class-level declaration inside the static ability subclass — targets the attached permanent automatically. Example: `SetessanTraining::PowerModification`, `SetessanTraining::KeywordGrantTrample`.
@@ -57,3 +59,11 @@ Pre-built subclasses in `lib/magic/abilities/static/` — declare these on a car
 
 **Querying static abilities generically**: Use `game.battlefield.static_abilities.of_type(Abilities::Static::SomeBaseClass)` (`lib/magic/static_abilities.rb`), not `.respond_to?(:some_method)` — the latter is fragile (a class overriding the method without inheriting the right base silently no-ops, or worse, an unrelated ability happens to define a same-named method). Every hook queried this way needs a real base class under `lib/magic/abilities/static/`, even if it only has one implementation so far.
 
+
+**"Becomes <color> until end of turn" / "becomes all colors"**: `permanent.change_colors!([:blue])` adds a `Modifications::Color` (until end of turn by default); `Permanent#colors` uses the latest one, else the card's colors. Example: `ForagingWickermaw`.
+
+**Auras/Equipment restricting the attached creature**: define methods on the Attachment card: `can_attack?`, `can_block?(_)`, `can_activate_ability?(_)`, `does_not_untap_during_untap_step?`, `prevents_untapping?` ("can't become untapped", checked by `Permanent#untap!`) and `prevents_counters?` ("can't have counters put on it", checked by `Effects::AddCounterToPermanent` via `Permanent#can_have_counters?`). `Attachment` defaults them all to allow. An Aura enters already attached (`Permanent.resolve(attach_to:)`), so its enters trigger can use `actor.attached_to`; an attachment leaving the battlefield is removed from its host's `attachments` but keeps `attached_to`. Example: `Blossombind`.
+
+**"Becomes an N/N creature until end of turn" (manlands, Firdoch Core)**: `permanent.become_creature!(power:, toughness:, types: [T::Artifact])` adds `Creature` (and any other types) plus base power/toughness modifiers, all until end of turn. Every permanent (not just creatures) is cleaned up at end of turn, so it stops being a creature then. Example: `FirdochCore`.
+
+**Keyword grants that depend on the creature ("hexproof from each of its colors")**: in an `Abilities::Static::KeywordGrant` subclass, override `keyword_grants_for(permanent)` (defaults to `keyword_grants`); `ContinuousEffects` calls it for each permanent the ability applies to. Example: `TamMindfulFirstYear`.
