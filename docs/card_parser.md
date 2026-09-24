@@ -100,6 +100,8 @@ What the rules cover:
   can't have counters put on it / its activated abilities can't be activated", clauses
   joined by "and" or commas → methods on the Attachment card (`can_attack?`,
   `prevents_untapping?`, `prevents_counters?`, ...), which `Permanent` checks.
+- `CantBeCountered`: "This spell can't be countered." → `cant_be_countered`
+  (`Card#can_be_countered?` false, which `Effects::CounterSpell` checks).
 - `CostReduction`: "[<type>[ and <type>] / non<type>] spells you cast cost {N} less to
   cast." → a `ManaCostAdjustment` static ability.
 - `BlockingRestriction`: "~ can't block." / "~ can't be blocked." → `can_block?` /

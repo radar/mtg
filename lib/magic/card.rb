@@ -61,6 +61,11 @@ module Magic
         const_set(:CYCLING_COST, cost)
       end
 
+      # "This spell can't be countered."
+      def cant_be_countered
+        define_method(:can_be_countered?) { false }
+      end
+
       def buyback
         define_method(:buyback?) do
           true
