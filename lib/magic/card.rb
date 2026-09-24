@@ -295,6 +295,13 @@ module Magic
       []
     end
 
+    # Rule 702.73a: changeling works in every zone, not just on the battlefield.
+    def types
+      return @types unless static_abilities.include?(Abilities::Static::Changeling)
+
+      (@types + Types::Creatures.values).uniq
+    end
+
     def graveyard_static_abilities
       []
     end

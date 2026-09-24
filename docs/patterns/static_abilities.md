@@ -56,3 +56,5 @@ Pre-built subclasses in `lib/magic/abilities/static/` — declare these on a car
 
 **Querying static abilities generically**: Use `game.battlefield.static_abilities.of_type(Abilities::Static::SomeBaseClass)` (`lib/magic/static_abilities.rb`), not `.respond_to?(:some_method)` — the latter is fragile (a class overriding the method without inheriting the right base silently no-ops, or worse, an unrelated ability happens to define a same-named method). Every hook queried this way needs a real base class under `lib/magic/abilities/static/`, even if it only has one implementation so far.
 
+
+- **Changeling** (rule 702.73a, a CDA that works in every zone): return `Abilities::Static::Changeling` from `static_abilities` (a `TypeGrant` giving every creature type to its source). `Card#types` also checks for it, so the card is every creature type in hand/graveyard/etc. Declare only the printed types (e.g. Shapeshifter) in the DSL block. Example: `ChangelingWayfinder`. Does not cover granting changeling to other permanents.
