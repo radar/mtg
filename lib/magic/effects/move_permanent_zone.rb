@@ -44,6 +44,8 @@ module Magic
         end
 
         game.notify!(*entering_zone_notifications(from: from, to: to))
+
+        target.return_cards_exiled_until_leaves! if from&.battlefield? && !to.battlefield? && target.respond_to?(:return_cards_exiled_until_leaves!)
       end
 
       def leaving_zone_notifications(from:, to:)

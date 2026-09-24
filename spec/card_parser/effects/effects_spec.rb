@@ -76,6 +76,13 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("~ fights target artifact.")).to be_nil
   end
 
+  it "parses exiling until ~ leaves the battlefield" do
+    hold = described_class.parse("Exile up to one target nonland permanent an opponent controls until ~ leaves the battlefield.")
+    expect(hold.target_choices).to eq("battlefield.not_controlled_by(controller).nonland")
+    expect(hold.optional_target?).to eq(true)
+    expect(hold.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.exile_until_leaves!(target)")
+  end
+
   it "parses surveil as a choice" do
     surveil = described_class.parse("Surveil 2.")
     expect(surveil).to eq(e.const_get(:Surveil).new(2))

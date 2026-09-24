@@ -157,7 +157,7 @@ Zeitwerk (`lib/magic.rb`): auto-loads from `lib/magic/**/*.rb`. Define class →
 - `game`: Two-player game (p1, p2), 7-card libraries
 - `current_turn`: Turn state and phase transitions
 - Helpers: `go_to_main_phase!`, `skip_to_combat!`, `go_to_combat_damage!`
-- `ResolvePermanent(name, owner: p1)`: Create and resolve a permanent
+- `ResolvePermanent(name, owner: p1)`: Create and resolve a permanent (the card is owned by `owner` too)
 - `cast_and_resolve(card:, player:)`: Cast and resolve immediately
 
 **Card Helper**: `Card(name)` and `ResolvePermanent(name)` strip non-letter chars and look up constant. Every word must be capitalised — `"Terror Of The Peaks"` not `"Terror of the Peaks"`. Lowercase words (of, the, a) must be uppercased or lookup fails.

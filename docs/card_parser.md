@@ -152,7 +152,8 @@ scry, surveil (`Choice::Surveil`, a choice point like scry), gain control of a t
 [until end of turn] (`Permanent#gain_control_until_eot!`, undone at cleanup), and "If
 that creature is a <type>, it [also] <effect on it>" (`IfTargetIsType`), and "~ /
 enchanted creature / equipped creature fights [up to one] target creature ..." (`Fight`,
-`Permanents::Creature#fights!`). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
+`Permanents::Creature#fights!`), and "exile [up to one] target ... until ~ leaves the
+battlefield" (`ExileUntilLeaves`, `Permanent#exile_until_leaves!`). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 

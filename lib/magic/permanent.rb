@@ -505,6 +505,28 @@ module Magic
       card.target_choices(self)
     end
 
+    # "Exile target permanent until ~ leaves the battlefield" (rule 610.3). Does nothing if
+    # this permanent has already left; a token exiled this way is gone for good.
+    def exile_until_leaves!(target)
+      return unless zone&.battlefield?
+
+      target.exile!
+      cards_exiled_until_leaves << target.card unless target.token?
+    end
+
+    def cards_exiled_until_leaves
+      @cards_exiled_until_leaves ||= []
+    end
+
+    # Called as this permanent leaves the battlefield: the cards come back under their
+    # owners' control.
+    def return_cards_exiled_until_leaves!
+      cards, @cards_exiled_until_leaves = cards_exiled_until_leaves, []
+      cards.select { _1.zone&.exile? }.each do |card|
+        Permanent.resolve(game:, card:, owner: card.owner, from_zone: card.zone, cast: false)
+      end
+    end
+
     def remove_from_exile(card)
       @exiled_cards -= [card]
       game.exile.remove(card)
