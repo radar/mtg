@@ -2,6 +2,7 @@ module Magic
   class Game
     class CombatPhase
       class AttackerHasProtection < StandardError; end
+      class IllegalBlock < StandardError; end
 
       class Attack
         attr_reader :attacker, :target, :blockers
@@ -84,12 +85,14 @@ module Magic
         @attacks.any?
       end
 
+      # Protection, "can't block" on the blocker, and "can't be blocked" on the attacker.
       def can_block?(attacker:, blocker:)
-        !attacker.protected_from?(blocker)
+        !attacker.protected_from?(blocker) && blocker.can_block?(attacker) && attacker.can_be_blocked?(blocker)
       end
 
       def declare_blocker(blocker, attacker:)
-        raise AttackerHasProtection unless can_block?(attacker: attacker, blocker: blocker)
+        raise AttackerHasProtection if attacker.protected_from?(blocker)
+        raise IllegalBlock, "#{blocker.name} can't block #{attacker.name}" unless can_block?(attacker: attacker, blocker: blocker)
 
         attack = @attacks.find do |attack|
           attack.attacker == attacker

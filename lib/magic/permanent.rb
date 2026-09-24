@@ -417,6 +417,10 @@ module Magic
       !prevented_from_blocking? && card.can_block?(permanent) && attachments.all? { |attachment| attachment.can_block?(permanent) }
     end
 
+    def can_be_blocked?(blocker)
+      card.can_be_blocked?(blocker)
+    end
+
 
     def cleanup!
       @turn_triggers = {}

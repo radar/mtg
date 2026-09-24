@@ -54,6 +54,9 @@ module Magic
     end
 
     def entering_counters = {}
+    def can_attack? = !defender?
+    def can_block?(_) = true
+    def can_be_blocked?(_) = true
 
     def zone=(zone)
       @zone = zone

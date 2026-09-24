@@ -350,6 +350,7 @@ module Magic
 
     def can_attack? = !defender?
     def can_block?(_) = true
+    def can_be_blocked?(_) = true
     def can_activate_ability?(_) = true
 
     def add_choice(choice, **args)
