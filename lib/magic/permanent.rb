@@ -423,6 +423,10 @@ module Magic
       card.can_be_blocked?(blocker)
     end
 
+    def maximum_attackers_blocked
+      card.maximum_attackers_blocked
+    end
+
 
     def cleanup!
       @turn_triggers = {}

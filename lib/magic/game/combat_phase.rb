@@ -42,65 +42,35 @@ module Magic
           blockers.select { |blocker| CombatPhase.in_combat?(blocker) }
         end
 
-        def assign_damage!(assignment)
-          reason = assignment_illegal_reason(assignment, attacker.power)
+        # Checks the assignment against the damage other creatures are assigning in the same step.
+        def assign_damage!(assignment, pending)
+          reason = assignment_illegal_reason(assignment, pending)
           raise IllegalDamageAssignment, reason if reason
 
           @damage_assignment = assignment
         end
 
-        # Rule 510.1c-d: how much damage this attacker deals to each recipient in this damage step.
-        def damage_assignments
+        # The division the attacking player chose, if it is still legal in this damage step.
+        def chosen_damage_assignments(pending)
+          return unless blocked? && damage_assignment && attacker.power.positive?
+          return if assignment_illegal_reason(damage_assignment, pending)
+
+          damage_assignment.reject { |_, amount| amount.zero? }
+        end
+
+        # Rule 510.1c: lethal damage to each blocker in the order they were declared. Leftover damage
+        # goes to the player or permanent under attack if the attacker has trample, or to the last
+        # blocker if not.
+        def default_damage_assignments(pending)
           power = attacker.power
           return {} unless power.positive?
           return { target => power } unless blocked?
 
-          if damage_assignment && assignment_illegal_reason(damage_assignment, power).nil?
-            return damage_assignment.reject { |_, amount| amount.zero? }
-          end
-
-          default_damage_assignments(power)
+          CombatPhase.divide_damage(attacker, power, remaining_blockers, pending, leftover_to: attacker.trample? ? target : nil)
         end
 
-        # Rule 510.1d: each blocker deals its combat damage to the attacker it blocks.
-        def blocker_damage_assignments(blocker)
-          return {} unless blocker.power.positive? && CombatPhase.in_combat?(attacker)
-
-          { attacker => blocker.power }
-        end
-
-        def lethal_damage_for(blocker)
-          return 1 if attacker.deathtouch?
-
-          [blocker.toughness - blocker.damage, 0].max
-        end
-
-        private
-
-        # Lethal damage to each blocker in the order they were declared. Leftover damage goes to the
-        # player or permanent under attack if the attacker has trample, or to the last blocker if not.
-        def default_damage_assignments(power)
-          remaining = remaining_blockers
-          if remaining.empty?
-            return attacker.trample? ? { target => power } : {}
-          end
-
-          assignments = Hash.new(0)
-          remaining.each do |blocker|
-            assigned = [lethal_damage_for(blocker), power].min
-            assignments[blocker] += assigned
-            power -= assigned
-          end
-
-          if power.positive?
-            recipient = attacker.trample? ? target : remaining.last
-            assignments[recipient] += power
-          end
-
-          assignments.reject { |_, amount| amount.zero? }
-        end
-
-        def assignment_illegal_reason(assignment, power)
+        def assignment_illegal_reason(assignment, pending)
+          power = attacker.power
           remaining = remaining_blockers
           recipients = assignment.keys
           return "#{attacker.name} isn't blocked" unless blocked?
@@ -112,9 +82,52 @@ module Magic
           return unless recipients.include?(target) && assignment[target].positive?
           return "#{attacker.name} doesn't have trample" unless attacker.trample?
 
-          short = remaining.find { |blocker| assignment.fetch(blocker, 0) < lethal_damage_for(blocker) }
+          short = remaining.find { |blocker| assignment.fetch(blocker, 0) < pending.lethal_damage(blocker, source: attacker) }
           "#{short.name} must be assigned lethal damage before damage tramples over" if short
         end
+      end
+
+      # Combat damage assigned so far in one damage step. Rules 510.1c-d and 702.19c: lethal damage
+      # counts damage already marked on a creature and damage other creatures are assigning to it in
+      # the same step, and any damage from a deathtouch source is lethal.
+      class PendingDamage
+        def initialize
+          @amounts = Hash.new(0)
+          @deathtouched = []
+        end
+
+        def add(source, recipient, amount)
+          @amounts[recipient] += amount
+          @deathtouched << recipient if source.deathtouch? && amount.positive?
+        end
+
+        def add_all(source, assignments)
+          assignments.each { |recipient, amount| add(source, recipient, amount) }
+        end
+
+        def lethal_damage(creature, source:)
+          return 0 if @deathtouched.include?(creature)
+
+          needed = creature.toughness - creature.damage - @amounts[creature]
+          needed = [needed, 1].min if source.deathtouch?
+          [needed, 0].max
+        end
+      end
+
+      # Lethal damage to each recipient in order, then whatever is left to `leftover_to`, or to the
+      # last recipient if there is none.
+      def self.divide_damage(source, power, recipients, pending, leftover_to: nil)
+        return (leftover_to ? { leftover_to => power } : {}) if recipients.empty?
+
+        assignments = Hash.new(0)
+        recipients.each do |recipient|
+          assigned = [pending.lethal_damage(recipient, source: source), power].min
+          assignments[recipient] += assigned
+          power -= assigned
+        end
+        assignments[leftover_to || recipients.last] += power if power.positive?
+
+        assignments.reject { |_, amount| amount.zero? }
       end
 
       attr_reader :game, :attacks
@@ -153,7 +166,11 @@ module Magic
       end
 
       def blocking?(permanent)
-        @attacks.any? { |attack| attack.blockers.include?(permanent) }
+        attacks_blocked_by(permanent).any?
+      end
+
+      def attacks_blocked_by(blocker)
+        @attacks.select { |attack| attack.blockers.include?(blocker) }
       end
 
       def attackers_without_targets?
@@ -181,7 +198,9 @@ module Magic
           return "#{blocker.name} isn't controlled by the defending player"
         end
 
-        return "#{blocker.name} is already blocking" if blocking?(blocker)
+        blocked = attacks_blocked_by(blocker)
+        return "#{blocker.name} is already blocking #{attacker.name}" if blocked.include?(attack)
+        return "#{blocker.name} is already blocking" if blocked.count >= blocker.maximum_attackers_blocked
         return "#{attacker.name} has protection from #{blocker.name}" if attacker.protected_from?(blocker)
         return "#{blocker.name} can't block #{attacker.name}" unless blocker.can_block?(attacker)
         return "#{attacker.name} can't be blocked by #{blocker.name}" unless attacker.can_be_blocked?(blocker)
@@ -223,7 +242,7 @@ module Magic
         attack = attack_for_attacker(attacker)
         raise IllegalDamageAssignment, "#{attacker.name} isn't attacking" unless attack
 
-        attack.assign_damage!(assignment)
+        attack.assign_damage!(assignment, pending_from_chosen_assignments(except: attack))
       end
 
       # Rule 510.4: only creatures with first strike or double strike deal damage in this step.
@@ -243,20 +262,47 @@ module Magic
         @attacks.flat_map { |attack| [attack.attacker, *attack.blockers] }.uniq
       end
 
-      # Rule 510.1-2: work out all of the damage for this step first, then deal it together.
+      # The damage the other attackers' chosen divisions put on each creature.
+      def pending_from_chosen_assignments(except:, attacks: @attacks)
+        pending = PendingDamage.new
+        attacks.each do |attack|
+          next if attack == except || attack.damage_assignment.nil?
+
+          pending.add_all(attack.attacker, attack.damage_assignment)
+        end
+        pending
+      end
+
+      # Rule 510.1-2: work out all of the damage for this step first, then deal it together. Chosen
+      # divisions go first, so the default divisions can count their damage toward lethal damage.
       def deal_damage(&deals_damage)
+        pending = PendingDamage.new
         assignments = []
 
-        @attacks.each do |attack|
-          if self.class.in_combat?(attack.attacker) && deals_damage.call(attack.attacker)
-            attack.damage_assignments.each { |recipient, amount| assignments << [attack.attacker, recipient, amount] }
-          end
+        attacking = @attacks.select { |attack| self.class.in_combat?(attack.attacker) && deals_damage.call(attack.attacker) }
+        chosen = attacking.to_h do |attack|
+          [attack, attack.chosen_damage_assignments(pending_from_chosen_assignments(except: attack, attacks: attacking))]
+        end.compact
+        chosen.each { |attack, division| pending.add_all(attack.attacker, division) }
 
-          attack.remaining_blockers.each do |blocker|
-            next unless deals_damage.call(blocker)
-
-            attack.blocker_damage_assignments(blocker).each { |recipient, amount| assignments << [blocker, recipient, amount] }
+        attacking.each do |attack|
+          division = chosen[attack]
+          unless division
+            division = attack.default_damage_assignments(pending)
+            pending.add_all(attack.attacker, division)
           end
+          division.each { |recipient, amount| assignments << [attack.attacker, recipient, amount] }
+        end
+
+        blockers_dealing_damage = @attacks.flat_map(&:remaining_blockers).uniq.select(&deals_damage)
+        blockers_dealing_damage.each do |blocker|
+          next unless blocker.power.positive?
+
+          # Rule 510.1d: a creature blocking several attackers divides its damage between them.
+          attackers = attacks_blocked_by(blocker).map(&:attacker).select { |attacker| self.class.in_combat?(attacker) }
+          division = self.class.divide_damage(blocker, blocker.power, attackers, pending)
+          pending.add_all(blocker, division)
+          division.each { |recipient, amount| assignments << [blocker, recipient, amount] }
         end
 
         assignments.each { |source, recipient, amount| source.fight(recipient, amount) }
