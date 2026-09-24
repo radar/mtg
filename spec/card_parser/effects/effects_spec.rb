@@ -179,6 +179,17 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Exile target creature, then return it to the battlefield under your control.")).to be_nil
   end
 
+  it "parses a library search onto the battlefield as a choice" do
+    basic = described_class.parse("Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.")
+    expect(basic).to eq(e.const_get(:SearchLibrary).new("basic land", 1, true))
+    expect(basic.choice_base).to eq("Magic::Choice::SearchLibrary")
+    expect(basic.choice_args).to eq(["to_zone: :battlefield", "enters_tapped: true", "upto: 1", "filter: Filter[:basic_lands]"])
+
+    forests = described_class.parse("Search your library for up to two Forest cards, put them onto the battlefield, then shuffle.")
+    expect(forests.choice_args).to eq(["to_zone: :battlefield", "enters_tapped: false", "upto: 2", "filter: ->(card) { card.any_type?(\"Forest\") }"])
+    expect(described_class.parse("Search your library for two basic land cards, put them onto the battlefield, then shuffle.")).to be_nil
+  end
+
   it "has no targets for untargeted effects" do
     expect(e.const_get(:DrawCards).new(1).target_choices).to be_nil
   end
