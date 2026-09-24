@@ -123,6 +123,14 @@ module Magic
       def reach?
         has_keyword?(Keywords::REACH)
       end
+
+      def menace?
+        has_keyword?(Keywords::MENACE)
+      end
+
+      def skulk?
+        has_keyword?(Keywords::SKULK)
+      end
     end
   end
 end
