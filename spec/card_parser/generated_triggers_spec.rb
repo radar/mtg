@@ -134,6 +134,15 @@ RSpec.describe "CardParser generated triggers in play" do
     expect(bears.card.zone).to be_graveyard
   end
 
+  it "surveils, then draws once the surveil is chosen" do
+    load_card("Parsed Watcher {1}{B}\nCreature — Rogue\nWhen this creature enters, surveil 1, then draw a card.\n1/1\n")
+    ResolvePermanent("Parsed Watcher", owner: p1)
+    top = p1.library.first
+
+    expect { game.resolve_choice!(graveyard: [top]) }.to change { p1.hand.count }.by(1)
+    expect(top.zone).to be_graveyard
+  end
+
   it "shrinks the opponent's creature to death on entering" do
     load_card("Parsed Blight {2}{B}\nCreature — Horror\nWhen Parsed Blight enters, target creature an opponent controls gets -2/-2 until end of turn.\n2/2\n")
     bears = ResolvePermanent("Grizzly Bears", owner: p2)

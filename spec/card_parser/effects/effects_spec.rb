@@ -43,6 +43,13 @@ RSpec.describe Magic::CardParser::Effect do
     expect(e.const_get(:DrawCards).new(1).choice_base).to be_nil
   end
 
+  it "parses surveil as a choice" do
+    surveil = described_class.parse("Surveil 2.")
+    expect(surveil).to eq(e.const_get(:Surveil).new(2))
+    expect(surveil.choice_base).to eq("Magic::Choice::Surveil")
+    expect(surveil.choice_args).to eq("amount: 2")
+  end
+
   it "parses life loss" do
     expect(described_class.parse("Target player loses 2 life.").resolve_call).to eq("trigger_effect(:lose_life, target: target, life: 2)")
     expect(described_class.parse("Target opponent loses 2 life.").target_choices).to eq("game.opponents(controller)")

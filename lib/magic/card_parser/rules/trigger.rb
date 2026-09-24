@@ -11,6 +11,7 @@ module Magic
       #   Whenever you cast an instant or sorcery spell, scry 1.
       #   Whenever another creature you control dies, you may draw a card.
       #   Whenever ~ enters or attacks, create a 1/1 white Soldier creature token.
+      #   Whenever ~ becomes tapped, draw a card, then discard a card.
       class Trigger < Data.define(:kind, :condition, :effect_list)
         include Rule
 
@@ -75,6 +76,8 @@ module Magic
                      checks.empty? ? nil : checks.join(" && ")
                    },
                    PERMANENT_KINDS),
+          Kind.new(/#{WHEN} ~ becomes tapped/, "BecomesTappedTrigger", "TriggeredAbility", :event_handlers,
+                   "Events::PermanentTapped", "event.permanent == actor", PERMANENT_KINDS),
           Kind.new(/#{WHEN} ~ attacks/, "AttacksTrigger", "TriggeredAbility", :event_handlers,
                    "Events::FinalAttackersDeclared", "event.attacks.any? { _1.attacker == actor }", %i[creature]),
           Kind.new(/#{WHEN} you attack/, "YouAttackTrigger", "TriggeredAbility", :event_handlers,

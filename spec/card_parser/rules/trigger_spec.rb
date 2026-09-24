@@ -103,6 +103,12 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     end
   end
 
+  it "parses becoming tapped" do
+    rule = parse("Whenever ~ becomes tapped, draw a card, then discard a card.")
+    expect([rule.class_base_name, rule.handled_event, rule.condition]).to eq(["BecomesTappedTrigger", "Events::PermanentTapped", "event.permanent == actor"])
+    expect(rule.effect_list.effects.map(&:class).map { _1.name.split("::").last }).to eq(%w[DrawCards Discard])
+  end
+
   it "treats When and Whenever alike" do
     expect(parse("Whenever ~ enters, draw a card.").class_base_name).to eq("EntersTrigger")
     expect(parse("When ~ attacks, draw a card.").class_base_name).to eq("AttacksTrigger")

@@ -56,7 +56,7 @@ What the rules cover:
   trigger (pattern, class name, `TriggeredAbility` base, hook, event,
   `should_perform?` condition, allowed card kinds). "When" and "Whenever" are
   interchangeable. Rows: ~ enters, ~ enters or attacks (`merge` splits it into an enters
-  trigger and an attacks trigger with the same effects), ~ dies, ~ leaves the
+  trigger and an attacks trigger with the same effects), ~ becomes tapped (`Events::PermanentTapped`), ~ dies, ~ leaves the
   battlefield, a/another creature [you control / an opponent controls] dies, a/another
   creature is exiled from the battlefield (`Events::LeftTheBattlefield` to exile), another
   creature you control enters, landfall, your upkeep, beginning of combat on your turn
@@ -139,7 +139,7 @@ keyword grants for ~ / a target creature / [other] creatures you control, option
 return target [type] card from your graveyard to your hand, create Treasure/Food/Clue
 tokens (the engine's `Magic::Tokens::Treasure`/`Food`/`Clue`), remove N <type> counters
 from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens, copy tokens,
-scry. Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
+scry, surveil (`Choice::Surveil`, a choice point like scry). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 
