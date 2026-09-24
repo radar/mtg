@@ -545,6 +545,22 @@ module Magic
       end
     end
 
+    # Exiles a card "with" this permanent, remembering the turn ("cards exiled with
+    # Maralen this turn").
+    def exile_with_this!(card)
+      trigger_effect(:exile, target: card)
+      exiled_cards << card
+      turns_cards_were_exiled[card] = game.current_turn.number
+    end
+
+    def exiled_with_this_this_turn?(card)
+      exiled_cards.include?(card) && card.zone&.exile? && turns_cards_were_exiled[card] == game.current_turn.number
+    end
+
+    def turns_cards_were_exiled
+      @turns_cards_were_exiled ||= {}.compare_by_identity
+    end
+
     def remove_from_exile(card)
       @exiled_cards -= [card]
       game.exile.remove(card)
