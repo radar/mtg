@@ -227,6 +227,27 @@ RSpec.describe Magic::CardParser::Effect do
     expect(target.resolve_call).to include("[target].each do |opponent|")
   end
 
+  it "targets creatures of a type, attacking ones and others" do
+    expect(described_class.parse("Target Elf you control gets +2/+2 until end of turn.").target_choices)
+      .to eq('battlefield.controlled_by(controller).creatures.by_any_type("Elf")')
+    expect(described_class.parse("Target attacking Goblin you control gets +1/+0 until end of turn.").target_choices)
+      .to eq('battlefield.controlled_by(controller).creatures.by_any_type("Goblin").attacking')
+    expect(described_class.parse("Another target Merfolk you control gets +2/+0 until end of turn.").target_choices)
+      .to eq("(battlefield.controlled_by(controller).creatures.by_any_type(\"Merfolk\") - [#{Magic::CardParser::Effect::THIS}])")
+    expect(described_class.parse("Destroy target Elf.").target_choices).to eq('battlefield.creatures.by_any_type("Elf")')
+    expect(described_class.parse("Target Widget you control gets +2/+2 until end of turn.")).to be_nil
+  end
+
+  it "parses untapping" do
+    expect(described_class.parse("Untap target Merfolk you control.").target_choices)
+      .to eq('battlefield.controlled_by(controller).creatures.by_any_type("Merfolk")')
+    expect(described_class.parse("Untap target creature.").resolve_call).to eq("target.untap!")
+    expect(described_class.parse("Untap ~.").resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.untap!")
+    each = described_class.parse("Untap each other Merfolk you control.")
+    expect(each.target_choices).to be_nil
+    expect(each.resolve_call).to include('by_any_type("Merfolk")', "- [#{Magic::CardParser::Effect::THIS}]", ".each(&:untap!)")
+  end
+
   it "has no targets for untargeted effects" do
     expect(e.const_get(:DrawCards).new(1).target_choices).to be_nil
   end

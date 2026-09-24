@@ -65,8 +65,12 @@ What the rules cover:
   (`event.active_player == controller && event.attacks.any?`), ~ deals combat damage
   to a player (`Events::CombatDamageDealt`), the last <type> counter is removed from ~
   (`Events::CounterRemoved`; the type must be one `Magic::Counters[]` knows), and you
-  cast a <type>[ or <type>] spell (`non<type>` → `!spell.type?`). A new trigger is one
-  row. A leading ability word ("Landfall — ") is dropped. "When ~ is turned face up"
+  cast a <type>[ or <type>] spell (`non<type>` → `!spell.type?`), your first main phase
+  (`Events::FirstMainPhase`), ~ becomes tapped (`Events::PermanentTapped`), and the
+  creature-type-qualified forms: another <Type> [or <Type>] you control dies, a <Type>
+  creature you control dies, [~ or] another <Type> [or <Type>] you control enters (the
+  types are any in `Magic::Types::Creatures`; `TYPE_CHECK` renders
+  `event.permanent.type?("Goblin")`). A new trigger is one row. A leading ability word ("Landfall — ") is dropped. "When ~ is turned face up"
   isn't supported: the engine has no face-down permanents (morph, disguise,
   manifest).
 - `Chapter`: saga chapters (`I — ...`, `II, III — ...`), merged into
@@ -99,6 +103,9 @@ What the rules cover:
 - `TokenDoubler`: "If an effect would create one or more tokens under your control, it
   creates twice that many of those tokens instead." → a `ReplacementEffect` on
   `Effects::CreateToken` (see `AnointedProcession`).
+- `Changeling`: the keyword line lists `Abilities::Static::Changeling` itself in
+  `static_abilities`. A rule does that by returning `class_reference` (an existing class
+  name) instead of a nested class from `class_source`.
 - Also: `Keywords` (`Keywords.phrase` reads "flying, first strike, and haste"),
   `Equip`, `Enchant`.
 
@@ -123,7 +130,11 @@ sacrifices a [type or type] (`EachOpponentSacrifices`; its `SacrificeChoice` cla
 [tapped], then shuffle (`SearchLibrary`, a choice effect), put a <type> counter on ~
 (`AddCounters`; named counter types only on ~), remove N <type> counters
 from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens, copy tokens,
-scry. Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
+scry, untap (`Untap`: target, ~, "each other <Type> you control"), blight (`Blight`: you
+(a `Choice::Blight`, and "If you do" effects run only if a creature was there to blight), each
+opponent or a target opponent; `Costs::Blight` is paid with `pay_blight(creature)`). A creature
+type is also a target: "target Elf you control", "target attacking Goblin you control",
+"another target Merfolk you control" (`PermanentTarget`). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 
@@ -144,7 +155,9 @@ spans two sentences), else each sentence, and a sentence that isn't one effect a
 whole is split into clauses on ", then" and ", and you" ("exile it, then return it"
 stays one effect; "draw a card, then discard a card" is two). A
 "you may <effect>" sentence becomes an `OptionalEffect` (also tried with an implied
-"You"), and following "If you do, <effect>" sentences join it.
+"You"), and following "If you do, <effect>" / "When you do, <effect>" sentences join it;
+"If you don't, <effect>" runs when it is declined (`OptionalEffect#if_you_dont`). Every
+clause of an "If you do" sentence stays conditional ("you draw a card and lose 1 life").
 
 Rendering (`render`) walks the effects to the first *choice point* (an
 `OptionalEffect`, a choice effect with `choice_base`/`choice_class_name`/`choice_args`

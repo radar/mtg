@@ -137,6 +137,28 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     expect(source).to include("class BlightChoice < Magic::Choice::Blight", "trigger_effect(:draw_cards")
   end
 
+  it "parses creature-type-qualified dies triggers" do
+    another = parse("Whenever another Goblin you control dies, draw a card.")
+    expect([another.class_base_name, another.handled_event, another.condition])
+      .to eq(["TribalDiesTrigger", "Events::CreatureDied", 'you? && event.permanent != actor && event.permanent.type?("Goblin")'])
+    expect(parse("Whenever another Elf or Faerie you control dies, draw a card.").condition).to include('(event.permanent.type?("Elf") || event.permanent.type?("Faerie"))')
+    expect(parse("Whenever a Goblin creature you control dies, draw a card.").condition).to eq('you? && event.permanent.type?("Goblin")')
+    expect(parse("Whenever another Widget you control dies, draw a card.")).to be_nil
+  end
+
+  it "parses creature-type-qualified enters triggers, with and without ~" do
+    another = parse("Whenever another Kithkin you control enters, draw a card.")
+    expect([another.class_base_name, another.handled_event, another.condition])
+      .to eq(["TribalEntersTrigger", "Events::EnteredTheBattlefield", 'under_your_control? && event.permanent != actor && event.permanent.type?("Kithkin")'])
+    expect(parse("Whenever ~ or another Kithkin you control enters, draw a card.").condition)
+      .to eq('under_your_control? && (event.permanent == actor || event.permanent.type?("Kithkin"))')
+  end
+
+  it "parses becoming tapped" do
+    rule = parse("Whenever ~ becomes tapped, draw a card.")
+    expect([rule.class_base_name, rule.handled_event, rule.condition]).to eq(["BecomesTappedTrigger", "Events::PermanentTapped", "event.permanent == actor"])
+  end
+
   it "negates non<type> spells" do
     expect(parse("Whenever you cast a noncreature spell, draw a card.").condition).to eq('you? && !spell.type?("Creature")')
   end

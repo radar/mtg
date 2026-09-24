@@ -13,7 +13,7 @@ module Magic
 
         def self.parse(text)
           return unless (m = LINE.match(text))
-          return if m[:kind] && m[:kind].downcase != "creature"
+          return if m[:kind] && !PermanentTarget.creature?(m)
           return unless m[:type].match?(%r{\A[+-]1/[+-]1\z}) || m[:self]
 
           Magic::Counters[m[:type].downcase] # raises for an unknown counter type

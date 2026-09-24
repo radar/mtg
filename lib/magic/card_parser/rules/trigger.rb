@@ -32,6 +32,13 @@ module Magic
         ENTERS_UNDER_YOUR_CONTROL = "(?:you control enters|enters(?: the battlefield)? under your control)"
         # "When" and "Whenever" are interchangeable here.
         WHEN = "When(?:ever)?"
+        # A creature type ("Goblin"), and "Elf or Faerie".
+        TYPE = "(?<type>#{PermanentTarget::CREATURE_TYPES})"
+        TYPES = "#{TYPE}(?: or (?<type2>#{PermanentTarget::CREATURE_TYPES}))?"
+        # Ruby for "is a <type>" from the match: "event.permanent.type?(\"Elf\") || ...".
+        TYPE_CHECK = lambda do |m|
+          [m[:type], m[:type2]].compact.map { "event.permanent.type?(#{_1.inspect})" }.join(" || ").then { m[:type2] ? "(#{_1})" : _1 }
+        end
 
         # "When ~ enters or attacks" (see merge).
         ENTERS_OR_ATTACKS = "EntersOrAttacksTrigger"
@@ -49,6 +56,19 @@ module Magic
                    :event_handlers, "Events::LeftTheBattlefield",
                    ->(m) { "event.permanent.creature? && event.to.exile?#{' && event.permanent != actor' if m[:who] == 'another'}" },
                    PERMANENT_KINDS),
+          Kind.new(/#{WHEN} another #{TYPES} you control dies/, "TribalDiesTrigger", "TriggeredAbility",
+                   :event_handlers, "Events::CreatureDied", ->(m) { "you? && event.permanent != actor && #{TYPE_CHECK.(m)}" },
+                   PERMANENT_KINDS),
+          Kind.new(/#{WHEN} an? #{TYPES} creature you control dies/, "TribalCreatureDiesTrigger", "TriggeredAbility",
+                   :event_handlers, "Events::CreatureDied", ->(m) { "you? && #{TYPE_CHECK.(m)}" }, PERMANENT_KINDS),
+          Kind.new(/#{WHEN} (?<itself>~ or )?another #{TYPES} you control enters/, "TribalEntersTrigger",
+                   "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
+                   lambda { |m|
+                     m[:itself] ? "under_your_control? && (event.permanent == actor || #{TYPE_CHECK.(m)})" : "under_your_control? && event.permanent != actor && #{TYPE_CHECK.(m)}"
+                   },
+                   PERMANENT_KINDS),
+          Kind.new(/#{WHEN} ~ becomes tapped/, "BecomesTappedTrigger", "TriggeredAbility", :event_handlers,
+                   "Events::PermanentTapped", "event.permanent == actor", PERMANENT_KINDS),
           Kind.new(/#{WHEN} another creature #{ENTERS_UNDER_YOUR_CONTROL}/, "CreatureEntersTrigger",
                    "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
                    "another_creature? && under_your_control?", PERMANENT_KINDS),
