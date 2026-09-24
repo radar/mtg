@@ -3,6 +3,29 @@ require 'spec_helper'
 RSpec.describe Magic::Permanent do
   include_context "two player game"
 
+  context "resolving a card that is in another zone" do
+    it "moves the card to the battlefield too, out of exile" do
+      bears = Card("Grizzly Bears", owner: p1)
+      p1.exile.add(bears)
+
+      permanent = described_class.resolve(game: game, card: bears, cast: false)
+
+      expect(permanent.zone).to be_battlefield
+      expect(bears.zone).to be_battlefield
+      expect(p1.exile).to be_empty
+    end
+
+    it "leaves the card alone when a token copy of it is made" do
+      bears = Card("Grizzly Bears", owner: p1)
+      p1.graveyard.add(bears)
+
+      described_class.resolve(game: game, card: bears, token: true, cast: false)
+
+      expect(bears.zone).to be_graveyard
+      expect(p1.graveyard.map(&:name)).to include("Grizzly Bears")
+    end
+  end
+
   context "moving to graveyard" do
     context "when permanent is not a token" do
       let!(:permanent) { ResolvePermanent("Scute Swarm", owner: p1) }

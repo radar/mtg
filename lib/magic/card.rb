@@ -230,7 +230,8 @@ module Magic
           enters_tapped: enters_tapped,
           kicked: kicked
         )
-        move_zone!(to: battlefield)
+        # A card resolving from the stack has no zone, so Permanent.resolve can't move it.
+        move_zone!(to: battlefield) unless zone&.battlefield?
         permanent
       end
     end

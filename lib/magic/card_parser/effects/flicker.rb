@@ -5,8 +5,7 @@ module Magic
     module Effects
       # "Exile another target creature you control, then return that card to the
       # battlefield under its owner's control." The card comes back as a new
-      # permanent, so its enters triggers fire again. Like Card#resolve!, the card
-      # itself is then moved too: Permanent.resolve alone leaves it listed in exile.
+      # permanent, so its enters triggers fire again.
       class Flicker < Data.define(:targets)
         include Effect
 
@@ -22,8 +21,7 @@ module Magic
           <<~RUBY.chomp
             card = target.card
             trigger_effect(:exile, target: target)
-            Permanent.resolve(game: game, card: card, owner: card.owner, from_zone: card.zone, cast: false)
-            card.move_zone!(to: game.battlefield)
+            Permanent.resolve(game: game, card: card, owner: card.owner, cast: false)
           RUBY
         end
       end

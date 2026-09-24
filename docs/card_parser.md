@@ -156,9 +156,9 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
 - String-only specs of generated code miss runtime errors (`battlefield.artifacts`
   didn't exist until a modal spec cast one), so give each new effect or rule an
   in-game spec in `spec/card_parser/generated_*_spec.rb`.
-- Returning a card from exile: `Permanent.resolve` creates the permanent but doesn't
-  move the card out of exile; also call `card.move_zone!(to: game.battlefield)`, as
-  `Card#resolve!` does (`Effects::Flicker`).
+- Returning a card to the battlefield from another zone: `Permanent.resolve` moves the
+  card itself too (out of exile, graveyard, ...), unless the entry was replaced or it's
+  a token/copy, so generated code just calls `Permanent.resolve` (`Effects::Flicker`).
 - `lib/magic/cards/opt.rb` is parser output: after changing `EffectList`, regenerate it
   and diff.
 - To check a pattern against real behaviour, generate an existing hand-written card

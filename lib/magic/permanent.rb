@@ -44,6 +44,7 @@ module Magic
 
     def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false)
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:)
+      card_zone = card.zone unless token || copy
 
       permanent = Magic::Permanent.new(
         game: game,
@@ -59,7 +60,19 @@ module Magic
       card.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       add_additional_counters_for_entering(game:, permanent:) if card.creature?
+      move_card_to_battlefield(game:, card:, permanent:, from: card_zone)
       permanent
+    end
+
+    # The card leaves the zone it was in (exile, graveyard, hand, ...) along with the
+    # permanent entering, unless something else already moved it: a replaced entry
+    # (Containment Priest), or the permanent leaving again as it entered. Tokens and
+    # copies made from a card leave that card be (`from` is nil for them).
+    def self.move_card_to_battlefield(game:, card:, permanent:, from:)
+      return if from.nil? || from.battlefield?
+      return unless card.zone == from && permanent.zone&.battlefield?
+
+      card.move_zone!(to: game.battlefield)
     end
 
     def self.add_additional_counters_for_entering(game:, permanent:)

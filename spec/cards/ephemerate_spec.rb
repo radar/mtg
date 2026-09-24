@@ -26,6 +26,8 @@ RSpec.describe Magic::Cards::Ephemerate do
     expect(new_bears).not_to eq(bears)
     expect(new_bears.owner).to eq(p1)
     expect(new_bears.counters).to be_empty
+    expect(new_bears.card.zone).to be_battlefield
+    expect(p1.exile.map(&:name)).not_to include("Grizzly Bears")
   end
 
   it "can only target a creature you control" do

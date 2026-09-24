@@ -92,6 +92,8 @@ RSpec.describe Magic::Cards::Soulherder do
     expect(new_permanent.card).to eq(card)
     expect(new_permanent.zone).to be_battlefield
     expect(new_permanent.owner).to eq(p1)
+    expect(card.zone).to be_battlefield
+    expect(p1.exile).to be_empty
   end
 
   it "gets a +1/+1 counter from its own blink ability exiling a creature" do

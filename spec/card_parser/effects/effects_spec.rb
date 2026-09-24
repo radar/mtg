@@ -162,8 +162,7 @@ RSpec.describe Magic::CardParser::Effect do
   it "parses flickering a target back under its owner's control" do
     flicker = described_class.parse("Exile another target creature you control, then return that card to the battlefield under its owner's control.")
     expect(flicker.target_choices).to eq("(battlefield.controlled_by(controller).creatures - [#{Magic::CardParser::Effect::THIS}])")
-    expect(flicker.resolve_call).to include("trigger_effect(:exile, target: target)", "Permanent.resolve(", "cast: false",
-                                            "card.move_zone!(to: game.battlefield)")
+    expect(flicker.resolve_call).to include("trigger_effect(:exile, target: target)", "Permanent.resolve(", "cast: false")
     expect(described_class.parse("Exile target creature, then return it to the battlefield under your control.")).to be_nil
   end
 
