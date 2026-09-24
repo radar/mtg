@@ -91,6 +91,14 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("~ becomes a 2/2 blue creature until end of turn.")).to be_nil
   end
 
+  it "parses changing colors until end of turn" do
+    all = described_class.parse("Target creature you control becomes all colors until end of turn.")
+    expect(all.target_choices).to eq("battlefield.controlled_by(controller).creatures")
+    expect(all.resolve_call).to eq("target.change_colors!([:white, :blue, :black, :red, :green])")
+    expect(described_class.parse("~ becomes red until end of turn.").resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.change_colors!([:red])")
+    expect(described_class.parse("It becomes colorless until end of turn.").earlier_target?).to eq(true)
+  end
+
   it "parses surveil as a choice" do
     surveil = described_class.parse("Surveil 2.")
     expect(surveil).to eq(e.const_get(:Surveil).new(2))

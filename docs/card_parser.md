@@ -20,6 +20,10 @@ Aura (needs an `Enchant` line), Saga (needs chapter lines), land and basic land.
 Instants and sorceries need effect lines or a modal block. Other type lines/subtypes
 raise `UnsupportedCard`.
 
+Mana costs may use hybrid symbols: `{G/U}` → `blue_or_green: 1`, the key
+`Costs::Parsers::Mana` uses. Names with hyphens become separate words (`First-Year` →
+`FirstYear`, `first_year`), like the hand-written cards and the specs' `Card()` helper.
+
 Parenthesised reminder text is stripped before parsing, and the card's own name in
 rules text is replaced with `~`, as is "this creature" / "this artifact" / "this
 permanent" etc., which current card text uses instead of the name.
@@ -158,7 +162,9 @@ enchanted creature / equipped creature fights [up to one] target creature ..." (
 `Permanents::Creature#fights!`), and "exile [up to one] target ... until ~ leaves the
 battlefield" (`ExileUntilLeaves`, `Permanent#exile_until_leaves!`), and "~ becomes an N/N
 [<types>] creature [with <keywords>] until end of turn[. It's still a land.]"
-(`BecomeCreature`, `Permanent#become_creature!`; colours aren't supported). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
+(`BecomeCreature`, `Permanent#become_creature!`; colours aren't supported), and "<target
+/ ~ / it> becomes all colors / colorless / <colour>[ and <colour>] until end of turn"
+(`ChangeColors`, `Permanent#change_colors!`). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 

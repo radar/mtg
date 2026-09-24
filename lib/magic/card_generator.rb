@@ -3,12 +3,14 @@
 module Magic
   # Renders a CardParser::Result as Ruby source for lib/magic/cards/.
   class CardGenerator
+    # A hyphen separates words ("First-Year" -> first_year / FirstYear), as in the
+    # hand-written cards and the specs' Card() helper.
     def self.snake_name(name)
-      name.downcase.gsub(/[^a-z0-9\s]/, "").split.join("_")
+      name.downcase.tr("-", " ").gsub(/[^a-z0-9\s]/, "").split.join("_")
     end
 
     def self.const_name(name)
-      name.gsub(/[^A-Za-z0-9\s]/, "").split.map(&:capitalize).join
+      name.tr("-", " ").gsub(/[^A-Za-z0-9\s]/, "").split.map { _1[0].upcase + _1[1..] }.join
     end
 
     def self.generate(result)
