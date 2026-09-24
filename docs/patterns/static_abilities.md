@@ -4,6 +4,8 @@ Keyword grants, CDA power/toughness, type changes, replacement effects, continuo
 
 **Conditional keyword (only on your turn)**: Subclass `Abilities::Static::KeywordGrant`, override `applicable_targets` to return `[source]` when `game.current_turn.active_player == controller`, else `[]`. Example: `RadhaHeartOfKeld::FirstStrikeGrant`.
 
+**Changeling / "is all creature types"**: `keywords :changeling` (cards and tokens). `Types#type?` also answers true for every creature type (`Types::Creatures`) when `all_creature_types?` is true: a card or token with changeling (printed, so it works in every zone), or a permanent whose Equipment/Aura defines `grants_all_creature_types? = true` (`Attachment` default false). `CardList#by_type`, `TriggeredAbility#type?` and `SpellCast#type?` all go through `type?`, so check types with `type?`, not `types.include?`. Example: `StalactiteDagger`.
+
 **Legendary creature DSL**: Use `legendary_creature_type "Elf Warrior"` in the DSL block instead of `creature_type`.
 
 **Aura static abilities on the attached creature**: Use `applies_to_target` (no arguments) as a class-level declaration inside the static ability subclass — targets the attached permanent automatically. Example: `SetessanTraining::PowerModification`, `SetessanTraining::KeywordGrantTrample`.

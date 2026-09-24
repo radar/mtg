@@ -16,7 +16,7 @@ module Magic
       class Keywords < Data.define(:keywords, :extras)
         include Rule
 
-        KNOWN = %w[deathtouch defender double_strike first_strike flash flying haste hexproof indestructible
+        KNOWN = %w[changeling deathtouch defender double_strike first_strike flash flying haste hexproof indestructible
                    infect lifelink menace prowess reach shroud skulk trample vigilance].freeze
         COLORS = %w[white blue black red green].freeze
         CARD_TYPES = { "artifacts" => "Artifact", "creatures" => "Creature", "enchantments" => "Enchantment",

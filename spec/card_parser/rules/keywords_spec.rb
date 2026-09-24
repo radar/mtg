@@ -7,6 +7,10 @@ RSpec.describe Magic::CardParser::Rules::Keywords do
     expect(described_class.parse("Flying, first strike")).to eq(described_class.new(%i[flying first_strike]))
   end
 
+  it "parses changeling" do
+    expect(described_class.parse("Changeling")).to eq(described_class.new([:changeling]))
+  end
+
   it "ignores lines that are not all keywords" do
     expect(described_class.parse("Flying, draws a card")).to be_nil
   end

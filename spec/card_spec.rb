@@ -46,3 +46,21 @@ RSpec.describe Magic::Card do
     end
   end
 end
+
+RSpec.describe "Changeling" do
+  include_context "two player game"
+
+  it "makes a card every creature type in any zone, but not other types" do
+    changeling = Class.new(Magic::Cards::Creature) do
+      const_set(:NAME, "Test Changeling")
+      creature_type "Shapeshifter"
+      keywords :changeling
+    end.new(game:, owner: p1)
+    p1.hand.add(changeling)
+
+    expect(changeling).to be_type("Goblin")
+    expect(changeling).to be_type("Elf")
+    expect(changeling).not_to be_type(Magic::Types::Land)
+    expect(Card("Grizzly Bears")).not_to be_type("Goblin")
+  end
+end

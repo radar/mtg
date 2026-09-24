@@ -314,6 +314,10 @@ module Magic
       false
     end
 
+    def all_creature_types?
+      changeling?
+    end
+
     def rebound?
       false
     end

@@ -9,8 +9,9 @@ module Magic
       # Elf you control." A line with both a P/T change and keywords becomes two
       # static abilities (see merge). "for each ..." (Count) makes the change
       # variable: `per` is the Ruby counting it. "as long as ..." (Condition) only
-      # applies it while `condition` holds.
-      class StaticBuff < Data.define(:subject, :power, :toughness, :per, :keywords, :condition)
+      # applies it while `condition` holds. "Equipped creature gets +1/+1 and is all
+      # creature types." makes the Equipment or Aura grant every creature type.
+      class StaticBuff < Data.define(:subject, :power, :toughness, :per, :keywords, :condition, :all_types)
         include Rule
 
         # Subject => [class name prefix, applicable targets, card kinds]
@@ -23,10 +24,11 @@ module Magic
           "~" => ["Self", "applicable_targets { [source] }", %i[creature]]
         }.freeze
         KEYWORDS = /[\w ,]+?/
-        LINE = %r{\A(?<subject>#{SUBJECTS.keys.join('|')}) (?:gets? (?<power>[+-]\d+)/(?<toughness>[+-]\d+)(?: for each (?<per>[^.]+?))?(?: and (?:has|have) (?<with>#{KEYWORDS}))?|(?:has|have) (?<only>#{KEYWORDS}))(?: as long as (?<condition>[^.]+?))?\.?\z}i
+        LINE = %r{\A(?<subject>#{SUBJECTS.keys.join('|')}) (?:gets? (?<power>[+-]\d+)/(?<toughness>[+-]\d+)(?: for each (?<per>[^.]+?))?(?: and (?:has|have) (?<with>#{KEYWORDS}))?(?<all_types> and is all creature types)?|(?:has|have) (?<only>#{KEYWORDS}))(?: as long as (?<condition>[^.]+?))?\.?\z}i
 
         def self.parse(line)
           return unless (m = LINE.match(line))
+          return if m[:all_types] && !%w[equipped enchanted].include?(m[:subject].downcase.split.first)
 
           keywords = []
           if (phrase = m[:with] || m[:only])
@@ -38,23 +40,27 @@ module Magic
           if m[:condition]
             condition = Condition.parse(m[:condition]) or return
           end
-          new(subject: m[:subject].downcase, power: m[:power]&.to_i, toughness: m[:toughness]&.to_i, per:, keywords:, condition:)
+          new(subject: m[:subject].downcase, power: m[:power]&.to_i, toughness: m[:toughness]&.to_i, per:, keywords:, condition:,
+              all_types: !m[:all_types].nil?)
         end
 
-        def initialize(subject:, power:, toughness:, per:, keywords:, condition: nil) = super
+        def initialize(subject:, power:, toughness:, per:, keywords:, condition: nil, all_types: false) = super
 
         # One static ability each for the P/T change and the keywords.
         def self.merge(rules)
           rules.flat_map do |rule|
             parts = []
-            parts << rule.with(keywords: []) if rule.power
-            parts << rule.with(power: nil, toughness: nil, per: nil) if rule.keywords.any?
+            parts << rule.with(keywords: [], all_types: false) if rule.power
+            parts << rule.with(power: nil, toughness: nil, per: nil, all_types: false) if rule.keywords.any?
+            parts << rule.with(power: nil, toughness: nil, per: nil, keywords: []) if rule.all_types
             parts
           end
         end
 
         def kinds = SUBJECTS.fetch(subject)[2]
-        def hook = :static_abilities
+        # "is all creature types" is a method on the Attachment, not a static ability.
+        def hook = all_types ? nil : :static_abilities
+        def body_source = all_types ? "def grants_all_creature_types? = true" : nil
         def class_base_name = "#{SUBJECTS.fetch(subject)[0]}#{power ? 'Buff' : 'Keywords'}"
 
         def class_source(name)

@@ -212,6 +212,10 @@ module Magic
       @token
     end
 
+    def all_creature_types?
+      copiable_card.all_creature_types? || attachments.any? { _1.card.grants_all_creature_types? }
+    end
+
     def ring_bearer?
       !!@ring_bearer
     end

@@ -4,6 +4,7 @@ module Magic
       class Keyword
       end
 
+      CHANGELING = Class.new(Keyword)
       DEATHTOUCH = Class.new(Keyword)
       DEFENDER = Class.new(Keyword)
       DOUBLE_STRIKE = Class.new(Keyword)
@@ -54,6 +55,10 @@ module Magic
         end
 
         keywords.any? { |kw| kw.is_a?(keyword) } || keywords.include?(keyword)
+      end
+
+      def changeling?
+        has_keyword?(Keywords::CHANGELING)
       end
 
       def infect?

@@ -117,6 +117,9 @@ What the rules cover:
   in `KNOWN` ("flying, first strike, and haste").
   Hexproof and hexproof from don't stop targeting yet (roadmap E2), so their specs only
   check that the keyword is there.
+- `changeling` is a plain keyword (`Types#type?` treats it as every creature type).
+  `StaticBuff` also reads "Equipped/Enchanted creature gets +N/+N and is all creature
+  types." (`merge` splits off `def grants_all_creature_types? = true` as a body).
 - Also: `Equip`, `Enchant`.
 
 ## Effects

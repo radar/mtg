@@ -14,6 +14,11 @@ module Magic
         []
       end
 
+      # "Equipped creature is all creature types."
+      def grants_all_creature_types?
+        false
+      end
+
       def power_modification
         0
       end
