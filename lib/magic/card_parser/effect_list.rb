@@ -28,7 +28,7 @@ module Magic
       # `text` as one effect (some span two sentences), else every sentence (or,
       # failing that, every clause of it) as an effect; nil unless all of them parse.
       def self.parse(text)
-        effect = Effect.parse(text) and return new(effects: [effect])
+        effect = Effect.parse(text) and return (new(effects: [effect]) unless effect.earlier_target?)
 
         effects = []
         clauses = text.split(SENTENCE).flat_map do |sentence|
@@ -52,7 +52,13 @@ module Magic
             effects << effect
           end
         end
-        new(effects:) if effects.any?
+        new(effects:) if effects.any? && earlier_targets?(effects)
+      end
+
+      # "Untap it." needs an earlier effect with a target for "it" to refer to.
+      def self.earlier_targets?(effects)
+        leaves = new(effects:).send(:leaves, effects)
+        leaves.each_with_index.all? { |effect, i| !effect.earlier_target? || leaves[...i].any?(&:target_choices) }
       end
 
       # The rest of an "If this spell was kicked, ..." sentence. Targets are chosen as
@@ -215,12 +221,18 @@ module Magic
       end
 
       # With several targets in scope (a multi-target spell), each targeted effect
-      # uses its own targets[i] in place of `target`.
+      # uses its own targets[i] in place of `target`, and an effect on an earlier
+      # target ("untap it") that of the last targeted effect before it.
       def calls(list, context)
-        targeted = leaves(effects).select(&:target_choices)
+        all = leaves(effects)
+        targeted = all.select(&:target_choices)
         list.map do |effect|
           call = expand(effect.resolve_call, context.this)
           index = targeted.index { _1.equal?(effect) }
+          if effect.earlier_target?
+            before = all[...all.index { _1.equal?(effect) }].select(&:target_choices)
+            index = targeted.index { _1.equal?(before.last) }
+          end
           context.targets_in_scope && targeted.size > 1 && index ? call.gsub(/\btarget\b(?!:)/, "targets[#{index}]") : call
         end
       end

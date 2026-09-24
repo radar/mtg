@@ -43,6 +43,15 @@ RSpec.describe Magic::CardParser::Effect do
     expect(e.const_get(:DrawCards).new(1).choice_base).to be_nil
   end
 
+  it "parses untapping a target, an earlier target or the enchanted creature" do
+    expect(described_class.parse("Untap target land you control.").target_choices).to eq("battlefield.controlled_by(controller).lands")
+    it = described_class.parse("Untap that creature.")
+    expect([it.target_choices, it.earlier_target?, it.resolve_call]).to eq([nil, true, "target.untap!"])
+    tap = described_class.parse("Tap enchanted creature.")
+    expect([tap.target_choices, tap.earlier_target?]).to eq([nil, false])
+    expect(tap.resolve_call).to eq("trigger_effect(:tap, target: #{Magic::CardParser::Effect::THIS}.attached_to)")
+  end
+
   it "parses surveil as a choice" do
     surveil = described_class.parse("Surveil 2.")
     expect(surveil).to eq(e.const_get(:Surveil).new(2))

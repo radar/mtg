@@ -13,6 +13,24 @@ RSpec.describe Magic::CardParser::Rules::SpellEffect do
     expect(spell("Scry 1.", "Draw a card.").effects).to eq([e.const_get(:Scry).new(1), e.const_get(:DrawCards).new(1)])
   end
 
+  it "acts on an earlier target for \"it\" and \"that creature\"" do
+    source = spell("Target creature gets +2/+2 and gains first strike until end of turn. Untap it.").body_source
+    expect(source).to include("def resolve!(target:)", "trigger_effect(:grant_keyword, target: target, keyword: :first_strike)\n  target.untap!")
+    expect(spell("Tap target creature. That creature gains haste until end of turn.").body_source)
+      .to include("trigger_effect(:grant_keyword, target: target, keyword: :haste)")
+  end
+
+  it "uses the latest earlier target for \"it\" in a spell with several targets" do
+    source = spell("Tap target creature you control. Untap target creature an opponent controls. It gains haste until end of turn.").body_source
+    expect(source).to include("trigger_effect(:tap, target: targets[0])", "targets[1].untap!",
+                              "trigger_effect(:grant_keyword, target: targets[1], keyword: :haste)")
+  end
+
+  it "doesn't parse \"it\" with no earlier target" do
+    expect(described_class.parse("Untap it.")).to be_nil
+    expect(described_class.parse("Draw a card. It gains haste until end of turn.")).to be_nil
+  end
+
   it "resolves untargeted effects in order" do
     source = spell("Draw two cards.", "You gain 2 life.").body_source
     expect(source).to eq(<<~RUBY)

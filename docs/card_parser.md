@@ -125,7 +125,7 @@ One-sentence game effects are reusable classes in `lib/magic/card_parser/effects
 (`include Effect`; `.parse(text)`, `target_choices`, `resolve_call`; `definitions`
 returns Ruby for a constant the call needs, e.g. `CreateToken`'s `Token.create`
 class). Current effects: damage to a target or each opponent, draw, gain/lose life,
-destroy/exile/tap/bounce target (`PermanentTarget`: [another] target
+destroy/exile/tap/untap/bounce target (`PermanentTarget`: [another] target
 creature/artifact/enchantment/land/[nonland] permanent [you control / an opponent
 controls]; "another" leaves out `Effect::THIS`), counter target [<type>/non<type>] spell
 (targets `game.stack.spells`), mill, search your library for a basic land/land/creature
@@ -143,6 +143,13 @@ scry, surveil (`Choice::Surveil`, a choice point like scry). Together, `EntersWi
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 
+- "It" / "that creature" ("Untap it.", "It gains haste until end of turn.") is
+  `PermanentTarget::PRONOUN`: the effect's `earlier_target?` is true and it acts on
+  `target`, the target of an earlier effect in the same ability. `EffectList.parse`
+  rejects one with no targeted effect before it; in a multi-target spell it uses the
+  `targets[i]` of the last targeted effect before it; in a trigger it runs inside that
+  effect's `TargetChoice`. Tap, untap and pumps also take "enchanted creature" /
+  "equipped creature" (`PermanentTarget::ATTACHED`, `Effect::THIS.attached_to`).
 - An effect refers to its own card/permanent as `Effect::THIS`, which `EffectList`
   expands per context (`self` in a spell, `source` in an activated ability, `card` in a
   mode, `actor` in a trigger or inside a Choice). Never write `self`/`actor`/`source` in
