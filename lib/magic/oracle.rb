@@ -16,6 +16,13 @@ module Magic
       card.slice("name", "mana_cost", "type_line", "oracle_text", "colors", "color_identity", "power", "toughness", "loyalty")
     end
 
+    # Every card whose Scryfall set code is +code+ (e.g. "ecl"), as raw Oracle hashes
+    # including card_faces. The oracle data holds one printing per card, so a card
+    # reprinted in the set may report its other set.
+    def cards_in_set(code)
+      @oracle_data.select { |card| card["set"] == code.downcase }
+    end
+
     def search_cards(fragment)
       @oracle_data
         .select { |card| card["name"].downcase.include?(fragment.downcase) }
