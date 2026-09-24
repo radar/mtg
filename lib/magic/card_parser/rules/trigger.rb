@@ -102,14 +102,22 @@ module Magic
 
         # An italic ability word ("Landfall — ") is flavour; the rest is the trigger.
         ABILITY_WORD = /\A[A-Z][a-z]+(?: [a-z]+)* — /
+        KICKED = /\Aif (?:it|~) was kicked, /
 
         def self.parse(line)
           text = line.sub(ABILITY_WORD, "")
           KINDS.each do |kind|
             next unless (m = /\A#{kind.pattern}, (?<effects>.+)\z/.match(text))
 
-            effect_list = EffectList.parse(m[:effects]) or return
+            effects = m[:effects]
             condition = kind.condition.respond_to?(:call) ? kind.condition.call(m) : kind.condition
+            # "When ~ enters, if it was kicked, ..." (kicker).
+            if kind.name == "EntersTrigger" && (kicked = KICKED.match(effects))
+              effects = kicked.post_match
+              condition = [condition, "actor.kicked?"].compact.join(" && ")
+            end
+
+            effect_list = EffectList.parse(effects) or return
             return new(kind:, condition:, effect_list:)
           end
           nil

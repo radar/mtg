@@ -40,7 +40,7 @@ module Magic
 
       def self.list(*keywords)
         keywords.map do |keyword|
-          one(keyword)
+          keyword.is_a?(Keyword) ? keyword : one(keyword)
         end
       end
 

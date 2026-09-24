@@ -67,7 +67,9 @@ What the rules cover:
   cast a <type>[ or <type>] spell (`non<type>` → `!spell.type?`), you gain life
   (`Events::LifeGain`), you draw a card (`Events::CardDraw`), and you sacrifice / a player
   sacrifices a/another <type or permanent> (`Events::PermanentSacrificed`). A new trigger is one
-  row. A leading ability word ("Landfall — ") is dropped. "When ~ is turned face up"
+  row. A leading ability word ("Landfall — ") is dropped. "When ~ enters, if it was
+  kicked, ..." adds `actor.kicked?` to the enters trigger's `should_perform?`; a spell's
+  "If this spell was kicked, ..." isn't supported yet. "When ~ is turned face up"
   isn't supported: the engine has no face-down permanents (morph, disguise,
   manifest).
 - `Chapter`: saga chapters (`I — ...`, `II, III — ...`), merged into
@@ -103,8 +105,19 @@ What the rules cover:
 - Lands: `EntersTapped` (→ `enters_tapped`), `TapForMana`, `TapForManaPerPermanent`,
   `TapForManaChoice` ("{T}: Add {W} or {U}.", "{R}, {G}, or {W}", "one mana of any
   color" → `choices ...`).
-- Also: `Keywords` (`Keywords.phrase` reads "flying, first strike, and haste"),
-  `Equip`, `Enchant`.
+- `Keywords`: a line of comma-separated keywords → `keywords :flying, ...`. Keywords
+  with a value: toxic N and hexproof from <colour> go into the same `keywords` call as
+  objects (`Keywords.list` takes `Keyword` instances as well as symbols); ward {N} /
+  ward—pay N life → `ward generic:`/`ward life:`; protection from <colour>[ and from
+  <colour>], multicolored or a card type (plural) → `protections [...]`; kicker,
+  flashback and cycling with a mana cost → `kicker_cost`, `flashback Costs::Mana.new(...)`,
+  `cycling`. Ward, protection, kicker, flashback and cycling each allow only one per
+  card; other costs (ward—discard, kicker—sacrifice, landcycling) are unsupported.
+  `Keywords.phrase` (used by pumps and static buffs) still reads only the plain keywords
+  in `KNOWN` ("flying, first strike, and haste").
+  Hexproof and hexproof from don't stop targeting yet (roadmap E2), so their specs only
+  check that the keyword is there.
+- Also: `Equip`, `Enchant`.
 
 ## Effects
 
