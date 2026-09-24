@@ -7,10 +7,10 @@ module Magic
       class LoseLife < Data.define(:who, :amount)
         include Effect
 
-        LINE = /\A(?<who>target player|target opponent|each opponent|you) loses? (?<amount>\d+|\w+) life\.?\z/i
+        LINE = /\A(?:(?<who>target player|target opponent|each opponent|you) )?loses? (?<amount>\d+|\w+) life\.?\z/i
 
         def self.parse(text)
-          new(who: $~[:who].downcase, amount: Number.parse($~[:amount])) if LINE.match(text)
+          new(who: ($~[:who] || "you").downcase, amount: Number.parse($~[:amount])) if LINE.match(text)
         end
 
         def target_choices = { "target player" => "game.players", "target opponent" => "game.opponents(controller)" }[who]

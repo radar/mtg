@@ -145,4 +145,10 @@ RSpec.describe "CardParser card kinds" do
       expect(aura.can_enchant?(theirs, aura: aura)).to eq(false)
     end
   end
+
+  it "names hyphenated cards the way the Card() spec helper looks them up" do
+    expect(Magic::CardGenerator.const_name("Sting-Slinger")).to eq("StingSlinger")
+    expect(Magic::CardGenerator.snake_name("Sting-Slinger")).to eq("sting_slinger")
+    expect(Magic::CardGenerator.const_name("Kenrith's Transformation")).to eq("KenrithsTransformation")
+  end
 end

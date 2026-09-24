@@ -7,7 +7,7 @@ module Magic
       class GainLife < Data.define(:amount)
         include Effect
 
-        LINE = /\AYou gain (?<amount>\d+|\w+) life\.?\z/i
+        LINE = /\A(?:You )?gain (?<amount>\d+|\w+) life\.?\z/i
 
         def self.parse(text)
           new(amount: Number.parse($~[:amount])) if LINE.match(text)

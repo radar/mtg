@@ -4,11 +4,11 @@ module Magic
   # Renders a CardParser::Result as Ruby source for lib/magic/cards/.
   class CardGenerator
     def self.snake_name(name)
-      name.downcase.gsub(/[^a-z0-9\s]/, "").split.join("_")
+      name.downcase.tr("-", " ").gsub(/[^a-z0-9\s]/, "").split.join("_")
     end
 
     def self.const_name(name)
-      name.gsub(/[^A-Za-z0-9\s]/, "").split.map(&:capitalize).join
+      name.tr("-", " ").gsub(/[^A-Za-z0-9\s]/, "").split.map(&:capitalize).join
     end
 
     def self.generate(result)

@@ -14,7 +14,7 @@ module Magic
       SENTENCE = /(?<=\.)\s+/
       # Clauses of one sentence, when the sentence isn't one effect as a whole
       # ("exile it, then return it" is one effect; "draw a card, then discard a card" two).
-      CLAUSE = /,? then |,? and (?=you )/i
+      CLAUSE = /,? then |,? and (?=you |lose |gain )/i
       MAY = /\Ayou may /i
       IF_YOU_DO = /\A(?:If|When) you do, /i
       IF_YOU_DONT = /\AIf you don't, /i
@@ -32,7 +32,12 @@ module Magic
 
         effects = []
         clauses = text.split(SENTENCE).flat_map do |sentence|
-          parse_sentence(sentence.sub(IF_YOU_DO, "").sub(IF_YOU_DONT, "").sub(MAY, "")) ? [sentence] : sentence.split(CLAUSE)
+          next [sentence] if parse_sentence(sentence.sub(IF_YOU_DO, "").sub(IF_YOU_DONT, "").sub(MAY, ""))
+
+          # Every clause of an "If you do, ..." sentence stays conditional.
+          first, *rest = sentence.split(CLAUSE)
+          prefix = sentence[IF_YOU_DO] || sentence[IF_YOU_DONT]
+          [first, *rest.map { "#{prefix}#{_1}" }]
         end
         clauses.each do |sentence|
           if IF_YOU_DONT.match?(sentence)
