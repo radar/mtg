@@ -95,6 +95,11 @@ What the rules cover:
   "[<type>] card in your graveyard") and renders `def power_modification = N * <count>`,
   recomputed with continuous effects. `TribalLord` handles
   "Other <type>s you control get +N/+N."
+- `AttachedRestriction`: "Enchanted/Equipped creature can't attack [or block] / can't
+  block / can't become untapped / doesn't untap during its controller's untap step /
+  can't have counters put on it / its activated abilities can't be activated", clauses
+  joined by "and" or commas → methods on the Attachment card (`can_attack?`,
+  `prevents_untapping?`, `prevents_counters?`, ...), which `Permanent` checks.
 - `CostReduction`: "[<type>[ and <type>] / non<type>] spells you cast cost {N} less to
   cast." → a `ManaCostAdjustment` static ability.
 - `BlockingRestriction`: "~ can't block." / "~ can't be blocked." → `can_block?` /

@@ -220,7 +220,7 @@ module Magic
       controller.hand
     end
 
-    def resolve!(enters_tapped: enters_tapped?, kicked: false)
+    def resolve!(enters_tapped: enters_tapped?, kicked: false, attach_to: nil)
       if permanent?
         permanent = Magic::Permanent.resolve(
           game: game,
@@ -228,7 +228,8 @@ module Magic
           card: self,
           from_zone: zone,
           enters_tapped: enters_tapped,
-          kicked: kicked
+          kicked: kicked,
+          attach_to: attach_to
         )
         # A card resolving from the stack has no zone, so Permanent.resolve can't move it.
         move_zone!(to: battlefield) unless zone&.battlefield?

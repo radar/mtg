@@ -42,7 +42,7 @@ module Magic
     # The number of the turn during which the current controller gained control of this permanent.
     attr_accessor :controlled_since_turn
 
-    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false)
+    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil)
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:)
       card_zone = card.zone unless token || copy
 
@@ -57,6 +57,7 @@ module Magic
       )
 
       permanent.tap! if enters_tapped
+      permanent.attach_to!(attach_to) if attach_to
       card.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       add_additional_counters_for_entering(game:, permanent:) if card.creature?
@@ -368,6 +369,7 @@ module Magic
 
     def untap!
       return if untapped?
+      return if attachments.any? { _1.card.prevents_untapping? }
       @tapped = false
 
       untapped_event = Events::PermanentUntapped.new(
@@ -467,6 +469,10 @@ module Magic
       remove_until_eot_modifiers!
       revert_until_eot_control!
       apply_continuous_effects!
+    end
+
+    def can_have_counters?
+      attachments.none? { _1.card.prevents_counters? }
     end
 
     def add_counter(counter_type, amount: 1)

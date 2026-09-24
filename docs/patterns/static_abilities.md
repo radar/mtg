@@ -61,3 +61,5 @@ Pre-built subclasses in `lib/magic/abilities/static/` — declare these on a car
 
 
 **"Becomes <color> until end of turn" / "becomes all colors"**: `permanent.change_colors!([:blue])` adds a `Modifications::Color` (until end of turn by default); `Permanent#colors` uses the latest one, else the card's colors. Example: `ForagingWickermaw`.
+
+**Auras/Equipment restricting the attached creature**: define methods on the Attachment card: `can_attack?`, `can_block?(_)`, `can_activate_ability?(_)`, `does_not_untap_during_untap_step?`, `prevents_untapping?` ("can't become untapped", checked by `Permanent#untap!`) and `prevents_counters?` ("can't have counters put on it", checked by `Effects::AddCounterToPermanent` via `Permanent#can_have_counters?`). `Attachment` defaults them all to allow. An Aura enters already attached (`Permanent.resolve(attach_to:)`), so its enters trigger can use `actor.attached_to`; an attachment leaving the battlefield is removed from its host's `attachments` but keeps `attached_to`. Example: `Blossombind`.

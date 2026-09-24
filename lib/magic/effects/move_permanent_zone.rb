@@ -27,7 +27,12 @@ module Magic
 
         game.notify!(*leaving_zone_notifications(from: from, to: to))
 
-        game.unsubscribe(target) if from&.battlefield?
+        if from&.battlefield?
+          game.unsubscribe(target)
+          # An Aura or Equipment that leaves stops affecting its host. `attached_to` is
+          # kept, so its leaves-the-battlefield triggers still know what it was on.
+          target.attached_to&.attachments&.delete(target) if target.respond_to?(:attached_to)
+        end
 
         from&.remove(target)
 
