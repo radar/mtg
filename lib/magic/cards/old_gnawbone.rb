@@ -9,26 +9,13 @@ module Magic
     end
 
     class OldGnawbone < Creature
-      TreasureToken = Token.create("Treasure") do
-        type T::Artifact, "Treasure"
-        power 0
-        toughness 0
-
-        class ManaAbility < Magic::ManaAbility
-          costs "{T}, Sacrifice {this}"
-          choices :all
-        end
-
-        def activated_abilities = [ManaAbility]
-      end
-
       class CombatDamageTrigger < TriggeredAbility
         def should_perform?
           event.target.player? && event.source.controller == controller
         end
 
         def call
-          actor.trigger_effect(:create_token, token_class: TreasureToken, amount: event.damage)
+          actor.trigger_effect(:create_token, token_class: Tokens::Treasure, amount: event.damage)
         end
       end
 
