@@ -24,6 +24,8 @@ Mana costs may use hybrid symbols: `{G/U}` → `blue_or_green: 1`, the key
 `Costs::Parsers::Mana` uses. Names with hyphens become separate words (`First-Year` →
 `FirstYear`, `first_year`), like the hand-written cards and the specs' `Card()` helper.
 
+A leading ability word on any rules line ("Vivid — ", "Landfall — ") is dropped.
+
 Parenthesised reminder text is stripped before parsing, and the card's own name in
 rules text is replaced with `~`, as is "this creature" / "this artifact" / "this
 permanent" etc., which current card text uses instead of the name.
@@ -116,6 +118,8 @@ What the rules cover:
   `enters_with_counters "+1/+1", N` class macro (`Card#entering_counters`, added by
   `Permanent.resolve` before the permanent enters).
 - Lands: `EntersTapped` (→ `enters_tapped`), `TapForMana`, `TapForManaPerPermanent`,
+  `TapForManaPerColor` ("{T}: For each color among permanents you control, add one mana
+  of that color."),
   `TapForManaChoice` ("{T}: Add {W} or {U}.", "{R}, {G}, or {W}", "one mana of any
   color" → `choices ...`).
 - `Keywords`: a line of comma-separated keywords → `keywords :flying, ...`. Keywords
