@@ -41,7 +41,7 @@ found by glob, no registration. Add a mechanic = one rule file +
 - `kinds` limits a rule to some card kinds; `Rule::PERMANENT_KINDS` lists the kinds
   that become permanents.
 - `.merge(rules)` combines every instance one card produced (several keyword lines,
-  saga chapters, a modal block) or splits one (an anthem with both a buff and
+  saga chapters, a modal block) or splits one (a static buff with both a P/T change and
   keywords becomes two static abilities).
 - Several triggers on one event are fine: the generator emits
   `{ Event => [Trigger1, Trigger2] }` (`Permanent#dispatch_event_handlers` takes an
@@ -76,9 +76,12 @@ What the rules cover:
   `Sacrifice ~`/`a creature`, `Exile ~`, `Discard a card`); the sorcery restriction
   becomes `requirements_met? = game.can_cast_sorcery?(controller)`. Mana abilities
   stay with the TapForMana rules, since "Add ..." isn't an effect.
-- `Anthem`: "[Other] creatures you control get +N/+N[ and have <keywords>]." /
-  "... have <keywords>." → `PowerAndToughnessModification` / `KeywordGrant` static
-  abilities. `TribalLord` handles "Other <type>s you control get +N/+N."
+- `StaticBuff`: "[Other] creatures you control get +N/+N[ and have <keywords>]." /
+  "... have <keywords>.", and the same for "Equipped creature" (Equipment only) and
+  "Enchanted creature" (Auras only) → `PowerAndToughnessModification` / `KeywordGrant`
+  static abilities (`applicable_targets { ... }`, or `applies_to_target` for the
+  attached creature). A line with both becomes two abilities. `TribalLord` handles
+  "Other <type>s you control get +N/+N."
 - `EntersWithCounters`: "~ enters with N <type> counters on it." (+1/+1 on creatures,
   or any type `Magic::Counters[]` knows, e.g. time) → the
   `enters_with_counters "+1/+1", N` class macro (`Card#entering_counters`, added by
@@ -165,7 +168,8 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   into `lib/magic/cards/`, run its spec, then restore the original. Cards checked this
   way: Temple of Mystery, Jungle Hollow, Dismal Backwater, Mind Stone, Enchantress's
   Presence, Phyrexian Arena, Beast Whisperer, Firebrand Archer, Kessig Flamebreather,
-  Glorious Anthem, Titanic Growth. Soulherder is covered by
+  Glorious Anthem, Titanic Growth, Short Sword, Swiftfoot Boots, Setessan Training.
+  Soulherder is covered by
   `spec/card_parser/generated_soulherder_spec.rb` instead: its hand-written spec names
   its own choice classes and expects a lone target to be offered rather than chosen
   automatically (`game.add_choice`). Generate from the card's exact text (cost, P/T):
