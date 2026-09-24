@@ -150,7 +150,9 @@ tokens (the engine's `Magic::Tokens::Treasure`/`Food`/`Clue`), remove N <type> c
 from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens, copy tokens,
 scry, surveil (`Choice::Surveil`, a choice point like scry), gain control of a target
 [until end of turn] (`Permanent#gain_control_until_eot!`, undone at cleanup), and "If
-that creature is a <type>, it [also] <effect on it>" (`IfTargetIsType`). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
+that creature is a <type>, it [also] <effect on it>" (`IfTargetIsType`), and "~ /
+enchanted creature / equipped creature fights [up to one] target creature ..." (`Fight`,
+`Permanents::Creature#fights!`). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 
@@ -207,6 +209,11 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   targeted effects make it `multi_target?` with one list of choices per target and
   `resolve!(targets:)`, each effect's `target` rewritten to its `targets[i]`
   (`ActivatedAbility#valid_targets?` checks each target against its own list).
+- "up to one target ..." (`PermanentTarget` `up_to`, an effect's `optional_target?`) is
+  only supported in triggered abilities (`spell_source` raises). Its `TargetChoice` has
+  `choice_amount = 0..1` (so `Stack#add_choice` doesn't pick a lone target for you),
+  and effects after it run in `finish`, from `resolve!`, from `decline!`
+  (`game.skip_choice!`) or straight away when there is nothing to target.
 - `trigger_source(entry:)` renders a triggered/chapter ability's `call`/`resolve!`. Each
   targeted effect is its own choice, nested in turn (`TargetChoice`, `TargetChoice2`,
   ...). Unless its only target is its first effect, it starts with

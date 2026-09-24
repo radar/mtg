@@ -41,6 +41,19 @@ module Magic
         @damage += damage
       end
 
+      # Rule 701.14: each creature deals damage equal to its power to the other. If
+      # either has left the battlefield or stopped being a creature, neither deals damage.
+      def fights!(other)
+        return unless creature? && zone&.battlefield? && other&.creature? && other.zone&.battlefield?
+
+        # Current power, including anything that changed since continuous effects last applied.
+        [self, other].each(&:apply_continuous_effects!)
+        my_power, their_power = power, other.power
+        trigger_effect(:deal_damage, source: self, target: other, damage: my_power) if my_power.positive?
+        other.trigger_effect(:deal_damage, source: other, target: self, damage: their_power) if their_power.positive?
+      end
+
+      # One-way combat damage (CombatPhase uses it); see #fights! for the keyword action.
       def fight(target, assigned_damage = power)
         trigger_effect(:deal_combat_damage, source: self, target: target, damage: assigned_damage)
       end

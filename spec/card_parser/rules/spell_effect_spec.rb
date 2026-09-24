@@ -31,6 +31,10 @@ RSpec.describe Magic::CardParser::Rules::SpellEffect do
     expect(described_class.parse("Draw a card. It gains haste until end of turn.")).to be_nil
   end
 
+  it "doesn't support \"up to one\" targets on spells" do
+    expect { spell("~ fights up to one target creature.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard)
+  end
+
   it "resolves untargeted effects in order" do
     source = spell("Draw two cards.", "You gain 2 life.").body_source
     expect(source).to eq(<<~RUBY)

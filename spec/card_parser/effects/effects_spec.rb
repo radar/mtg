@@ -66,6 +66,16 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("If that creature is a Goat, draw a card.")).to be_nil
   end
 
+  it "parses fighting, with an optional target" do
+    fight = described_class.parse("~ fights target creature you don't control.")
+    expect([fight.target_choices, fight.optional_target?]).to eq(["battlefield.not_controlled_by(controller).creatures", false])
+    expect(fight.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.fights!(target)")
+    up_to = described_class.parse("Enchanted creature fights up to one target creature an opponent controls.")
+    expect(up_to.optional_target?).to eq(true)
+    expect(up_to.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.attached_to.fights!(target)")
+    expect(described_class.parse("~ fights target artifact.")).to be_nil
+  end
+
   it "parses surveil as a choice" do
     surveil = described_class.parse("Surveil 2.")
     expect(surveil).to eq(e.const_get(:Surveil).new(2))

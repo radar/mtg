@@ -65,3 +65,7 @@ Pre-built subclasses in `lib/magic/triggered_ability/` — use these to avoid re
 
 
 **"If it entered or was cast from a graveyard"**: check `event.from&.graveyard?` on `Events::EnteredTheBattlefield`. A spell's card stays in the zone it was cast from until it resolves, so `from` is the graveyard for a creature cast from there as well as one returned by an effect (`Effects::ReturnTargetFromGraveyardToBattlefield` passes `from_zone:`). For "triggers only once each turn" keyed on the source, use `actor.triggered_once_this_turn?(self.class)` / `actor.trigger_once_this_turn!(self.class)` (`TriggeredAbility::OncePerTurn` keys on `event.permanent` instead). Example: `TwilightDiviner`.
+
+**Fight**: `creature.fights!(other)` (rule 701.14): both deal damage equal to their power to each other, and neither does if either has left the battlefield. `Permanents::Creature#fight` is one-way combat damage used by `CombatPhase`, not the keyword action. Example: `PitilessFists`, `PrimalMight`.
+
+**"Up to one target" in a trigger**: `def choice_amount = 0..1` on the `Choice::Targeted`; `Stack#add_choice` only auto-picks a lone target when the minimum is at least 1, and `game.skip_choice!` chooses nothing (calls `decline!`).
