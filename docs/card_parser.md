@@ -74,7 +74,8 @@ What the rules cover:
   I, II, III... without gaps.
 - `ActivatedAbility`: "<costs>: <effects>[ Activate only as a sorcery.]". Costs go to
   `Costs::Parser` as a `costs "..."` string (`~` → `{this}`; only mana, `{T}`,
-  `Sacrifice ~`/`a creature`, `Exile ~`, `Discard a card`); the sorcery restriction
+  `Sacrifice ~`/`a creature`, `Exile ~`, `Discard a card`, `Remove N <type> counters from ~` [`and sacrifice it`,
+  as a second cost; the type must be one `Magic::Counters[]` knows]); the sorcery restriction
   becomes `requirements_met? = game.can_cast_sorcery?(controller)`. Mana abilities
   stay with the TapForMana rules, since "Add ..." isn't an effect.
 - `StaticBuff`: "[Other] creatures you control get +N/+N[ and have <keywords>]." /
@@ -93,7 +94,11 @@ What the rules cover:
   `Permanent.resolve` before the permanent enters).
 - Lands: `EntersTapped` (→ `enters_tapped`), `TapForMana`, `TapForManaPerPermanent`,
   `TapForManaChoice` ("{T}: Add {W} or {U}.", "{R}, {G}, or {W}", "one mana of any
-  color" → `choices ...`).
+  color" → `choices ...`; "any color in your commander's color identity" →
+  `def choices = controller.commander.color_identity`).
+- `TokenDoubler`: "If an effect would create one or more tokens under your control, it
+  creates twice that many of those tokens instead." → a `ReplacementEffect` on
+  `Effects::CreateToken` (see `AnointedProcession`).
 - Also: `Keywords` (`Keywords.phrase` reads "flying, first strike, and haste"),
   `Equip`, `Enchant`.
 
@@ -104,14 +109,19 @@ One-sentence game effects are reusable classes in `lib/magic/card_parser/effects
 returns Ruby for a constant the call needs, e.g. `CreateToken`'s `Token.create`
 class). Current effects: damage to a target or each opponent, draw, gain/lose life,
 destroy/exile target (`PermanentTarget`: [another] target
-creature/artifact/enchantment/land [you control / an opponent controls]; "another"
+creature/artifact/enchantment/land/nonland permanent [you control / an opponent controls]; "another"
 leaves out `Effect::THIS`), flicker ("exile <target>, then return that card to the
 battlefield under its owner's control"), discard, +1/+1 counters on a target, each
 creature you control or ~, until-end-of-turn pumps and
 keyword grants for ~ / a target creature / [other] creatures you control, optionally
 "for each <thing>" before or after "until end of turn", counted once as it resolves
 (`Pump`, with `Count.parse(text, this: Effect::THIS)`),
-return target [type] card from your graveyard to your hand, remove N <type> counters
+return target [type] card from your graveyard to your hand, put target [type or type] card
+from a/your graveyard onto the battlefield under your control (`Reanimate`), each opponent
+sacrifices a [type or type] (`EachOpponentSacrifices`; its `SacrificeChoice` class comes from
+`definitions`), search your library for a basic land / <Type> card(s) onto the battlefield
+[tapped], then shuffle (`SearchLibrary`, a choice effect), put a <type> counter on ~
+(`AddCounters`; named counter types only on ~), remove N <type> counters
 from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens, copy tokens,
 scry. Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
