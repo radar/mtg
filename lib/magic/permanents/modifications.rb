@@ -7,6 +7,14 @@ module Magic
         )
       end
 
+      # "~ becomes a 4/4 artifact creature until end of turn." (a manland, Firdoch Core)
+      def become_creature!(power:, toughness:, types: [], until_eot: true)
+        modifiers << AdditionalType.new(types: [T::Creature, *types], until_eot:)
+        modifiers << BasePower.new(base_power: power, until_eot:)
+        modifiers << BaseToughness.new(base_toughness: toughness, until_eot:)
+        apply_continuous_effects!
+      end
+
       def modify_base_power(power)
         modifiers << BasePower.new(
           base_power: power,

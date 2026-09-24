@@ -90,6 +90,7 @@ module Magic
           *modifiers_by_type(Modifications::AdditionalType).flat_map(&:type_grants),
         ]
 
+        types = types.uniq
         types -= static_abilities_for(permanent).of_type(Abilities::Static::TypeRemoval).flat_map(&:type_removal)
       end
 

@@ -14,7 +14,8 @@ writes `lib/magic/cards/<name>.rb` from plain card text (`Magic::CardParser` →
 chapters parses under a C locale. Unrecognised rules text raises `UnsupportedCard`.
 
 Supported card kinds: creature (also Artifact/Enchantment Creature), instant,
-sorcery, enchantment, artifact (incl. legendary), Equipment (needs an `Equip` line),
+sorcery, enchantment, artifact (incl. legendary), Kindred artifact/enchantment/instant/
+sorcery (`type T::Kindred, T::Artifact, T::Creatures[...]`), Equipment (needs an `Equip` line),
 Aura (needs an `Enchant` line), Saga (needs chapter lines), land and basic land.
 Instants and sorceries need effect lines or a modal block. Other type lines/subtypes
 raise `UnsupportedCard`.
@@ -155,7 +156,9 @@ scry, surveil (`Choice::Surveil`, a choice point like scry), gain control of a t
 that creature is a <type>, it [also] <effect on it>" (`IfTargetIsType`), and "~ /
 enchanted creature / equipped creature fights [up to one] target creature ..." (`Fight`,
 `Permanents::Creature#fights!`), and "exile [up to one] target ... until ~ leaves the
-battlefield" (`ExileUntilLeaves`, `Permanent#exile_until_leaves!`). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
+battlefield" (`ExileUntilLeaves`, `Permanent#exile_until_leaves!`), and "~ becomes an N/N
+[<types>] creature [with <keywords>] until end of turn[. It's still a land.]"
+(`BecomeCreature`, `Permanent#become_creature!`; colours aren't supported). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 

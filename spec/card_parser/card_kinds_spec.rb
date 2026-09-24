@@ -18,6 +18,13 @@ RSpec.describe "CardParser card kinds" do
     expect(generate("Baubles {2}\nArtifact\n")).to include('Artifact("Baubles")')
   end
 
+  it "generates Kindred cards with their creature types" do
+    expect(generate("Kin Idol {3}\nKindred Artifact — Shapeshifter\nChangeling\n"))
+      .to include('Artifact("Kin Idol")', 'type T::Kindred, T::Artifact, T::Creatures["Shapeshifter"]', "keywords :changeling")
+    expect(generate("Elf Rite {G}\nKindred Sorcery — Elf\nYou gain 3 life.\n")).to include('type T::Kindred, T::Sorcery, T::Creatures["Elf"]')
+    expect { generate("Kin Blade {1}\nKindred Artifact — Elf Equipment\nEquip {1}\n") }.to raise_error(Magic::CardParser::UnsupportedCard)
+  end
+
   it "requires an effect on instants and sorceries" do
     expect { generate("Zap {R}\nInstant\n") }.to raise_error(Magic::CardParser::ParseError, /SpellEffect/)
   end

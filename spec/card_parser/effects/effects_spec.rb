@@ -83,6 +83,14 @@ RSpec.describe Magic::CardParser::Effect do
     expect(hold.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.exile_until_leaves!(target)")
   end
 
+  it "parses becoming a creature until end of turn" do
+    core = described_class.parse("~ becomes a 4/4 artifact creature until end of turn.")
+    expect(core.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.become_creature!(power: 4, toughness: 4, types: [T::Artifact])")
+    land = described_class.parse("~ becomes a 3/3 Elemental creature with haste until end of turn. It's still a land.")
+    expect(land.resolve_call).to include('types: [T::Creatures["Elemental"]]', "keyword: :haste")
+    expect(described_class.parse("~ becomes a 2/2 blue creature until end of turn.")).to be_nil
+  end
+
   it "parses surveil as a choice" do
     surveil = described_class.parse("Surveil 2.")
     expect(surveil).to eq(e.const_get(:Surveil).new(2))

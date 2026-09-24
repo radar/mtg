@@ -36,7 +36,7 @@ module Magic
 
     # What sort of card this is, or UnsupportedCard for type lines not handled yet.
     def kind
-      types = @result.types
+      types = @result.types - ["Kindred"]
       subtypes = @result.subtypes
       return :creature if types.include?("Creature")
       raise CardParser::UnsupportedCard, "unsupported type line: #{types.join(' ')}" if types.size != 1
@@ -51,9 +51,11 @@ module Magic
       end
     end
 
-    # Card types with no subtypes to worry about.
+    def kindred? = @result.types.include?("Kindred")
+
+    # Card types with no subtypes to worry about (a Kindred card's are creature types).
     def plain(kind)
-      raise CardParser::UnsupportedCard, "subtypes not supported for #{kind}: #{@result.subtypes.join(' ')}" if @result.subtypes.any?
+      raise CardParser::UnsupportedCard, "subtypes not supported for #{kind}: #{@result.subtypes.join(' ')}" if @result.subtypes.any? && !kindred?
 
       kind
     end
@@ -108,6 +110,8 @@ module Magic
     end
 
     def type_lines(kind)
+      return kindred_type_lines(kind) if kindred?
+
       case kind
       when :creature then creature_type_lines
       when :artifact then @result.legendary? ? ["legendary_artifact"] : []
@@ -116,6 +120,18 @@ module Magic
 
         []
       end
+    end
+
+    # "Kindred Artifact — Shapeshifter" -> type T::Kindred, T::Artifact, T::Creatures["Shapeshifter"]
+    def kindred_type_lines(kind)
+      raise CardParser::UnsupportedCard, "unsupported Kindred card: #{kind}" unless %i[artifact enchantment instant sorcery].include?(kind)
+      raise CardParser::UnsupportedCard, "legendary Kindred cards not supported" if @result.legendary?
+      unless (@result.subtypes - Types::Creatures.values).empty?
+        raise CardParser::UnsupportedCard, "Kindred subtypes must be creature types: #{@result.subtypes.join(' ')}"
+      end
+
+      creature_types = @result.subtypes.map { "T::Creatures[#{_1.inspect}]" }
+      ["type #{['T::Kindred', "T::#{kind.to_s.capitalize}", *creature_types].join(', ')}"]
     end
 
     def creature_type_lines
