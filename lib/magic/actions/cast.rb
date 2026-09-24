@@ -147,7 +147,7 @@ module Magic
       def any_color_for_any_cost?
         game.battlefield.static_abilities
           .of_type(Abilities::Static::AnyColorForAnyCost)
-          .any? { |ability| ability.controller == player }
+          .any? { |ability| ability.controller == player && ability.any_color_for?(card) }
       end
 
       def auto_pay_mana
@@ -218,6 +218,7 @@ module Magic
             targets: targets,
             kicked: kicker_cost.paid?,
             value_for_x: mana_cost.x,
+            controller: player,
           )
         end
 
