@@ -82,6 +82,64 @@ RSpec.describe "CardParser generated keywords with values, in play" do
     end
   end
 
+  context "if this spell was kicked" do
+    before do
+      load_card("Parsed Blast {1}{R}\nInstant\nKicker {2}\n" \
+                "Parsed Blast deals 2 damage to any target. If this spell was kicked, draw a card and you gain 2 life.\n")
+    end
+
+    let(:blast) { Card("Parsed Blast", owner: p1).tap { p1.hand.add(_1) } }
+
+    it "runs the extra effects when kicked" do
+      p1.add_mana(red: 4)
+      p1.cast(card: blast) do |action|
+        action.pay_mana(generic: { red: 1 }, red: 1).targeting(p2)
+        action.pay_kicker(generic: { red: 2 })
+      end
+
+      top_card = p1.library.first
+      game.stack.resolve!
+
+      expect(p1.hand).to include(top_card)
+      expect(p2.life).to eq(18)
+      expect(p1.life).to eq(22)
+    end
+
+    it "skips them when not kicked" do
+      p1.add_mana(red: 2)
+      p1.cast(card: blast) { _1.pay_mana(generic: { red: 1 }, red: 1).targeting(p2) }
+
+      top_card = p1.library.first
+      game.stack.resolve!
+
+      expect(p1.hand).not_to include(top_card)
+      expect(p2.life).to eq(18)
+      expect(p1.life).to eq(20)
+    end
+
+    it "works inside a mode" do
+      load_card("Parsed Charm {1}{B}\nInstant\nKicker {1}\nChoose one —\n" \
+                "• Draw a card. If this spell was kicked, you gain 3 life.\n• Each opponent loses 2 life.\n")
+      charm = Card("Parsed Charm", owner: p1)
+      p1.hand.add(charm)
+      p1.add_mana(black: 3)
+      p1.cast(card: charm) do |action|
+        action.choose_mode(charm.modes[0])
+        action.pay_mana(generic: { black: 1 }, black: 1)
+        action.pay_kicker(generic: { black: 1 })
+      end
+      game.stack.resolve!
+
+      expect(p1.life).to eq(23)
+    end
+
+    it "isn't supported on a triggered ability" do
+      expect { generate("Parsed Bird {1}{U}\nCreature — Bird\nWhen Parsed Bird enters, draw a card. " \
+                        "If this spell was kicked, you gain 2 life.\n1/1\n") }
+        .to raise_error(Magic::CardParser::UnsupportedCard, /only works on instants and sorceries/)
+    end
+  end
+
   it "cycles for its cycling cost" do
     load_card("Parsed Cycler {3}{U}\nCreature — Bird\nFlying\nCycling {1}{U}\n2/2\n")
     card = Card("Parsed Cycler", owner: p1)

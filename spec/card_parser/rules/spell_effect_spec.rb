@@ -92,3 +92,38 @@ RSpec.describe Magic::CardParser::Rules::SpellEffect do
     expect(source).to include("def resolve!\n  trigger_effect(:draw_cards, number_to_draw: 1)\n  game.choices.add(MayChoice.new(actor: self))")
   end
 end
+
+RSpec.describe Magic::CardParser::Rules::SpellEffect, "if this spell was kicked" do
+  def spell(*lines)
+    described_class.merge(lines.map { described_class.parse(_1) }).first
+  end
+
+  it "runs the kicked effects only when the kicker was paid" do
+    source = spell("~ deals 2 damage to any target. If ~ was kicked, draw a card and you gain 2 life.").body_source
+    expect(source).to eq(<<~RUBY)
+      def target_choices
+        game.any_target
+      end
+
+      def resolve!(target:)
+        trigger_effect(:deal_damage, target: target, damage: 2)
+        if kicker_cost.paid?
+          trigger_effect(:draw_cards, number_to_draw: 1)
+          trigger_effect(:gain_life, target: controller, life: 2)
+        end
+      end
+    RUBY
+  end
+
+  it "can end with a choice" do
+    source = spell("Draw a card.", "If ~ was kicked, scry 2.").body_source
+    expect(source).to include("if kicker_cost.paid?\n    game.choices.add(Magic::Choice::Scry.new(actor: self, amount: 2))\n  end")
+  end
+
+  it "rejects kicked effects it can't order or target" do
+    expect { spell("If ~ was kicked, scry 2.", "Draw a card.").body_source }
+      .to raise_error(Magic::CardParser::UnsupportedCard, /after a choice/)
+    expect { spell("If ~ was kicked, destroy target creature.") }
+      .to raise_error(Magic::CardParser::UnsupportedCard, /targeted/)
+  end
+end
