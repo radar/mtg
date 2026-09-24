@@ -4,13 +4,16 @@ module Magic
   class CardParser
     module Effects
       # Until end of turn: "~ gets +1/+0", "Target creature gets +2/+2 and gains
-      # trample", "[Other] creatures you control gain flying and haste".
-      class Pump < Data.define(:who, :targets, :power, :toughness, :keywords)
+      # trample", "[Other] creatures you control gain flying and haste", "Target
+      # creature gets +1/+1 for each Elf you control" (the count, `per`, may also
+      # follow "until end of turn"; it's taken once, as the effect resolves).
+      class Pump < Data.define(:who, :targets, :power, :toughness, :per, :keywords)
         include Effect
 
         WHO = /(?:(?<self>~)|(?<each>(?:other )?creatures you control)|#{PermanentTarget::PATTERN})/i
         KEYWORDS = /[\w ,]+?/
-        LINE = %r{\A#{WHO} (?:gets? (?<power>[+-]\d+)/(?<toughness>[+-]\d+)(?: and gains? (?<with>#{KEYWORDS}))?|gains? (?<only>#{KEYWORDS})) until end of turn\.?\z}i
+        PER = /[^.]+?/
+        LINE = %r{\A#{WHO} (?:gets? (?<power>[+-]\d+)/(?<toughness>[+-]\d+)(?: for each (?<per>#{PER}))?(?: and gains? (?<with>#{KEYWORDS}))?|gains? (?<only>#{KEYWORDS})) until end of turn(?: for each (?<per_after>#{PER}))?\.?\z}i
 
         def self.parse(text)
           return unless (m = LINE.match(text))
@@ -20,8 +23,12 @@ module Magic
           if (phrase = m[:with] || m[:only])
             keywords = Rules::Keywords.phrase(phrase) or return
           end
+          if (phrase = m[:per] || m[:per_after])
+            return unless m[:power] && (per = Count.parse(phrase, this: THIS))
+          end
           who = m[:self] ? :self : m[:each]&.downcase || :target
-          new(who:, targets: m[:kind] && PermanentTarget.choices(m), power: m[:power]&.to_i, toughness: m[:toughness]&.to_i, keywords:)
+          new(who:, targets: m[:kind] && PermanentTarget.choices(m), power: m[:power]&.to_i, toughness: m[:toughness]&.to_i, per:,
+              keywords:)
         end
 
         def target_choices = who == :target ? targets : nil
@@ -44,9 +51,17 @@ module Magic
           "#{collection}.each do |creature|\n#{lines.map { "  #{_1}" }.join.chomp}\nend"
         end
 
+        # A fixed amount, or so many for each of `per`.
+        def amount(value)
+          return value unless per
+          return 0 if value.zero?
+
+          value == 1 ? per : "#{value} * #{per}"
+        end
+
         def calls(target)
           lines = []
-          lines << "trigger_effect(:modify_power_toughness, target: #{target}, power: #{power}, toughness: #{toughness})" if power
+          lines << "trigger_effect(:modify_power_toughness, target: #{target}, power: #{amount(power)}, toughness: #{amount(toughness)})" if power
           keywords.each { lines << "trigger_effect(:grant_keyword, target: #{target}, keyword: #{_1.inspect})" }
           lines.join("\n")
         end

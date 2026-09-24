@@ -3,7 +3,8 @@
 module Magic
   class CardParser
     # The "for each ..." in a variable amount -> a Ruby expression counting it, for
-    # code with `controller` and `source` in scope (a static ability).
+    # code with `controller` in scope. `this` is Ruby for the object itself ("other"
+    # leaves it out): `source` in a static ability, Effect::THIS in an effect.
     #
     #   "Equipment you control"          -> controller.permanents.count { _1.type?("Equipment") }
     #   "other Elf you control"          -> (controller.permanents - [source]).count { _1.type?("Elf") }
@@ -14,9 +15,9 @@ module Magic
       PERMANENTS = /\A(?<other>other )?(?<type>#{TYPE}) you control\z/
       GRAVEYARD = /\A(?:(?<type>#{TYPE}) )?card in your graveyard\z/
 
-      def self.parse(text)
+      def self.parse(text, this: "source")
         if (m = PERMANENTS.match(text))
-          permanents = m[:other] ? "(controller.permanents - [source])" : "controller.permanents"
+          permanents = m[:other] ? "(controller.permanents - [#{this}])" : "controller.permanents"
           "#{permanents}.count { _1.type?(#{type(m[:type]).inspect}) }"
         elsif text == "card in your hand"
           "controller.hand.count"

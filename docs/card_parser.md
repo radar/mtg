@@ -107,7 +107,9 @@ creature/artifact/enchantment/land [you control / an opponent controls]; "anothe
 leaves out `Effect::THIS`), flicker ("exile <target>, then return that card to the
 battlefield under its owner's control"), discard, +1/+1 counters on a target, each
 creature you control or ~, until-end-of-turn pumps and
-keyword grants for ~ / a target creature / [other] creatures you control (`Pump`),
+keyword grants for ~ / a target creature / [other] creatures you control, optionally
+"for each <thing>" before or after "until end of turn", counted once as it resolves
+(`Pump`, with `Count.parse(text, this: Effect::THIS)`),
 return target [type] card from your graveyard to your hand, remove N <type> counters
 from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens, copy tokens,
 scry. Together, `EntersWithCounters`, an upkeep "remove a time counter" and a

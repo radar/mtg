@@ -9,6 +9,10 @@ RSpec.describe Magic::CardParser::Count do
     expect(described_class.parse("other Elf you control")).to eq('(controller.permanents - [source]).count { _1.type?("Elf") }')
   end
 
+  it "leaves out whatever `this` names" do
+    expect(described_class.parse("other Elf you control", this: "actor")).to eq('(controller.permanents - [actor]).count { _1.type?("Elf") }')
+  end
+
   it "counts cards in your hand and graveyard" do
     expect(described_class.parse("card in your hand")).to eq("controller.hand.count")
     expect(described_class.parse("card in your graveyard")).to eq("controller.graveyard.cards.count")

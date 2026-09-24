@@ -58,6 +58,38 @@ RSpec.describe "CardParser generated statics, counters, grants and modes in play
     expect(bears.zone).to be_hand
   end
 
+  context "with pumps that count" do
+    it "counts Elves as the spell resolves, and keeps that bonus" do
+      load_card("Parsed Rally {1}{G}\nInstant\nTarget creature gets +1/+1 until end of turn for each Elf you control.\n")
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      ResolvePermanent("Llanowar Elves", owner: p1)
+      ResolvePermanent("Wood Elves", owner: p1)
+      ResolvePermanent("Llanowar Elves", owner: p2)
+      rally = Card("Parsed Rally", owner: p1)
+      p1.hand.add(rally)
+      p1.add_mana(green: 2)
+      p1.cast(card: rally) { _1.pay_mana(generic: { green: 1 }, green: 1).targeting(bears) }
+      game.stack.resolve!
+      game.tick!
+      expect([bears.power, bears.toughness]).to eq([4, 4])
+
+      ResolvePermanent("Llanowar Elves", owner: p1)
+      game.tick!
+      expect(bears.power).to eq(4)
+    end
+
+    it "leaves out the ability's own creature for \"other\"" do
+      load_card("Parsed Chanter {R}\nCreature — Goblin Shaman\n{T}: Parsed Chanter gets +2/+0 until end of turn for each other Goblin you control.\n1/1\n")
+      chanter = ResolvePermanent("Parsed Chanter", owner: p1)
+      load_card("Parsed Goblin {R}\nCreature — Goblin\n1/1\n")
+      ResolvePermanent("Parsed Goblin", owner: p1)
+      p1.activate_ability(ability: chanter.activated_abilities.first)
+      game.stack.resolve!
+      game.tick!
+      expect([chanter.power, chanter.toughness]).to eq([3, 1])
+    end
+  end
+
   context "with a modal spell" do
     let(:spell_class) do
       load_card("Parsed Charm {1}{R}\nInstant\nChoose one —\n• Parsed Charm deals 3 damage to target creature.\n" \
