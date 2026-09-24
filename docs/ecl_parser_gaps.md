@@ -41,6 +41,37 @@ bundle exec ruby script/parser_gaps.rb ecl
 Most faces are one or two mechanics away, so unlocking is incremental: no single mechanic
 is a wall, but there are about 45 of them.
 
+## Progress
+
+Last re-run: 269 faces, **36** generate cleanly (was 15); 151 failing faces have a single
+remaining blocker (was 135). Numbers in the tables below are from the first survey.
+
+Done so far:
+
+- **Hybrid mana and `{X}` in costs**: `ManaCost` (hybrid keys like `black_or_green`, `x: 1`).
+  Not done: hybrid symbols inside activation-cost strings (`Costs::Parser` can't read
+  `{B/G}` there yet).
+- **Blight**: `Choice::Blight`, `Costs::Blight` (`pay_blight`), the `Blight` effect (you /
+  each opponent / target opponent), "If you don't" / "When you do" after an optional
+  effect, and the first-main-phase trigger. Six cards generated. *Not* done: blight as a
+  cast cost ("As an additional cost to cast ~, you may blight N", "blight N or pay {M}",
+  "blight X"), the "if the additional cost was paid ... instead" grammar, "you may pay
+  {M}. If you don't, blight N", and effects that name the blighted creature (Grub).
+- **Changeling**: the keyword line (`Rules::Changeling`, via the new `Rule#class_reference`).
+  Not done: changeling tokens ("Shapeshifter creature token with changeling"), "is all
+  creature types" on equipment, "except it has changeling".
+- **Creature-type-qualified triggers and targets**: another <Type> you control dies /
+  enters, "~ or another <Type> you control enters", a <Type> creature you control dies,
+  ~ becomes tapped, "target [attacking] <Type> you control", plus an `Untap` effect.
+  Seven cards generated. Not done: "Kithkin creatures you control also gain first
+  strike", "Other tapped creatures ...", damage equal to a creature's power, and
+  "of the chosen type".
+
+Cards generated this way: Dream Seizer, Sourbread Auntie, Gutsplitter Gang, Warren
+Torchmaster, Sting-Slinger, Blighted Blackthorn, Boggart Cursecrafter, Elder Auntie,
+Boggart Prankster, Thoughtweft Lieutenant, Pestered Wellguard, Tributary Vaulter,
+Deepchannel Duelist.
+
 ## Tally by mechanic set
 
 Faces = failing faces containing that mechanic; Sole = faces it alone blocks.

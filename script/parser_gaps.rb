@@ -89,8 +89,6 @@ rescue StandardError
   lines = lines.map { |l| l.gsub(face[:name], "~").gsub(Magic::CardParser::THIS_OBJECT, "~") }
   unparsed = lines.select { |l| Magic::CardParser::Rule.all.none? { |rule| (rule.parse(l) rescue nil) } }
   tags = unparsed.map { |l| (MECHANICS.find { |_, re| re.match?(l) } || [OTHER]).first }
-  tags << "Hybrid mana symbols in cost" if face[:cost].to_s.match?(%r{\{[WUBRG]/[WUBRG]\}})
-  tags << "{X} in mana cost" if face[:cost].to_s.include?("{X}")
   tags << "Kindred type line" if face[:type].match?(/\bKindred\b/)
   tags << "Planeswalker card kind" if face[:type].include?("Planeswalker")
   tags << "Legendary enchantment" if face[:type].start_with?("Legendary Enchantment")
