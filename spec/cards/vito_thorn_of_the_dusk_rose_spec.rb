@@ -11,6 +11,7 @@ RSpec.describe Magic::Cards::VitoThornOfTheDuskRose do
 
   it "makes target opponent lose life" do
     p1.gain_life(1)
+    game.settle!
 
     choice = game.choices.last
     expect(choice).to be_a(described_class::LifeLossChoice)

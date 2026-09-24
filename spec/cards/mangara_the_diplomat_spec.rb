@@ -67,7 +67,7 @@ RSpec.describe Magic::Cards::MangaraTheDiplomat do
         _1.pay_mana(generic: { green: 2 }, green: 1)
       end
 
-      game.tick!
+      game.settle!
     end
   end
 end

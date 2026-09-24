@@ -10,6 +10,7 @@ RSpec.describe Magic::Cards::FelidarRetreat do
   it "offers a Cat Beast token after landfall" do
     p1.hand.add(forest)
     p1.play_land(land: forest)
+    game.settle!
     game.resolve_choice!(mode: :token)
 
     expect(p1.creatures.by_name("Cat Beast").count).to eq(1)
@@ -19,6 +20,7 @@ RSpec.describe Magic::Cards::FelidarRetreat do
     creature = ResolvePermanent("Grizzly Bears", owner: p1)
     p1.hand.add(forest)
     p1.play_land(land: forest)
+    game.settle!
     game.resolve_choice!(mode: :counter)
     game.tick!
 

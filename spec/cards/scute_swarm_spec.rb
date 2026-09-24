@@ -15,7 +15,7 @@ RSpec.describe Magic::Cards::ScuteSwarm do
       it "creates an insect" do
         subject
         p1.play_land(land: forest)
-        game.tick!
+        game.settle!
 
         expect(creatures.controlled_by(p1).by_name("Insect").count).to eq(1)
       end
@@ -29,7 +29,7 @@ RSpec.describe Magic::Cards::ScuteSwarm do
       it "creates a token copy of Scute Swarm" do
         subject
         p1.play_land(land: forest)
-        game.tick!
+        game.settle!
 
         scutes = creatures.controlled_by(p1).by_name("Scute Swarm")
 
@@ -47,7 +47,7 @@ RSpec.describe Magic::Cards::ScuteSwarm do
         subject
         ResolvePermanent("Scute Swarm", owner: p1)
         p1.play_land(land: forest)
-        game.tick!
+        game.settle!
 
         scutes = creatures.controlled_by(p1).by_name("Scute Swarm")
 

@@ -45,6 +45,7 @@ RSpec.describe Magic::Cards::IdolOfEndurance do
 
     it "when card leaves the battlefield, all exiled cards return to graveyard" do
       idol_of_endurance.destroy!
+      game.settle!
       expect(wood_elves.zone).to be_graveyard
     end
   end

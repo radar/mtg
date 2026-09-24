@@ -535,7 +535,14 @@ module Magic
         .count { |doubler| doubler.doubles_trigger_for?(self, event) }
 
       (1 + additional_triggers).times do
-        trigger_class.new(actor: self, event: event).perform!
+        ability = trigger_class.new(actor: self, event: event)
+        next unless ability.trigger!
+
+        if game.queue_triggers?
+          game.queue_trigger!(ability)
+        else
+          ability.call
+        end
       end
     end
 

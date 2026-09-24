@@ -35,7 +35,7 @@ RSpec.describe Magic::Cards::GoblinWizardry do
       cast_action = cast_action(player: p1, card: Card("Revitalize"))
         .pay_mana(white: 1, generic: { blue: 1 })
         .perform
-      game.tick!
+      game.settle!
       expect(goblin_wizards).to all(have_attributes(
         name: "Goblin Wizard",
         power: 2,
@@ -48,7 +48,7 @@ RSpec.describe Magic::Cards::GoblinWizardry do
       cast_action = cast_action(player: p1, card: Card("Onakke Ogre"))
         .pay_mana(red: 1, generic: { red: 1, black: 1 })
         .perform
-      game.tick!
+      game.settle!
       expect(goblin_wizards).to all(have_attributes(
         name: "Goblin Wizard",
         power: 1,

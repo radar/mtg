@@ -15,10 +15,19 @@ module CardHelper
     permanent
   end
 
-  def ResolvePermanent(name, summoning_sick: false, **args)
+  # settle: false opts out of the auto-settle below -- needed when a spec is mid-way
+  # through building up other pending stack items/choices it wants to stay pending
+  # (settling would resolve them out from under it).
+  def ResolvePermanent(name, summoning_sick: false, settle: true, **args)
     card = Card(name)
     permanent = Magic::Permanent.resolve(game: game, card: card, **args)
     permanent.controlled_since_turn = 0 unless summoning_sick
+    # Skip auto-settling for Auras: fixtures often build one unattached and call
+    # #attach_to! as a separate step, and settling in between would kill it to SBA
+    # 704.5m before it's actually attached.
+    if settle && !(permanent.card.is_a?(Magic::Cards::Aura) || permanent.type?("Aura"))
+      game.settle!
+    end
     permanent
   end
 
@@ -41,13 +50,13 @@ module CardHelper
 
   def add_to_stack_and_resolve(action)
     game.stack.add(action)
-    game.stack.resolve!
+    game.settle!
   end
 
   def cast_and_resolve(card:, player: card.owner, targeting: nil, &block)
     action = cast_action(card: card, player: player, targeting: targeting, &block)
     game.stack.add(action)
-    game.stack.resolve!
+    game.settle!
   end
 end
 

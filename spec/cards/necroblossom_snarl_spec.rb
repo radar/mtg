@@ -84,6 +84,7 @@ RSpec.describe Magic::Cards::NecroblossomSnarl do
 
   def play_land(card)
     p1.play_land(land: card)
+    game.settle!
     p1.permanents.by_name(card.name).first
   end
 end

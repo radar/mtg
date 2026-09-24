@@ -18,7 +18,7 @@ RSpec.describe Magic::Cards::JeskaiElder do
       action = cast_action(player: p1, card: Card("Rampant Growth"))
         .pay_mana(green: 1, generic: { green: 1 })
         .perform
-      game.tick!
+      game.settle!
     end
 
     it "has a boosted power + toughness" do
@@ -34,7 +34,7 @@ RSpec.describe Magic::Cards::JeskaiElder do
       action = cast_action(card: Card("Rampant Growth", owner: p2))
         .pay_mana(green: 1, generic: { green: 1 })
         .perform
-      game.tick!
+      game.settle!
     end
 
     it "has regular power + toughness" do
@@ -49,7 +49,7 @@ RSpec.describe Magic::Cards::JeskaiElder do
       action = cast_action(player: p1, card: Card("Wood Elves"))
         .pay_mana(green: 1, generic: { green: 2 })
         .perform
-      game.tick!
+      game.settle!
     end
 
     it "has a regular power and toughness" do

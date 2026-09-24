@@ -88,11 +88,14 @@ RSpec.describe Magic::Cards::SanctumOfAll do
   end
 
   context "additional trigger with six or more shrines" do
-    let!(:calm_waters_1) { ResolvePermanent("Sanctum Of Calm Waters") }
-    let!(:calm_waters_2) { ResolvePermanent("Sanctum Of Calm Waters") }
-    let!(:calm_waters_3) { ResolvePermanent("Sanctum Of Calm Waters") }
-    let!(:calm_waters_4) { ResolvePermanent("Sanctum Of Calm Waters") }
-    let!(:calm_waters_5) { ResolvePermanent("Sanctum Of Calm Waters") }
+    # 5 copies of the same legendary Shrine would violate the legend rule (704.5j)
+    # for real -- give each a distinct #name so the fixture can test shrine-count
+    # doubling in isolation, as if they were 5 different (legendary) cycle members.
+    let!(:calm_waters_1) { resolve_uniquely_named_shrine!("Sanctum Of Calm Waters", 1) }
+    let!(:calm_waters_2) { resolve_uniquely_named_shrine!("Sanctum Of Calm Waters", 2) }
+    let!(:calm_waters_3) { resolve_uniquely_named_shrine!("Sanctum Of Calm Waters", 3) }
+    let!(:calm_waters_4) { resolve_uniquely_named_shrine!("Sanctum Of Calm Waters", 4) }
+    let!(:calm_waters_5) { resolve_uniquely_named_shrine!("Sanctum Of Calm Waters", 5) }
 
     it "triggers other shrine abilities an additional time when controlling six or more shrines" do
       go_to_main_phase!
@@ -101,9 +104,11 @@ RSpec.describe Magic::Cards::SanctumOfAll do
       # With Sanctum of All + 5x SanctumOfCalmWaters = 6 shrines
       # Each calm waters triggers once normally, then Sanctum of All doubles it
       # So each calm waters triggers twice, giving 5 * 2 = 10 FirstMainPhase choices
-      # Plus Sanctum of All's own upkeep choice was already resolved
-      calm_waters_choices = game.choices.select { |c| c.is_a?(Magic::Cards::SanctumOfCalmWaters::Choice) }
-      expect(calm_waters_choices.count).to eq(10)
+      # Plus Sanctum of All's own upkeep choice was already resolved.
+      # Each of those choices only exists one at a time now that triggers go on the
+      # stack and resolve in order (rather than all firing synchronously up front),
+      # so count them as they appear instead of expecting them all pending at once.
+      expect(count_calm_waters_choices!).to eq(10)
     end
 
     context "with fewer than six shrines" do
@@ -114,9 +119,32 @@ RSpec.describe Magic::Cards::SanctumOfAll do
         go_to_main_phase!
 
         # With only 5 shrines, no doubling
-        calm_waters_choices = game.choices.select { |c| c.is_a?(Magic::Cards::SanctumOfCalmWaters::Choice) }
-        expect(calm_waters_choices.count).to eq(4)
+        expect(count_calm_waters_choices!).to eq(4)
       end
     end
+  end
+
+  def resolve_uniquely_named_shrine!(card_name, suffix)
+    permanent = ResolvePermanent(card_name)
+    unique_name = "#{permanent.name} (#{suffix})"
+    permanent.define_singleton_method(:name) { unique_name }
+    permanent
+  end
+
+  def count_calm_waters_choices!
+    count = 0
+    loop do
+      game.check_state_based_actions!
+      if game.stack.pending_choices?
+        choice = game.choices.first
+        count += 1 if choice.is_a?(Magic::Cards::SanctumOfCalmWaters::Choice)
+        game.skip_choice!
+      elsif !game.stack.empty?
+        game.stack.resolve!
+      else
+        break
+      end
+    end
+    count
   end
 end

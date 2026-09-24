@@ -10,6 +10,7 @@ RSpec.describe Magic::Cards::GraspOfFate do
 
     expect(target.card.zone).to be_exile
     grasp.destroy!
+    game.settle!
 
     expect(target.card.zone).to be_battlefield
   end

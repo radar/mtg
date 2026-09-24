@@ -16,6 +16,7 @@ RSpec.describe Magic::Cards::RhysticStudy do
       p2.cast(card: wood_elves_1) do
         _1.pay_mana(generic: {green: 2}, green: 1)
       end
+      game.settle!
 
       choice = game.choices.first
       expect(choice).to be_a(Magic::Cards::RhysticStudy::Choice)
@@ -40,6 +41,7 @@ RSpec.describe Magic::Cards::RhysticStudy do
       p2.cast(card: wood_elves_1) do
         _1.pay_mana(generic: {green: 2}, green: 1)
       end
+      game.settle!
 
       choice = game.choices.first
       expect(choice).to be_a(Magic::Cards::RhysticStudy::Choice)
@@ -55,6 +57,7 @@ RSpec.describe Magic::Cards::RhysticStudy do
         p2.cast(card: wood_elves_1) do
           _1.pay_mana(generic: {green: 2}, green: 1)
         end
+        game.settle!
 
         choice = game.choices.first
         expect(choice).to be_a(Magic::Cards::RhysticStudy::Choice)

@@ -24,6 +24,7 @@ RSpec.describe Magic::Cards::JaxisTheTroublemaker do
     end
 
     it "cannot be activated while the stack isn't empty" do
+      ability # force Jaxis to enter (and settle) before Shock goes on the stack
       shock = Card("Shock", owner: p1)
       p1.hand.add(shock)
       p1.add_mana(red: 1)

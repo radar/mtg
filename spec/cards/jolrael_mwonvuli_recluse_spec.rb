@@ -26,6 +26,7 @@ RSpec.describe Magic::Cards::JolraelMwonvuliRecluse do
     it "creates a 2/2 green Cat token on the second card drawn" do
       p1.draw!
       p1.draw!
+      game.settle!
 
       cats = creatures.by_name("Cat")
       expect(cats.count).to eq(1)
@@ -40,6 +41,7 @@ RSpec.describe Magic::Cards::JolraelMwonvuliRecluse do
       p1.draw!
       p1.draw!
       p1.draw!
+      game.settle!
 
       cats = creatures.by_name("Cat")
       expect(cats.count).to eq(1)

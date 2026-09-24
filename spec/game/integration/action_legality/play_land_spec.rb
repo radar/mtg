@@ -55,6 +55,7 @@ RSpec.describe Magic::Game, "action legality -- playing lands" do
     go_to_main_phase!
     ResolvePermanent("Oracle of Mul Daya", owner: p1)
     p1.play_land(land: forest)
+    game.settle!
 
     p1.play_land(land: second_forest)
 

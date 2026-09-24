@@ -26,6 +26,7 @@ RSpec.describe Magic::Cards::SporewebWeaver do
           damage: 1,
         )
       )
+      game.settle!
     end
 
     it "gains 1 life for the controller" do

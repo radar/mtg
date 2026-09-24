@@ -41,6 +41,7 @@ RSpec.describe Magic::Cards::ElderfangVenom do
 
     it "each opponent loses 1 life and you gain 1 life" do
       elf.destroy!
+      game.settle!
 
       expect(p1.life).to eq(21)
       expect(p2.life).to eq(19)

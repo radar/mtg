@@ -16,6 +16,7 @@ RSpec.describe Magic::Cards::DoubleVision do
 
   it "copies the first instant or sorcery spell cast each turn, resolving the copy against the original target" do
     p1.cast(card: bolt) { |a| a.pay_mana(red: 1); a.targeting(p2) }
+    game.settle!
     game.skip_choice!
     game.stack.resolve!
 
@@ -24,6 +25,7 @@ RSpec.describe Magic::Cards::DoubleVision do
 
   it "may choose new targets for the copy" do
     p1.cast(card: bolt) { |a| a.pay_mana(red: 1); a.targeting(p2) }
+    game.settle!
     game.resolve_choice!
     game.resolve_choice!(target: p1)
     game.stack.resolve!
@@ -38,6 +40,7 @@ RSpec.describe Magic::Cards::DoubleVision do
     p1.add_mana(red: 1)
 
     p1.cast(card: bolt) { |a| a.pay_mana(red: 1); a.targeting(p2) }
+    game.settle!
     game.skip_choice!
     game.stack.resolve!
 

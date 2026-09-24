@@ -7,6 +7,7 @@ RSpec.describe Magic::Cards::AjanisPridemate do
 
   it "gets counters when player gains life" do
     p1.gain_life(3)
+    game.settle!
     expect(permanent.counters.of_type(Magic::Counters::Plus1Plus1).count).to eq(3)
   end
 end

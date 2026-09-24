@@ -30,7 +30,7 @@ RSpec.describe Magic::Cards::ThermoAlchemist do
       .pay_mana(red: 1)
       .targeting(p2)
       .perform
-    game.tick!
+    game.settle!
 
     expect(alchemist.tapped?).to eq(false)
   end
@@ -42,7 +42,7 @@ RSpec.describe Magic::Cards::ThermoAlchemist do
     cast_action(player: p1, card: Card("Grizzly Bears", owner: p1))
       .pay_mana(generic: { green: 1 }, green: 1)
       .perform
-    game.tick!
+    game.settle!
 
     expect(alchemist.tapped?).to eq(true)
   end

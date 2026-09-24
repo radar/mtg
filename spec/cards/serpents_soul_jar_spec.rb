@@ -12,7 +12,7 @@ RSpec.describe Magic::Cards::SerpentsSoulJar do
     subject
     elf = ResolvePermanent("Llanowar Elves", owner: p1)
     elf.mark_for_death!
-    game.tick!
+    game.settle!
 
     expect(subject.exiled_cards.map(&:name)).to eq(["Llanowar Elves"])
     expect(elf.card.zone).to be_exile
@@ -22,7 +22,7 @@ RSpec.describe Magic::Cards::SerpentsSoulJar do
     subject
     bear = ResolvePermanent("Grizzly Bears", owner: p1)
     bear.mark_for_death!
-    game.tick!
+    game.settle!
 
     expect(subject.exiled_cards).to be_empty
   end
@@ -31,7 +31,7 @@ RSpec.describe Magic::Cards::SerpentsSoulJar do
     subject
     elf = ResolvePermanent("Llanowar Elves", owner: p2)
     elf.mark_for_death!
-    game.tick!
+    game.settle!
 
     expect(subject.exiled_cards).to be_empty
   end
@@ -40,7 +40,7 @@ RSpec.describe Magic::Cards::SerpentsSoulJar do
     subject
     elf = ResolvePermanent("Llanowar Elves", owner: p1)
     elf.mark_for_death!
-    game.tick!
+    game.settle!
     exiled_card = subject.exiled_cards.first
 
     ability = subject.activated_abilities.first
@@ -57,7 +57,7 @@ RSpec.describe Magic::Cards::SerpentsSoulJar do
     subject
     elf = ResolvePermanent("Llanowar Elves", owner: p1)
     elf.mark_for_death!
-    game.tick!
+    game.settle!
     exiled_card = subject.exiled_cards.first
 
     action = p1.prepare_cast(card: exiled_card)

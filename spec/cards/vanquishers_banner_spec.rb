@@ -42,6 +42,7 @@ RSpec.describe Magic::Cards::VanquishersBanner do
     p1.add_mana(green: 1)
     draws_before = game.current_turn.events.count { |e| e.is_a?(Magic::Events::CardDraw) && e.player == p1 }
     p1.cast(card: spell) { |a| a.pay_mana(green: 1) }
+    game.settle!
 
     draws_after = game.current_turn.events.count { |e| e.is_a?(Magic::Events::CardDraw) && e.player == p1 }
     expect(draws_after - draws_before).to eq(1)

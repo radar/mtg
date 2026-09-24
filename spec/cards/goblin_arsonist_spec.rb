@@ -17,12 +17,14 @@ RSpec.describe Magic::Cards::GoblinArsonist do
   context "when it dies" do
     it "presents a may choice to deal 1 damage to any target" do
       goblin_arsonist.destroy!
+      game.settle!
 
       expect(game.choices.last).to be_a(Magic::Cards::GoblinArsonist::MayDamageChoice)
     end
 
     it "deals no damage when declining" do
       goblin_arsonist.destroy!
+      game.settle!
       game.skip_choice!
 
       expect(p2.life).to eq(20)
@@ -30,6 +32,7 @@ RSpec.describe Magic::Cards::GoblinArsonist do
 
     it "deals 1 damage to the chosen player when accepting" do
       goblin_arsonist.destroy!
+      game.settle!
       game.resolve_choice!
       game.resolve_choice!(target: p2)
 
@@ -40,6 +43,7 @@ RSpec.describe Magic::Cards::GoblinArsonist do
       bear = ResolvePermanent("Grizzly Bears", owner: p2)
 
       goblin_arsonist.destroy!
+      game.settle!
       game.resolve_choice!
       game.resolve_choice!(target: bear)
 

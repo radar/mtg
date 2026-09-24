@@ -14,6 +14,7 @@ RSpec.describe Magic::Cards::LysAlanaHuntmaster do
       p1.hand.add(card)
       p1.add_mana(green: 2)
       p1.cast(card: card) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
+      resolve_spell_cast_trigger!
 
       expect(game.choices.last).to be_a(Magic::Cards::LysAlanaHuntmaster::CreateTokenChoice)
     end
@@ -23,6 +24,7 @@ RSpec.describe Magic::Cards::LysAlanaHuntmaster do
       p1.hand.add(card)
       p1.add_mana(green: 2)
       p1.cast(card: card) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
+      resolve_spell_cast_trigger!
 
       game.resolve_choice!
 
@@ -65,5 +67,12 @@ RSpec.describe Magic::Cards::LysAlanaHuntmaster do
 
       expect(game.choices.last).to be_nil
     end
+  end
+
+  # Resolves only the SpellCastTrigger sitting on top of the stack -- the spell itself
+  # (below it) is deliberately left unresolved, matching what these specs assert.
+  def resolve_spell_cast_trigger!
+    game.check_state_based_actions!
+    game.stack.first.resolve!
   end
 end

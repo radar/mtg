@@ -17,6 +17,7 @@ RSpec.describe Magic::Cards::ArcaneBombardment do
 
   it "exiles an instant or sorcery card at random from the graveyard and offers a free copy of it" do
     p1.cast(card: shock) { |a| a.pay_mana(red: 1); a.targeting(p2) }
+    game.settle!
 
     expect(old_bolt.zone).to be_exile
     expect(arcane_bombardment.exiled_cards).to include(old_bolt)
@@ -44,6 +45,7 @@ RSpec.describe Magic::Cards::ArcaneBombardment do
     p1.add_mana(red: 1)
 
     p1.cast(card: shock) { |a| a.pay_mana(red: 1); a.targeting(p2) }
+    game.settle!
     game.resolve_choice!
     game.resolve_choice!(target: p2)
     game.stack.resolve!
@@ -62,6 +64,7 @@ RSpec.describe Magic::Cards::ArcaneBombardment do
 
   it "can decline to cast the free copy" do
     p1.cast(card: shock) { |a| a.pay_mana(red: 1); a.targeting(p2) }
+    game.settle!
 
     game.skip_choice!
     game.stack.resolve!

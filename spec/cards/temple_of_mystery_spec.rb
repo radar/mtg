@@ -8,6 +8,7 @@ RSpec.describe Magic::Cards::TempleOfMystery do
 
   let!(:permanent) do
     p1.play_land(land: card)
+    game.settle!
     p1.permanents.by_name("Temple of Mystery").first
   end
 

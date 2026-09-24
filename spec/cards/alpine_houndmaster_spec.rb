@@ -53,6 +53,8 @@ RSpec.describe Magic::Cards::AlpineHoundmaster do
     let!(:wood_elves_2) { ResolvePermanent("Wood Elves", owner: p1) }
 
     before do
+      houndmaster
+      game.skip_choice! # decline the ETB may-search choice
       skip_to_combat!
     end
 

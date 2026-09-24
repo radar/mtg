@@ -17,6 +17,7 @@ RSpec.describe Magic::Cards::Soulherder do
   it "gets a +1/+1 counter when a creature you control is exiled from the battlefield" do
     creature = ResolvePermanent("Grizzly Bears", owner: p1)
     creature.exile!
+    game.settle!
 
     expect(soulherder.counters.count).to eq(1)
   end
@@ -24,6 +25,7 @@ RSpec.describe Magic::Cards::Soulherder do
   it "gets a +1/+1 counter when an opponent's creature is exiled from the battlefield" do
     creature = ResolvePermanent("Grizzly Bears", owner: p2)
     creature.exile!
+    game.settle!
 
     expect(soulherder.counters.count).to eq(1)
   end
@@ -102,6 +104,7 @@ RSpec.describe Magic::Cards::Soulherder do
     current_turn.end!
     game.resolve_choice!
     game.resolve_choice!(target: creature)
+    game.settle!
 
     expect(soulherder.counters.count).to eq(1)
   end

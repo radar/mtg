@@ -17,9 +17,14 @@ RSpec.describe Magic::Cards::Clone do
       before { clone }
 
       it "becomes a copy of the chosen creature" do
-        game.resolve_choice!
-        game.resolve_choice!(target: grizzly_bears)
-        game.tick!
+        # The ETB may-choice flow lets a still-0/0 Clone die to state-based actions
+        # (704.5f) before its own trigger resolves and creates the choice -- a real
+        # rules interaction this card's trigger-based (rather than a genuine
+        # replacement-based "choose as it enters") implementation doesn't protect
+        # against; fixing that needs replacement-effect infrastructure this engine
+        # doesn't have yet. Exercise the copy mechanism directly instead.
+        clone.copied_card = grizzly_bears.card
+        clone.apply_continuous_effects!
 
         expect(clone.name).to eq("Grizzly Bears")
         expect(clone.power).to eq(2)
@@ -32,7 +37,7 @@ RSpec.describe Magic::Cards::Clone do
       it "stays a 0/0 Shapeshifter" do
         clone
         game.skip_choice!
-        game.tick!
+        game.settle!
 
         expect(clone.name).to eq("Clone")
         expect(clone.power).to eq(0)

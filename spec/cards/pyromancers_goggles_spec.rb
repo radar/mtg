@@ -24,6 +24,7 @@ RSpec.describe Magic::Cards::PyromancersGoggles do
   it "copies a red instant or sorcery spell cast with that mana, offering new targets for the copy" do
     tap_goggles_for_red!
     p1.cast(card: bolt) { |a| a.pay_mana(red: 1); a.targeting(p2) }
+    game.settle!
 
     game.skip_choice!
     game.stack.resolve!
@@ -34,6 +35,7 @@ RSpec.describe Magic::Cards::PyromancersGoggles do
   it "may choose new targets for the copy" do
     tap_goggles_for_red!
     p1.cast(card: bolt) { |a| a.pay_mana(red: 1); a.targeting(p2) }
+    game.settle!
 
     game.resolve_choice!
     game.resolve_choice!(target: p1)
@@ -72,6 +74,7 @@ RSpec.describe Magic::Cards::PyromancersGoggles do
     p1.add_mana(red: 1)
 
     p1.cast(card: bolt) { |a| a.pay_mana(red: 1); a.targeting(p2) }
+    game.settle!
     game.skip_choice!
     game.stack.resolve!
 

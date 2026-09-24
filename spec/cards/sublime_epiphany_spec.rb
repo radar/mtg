@@ -131,7 +131,7 @@ RSpec.describe Magic::Cards::SublimeEpiphany do
 
     shock_cast = game.stack.first
 
-    igneous_cur_p2 = ResolvePermanent("Igneous Cur", owner: p2)
+    igneous_cur_p2 = ResolvePermanent("Igneous Cur", owner: p2, settle: false)
 
     p2.add_mana(red: 2)
     p2.activate_ability(ability: igneous_cur_p2.activated_abilities.first) do
@@ -146,7 +146,7 @@ RSpec.describe Magic::Cards::SublimeEpiphany do
     fourth_mode = sublime_epiphany.modes[3]
     fifth_mode = sublime_epiphany.modes[4]
 
-    igneous_cur_p1 = ResolvePermanent("Igneous Cur", owner: p1)
+    igneous_cur_p1 = ResolvePermanent("Igneous Cur", owner: p1, settle: false)
 
 
     expect(p1).to receive(:draw!)

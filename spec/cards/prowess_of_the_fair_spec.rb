@@ -18,6 +18,7 @@ RSpec.describe Magic::Cards::ProwessOfTheFair do
 
     it "offers a may choice to create an Elf Warrior token" do
       wood_elves.destroy!
+      game.settle!
 
       expect(game.choices.last).to be_a(described_class::CreateTokenChoice)
       game.resolve_choice!

@@ -24,7 +24,7 @@ RSpec.describe Magic::Cards::SiegeStriker do
 
       action = Magic::Actions::TapPermanent.new(game: game, player: p1, permanent: wood_elves)
       game.take_action(action)
-      game.tick!
+      game.settle!
 
       expect(siege_striker.power).to eq(2)
       expect(siege_striker.toughness).to eq(2)
@@ -36,7 +36,7 @@ RSpec.describe Magic::Cards::SiegeStriker do
 
       action = Magic::Actions::TapPermanent.new(game: game, player: p1, permanent: wood_elves)
       game.take_action(action)
-      game.tick!
+      game.settle!
 
       expect(siege_striker.power).to eq(1)
       expect(siege_striker.toughness).to eq(1)

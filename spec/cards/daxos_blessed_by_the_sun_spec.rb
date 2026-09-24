@@ -34,6 +34,7 @@ RSpec.describe Magic::Cards::DaxosBlessedByTheSun do
 
     it "gains controller 1 life" do
       elves.sacrifice!
+      game.settle!
 
       expect(p1.life).to eq(22)
     end

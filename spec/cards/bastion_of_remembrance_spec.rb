@@ -12,6 +12,7 @@ RSpec.describe Magic::Cards::BastionOfRemembrance do
   it "drains each opponent when a creature you control dies" do
     creature = ResolvePermanent("Grizzly Bears", owner: p1)
     creature.destroy!
+    game.settle!
 
     expect(p1.life).to eq(21)
     expect(p2.life).to eq(19)

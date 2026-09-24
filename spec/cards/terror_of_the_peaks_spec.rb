@@ -21,6 +21,7 @@ RSpec.describe Magic::Cards::TerrorOfThePeaks do
       action.pay_mana(red: 1)
       action.targeting(terror)
       game.take_action(action)
+      game.settle!
     end
 
     it "the opponent loses 3 life" do

@@ -17,6 +17,7 @@ RSpec.describe Magic::Cards::LightOfPromise do
       game.take_action(action)
       game.stack.resolve!
       p1.gain_life(3)
+      game.settle!
       expect(wood_elves.counters.of_type(Magic::Counters::Plus1Plus1).count).to eq(3)
     end
   end

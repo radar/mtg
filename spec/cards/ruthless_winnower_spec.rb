@@ -19,6 +19,7 @@ RSpec.describe Magic::Cards::RuthlessWinnower do
 
     it "offers that player a choice to sacrifice one of their non-Elf creatures" do
       game.notify!(Magic::Events::BeginningOfUpkeep.new(player: p1))
+      game.settle!
 
       choice = game.choices.last
       expect(choice).to be_a(described_class::SacrificeChoice)
@@ -33,6 +34,7 @@ RSpec.describe Magic::Cards::RuthlessWinnower do
       opponent_bears = ResolvePermanent("Grizzly Bears", owner: p2)
 
       game.notify!(Magic::Events::BeginningOfUpkeep.new(player: p2))
+      game.settle!
 
       choice = game.choices.last
       expect(choice.choices).to eq([opponent_bears])
@@ -47,7 +49,8 @@ RSpec.describe Magic::Cards::RuthlessWinnower do
       llanowar_elves = ResolvePermanent("Llanowar Elves", owner: p2)
       grizzly_bears.sacrifice!
 
-      expect { game.notify!(Magic::Events::BeginningOfUpkeep.new(player: p2)) }
+      expect { game.notify!(Magic::Events::BeginningOfUpkeep.new(player: p2))
+      game.settle! }
         .not_to change { game.choices.count }
 
       expect(p2.permanents).to include(ruthless_winnower, llanowar_elves)
