@@ -121,8 +121,10 @@ module Magic
       self.class.new(super(&condition))
     end
 
-    # filters are an array of methods to filter by
+    # filters are an array of methods to filter by, or a lambda taking a card
     def filter(filters)
+      return self.class.new(select(&filters)) if filters.respond_to?(:call)
+
       self.class.new(filters.reduce(self) do |cards, filter|
         cards.send(filter)
       end)
