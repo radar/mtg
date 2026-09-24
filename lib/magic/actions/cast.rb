@@ -36,7 +36,7 @@ module Magic
 
       def countered!
         game.notify!(Events::SpellCountered.new(spell: card, player: player))
-        card.move_to_graveyard!(player)
+        card.move_to_graveyard!(card.owner)
       end
 
       def return_to_hand!
@@ -59,6 +59,8 @@ module Magic
             cost = card.blitz_cost
           elsif @adventure
             cost = card.adventure_cost
+          elsif free_from_exile?
+            cost = Costs::Mana.new({})
           else
             cost = card.cost
           end
@@ -147,7 +149,18 @@ module Magic
       def any_color_for_any_cost?
         game.battlefield.static_abilities
           .of_type(Abilities::Static::AnyColorForAnyCost)
-          .any? { |ability| ability.controller == player }
+          .any? { |ability| ability.controller == player } ||
+          static_ability_allows?(:any_mana_type_for?)
+      end
+
+      # "Mana of any type can be spent to cast that spell" / "cast it without paying its
+      # mana cost": static abilities answering for this card and player.
+      def static_ability_allows?(method)
+        game.battlefield.static_abilities.any? { _1.respond_to?(method) && _1.public_send(method, card, player) }
+      end
+
+      def free_from_exile?
+        card.zone&.exile? && static_ability_allows?(:free_cast_from_exile?)
       end
 
       def auto_pay_mana
@@ -187,6 +200,9 @@ module Magic
       def perform
         missing_costs = additional_costs - @paid_additional_costs
         raise "Additional costs have not been paid" unless missing_costs.empty?
+
+        # Casting a card you don't own (from an opponent's exile) makes you its controller.
+        card.controller = player
 
         mana_cost.finalize!(player)
         player.consume_spell_cast!
@@ -238,9 +254,9 @@ module Magic
           elsif card.rebound? && card.zone.hand?
             card.exile!
           elsif card.buyback? && kicker_cost.paid?
-            card.move_to_hand!(player)
+            card.move_to_hand!(card.owner)
           else
-            card.move_to_graveyard!(player)
+            card.move_to_graveyard!(card.owner)
           end
         end
       end

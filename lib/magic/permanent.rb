@@ -42,13 +42,14 @@ module Magic
     # The number of the turn during which the current controller gained control of this permanent.
     attr_accessor :controlled_since_turn
 
-    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil)
+    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner)
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:)
       card_zone = card.zone unless token || copy
 
       permanent = Magic::Permanent.new(
         game: game,
         owner: owner,
+        controller: controller,
         card: card,
         kicked: kicked,
         cast: cast,
@@ -95,10 +96,10 @@ module Magic
 
     def self.static_abilities(game, type) = game.battlefield.static_abilities.of_type(type)
 
-    def initialize(game:, owner:, card:, token: false, cast: true, kicked: false, copy: false, timestamp: Time.now)
+    def initialize(game:, owner:, card:, controller: owner, token: false, cast: true, kicked: false, copy: false, timestamp: Time.now)
       @game = game
       @owner = owner
-      @controller = owner
+      @controller = controller
       @card = card
       @token = token
       @cast = cast
@@ -429,9 +430,9 @@ module Magic
     # A token or copy has no card of its own to move (a token copy of a card
     # leaves that card where it is).
     def put_into_graveyard!
-      move_zone!(to: controller.graveyard)
+      move_zone!(to: owner.graveyard)
       unless copy? || token? || card.zone&.exile?
-        card.move_zone!(to: controller.graveyard)
+        card.move_zone!(to: owner.graveyard)
       end
     end
 

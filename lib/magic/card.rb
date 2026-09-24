@@ -206,8 +206,13 @@ module Magic
 
     def zone=(zone)
       @on_adventure = false unless zone&.exile?
+      # Only a spell (or a permanent's card) can be controlled by someone other than its owner.
+      @controller = owner unless zone&.battlefield?
       @zone = zone
     end
+
+    # Set as the card is cast (Actions::Cast#perform), for a player casting a card they don't own.
+    attr_writer :controller
 
     def move_zone!(to:)
       @revealed = false
@@ -234,7 +239,8 @@ module Magic
           from_zone: zone,
           enters_tapped: enters_tapped,
           kicked: kicked,
-          attach_to: attach_to
+          attach_to: attach_to,
+          controller: controller
         )
         # A card resolving from the stack has no zone, so Permanent.resolve can't move it.
         move_zone!(to: battlefield) unless zone&.battlefield?

@@ -2,7 +2,8 @@ module Magic
   class Game
     extend Forwardable
 
-    attr_reader :logger, :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn, :event_listeners, :monarch
+    attr_reader :logger, :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn, :event_listeners, :monarch,
+                :play_permissions
 
     class EmblemList
       include Enumerable
@@ -53,6 +54,7 @@ module Magic
       @player_count = 0
       @players = players
       @emblems = EmblemList.new(self)
+      @play_permissions = PlayPermissions.new(self)
       @turns = []
       @event_listeners = []
       @monarch = nil
