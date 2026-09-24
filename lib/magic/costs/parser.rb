@@ -26,6 +26,8 @@ module Magic
             Sacrifice.new(source, source.controller.creatures)
           when /\ARemove (?<amount>\d+) (?<type>[\w+\/-]+) counters? from {this}\z/
             RemoveCounter.new(source, Counters[$~[:type].downcase], amount: $~[:amount].to_i)
+          when /\ABlight (?<amount>\d+)\z/
+            Blight.new(source, amount: $~[:amount].to_i)
           when /Sacrifice {this}/
             SelfSacrifice.new(source)
           when /Exile {this}/

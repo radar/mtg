@@ -77,6 +77,10 @@ module Magic
         pay(:discard, targets)
       end
 
+      def pay_blight(creature)
+        pay(:blight, creature)
+      end
+
       def perform
         game.stack.add(self)
 
@@ -95,6 +99,8 @@ module Magic
           Costs::MultiTap
         when :discard
           Costs::Discard
+        when :blight
+          Costs::Blight
         when :sacrifice
           Costs::Sacrifice
         when :self_sacrifice

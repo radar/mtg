@@ -23,6 +23,11 @@ RSpec.describe Magic::CardParser::Rules::ActivatedAbility do
     expect(described_class.parse("{1}, Remove a +1/+1 counter from ~: Draw a card.").costs).to eq("{1}, Remove 1 +1/+1 counters from {this}")
   end
 
+  it "parses blight as a cost" do
+    rule = described_class.parse("{1}{R}, {T}, Blight 1: ~ deals 2 damage to each opponent.")
+    expect(rule.costs).to eq("{1}{R}, {T}, Blight 1")
+  end
+
   it "ignores mana abilities, unknown costs and unknown effects" do
     expect(described_class.parse("{T}: Add {G}.")).to be_nil
     expect(described_class.parse("{X}{R}: ~ deals X damage to any target.")).to be_nil

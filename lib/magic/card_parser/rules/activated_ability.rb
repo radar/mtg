@@ -9,7 +9,7 @@ module Magic
       class ActivatedAbility < Data.define(:costs, :effect_list, :sorcery_speed)
         include Rule
 
-        COST = /(?:\{(?:\d+|[WUBRGC])\})+|\{T\}|Sacrifice ~|Sacrifice a creature|Exile ~|Discard a card|Remove (?:\d+|\w+) [\w+\/-]+ counters? from ~(?: and sacrifice it)?/
+        COST = /(?:\{(?:\d+|[WUBRGC])\})+|\{T\}|Sacrifice ~|Sacrifice a creature|Exile ~|Discard a card|Blight \d+|Remove (?:\d+|\w+) [\w+\/-]+ counters? from ~(?: and sacrifice it)?/
         LINE = /\A(?<costs>#{COST}(?:, #{COST})*): (?<effects>.+?)(?<sorcery> Activate only as a sorcery\.)?\z/
 
         def self.parse(line)

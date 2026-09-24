@@ -121,6 +121,22 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     end
   end
 
+  it "parses the beginning of your first main phase" do
+    rule = parse("At the beginning of your first main phase, draw a card.")
+    expect([rule.class_base_name, rule.handled_event, rule.condition])
+      .to eq(["MainPhaseTrigger", "Events::FirstMainPhase", "event.active_player == controller"])
+  end
+
+  it "runs \"If you don't\" effects when an optional effect is declined, and \"When you do\" like \"If you do\"" do
+    list = described_class.parse("At the beginning of your upkeep, you may blight 2. If you don't, you lose 3 life.").effect_list
+    optional = list.effects.first
+    expect(optional).to be_a(Magic::CardParser::OptionalEffect)
+    expect(optional.if_you_dont).to eq([Magic::CardParser::Effects::LoseLife.new("you", 3)])
+
+    source = described_class.parse("At the beginning of your upkeep, you may blight 2. When you do, draw a card.").effect_list.trigger_source
+    expect(source).to include("class BlightChoice < Magic::Choice::Blight", "trigger_effect(:draw_cards")
+  end
+
   it "negates non<type> spells" do
     expect(parse("Whenever you cast a noncreature spell, draw a card.").condition).to eq('you? && !spell.type?("Creature")')
   end

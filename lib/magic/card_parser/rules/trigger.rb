@@ -58,6 +58,8 @@ module Magic
                    :event_handlers, "Events::LifeGain", ->(m) { LIFE_GAINERS.fetch(m[:who]) }, PERMANENT_KINDS),
           Kind.new(/At the beginning of your upkeep/, "UpkeepTrigger", "TriggeredAbility::BeginningOfYourUpkeep",
                    :event_handlers, "Events::BeginningOfUpkeep", nil, PERMANENT_KINDS),
+          Kind.new(/At the beginning of your first main phase/, "MainPhaseTrigger", "TriggeredAbility",
+                   :event_handlers, "Events::FirstMainPhase", "event.active_player == controller", PERMANENT_KINDS),
           Kind.new(/At the beginning of combat on your turn/, "BeginningOfCombatTrigger", "TriggeredAbility",
                    :event_handlers, "Events::BeginningOfCombat", "event.active_player == controller", PERMANENT_KINDS),
           Kind.new(/At the beginning of your end step/, "EndStepTrigger", "TriggeredAbility::BeginningOfEndStep",

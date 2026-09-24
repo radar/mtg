@@ -212,6 +212,21 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Each opponent sacrifices an artifact.").permanent_types).to eq(%w[Artifact])
   end
 
+  it "parses blight, for you, each opponent or a target opponent" do
+    mine = described_class.parse("Blight 2.")
+    expect(mine).to eq(e.const_get(:Blight).new("you", 2))
+    expect(mine.choice_base).to eq("Magic::Choice::Blight")
+    expect(mine.choice_guard).to eq("Magic::Choice::Blight.possible?(controller, game)")
+
+    each = described_class.parse("Each opponent blights 1.")
+    expect([each.choice_base, each.target_choices]).to eq([nil, nil])
+    expect(each.resolve_call).to include("game.opponents(controller).each do |opponent|", "player: opponent")
+
+    target = described_class.parse("Target opponent blights 2.")
+    expect(target.target_choices).to eq("game.opponents(controller)")
+    expect(target.resolve_call).to include("[target].each do |opponent|")
+  end
+
   it "has no targets for untargeted effects" do
     expect(e.const_get(:DrawCards).new(1).target_choices).to be_nil
   end

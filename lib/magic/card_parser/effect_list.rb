@@ -16,7 +16,8 @@ module Magic
       # ("exile it, then return it" is one effect; "draw a card, then discard a card" two).
       CLAUSE = /,? then |,? and (?=you )/i
       MAY = /\Ayou may /i
-      IF_YOU_DO = /\AIf you do, /i
+      IF_YOU_DO = /\A(?:If|When) you do, /i
+      IF_YOU_DONT = /\AIf you don't, /i
 
       # Where effects are rendered: `this` is Ruby for the card or permanent the
       # effects belong to (and the actor of any Choice they add); a spell has its
@@ -31,10 +32,14 @@ module Magic
 
         effects = []
         clauses = text.split(SENTENCE).flat_map do |sentence|
-          parse_sentence(sentence.sub(IF_YOU_DO, "").sub(MAY, "")) ? [sentence] : sentence.split(CLAUSE)
+          parse_sentence(sentence.sub(IF_YOU_DO, "").sub(IF_YOU_DONT, "").sub(MAY, "")) ? [sentence] : sentence.split(CLAUSE)
         end
         clauses.each do |sentence|
-          if IF_YOU_DO.match?(sentence)
+          if IF_YOU_DONT.match?(sentence)
+            return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DONT, "")))
+
+            effects[-1] = effects.last.with(if_you_dont: effects.last.if_you_dont + [effect])
+          elsif IF_YOU_DO.match?(sentence)
             return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DO, "")))
 
             effects[-1] = effects.last.with(if_you_do: effects.last.if_you_do + [effect])
@@ -92,7 +97,7 @@ module Magic
       private
 
       # Effects with optional ones opened up.
-      def leaves(list) = list.flat_map { _1.is_a?(OptionalEffect) ? _1.effects : [_1] }
+      def leaves(list) = list.flat_map { _1.is_a?(OptionalEffect) ? _1.all_effects : [_1] }
 
       def definitions = leaves(effects).filter_map(&:definitions).uniq
 
@@ -127,23 +132,30 @@ module Magic
           raise UnsupportedCard, "effects after an optional effect that makes a choice are not supported"
         end
 
-        methods = if after.empty?
+        declined_classes, declined = render(point.if_you_dont, INSIDE_CHOICE)
+        methods = if after.empty? && declined.empty?
                     [method("resolve!", accepted)]
-                  else
+                  elsif after.empty?
+                    [method("resolve!", accepted), method("decline!", declined)]
+                  elsif declined.empty?
                     [method("resolve!", accepted + ["finish"]), "def decline! = finish\n", method("finish", after)]
+                  else
+                    [method("resolve!", accepted + ["finish"]), method("decline!", declined + ["finish"]), method("finish", after)]
                   end
-        [class_source("MayChoice", "Magic::Choice::May", accepted_classes + rest_classes + methods),
+        [class_source("MayChoice", "Magic::Choice::May", accepted_classes + declined_classes + rest_classes + methods),
          ["game.choices.add(MayChoice.new(actor: #{context.this}))"]]
       end
 
       # A scry: its own Choice class, subclassed when effects follow it.
       def effect_choice(point, rest, context)
         args = ["actor: #{context.this}", *point.choice_args].join(", ")
-        return [nil, ["game.choices.add(#{point.choice_base}.new(#{args}))"]] if rest.empty?
+        # An effect whose choice can be impossible (blight with no creature) has a choice_guard.
+        guard = point.respond_to?(:choice_guard) ? " if #{point.choice_guard}" : ""
+        return [nil, ["game.choices.add(#{point.choice_base}.new(#{args}))#{guard}"]] if rest.empty?
 
         classes, after = render(rest, INSIDE_CHOICE)
         [class_source(point.choice_class_name, point.choice_base, classes + [method("resolve!(**args)", ["super(**args)", *after])]),
-         ["game.choices.add(#{point.choice_class_name}.new(#{args}))"]]
+         ["game.choices.add(#{point.choice_class_name}.new(#{args}))#{guard}"]]
       end
 
       # A target chosen on resolution (triggered abilities).
