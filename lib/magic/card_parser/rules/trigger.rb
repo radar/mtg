@@ -60,6 +60,21 @@ module Magic
                    :event_handlers, "Events::BeginningOfEndStep", "controllers_end_step?", PERMANENT_KINDS),
           Kind.new(/At the beginning of each end step/, "EachEndStepTrigger", "TriggeredAbility::BeginningOfEndStep",
                    :event_handlers, "Events::BeginningOfEndStep", nil, PERMANENT_KINDS),
+          Kind.new(/#{WHEN} you gain life/, "LifeGainTrigger", "TriggeredAbility", :event_handlers, "Events::LifeGain", "you?",
+                   PERMANENT_KINDS),
+          Kind.new(/#{WHEN} you draw a card/, "CardDrawTrigger", "TriggeredAbility", :event_handlers, "Events::CardDraw", "you?",
+                   PERMANENT_KINDS),
+          Kind.new(/#{WHEN} (?<who>you sacrifice|a player sacrifices) (?:an?|(?<another>another)) (?<type>[\w-]+)/, "SacrificeTrigger",
+                   "TriggeredAbility", :event_handlers, "Events::PermanentSacrificed",
+                   lambda { |m|
+                     checks = []
+                     checks << "event.permanent.controller == controller" if m[:who] == "you sacrifice"
+                     checks << "event.permanent != actor" if m[:another]
+                     type = m[:type].downcase == "permanent" ? nil : m[:type][0].upcase + m[:type][1..]
+                     checks << "event.permanent.type?(#{type.inspect})" if type
+                     checks.empty? ? nil : checks.join(" && ")
+                   },
+                   PERMANENT_KINDS),
           Kind.new(/#{WHEN} ~ attacks/, "AttacksTrigger", "TriggeredAbility", :event_handlers,
                    "Events::FinalAttackersDeclared", "event.attacks.any? { _1.attacker == actor }", %i[creature]),
           Kind.new(/#{WHEN} you attack/, "YouAttackTrigger", "TriggeredAbility", :event_handlers,

@@ -64,7 +64,9 @@ What the rules cover:
   (`event.active_player == controller && event.attacks.any?`), ~ deals combat damage
   to a player (`Events::CombatDamageDealt`), the last <type> counter is removed from ~
   (`Events::CounterRemoved`; the type must be one `Magic::Counters[]` knows), and you
-  cast a <type>[ or <type>] spell (`non<type>` → `!spell.type?`). A new trigger is one
+  cast a <type>[ or <type>] spell (`non<type>` → `!spell.type?`), you gain life
+  (`Events::LifeGain`), you draw a card (`Events::CardDraw`), and you sacrifice / a player
+  sacrifices a/another <type or permanent> (`Events::PermanentSacrificed`). A new trigger is one
   row. A leading ability word ("Landfall — ") is dropped. "When ~ is turned face up"
   isn't supported: the engine has no face-down permanents (morph, disguise,
   manifest).
@@ -90,6 +92,8 @@ What the rules cover:
   "[<type>] card in your graveyard") and renders `def power_modification = N * <count>`,
   recomputed with continuous effects. `TribalLord` handles
   "Other <type>s you control get +N/+N."
+- `CostReduction`: "[<type>[ and <type>] / non<type>] spells you cast cost {N} less to
+  cast." → a `ManaCostAdjustment` static ability.
 - `BlockingRestriction`: "~ can't block." / "~ can't be blocked." → `can_block?` /
   `can_be_blocked?` returning false, which `CombatPhase#can_block?` checks.
 - `EntersWithCounters`: "~ enters with N <type> counters on it." (+1/+1 on creatures,
@@ -119,7 +123,8 @@ creature you control or ~, until-end-of-turn pumps and
 keyword grants for ~ / a target creature / [other] creatures you control, optionally
 "for each <thing>" before or after "until end of turn", counted once as it resolves
 (`Pump`, with `Count.parse(text, this: Effect::THIS)`),
-return target [type] card from your graveyard to your hand, remove N <type> counters
+return target [type] card from your graveyard to your hand, create Treasure/Food/Clue
+tokens (the engine's `Magic::Tokens::Treasure`/`Food`/`Clue`), remove N <type> counters
 from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens, copy tokens,
 scry. Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
@@ -187,7 +192,8 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   way: Temple of Mystery, Jungle Hollow, Dismal Backwater, Mind Stone, Enchantress's
   Presence, Phyrexian Arena, Beast Whisperer, Firebrand Archer, Kessig Flamebreather,
   Glorious Anthem, Titanic Growth, Short Sword, Swiftfoot Boots, Setessan Training,
-  Cancel, Rampant Growth (its spec names the hand-written choice class; the rest passes).
+  Cancel, Lorescale Coatl, Herald of the Pantheon, Rampant Growth (its spec names the
+  hand-written choice class; the rest passes).
   Soulherder is covered by
   `spec/card_parser/generated_soulherder_spec.rb` instead: its hand-written spec names
   its own choice classes and expects a lone target to be offered rather than chosen

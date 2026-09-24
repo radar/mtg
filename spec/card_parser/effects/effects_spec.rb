@@ -73,7 +73,6 @@ RSpec.describe Magic::CardParser::Effect do
   it "parses two-colour tokens and several keywords" do
     expect(described_class.parse("Create a 2/2 white and blue Knight creature token.").colors).to eq(%i[white blue])
     expect(described_class.parse("Create a 1/1 colorless Thopter creature token with flying and first strike.").keywords).to eq(%i[flying first_strike])
-    expect(described_class.parse("Create a Treasure token.")).to be_nil
   end
 
   it "parses token creation" do
@@ -211,6 +210,13 @@ RSpec.describe Magic::CardParser::Effect do
     tutor = described_class.parse("Search your library for a creature card, reveal it, put it into your hand, then shuffle.")
     expect(tutor.choice_args).to eq("to_zone: :hand, filter: Filter[:creatures], reveal: true")
     expect(described_class.parse("Search your library for an artifact card, put it into your hand, then shuffle.")).to be_nil
+  end
+
+  it "parses Treasure, Food and Clue tokens" do
+    expect(described_class.parse("Create a Treasure token.").resolve_call).to eq("trigger_effect(:create_token, token_class: Tokens::Treasure)")
+    expect(described_class.parse("Create two Food tokens.").resolve_call).to eq("trigger_effect(:create_token, token_class: Tokens::Food, amount: 2)")
+    expect(described_class.parse("Create a Clue token.").resolve_call).to include("Tokens::Clue")
+    expect(described_class.parse("Create a Blood token.")).to be_nil
   end
 
   it "has no targets for untargeted effects" do

@@ -86,6 +86,23 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
                               "return if battlefield.controlled_by(controller).creatures.none? || battlefield.not_controlled_by(controller).creatures.none?")
   end
 
+  it "parses life gain, card draw and sacrifice triggers" do
+    expect([parse("Whenever you gain life, draw a card.").handled_event, parse("Whenever you gain life, draw a card.").condition])
+      .to eq(["Events::LifeGain", "you?"])
+    expect(parse("Whenever you draw a card, you gain 1 life.").handled_event).to eq("Events::CardDraw")
+    conditions = {
+      "Whenever you sacrifice a Treasure, draw a card." => 'event.permanent.controller == controller && event.permanent.type?("Treasure")',
+      "Whenever you sacrifice another creature, draw a card." =>
+        'event.permanent.controller == controller && event.permanent != actor && event.permanent.type?("Creature")',
+      "Whenever you sacrifice a permanent, draw a card." => "event.permanent.controller == controller",
+      "Whenever a player sacrifices a permanent, draw a card." => nil
+    }
+    conditions.each do |line, condition|
+      rule = parse(line)
+      expect([rule.handled_event, rule.condition]).to eq(["Events::PermanentSacrificed", condition]), line
+    end
+  end
+
   it "treats When and Whenever alike" do
     expect(parse("Whenever ~ enters, draw a card.").class_base_name).to eq("EntersTrigger")
     expect(parse("When ~ attacks, draw a card.").class_base_name).to eq("AttacksTrigger")
