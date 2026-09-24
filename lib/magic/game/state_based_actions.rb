@@ -131,15 +131,12 @@ module Magic
           end
       end
 
-      # Aura and Equipment cards declare their type line as a single string ("Enchantment -- Aura"),
-      # so a permanent's `types` holds that whole string rather than a separate "Aura" entry.
-      # Check the card class as well as the type list.
       def aura?(permanent)
-        permanent.card.is_a?(Cards::Aura) || permanent.type?("Aura")
+        permanent.type?("Aura")
       end
 
       def equipment?(permanent)
-        permanent.card.is_a?(Cards::Equipment) || permanent.type?("Equipment")
+        permanent.type?("Equipment")
       end
 
       def legally_enchanting?(aura)

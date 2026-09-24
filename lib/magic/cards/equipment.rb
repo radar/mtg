@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class Equipment < Attachment
-      TYPE_LINE = "Artifact -- Equipment"
+      TYPE_LINE = [T::Artifact, "Equipment"].freeze
 
       def self.equip(equip_cost)
         equip = Class.new(ActivatedAbility) do

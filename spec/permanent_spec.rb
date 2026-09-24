@@ -3,6 +3,16 @@ require 'spec_helper'
 RSpec.describe Magic::Permanent do
   include_context "two player game"
 
+  context "Equipment and Auras" do
+    it "have each of their types, so type checks work on them" do
+      sword = ResolvePermanent("Short Sword", owner: p1)
+      armor = Card("Ethereal Armor", owner: p1)
+
+      expect([sword.type?("Artifact"), sword.type?("Equipment"), sword.artifact?]).to eq([true, true, true])
+      expect([armor.type?("Enchantment"), armor.type?("Aura"), armor.enchantment?]).to eq([true, true, true])
+    end
+  end
+
   context "resolving a card that is in another zone" do
     it "moves the card to the battlefield too, out of exile" do
       bears = Card("Grizzly Bears", owner: p1)

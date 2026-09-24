@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class Aura < Attachment
-      TYPE_LINE = "Enchantment -- Aura"
+      TYPE_LINE = [T::Enchantment, "Aura"].freeze
 
       # Declares what the Aura can enchant (rule 303.4a), matching the "Enchant ..." line of the
       # Oracle text: `enchant "Creature"`, `enchant "Creature", you_control: true`, `enchant :player`
