@@ -27,6 +27,8 @@ module Magic
           "another creature" => "event.permanent != actor",
           "a creature" => nil
         }.freeze
+        # Whose life gain triggers "Whenever <who> gain(s) life" -> should_perform?
+        LIFE_GAINERS = { "you" => "you?", "an opponent" => "opponent?", "a player" => nil }.freeze
         ENTERS_UNDER_YOUR_CONTROL = "(?:you control enters|enters(?: the battlefield)? under your control)"
         # "When" and "Whenever" are interchangeable here.
         WHEN = "When(?:ever)?"
@@ -52,6 +54,8 @@ module Magic
                    "another_creature? && under_your_control?", PERMANENT_KINDS),
           Kind.new(/#{WHEN} a land #{ENTERS_UNDER_YOUR_CONTROL}/, "LandfallTrigger", "TriggeredAbility::Landfall",
                    :event_handlers, "Events::Landfall", "you?", PERMANENT_KINDS),
+          Kind.new(/#{WHEN} (?<who>you|an opponent|a player) gains? life/, "LifeGainTrigger", "TriggeredAbility",
+                   :event_handlers, "Events::LifeGain", ->(m) { LIFE_GAINERS.fetch(m[:who]) }, PERMANENT_KINDS),
           Kind.new(/At the beginning of your upkeep/, "UpkeepTrigger", "TriggeredAbility::BeginningOfYourUpkeep",
                    :event_handlers, "Events::BeginningOfUpkeep", nil, PERMANENT_KINDS),
           Kind.new(/At the beginning of combat on your turn/, "BeginningOfCombatTrigger", "TriggeredAbility",

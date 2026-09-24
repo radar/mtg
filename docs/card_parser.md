@@ -59,7 +59,8 @@ What the rules cover:
   trigger and an attacks trigger with the same effects), ~ dies, ~ leaves the
   battlefield, a/another creature [you control / an opponent controls] dies, a/another
   creature is exiled from the battlefield (`Events::LeftTheBattlefield` to exile), another
-  creature you control enters, landfall, your upkeep, beginning of combat on your turn
+  creature you control enters, landfall, you / an opponent / a player gain(s) life
+  (`Events::LifeGain`), your upkeep, beginning of combat on your turn
   (`Events::BeginningOfCombat`), your end step, each end step, ~ attacks, you attack
   (`event.active_player == controller && event.attacks.any?`), ~ deals combat damage
   to a player (`Events::CombatDamageDealt`), the last <type> counter is removed from ~

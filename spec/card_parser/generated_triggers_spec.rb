@@ -35,6 +35,20 @@ RSpec.describe "CardParser generated triggers in play" do
     expect(p1.life).to eq(22)
   end
 
+  it "drains each opponent whenever you gain life, not when they do" do
+    load_card("Parsed Leech {3}{B}\nCreature — Vampire\nWhenever you gain life, each opponent loses 1 life.\n4/4\n")
+    ResolvePermanent("Parsed Leech", owner: p1)
+
+    p1.gain_life(2)
+    game.settle!
+    expect(p2.life).to eq(19)
+
+    p2.gain_life(2)
+    game.settle!
+    expect(p2.life).to eq(21)
+    expect(p1.life).to eq(22)
+  end
+
   it "creates a token when a generated creature attacks" do
     load_card("Parsed Raider {2}{R}\nCreature — Goblin\nWhenever Parsed Raider attacks, create a 1/1 red Goblin creature token.\n2/2\n")
     raider = ResolvePermanent("Parsed Raider", owner: p1)

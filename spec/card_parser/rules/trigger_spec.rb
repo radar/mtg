@@ -114,6 +114,13 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     end
   end
 
+  it "parses life gain, by who gains the life" do
+    { "you gain" => "you?", "an opponent gains" => "opponent?", "a player gains" => nil }.each do |who, condition|
+      rule = parse("Whenever #{who} life, each opponent loses 1 life.")
+      expect([rule.class_base_name, rule.handled_event, rule.condition]).to eq(["LifeGainTrigger", "Events::LifeGain", condition]), who
+    end
+  end
+
   it "negates non<type> spells" do
     expect(parse("Whenever you cast a noncreature spell, draw a card.").condition).to eq('you? && !spell.type?("Creature")')
   end
