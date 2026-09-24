@@ -5,7 +5,11 @@ module Magic
 
       def self.equip(equip_cost)
         equip = Class.new(ActivatedAbility) do
-          define_method(:costs) { equip_cost }
+          # Fresh costs per activation: a cost tracks what's been paid towards it,
+          # so reusing one would leave it paid after the first equip.
+          define_method(:costs) do
+            equip_cost.map { |cost| cost.is_a?(Costs::Mana) ? Costs::Mana.new(cost.cost.dup) : cost }
+          end
 
           def target_choices
             creatures_you_control
