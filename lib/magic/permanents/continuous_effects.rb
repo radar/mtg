@@ -19,7 +19,10 @@ module Magic
 
         permanent.types = types
         game.logger.debug "Types: #{types}"
+        # Layer 5
+        permanent.color_override = characteristic_settings.filter_map(&:set_colors).last
         # Layer 6
+        permanent.lost_all_abilities = characteristic_settings.any?(&:loses_all_abilities?)
         permanent.activated_abilities = calculate_activated_abililities
         permanent.keywords = calculate_keywords
         game.logger.debug "Keywords: #{permanent.keywords}"
@@ -51,7 +54,8 @@ module Magic
       end
 
       def calculate_power
-        base_power = modifiers_by_type(Modifications::BasePower).last&.base_power || copiable_card.base_power
+        base_power = modifiers_by_type(Modifications::BasePower).last&.base_power ||
+                     characteristic_settings.filter_map(&:set_base_power).last || copiable_card.base_power
         [
           permanent.counters,
           modifiers_by_type(Modifications::Power),
@@ -65,7 +69,8 @@ module Magic
       end
 
       def calculate_toughness
-        base_toughness = modifiers_by_type(Modifications::BaseToughness).last&.base_toughness || copiable_card.base_toughness
+        base_toughness = modifiers_by_type(Modifications::BaseToughness).last&.base_toughness ||
+                         characteristic_settings.filter_map(&:set_base_toughness).last || copiable_card.base_toughness
         [
           permanent.counters,
           modifiers_by_type(Modifications::Toughness),
@@ -84,7 +89,7 @@ module Magic
 
       def calculate_types
         types = [
-          *copiable_card.types,
+          *(characteristic_settings.filter_map(&:set_types).last || copiable_card.types),
           *permanent.attachments.flat_map(&:type_grants),
           *static_abilities_for(permanent).of_type(Abilities::Static::TypeGrant).flat_map(&:type_grants),
           *modifiers_by_type(Modifications::AdditionalType).flat_map(&:type_grants),
@@ -94,12 +99,18 @@ module Magic
       end
 
       def calculate_keywords
+        return [] if permanent.lost_all_abilities
+
         [
           *copiable_card.keywords,
           *keyword_grant_static_abilities.flat_map(&:keyword_grants),
           *modifiers_by_type(Modifications::KeywordGrant).map(&:keyword_grant),
           *permanent.attachments.flat_map(&:keyword_grants),
         ]
+      end
+
+      def characteristic_settings
+        static_abilities_for(permanent).of_type(Abilities::Static::CharacteristicSetting)
       end
 
       def power_toughness_static_abilities
@@ -115,6 +126,8 @@ module Magic
       end
 
       def calculate_activated_abililities
+        return [] if permanent.lost_all_abilities
+
         class_types = permanent.types.select { |type| type.is_a?(Class) }
         [
           *copiable_card.activated_abilities,

@@ -29,6 +29,9 @@ module Magic
 
     attr_accessor :copied_card, :chosen_creature_type, :exile_cast_permission_turn, :ring_bearer, :prevent_opponent_lifegain_turn, :pending_mana_ability_uses
 
+    # Set by ContinuousEffects from Abilities::Static::CharacteristicSetting.
+    attr_accessor :color_override, :lost_all_abilities
+
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :additional_lands_per_turn, :power_modification, :toughness_modification, :type_grants
     def_delegators :@game, :logger
 
@@ -134,8 +137,8 @@ module Magic
     def name = copiable_card.name
     def cmc = copiable_card.cmc
     def mana_value = copiable_card.mana_value
-    def colors = copiable_card.colors
-    def colorless? = copiable_card.colorless?
+    def colors = color_override || copiable_card.colors
+    def colorless? = colors.empty?
 
     def apply_continuous_effects!
       Magic::Permanents::ContinuousEffects.new(game: game, permanent: self).apply!
@@ -362,6 +365,8 @@ module Magic
     end
 
     def static_abilities
+      return [] if lost_all_abilities
+
       card.static_abilities.map { |ability| ability.new(source: self) }
     end
 
@@ -507,6 +512,7 @@ module Magic
     private
 
     def dispatch_lifecycle_triggers(event)
+      return if lost_all_abilities
       return unless event.respond_to?(:permanent) && event.permanent == self
 
       lifecycle_triggers_for(event).each do |trigger_class|
@@ -524,6 +530,8 @@ module Magic
     end
 
     def dispatch_event_handlers(event)
+      return if lost_all_abilities
+
       Array(card.event_handlers[event.class]).each do |handler_class|
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
         perform_trigger!(handler_class, event)

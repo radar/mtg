@@ -44,6 +44,7 @@ Pre-built subclasses in `lib/magic/abilities/static/` — declare these on a car
 - `Abilities::Static::KeywordGrant` — grants keywords to matching permanents
 - `Abilities::Static::PowerAndToughnessModification` — modifies power/toughness
 - `Abilities::Static::TypeGrant` / `TypeRemoval` — adds/removes types
+- `Abilities::Static::CharacteristicSetting` — overrides an attached/targeted permanent's characteristics: `sets_types(...)`, `sets_colors(...)`, `sets_base_power_and_toughness(p, t)`, `loses_all_abilities`. `ContinuousEffects` applies them (types layer 4, colours 5, ability loss 6, base P/T 7b) and stores `permanent.color_override` / `permanent.lost_all_abilities`; a permanent that lost all abilities returns no static abilities, no activated abilities/keywords and skips its lifecycle/event-handler triggers. Example: `KenrithsTransformation` ("loses all abilities and is a green Elk creature with base power and toughness 3/3").
 - `Abilities::Static::ManaCostAdjustment` — reduces/adjusts mana costs for matching cards
 - `Abilities::Static::AnyColorForCreatureActivations` — controller can spend mana as any color when activating abilities of creature permanents (e.g. Agatha's Soul Cauldron)
 - `Abilities::Static::GrantActivatedAbilities` — grants activated abilities to matching permanents; subclass and implement `applies_to?(permanent)` and `granted_abilities` (e.g. Agatha's Soul Cauldron grants abilities from exiled creature cards to creatures with +1/+1 counters)
