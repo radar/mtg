@@ -6,7 +6,8 @@ module Magic
       attr_reader :active_player, :number, :events, :combat, :actions
 
       def_delegators :@game, :logger, :battlefield, :emblems, :players
-      def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :attacks, :attacking?
+      def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :illegal_block_reason,
+        :assign_combat_damage, :attacks, :attacking?, :blocking?
 
       state_machine :step, initial: :beginning do
 
@@ -45,6 +46,10 @@ module Magic
           turn.notify!(
             Events::BeginningOfCombat.new(active_player: turn.active_player)
           )
+        end
+
+        before_transition from: :declare_blockers, to: :combat_damage do |turn|
+          turn.combat.validate_blocks!
         end
 
         after_transition to: :combat_damage do |turn|

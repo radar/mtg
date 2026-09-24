@@ -35,8 +35,8 @@ RSpec.describe Magic::Cards::BrashTaunter do
       current_turn.declare_blocker(taunter, attacker: bear)
       go_to_combat_damage!
 
-      expect(taunter.damage).to eq(1)
-      expect(p2.life).to eq(19)
+      expect(taunter.damage).to eq(2)
+      expect(p2.life).to eq(18)
     end
   end
 
