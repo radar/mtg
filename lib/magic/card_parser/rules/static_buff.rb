@@ -8,8 +8,9 @@ module Magic
       # "Enchanted creature gets +1/+1 and has flying." / "~ gets +1/+1 for each other
       # Elf you control." A line with both a P/T change and keywords becomes two
       # static abilities (see merge). "for each ..." (Count) makes the change
-      # variable: `per` is the Ruby counting it.
-      class StaticBuff < Data.define(:subject, :power, :toughness, :per, :keywords)
+      # variable: `per` is the Ruby counting it. "as long as ..." (Condition) only
+      # applies it while `condition` holds.
+      class StaticBuff < Data.define(:subject, :power, :toughness, :per, :keywords, :condition)
         include Rule
 
         # Subject => [class name prefix, applicable targets, card kinds]
@@ -22,7 +23,7 @@ module Magic
           "~" => ["Self", "applicable_targets { [source] }", %i[creature]]
         }.freeze
         KEYWORDS = /[\w ,]+?/
-        LINE = %r{\A(?<subject>#{SUBJECTS.keys.join('|')}) (?:gets? (?<power>[+-]\d+)/(?<toughness>[+-]\d+)(?: for each (?<per>[^.]+?))?(?: and (?:has|have) (?<with>#{KEYWORDS}))?|(?:has|have) (?<only>#{KEYWORDS}))\.?\z}i
+        LINE = %r{\A(?<subject>#{SUBJECTS.keys.join('|')}) (?:gets? (?<power>[+-]\d+)/(?<toughness>[+-]\d+)(?: for each (?<per>[^.]+?))?(?: and (?:has|have) (?<with>#{KEYWORDS}))?|(?:has|have) (?<only>#{KEYWORDS}))(?: as long as (?<condition>[^.]+?))?\.?\z}i
 
         def self.parse(line)
           return unless (m = LINE.match(line))
@@ -34,8 +35,13 @@ module Magic
           if m[:per]
             per = Count.parse(m[:per]) or return
           end
-          new(subject: m[:subject].downcase, power: m[:power]&.to_i, toughness: m[:toughness]&.to_i, per:, keywords:)
+          if m[:condition]
+            condition = Condition.parse(m[:condition]) or return
+          end
+          new(subject: m[:subject].downcase, power: m[:power]&.to_i, toughness: m[:toughness]&.to_i, per:, keywords:, condition:)
         end
+
+        def initialize(subject:, power:, toughness:, per:, keywords:, condition: nil) = super
 
         # One static ability each for the P/T change and the keywords.
         def self.merge(rules)
@@ -53,6 +59,7 @@ module Magic
 
         def class_source(name)
           targets = SUBJECTS.fetch(subject)[1]
+          targets += "\n  conditions { #{condition} }" if condition
           if per
             "class #{name} < Abilities::Static::PowerAndToughnessModification\n  #{targets}\n\n#{variable_modifications}end\n"
           elsif power

@@ -150,7 +150,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
   it "ignores other lines and unknown effects" do
     expect(parse("Whenever ~ becomes blocked, draw a card.")).to be_nil
     expect(parse("Whenever you cast a creature spell, if you do, draw a card.")).to be_nil
-    expect(parse("When ~ enters, return target creature to its owner's hand.")).to be_nil
+    expect(parse("When ~ enters, investigate.")).to be_nil
   end
 
   it "renders an untargeted trigger" do

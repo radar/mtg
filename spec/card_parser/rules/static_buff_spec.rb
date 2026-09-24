@@ -41,6 +41,15 @@ RSpec.describe Magic::CardParser::Rules::StaticBuff do
     RUBY
   end
 
+  it "applies a buff only as long as a condition holds" do
+    rule = described_class.parse("~ has flying as long as you control another artifact.")
+    expect(rule.condition).to eq("controller.artifacts.except(source).any?")
+    expect(rule.class_source("SelfKeywords")).to include("keyword_grants Keywords::FLYING", "conditions { controller.artifacts.except(source).any? }")
+    buff = described_class.merge([described_class.parse("~ gets +1/+1 and has trample as long as it's your turn.")])
+    expect(buff.map(&:condition).uniq).to eq(["game.current_turn.active_player == controller"])
+    expect(described_class.parse("~ has flying as long as you have 30 or more life.")).to be_nil
+  end
+
   it "ignores other lines" do
     expect(described_class.parse("Creatures you control get +1/+1 until end of turn.")).to be_nil
     expect(described_class.parse("Creatures you control have ward 2.")).to be_nil

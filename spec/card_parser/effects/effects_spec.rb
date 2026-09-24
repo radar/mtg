@@ -179,6 +179,40 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Exile target creature, then return it to the battlefield under your control.")).to be_nil
   end
 
+  it "parses bouncing and tapping a target permanent" do
+    bounce = described_class.parse("Return target nonland permanent an opponent controls to its owner's hand.")
+    expect(bounce.target_choices).to eq("battlefield.not_controlled_by(controller).nonland")
+    expect(bounce.resolve_call).to eq("trigger_effect(:return_to_owners_hand, target: target)")
+    expect(described_class.parse("Return target creature to its owner's hand.").target_choices).to eq("battlefield.creatures")
+    tap = described_class.parse("Tap target creature.")
+    expect([tap.target_choices, tap.resolve_call]).to eq(["battlefield.creatures", "trigger_effect(:tap, target: target)"])
+  end
+
+  it "parses countering a spell on the stack, by type" do
+    expect(described_class.parse("Counter target spell.").target_choices).to eq("game.stack.spells")
+    expect(described_class.parse("Counter target creature spell.").target_choices).to eq('game.stack.spells.select { _1.card.type?("Creature") }')
+    expect(described_class.parse("Counter target noncreature spell.").target_choices).to eq('game.stack.spells.select { !_1.card.type?("Creature") }')
+    expect(described_class.parse("Counter target instant or sorcery spell.").target_choices)
+      .to eq('game.stack.spells.select { _1.card.type?("Instant") || _1.card.type?("Sorcery") }')
+    expect(described_class.parse("Counter target spell.").resolve_call).to eq("trigger_effect(:counter_spell, target: target)")
+  end
+
+  it "parses milling" do
+    expect(described_class.parse("Target player mills three cards.").resolve_call).to eq("target.mill(3)")
+    expect(described_class.parse("Target player mills three cards.").target_choices).to eq("game.players")
+    expect(described_class.parse("Each opponent mills two cards.").resolve_call).to eq("game.opponents(controller).each { _1.mill(2) }")
+    expect(described_class.parse("Mill four cards.").resolve_call).to eq("controller.mill(4)")
+  end
+
+  it "parses searching your library as a choice" do
+    ramp = described_class.parse("Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.")
+    expect(ramp.choice_base).to eq("Magic::Choice::SearchLibrary")
+    expect(ramp.choice_args).to eq("to_zone: :battlefield, filter: Filter[:basic_lands], enters_tapped: true")
+    tutor = described_class.parse("Search your library for a creature card, reveal it, put it into your hand, then shuffle.")
+    expect(tutor.choice_args).to eq("to_zone: :hand, filter: Filter[:creatures], reveal: true")
+    expect(described_class.parse("Search your library for an artifact card, put it into your hand, then shuffle.")).to be_nil
+  end
+
   it "has no targets for untargeted effects" do
     expect(e.const_get(:DrawCards).new(1).target_choices).to be_nil
   end

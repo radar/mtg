@@ -9,7 +9,7 @@ RSpec.describe Magic::CardParser::Rules::Modal do
     expect(described_class.parse("Choose one —").choose).to eq("one")
     expect(described_class.parse("Choose one or both —").choose).to eq("one or both")
     expect(described_class.parse("• Draw a card.").modes.first.effects).to eq([Magic::CardParser::Effects::DrawCards.new(1)])
-    expect(described_class.parse("• Mill two cards.")).to be_nil
+    expect(described_class.parse("• Investigate.")).to be_nil
   end
 
   it "renders a Mode class per bullet" do

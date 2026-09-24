@@ -6,7 +6,8 @@ module Magic
     # creature you control", ... -> the Ruby expression for the permanents that
     # phrase can target ("another" leaves out Effect::THIS).
     module PermanentTarget
-      KINDS = { "creature" => "creatures", "artifact" => "artifacts", "enchantment" => "enchantments", "land" => "lands" }.freeze
+      KINDS = { "creature" => "creatures", "artifact" => "artifacts", "enchantment" => "enchantments", "land" => "lands",
+                "nonland permanent" => "nonland", "permanent" => "permanents" }.freeze
       CONTROLLERS = {
         nil => "battlefield",
         "you control" => "battlefield.controlled_by(controller)",

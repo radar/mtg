@@ -81,11 +81,15 @@ What the rules cover:
   "Enchanted creature" (Auras only) and "~" (a creature buffing itself) →
   `PowerAndToughnessModification` / `KeywordGrant` static abilities
   (`applicable_targets { ... }`, or `applies_to_target` for the attached creature). A
-  line with both becomes two abilities. "gets +N/+N for each <thing>" uses `Count`
+  line with both becomes two abilities. "... as long as <condition>" adds `conditions { }`
+  from `Condition` (`lib/magic/card_parser/condition.rb`: you control a/another <type>,
+  N or more <types>, it's your turn, no cards in hand). "gets +N/+N for each <thing>" uses `Count`
   (`lib/magic/card_parser/count.rb`: "[other] <type> you control", "card in your hand",
   "[<type>] card in your graveyard") and renders `def power_modification = N * <count>`,
   recomputed with continuous effects. `TribalLord` handles
   "Other <type>s you control get +N/+N."
+- `BlockingRestriction`: "~ can't block." / "~ can't be blocked." → `can_block?` /
+  `can_be_blocked?` returning false, which `CombatPhase#can_block?` checks.
 - `EntersWithCounters`: "~ enters with N <type> counters on it." (+1/+1 on creatures,
   or any type `Magic::Counters[]` knows, e.g. time) → the
   `enters_with_counters "+1/+1", N` class macro (`Card#entering_counters`, added by
@@ -102,9 +106,12 @@ One-sentence game effects are reusable classes in `lib/magic/card_parser/effects
 (`include Effect`; `.parse(text)`, `target_choices`, `resolve_call`; `definitions`
 returns Ruby for a constant the call needs, e.g. `CreateToken`'s `Token.create`
 class). Current effects: damage to a target or each opponent, draw, gain/lose life,
-destroy/exile target (`PermanentTarget`: [another] target
-creature/artifact/enchantment/land [you control / an opponent controls]; "another"
-leaves out `Effect::THIS`), flicker ("exile <target>, then return that card to the
+destroy/exile/tap/bounce target (`PermanentTarget`: [another] target
+creature/artifact/enchantment/land/[nonland] permanent [you control / an opponent
+controls]; "another" leaves out `Effect::THIS`), counter target [<type>/non<type>] spell
+(targets `game.stack.spells`), mill, search your library for a basic land/land/creature
+card (onto the battlefield [tapped] or into your hand; a `Choice::SearchLibrary` choice
+point), flicker ("exile <target>, then return that card to the
 battlefield under its owner's control"), discard, +1/+1 counters on a target, each
 creature you control or ~, until-end-of-turn pumps and
 keyword grants for ~ / a target creature / [other] creatures you control, optionally
@@ -174,7 +181,8 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   into `lib/magic/cards/`, run its spec, then restore the original. Cards checked this
   way: Temple of Mystery, Jungle Hollow, Dismal Backwater, Mind Stone, Enchantress's
   Presence, Phyrexian Arena, Beast Whisperer, Firebrand Archer, Kessig Flamebreather,
-  Glorious Anthem, Titanic Growth, Short Sword, Swiftfoot Boots, Setessan Training.
+  Glorious Anthem, Titanic Growth, Short Sword, Swiftfoot Boots, Setessan Training,
+  Cancel, Rampant Growth (its spec names the hand-written choice class; the rest passes).
   Soulherder is covered by
   `spec/card_parser/generated_soulherder_spec.rb` instead: its hand-written spec names
   its own choice classes and expects a lone target to be offered rather than chosen
