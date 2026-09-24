@@ -30,4 +30,15 @@ RSpec.describe Magic::Cards::TirelessTracker do
     expect(clues).to be_empty
     expect(tracker.power).to eq(4)
   end
+
+  it "doesn't grow when an opponent sacrifices their Clue" do
+    clue = Magic::Tokens::Clue.new(game: game, owner: p2).resolve!
+    p2.add_mana(blue: 2)
+    p2.activate_ability(ability: clue.activated_abilities.first) { _1.pay_mana(generic: { blue: 2 }) }
+    game.stack.resolve!
+    game.tick!
+
+    expect(clue.zone).to be_nil
+    expect(tracker.power).to eq(3)
+  end
 end

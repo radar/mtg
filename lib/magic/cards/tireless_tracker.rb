@@ -20,7 +20,7 @@ module Magic
 
       class ClueSacrificedTrigger < TriggeredAbility
         def should_perform?
-          event.permanent.artifact? && event.permanent.name == "Clue"
+          event.permanent.controller == controller && event.permanent.type?("Clue")
         end
 
         def call
