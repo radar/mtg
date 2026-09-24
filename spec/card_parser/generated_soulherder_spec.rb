@@ -58,6 +58,7 @@ RSpec.describe "CardParser generated Soulherder" do
     game.resolve_choice!
     expect(game.choices.last.choices).to contain_exactly(ally, other_ally)
     game.resolve_choice!(target: ally)
+    game.settle!
 
     returned = p1.permanents.by_name("Grizzly Bears").first
     expect(returned).not_to eq(ally)
@@ -71,6 +72,7 @@ RSpec.describe "CardParser generated Soulherder" do
     ally = ResolvePermanent("Grizzly Bears", owner: p1)
     current_turn.end!
     game.resolve_choice!
+    game.settle!
 
     expect(p1.permanents.by_name("Grizzly Bears").first).not_to eq(ally)
     expect(counters).to eq(1)

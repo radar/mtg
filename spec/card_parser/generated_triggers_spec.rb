@@ -10,7 +10,7 @@ RSpec.describe "CardParser generated triggers in play" do
   it "draws when a generated creature dies" do
     load_card("Parsed Scholar {2}{B}\nCreature — Zombie\nWhen Parsed Scholar dies, draw a card.\n2/1\n")
     scholar = ResolvePermanent("Parsed Scholar", owner: p1)
-    expect { scholar.destroy! }.to change { p1.hand.count }.by(1)
+    expect { scholar.destroy!; game.settle! }.to change { p1.hand.count }.by(1)
   end
 
   it "gains life on landfall, only for your own lands" do
@@ -27,6 +27,7 @@ RSpec.describe "CardParser generated triggers in play" do
 
     p1.add_mana(red: 1)
     p1.cast(card: Card("Lightning Bolt", owner: p1)) { _1.pay_mana(red: 1).targeting(p2) }
+    resolve_spell_cast_trigger!
     expect(p1.life).to eq(22)
 
     p2.add_mana(red: 1)
@@ -69,17 +70,20 @@ RSpec.describe "CardParser generated triggers in play" do
 
     it "offers a draw when another of your creatures dies, and draws if accepted" do
       ResolvePermanent("Grizzly Bears", owner: p1).destroy!
+      game.settle!
       expect(game.choices.last).to be_a(collector.card.class::CreatureDiesTrigger1::MayChoice)
       expect { game.resolve_choice! }.to change { p1.hand.count }.by(1)
     end
 
     it "draws nothing when declined" do
       ResolvePermanent("Grizzly Bears", owner: p1).destroy!
+      game.settle!
       expect { game.skip_choice! }.not_to(change { p1.hand.count })
     end
 
     it "gains life, without asking, when an opponent's creature dies" do
       ResolvePermanent("Grizzly Bears", owner: p2).destroy!
+      game.settle!
       expect(game.choices).to be_empty
       expect(p1.life).to eq(21)
     end
@@ -91,6 +95,7 @@ RSpec.describe "CardParser generated triggers in play" do
 
     p1.add_mana(red: 1)
     p1.cast(card: Card("Lightning Bolt", owner: p1)) { _1.pay_mana(red: 1).targeting(p2) }
+    resolve_spell_cast_trigger!
     expect(p2.life).to eq(19)
     game.stack.resolve!
     expect(p2.life).to eq(16)
@@ -104,6 +109,7 @@ RSpec.describe "CardParser generated triggers in play" do
   it "gains life when a generated enchantment leaves the battlefield" do
     load_card("Parsed Gift {1}{W}\nEnchantment\nWhen Parsed Gift leaves the battlefield, you gain 3 life.\n")
     ResolvePermanent("Parsed Gift", owner: p1).destroy!
+    game.settle!
     expect(p1.life).to eq(23)
   end
 
@@ -162,5 +168,18 @@ RSpec.describe "CardParser generated triggers in play" do
       current_turn.end!
       expect(p1.life).to eq(20)
     end
+  end
+
+  # Resolves only the SpellCastTrigger sitting on top of the stack -- the spell itself
+  # (below it) is deliberately left unresolved, matching what these specs assert.
+  # TriggeredAbility#resolve! only calls `call`, it does not remove itself from the
+  # stack (Stack#resolve_stack! does that itself via `shift` before calling
+  # `item.resolve!`) -- so this must remove it explicitly, or a later
+  # `game.stack.resolve!` re-resolves the same trigger a second time.
+  def resolve_spell_cast_trigger!
+    game.check_state_based_actions!
+    trigger = game.stack.first
+    game.stack.remove(trigger)
+    trigger.resolve!
   end
 end

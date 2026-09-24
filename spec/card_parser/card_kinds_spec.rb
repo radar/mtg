@@ -129,6 +129,7 @@ RSpec.describe "CardParser card kinds" do
       expect(game.battlefield.creatures.by_name("Wolf").map(&:power)).to eq([2])
 
       saga.trigger_effect(:add_counter, counter_type: "lore", target: saga)
+      game.settle!
       game.resolve_choice!(target: p2)
       expect(p2.life).to eq(17)
       expect(saga.card.zone).to be_graveyard

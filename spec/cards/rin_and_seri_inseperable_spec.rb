@@ -57,8 +57,14 @@ RSpec.describe Magic::Cards::RinAndSeriInseperable do
 
   # Resolves only the SpellCastTrigger sitting on top of the stack -- the spell itself
   # (below it) is deliberately left unresolved, matching what these specs assert.
+  # TriggeredAbility#resolve! only calls `call`, it does not remove itself from the
+  # stack (Stack#resolve_stack! does that itself via `shift` before calling
+  # `item.resolve!`) -- so this must remove it explicitly, or a later
+  # `game.stack.resolve!` re-resolves the same trigger a second time.
   def resolve_spell_cast_trigger!
     game.check_state_based_actions!
-    game.stack.first.resolve!
+    trigger = game.stack.first
+    game.stack.remove(trigger)
+    trigger.resolve!
   end
 end

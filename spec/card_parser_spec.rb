@@ -141,7 +141,7 @@ RSpec.describe Magic::CardParser do
         elf = Card("Elvish Mystic", owner: p1)
         p1.hand.add(elf)
         p1.add_mana(green: 1)
-        expect { p1.cast(card: elf) { |a| a.pay_mana(green: 1) } }.to change { draws.call }.by(1)
+        expect { p1.cast(card: elf) { |a| a.pay_mana(green: 1) }; game.settle! }.to change { draws.call }.by(1)
       end
     end
 
