@@ -14,6 +14,8 @@ module Magic
     #   #body_source       -> Ruby for the class reopening's body (e.g. `enchant "Creature"`)
     #   #class_base_name   -> name for that nested class ("ManaAbility")
     #   #class_source(name)-> Ruby source of the nested class
+    #   #class_reference   -> name of an existing class to list in the hook instead of a
+    #                         nested class (e.g. "Abilities::Static::Changeling")
     #
     # Include this module in a `Data.define(...)` class and it is picked up
     # automatically — no registration needed.
@@ -43,6 +45,7 @@ module Magic
       def class_base_name = nil
       def handled_event = nil
       def class_source(_name) = nil
+      def class_reference = nil
     end
   end
 end

@@ -169,12 +169,14 @@ module Magic
       return if rules.empty?
 
       seen = Hash.new(0)
-      totals = rules.map(&:class_base_name).tally
+      totals = rules.reject(&:class_reference).map(&:class_base_name).tally
       named = rules.map do |rule|
+        next [rule, rule.class_reference] if rule.class_reference
+
         base = rule.class_base_name
         [rule, totals[base] > 1 ? "#{base}#{seen[base] += 1}" : base]
       end
-      classes = named.map { |rule, name| rule.class_source(name) }
+      classes = named.filter_map { |rule, name| rule.class_source(name) unless rule.class_reference }
       (classes + [hook_definition(hook, named)]).join("\n")
     end
 
