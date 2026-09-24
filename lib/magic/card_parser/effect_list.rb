@@ -55,36 +55,41 @@ module Magic
         Effect.parse(sentence[0].upcase + sentence[1..]) || Effect.parse("You #{sentence}")
       end
 
-      def initialize(effects:)
-        raise UnsupportedCard, "only one targeted effect per ability is supported" if leaves(effects).count(&:target_choices) > 1
-
-        super
-      end
-
       def +(other) = self.class.new(effects: effects + other.effects)
 
-      # Class body for an instant or sorcery (`this` = "self") or an activated
-      # ability (`this` = "source"): target_choices and resolve!(target:) when
-      # targeted. The target is chosen on casting, so it must come before any
-      # choice point.
+      # Class body for an instant or sorcery (`this` = "self"), a mode ("card") or
+      # an activated ability ("source"): target_choices and resolve!(target:) when
+      # targeted; with several targets, multi_target? with one list of choices per
+      # target and resolve!(targets:), each effect using its own targets[i]. Targets
+      # are chosen on casting, so they must come before any choice point.
       def spell_source(this: "self")
-        targeted = leaves(effects).find(&:target_choices)
+        targeted = leaves(effects).select(&:target_choices)
         choices, statements = render(effects, Context.new(this:, targets_in_scope: true))
         sections = definitions + choices
-        sections << "def target_choices\n  #{expand(targeted.target_choices, this)}\nend\n" if targeted
-        sections << method("resolve!#{'(target:)' if targeted}", statements)
+        if targeted.size > 1
+          lists = targeted.map { "  #{expand(_1.target_choices, this)},\n" }.join
+          sections << "def multi_target? = true\n"
+          sections << "def target_choices\n  [\n#{lists.gsub(/^/, '  ')}  ]\nend\n"
+          sections << method("resolve!(targets:)", statements)
+        else
+          sections << "def target_choices\n  #{expand(targeted.first.target_choices, this)}\nend\n" if targeted.any?
+          sections << method("resolve!#{'(target:)' if targeted.any?}", statements)
+        end
         sections.join("\n")
       end
 
       # Class body for a triggered or chapter ability, whose `entry` method runs
       # the effects. A targeted ability with no legal target does nothing.
       def trigger_source(entry: "call")
-        targeted = leaves(effects).find(&:target_choices)
+        targeted = leaves(effects).select(&:target_choices)
         choices, statements = render(effects, INSIDE_CHOICE)
-        if targeted && !effects.first.equal?(targeted)
-          targets = expand(targeted.target_choices, "actor")
-          targets = "(#{targets})" unless targets.match?(/\A\(.*\)\z/) || targets.match?(/\A[\w.()]+\z/)
-          statements.unshift("return if #{targets}.none?")
+        unless targeted.empty? || (targeted.one? && effects.first.equal?(targeted.first))
+          checks = targeted.map do |effect|
+            targets = expand(effect.target_choices, "actor")
+            targets = "(#{targets})" unless targets.match?(/\A\(.*\)\z/) || targets.match?(/\A[\w.()]+\z/)
+            "#{targets}.none?"
+          end
+          statements.unshift("return if #{checks.join(' || ')}")
         end
         (definitions + choices + [method(entry, statements)]).join("\n")
       end
@@ -147,15 +152,28 @@ module Magic
       end
 
       # A target chosen on resolution (triggered abilities).
+      # A target chosen on resolution (triggered abilities). A second target's
+      # choice nests inside the first's, as TargetChoice2.
       def target_choice(point, rest, context)
+        index = leaves(effects).select(&:target_choices).index { _1.equal?(point) }
+        name = index.to_i.zero? ? "TargetChoice" : "TargetChoice#{index + 1}"
         classes, after = render(rest, INSIDE_CHOICE)
         body = [method("choices", [expand(point.target_choices, "actor")]), "def choice_amount = 1\n", *classes,
                 method("resolve!(target:)", [expand(point.resolve_call, "actor"), *after])]
-        [class_source("TargetChoice", "Magic::Choice::Targeted", body),
-         ["choice = TargetChoice.new(actor: #{context.this})", "game.add_choice(choice) if choice.choices.any?"]]
+        [class_source(name, "Magic::Choice::Targeted", body),
+         ["choice = #{name}.new(actor: #{context.this})", "game.add_choice(choice) if choice.choices.any?"]]
       end
 
-      def calls(list, context) = list.map { expand(_1.resolve_call, context.this) }
+      # With several targets in scope (a multi-target spell), each targeted effect
+      # uses its own targets[i] in place of `target`.
+      def calls(list, context)
+        targeted = leaves(effects).select(&:target_choices)
+        list.map do |effect|
+          call = expand(effect.resolve_call, context.this)
+          index = targeted.index { _1.equal?(effect) }
+          context.targets_in_scope && targeted.size > 1 && index ? call.gsub(/\btarget\b(?!:)/, "targets[#{index}]") : call
+        end
+      end
 
       # Effects refer to the card or permanent they belong to as Effect::THIS.
       def expand(ruby, this) = ruby.gsub(Effect::THIS, this)

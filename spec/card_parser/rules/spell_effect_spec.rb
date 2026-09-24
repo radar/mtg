@@ -35,9 +35,27 @@ RSpec.describe Magic::CardParser::Rules::SpellEffect do
   end
 
   it "rejects combinations it cannot generate" do
-    expect { spell("Destroy target creature.", "Destroy target artifact.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard)
     expect { spell("Scry 1.", "Destroy target creature.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard)
     expect { spell("Draw a card. You may destroy target creature.").body_source }.to raise_error(Magic::CardParser::UnsupportedCard)
+  end
+
+  it "gives a spell with several targets one list of choices per target" do
+    source = spell("Destroy target creature.", "Destroy target artifact.").body_source
+    expect(source).to eq(<<~RUBY)
+      def multi_target? = true
+
+      def target_choices
+        [
+          battlefield.creatures,
+          battlefield.artifacts,
+        ]
+      end
+
+      def resolve!(targets:)
+        trigger_effect(:destroy_target, target: targets[0])
+        trigger_effect(:destroy_target, target: targets[1])
+      end
+    RUBY
   end
 
   it "nests one choice inside another" do

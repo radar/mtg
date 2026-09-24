@@ -15,9 +15,14 @@ module Magic
       true
     end
 
+    # A multi-target ability (`multi_target?`) has one list of choices per target.
     def valid_targets?(*targets)
+      return targets.each_with_index.all? { |target, index| target_choices[index]&.include?(target) } if multi_target?
+
       targets.all? { target_choices.include?(_1) }
     end
+
+    def multi_target? = false
 
     def costs
       @costs || self.class::COSTS.dup

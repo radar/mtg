@@ -78,6 +78,14 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     expect(parse("When ~ enters, draw a card, then discard a card.").effect_list.effects.size).to eq(2)
   end
 
+  it "chooses each of several targets in turn, doing nothing unless all have one" do
+    source = parse("When ~ enters, put a +1/+1 counter on target creature you control. Tap target creature an opponent controls.")
+      .class_source("EntersTrigger")
+    expect(source).to include("class TargetChoice < Magic::Choice::Targeted", "class TargetChoice2 < Magic::Choice::Targeted",
+                              "choice = TargetChoice2.new(actor: actor)",
+                              "return if battlefield.controlled_by(controller).creatures.none? || battlefield.not_controlled_by(controller).creatures.none?")
+  end
+
   it "treats When and Whenever alike" do
     expect(parse("Whenever ~ enters, draw a card.").class_base_name).to eq("EntersTrigger")
     expect(parse("When ~ attacks, draw a card.").class_base_name).to eq("AttacksTrigger")

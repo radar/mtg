@@ -129,4 +129,93 @@ RSpec.describe "CardParser generated bounce, counter, tap, mill, search, blockin
     game.tick!
     expect(gearsmith).not_to be_flying
   end
+
+  context "with several targets" do
+    it "casts a spell at a player and a creature" do
+      load_card("Parsed Drain {1}{U}\nSorcery\nTarget player mills three cards. Tap target creature an opponent controls.\n")
+      go_to_main_phase!
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      milled = p2.library.first(3)
+      cast("Parsed Drain", :blue, 1) { _1.targeting(p2, bears) }
+      game.stack.resolve!
+
+      expect(milled.map(&:zone)).to all(be_graveyard)
+      expect(bears).to be_tapped
+    end
+
+    it "refuses a target that doesn't fit its slot" do
+      load_card("Parsed Drain {1}{U}\nSorcery\nTarget player mills three cards. Tap target creature an opponent controls.\n")
+      go_to_main_phase!
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      expect { cast("Parsed Drain", :blue, 1) { _1.targeting(bears, p2) } }.to raise_error(Magic::Actions::Cast::InvalidTarget)
+    end
+
+    it "activates an ability at a creature and a player" do
+      load_card("Parsed Rod {3}\nArtifact\n{2}, {T}: Tap target creature. Target player mills two cards.\n")
+      rod = ResolvePermanent("Parsed Rod", owner: p1)
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      milled = p2.library.first(2)
+      p1.add_mana(blue: 2)
+      p1.activate_ability(ability: rod.activated_abilities.first) do
+        _1.pay_mana(generic: { blue: 2 })
+        _1.targeting(bears, p2)
+      end
+      game.stack.resolve!
+
+      expect(bears).to be_tapped
+      expect(milled.map(&:zone)).to all(be_graveyard)
+    end
+
+    it "chooses both targets of a trigger in turn" do
+      load_card("Parsed Scout {2}{G}\nCreature — Elf Scout\nWhen Parsed Scout enters, put a +1/+1 counter on target creature you control. " \
+                "Tap target creature an opponent controls.\n2/2\n")
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      theirs = ResolvePermanent("Grizzly Bears", owner: p2)
+      ResolvePermanent("Wood Elves", owner: p2)
+      ResolvePermanent("Parsed Scout", owner: p1)
+
+      game.resolve_choice!(target: bears)
+      game.resolve_choice!(target: theirs)
+      game.tick!
+      expect(bears.power).to eq(3)
+      expect(theirs).to be_tapped
+    end
+
+    it "does nothing when one of a trigger's targets has no legal choice" do
+      load_card("Parsed Scout {2}{G}\nCreature — Elf Scout\nWhen Parsed Scout enters, put a +1/+1 counter on target creature you control. " \
+                "Tap target creature an opponent controls.\n2/2\n")
+      ResolvePermanent("Parsed Scout", owner: p1)
+      expect(game.choices).to be_empty
+    end
+  end
+
+  context "with conditions" do
+    it "gets +2/+2 only while you have 25 or more life" do
+      load_card("Parsed Saint {W}\nCreature — Human Cleric\nParsed Saint gets +2/+2 as long as you have 25 or more life.\n1/1\n")
+      saint = ResolvePermanent("Parsed Saint", owner: p1)
+      game.tick!
+      expect(saint.power).to eq(1)
+
+      p1.gain_life(5)
+      game.tick!
+      expect(saint.power).to eq(3)
+    end
+
+    it "has first strike only while equipped" do
+      load_card("Parsed Duelist {1}{W}\nCreature — Human Soldier\nParsed Duelist has first strike as long as ~ is equipped.\n2/2\n".sub("~", "Parsed Duelist"))
+      duelist = ResolvePermanent("Parsed Duelist", owner: p1)
+      sword = ResolvePermanent("Short Sword", owner: p1)
+      game.tick!
+      expect(duelist).not_to be_first_strike
+
+      p1.add_mana(white: 1)
+      p1.activate_ability(ability: sword.activated_abilities.first) do
+        _1.targeting(duelist)
+        _1.pay_mana(generic: { white: 1 })
+      end
+      game.stack.resolve!
+      game.tick!
+      expect(duelist).to be_first_strike
+    end
+  end
 end

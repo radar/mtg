@@ -83,7 +83,9 @@ What the rules cover:
   (`applicable_targets { ... }`, or `applies_to_target` for the attached creature). A
   line with both becomes two abilities. "... as long as <condition>" adds `conditions { }`
   from `Condition` (`lib/magic/card_parser/condition.rb`: you control a/another <type>,
-  N or more <types>, it's your turn, no cards in hand). "gets +N/+N for each <thing>" uses `Count`
+  N or more <types>, no [other] <types>; it's [not] your turn; you have no cards in hand;
+  you have / an opponent has N or more/less life; N or more cards in your graveyard;
+  ~ is tapped/untapped/equipped/enchanted). "gets +N/+N for each <thing>" uses `Count`
   (`lib/magic/card_parser/count.rb`: "[other] <type> you control", "card in your hand",
   "[<type>] card in your graveyard") and renders `def power_modification = N * <count>`,
   recomputed with continuous effects. `TribalLord` handles
@@ -158,7 +160,10 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   auto-resolves a lone legal target and needs `choice_amount`.
 - `spell_source(this:)` renders an instant/sorcery (`"self"`), mode (`"card"`) or
   activated ability (`"source"`): the target is chosen on cast, so `target_choices` +
-  `resolve!(target:)`, and a targeted effect after a choice point raises.
+  `resolve!(target:)`, and a targeted effect after a choice point raises. Several
+  targeted effects make it `multi_target?` with one list of choices per target and
+  `resolve!(targets:)`, each effect's `target` rewritten to its `targets[i]`
+  (`ActivatedAbility#valid_targets?` checks each target against its own list).
 - `trigger_source(entry:)` renders a triggered/chapter ability's `call`/`resolve!`; if
   it targets anywhere but its first effect, it starts with
   `return if (<targets>).none?`: an ability with no legal target does nothing.

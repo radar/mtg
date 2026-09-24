@@ -47,7 +47,7 @@ RSpec.describe Magic::CardParser::Rules::StaticBuff do
     expect(rule.class_source("SelfKeywords")).to include("keyword_grants Keywords::FLYING", "conditions { controller.artifacts.except(source).any? }")
     buff = described_class.merge([described_class.parse("~ gets +1/+1 and has trample as long as it's your turn.")])
     expect(buff.map(&:condition).uniq).to eq(["game.current_turn.active_player == controller"])
-    expect(described_class.parse("~ has flying as long as you have 30 or more life.")).to be_nil
+    expect(described_class.parse("~ has flying as long as you have 30 or more poison counters.")).to be_nil
   end
 
   it "ignores other lines" do

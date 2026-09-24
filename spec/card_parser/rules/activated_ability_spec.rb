@@ -41,6 +41,12 @@ RSpec.describe Magic::CardParser::Rules::ActivatedAbility do
     RUBY
   end
 
+  it "gives an ability with several targets one list of choices per target" do
+    source = described_class.parse("{2}, {T}: Tap target creature. Target player mills two cards.").class_source("ActivatedAbility")
+    expect(source).to include("def multi_target? = true", "battlefield.creatures,\n      game.players,",
+                              "trigger_effect(:tap, target: targets[0])", "targets[1].mill(2)")
+  end
+
   it "renders a sorcery-speed requirement" do
     source = described_class.parse("{2}{U}: Scry 1, then draw a card. Activate only as a sorcery.").class_source("ActivatedAbility")
     expect(source).to include("def requirements_met? = game.can_cast_sorcery?(controller)", "class ScryChoice < Magic::Choice::Scry")
