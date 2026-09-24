@@ -56,6 +56,31 @@ RSpec.describe Magic::Permanent do
     end
   end
 
+  context "a token that leaves the battlefield" do
+    let(:soldier_class) do
+      Magic::Token.create("Soldier") do
+        creature_type "Soldier"
+        power 1
+        toughness 1
+      end
+    end
+
+    it "can be sacrificed, destroyed or exiled" do
+      3.times.map { soldier_class.new(game: game, owner: p1).resolve! }.zip(%i[sacrifice! destroy! exile!]).each do |token, action|
+        expect { token.public_send(action) }.not_to raise_error
+        expect(token.zone).to be_nil
+      end
+    end
+
+    it "leaves the card it copies alone" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      copy = described_class.resolve(game: game, card: bears.card, token: true, cast: false)
+      copy.sacrifice!
+
+      expect(p1.graveyard.cards).not_to include(bears.card)
+    end
+  end
+
   context "becomes" do
     let(:permanent) { ResolvePermanent("Riddleform", owner: p1) }
 

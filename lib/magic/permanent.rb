@@ -379,9 +379,11 @@ module Magic
 
     # Moves the permanent to its controller's graveyard whether or not it is indestructible.
     # Use this (not #destroy!) for sacrifice and for state-based actions that aren't "destroy".
+    # A token or copy has no card of its own to move (a token copy of a card
+    # leaves that card where it is).
     def put_into_graveyard!
       move_zone!(to: controller.graveyard)
-      unless copy? || card.zone&.exile?
+      unless copy? || token? || card.zone&.exile?
         card.move_zone!(to: controller.graveyard)
       end
     end
@@ -393,7 +395,7 @@ module Magic
 
     def exile!
       move_zone!(to: game.exile)
-      card.move_zone!(to: game.exile) unless copy? || card.zone&.exile?
+      card.move_zone!(to: game.exile) unless copy? || token? || card.zone&.exile?
     end
 
     def return_to_hand
