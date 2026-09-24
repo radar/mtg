@@ -164,10 +164,10 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   targeted effects make it `multi_target?` with one list of choices per target and
   `resolve!(targets:)`, each effect's `target` rewritten to its `targets[i]`
   (`ActivatedAbility#valid_targets?` checks each target against its own list).
-- `trigger_source(entry:)` renders a triggered/chapter ability's `call`/`resolve!`; if
-  it targets anywhere but its first effect, it starts with
-  `return if (<targets>).none?`: an ability with no legal target does nothing.
-- At most one targeted effect per spell, mode or ability.
+- `trigger_source(entry:)` renders a triggered/chapter ability's `call`/`resolve!`. Each
+  targeted effect is its own choice, nested in turn (`TargetChoice`, `TargetChoice2`,
+  ...). Unless its only target is its first effect, it starts with
+  `return if <targets>.none? || ...`: an ability missing a legal target does nothing.
 
 ## Testing
 
