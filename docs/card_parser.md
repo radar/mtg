@@ -143,7 +143,9 @@ keyword grants for ~ / a target creature / [other] creatures you control, option
 return target [type] card from your graveyard to your hand, create Treasure/Food/Clue
 tokens (the engine's `Magic::Tokens::Treasure`/`Food`/`Clue`), remove N <type> counters
 from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens, copy tokens,
-scry, surveil (`Choice::Surveil`, a choice point like scry). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
+scry, surveil (`Choice::Surveil`, a choice point like scry), gain control of a target
+[until end of turn] (`Permanent#gain_control_until_eot!`, undone at cleanup), and "If
+that creature is a <type>, it [also] <effect on it>" (`IfTargetIsType`). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 

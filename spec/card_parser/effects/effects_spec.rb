@@ -52,6 +52,20 @@ RSpec.describe Magic::CardParser::Effect do
     expect(tap.resolve_call).to eq("trigger_effect(:tap, target: #{Magic::CardParser::Effect::THIS}.attached_to)")
   end
 
+  it "parses gaining control, for good or until end of turn" do
+    threaten = described_class.parse("Gain control of target creature until end of turn.")
+    expect([threaten.target_choices, threaten.resolve_call]).to eq(["battlefield.creatures", "target.gain_control_until_eot!(controller)"])
+    expect(described_class.parse("Gain control of target artifact.").resolve_call).to eq("target.controller = controller")
+  end
+
+  it "parses an effect on an earlier target that only applies to one type" do
+    goat = described_class.parse("If that creature is a Goat, it also gets +3/+0 until end of turn.")
+    expect(goat.earlier_target?).to eq(true)
+    expect(goat.target_choices).to be_nil
+    expect(goat.resolve_call).to eq("if target.type?(\"Goat\")\n  trigger_effect(:modify_power_toughness, target: target, power: 3, toughness: 0)\nend")
+    expect(described_class.parse("If that creature is a Goat, draw a card.")).to be_nil
+  end
+
   it "parses surveil as a choice" do
     surveil = described_class.parse("Surveil 2.")
     expect(surveil).to eq(e.const_get(:Surveil).new(2))

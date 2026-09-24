@@ -198,6 +198,13 @@ module Magic
       @controlled_since_turn = game.current_turn&.number
     end
 
+    # "Gain control of target creature until end of turn": control returns to the
+    # previous controller at cleanup.
+    def gain_control_until_eot!(player)
+      @controller_before_eot ||= controller
+      self.controller = player
+    end
+
     # Rule 302.6: a creature's {T} abilities and its ability to attack need it to have been under its
     # controller's control continuously since their most recent turn began, unless it has haste.
     def summoning_sick?
@@ -458,6 +465,7 @@ module Magic
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
       remove_until_eot_modifiers!
+      revert_until_eot_control!
       apply_continuous_effects!
     end
 
@@ -584,6 +592,13 @@ module Magic
       until_eot_protections.each do |protection|
         protections.delete(protection)
       end
+    end
+
+    def revert_until_eot_control!
+      return unless @controller_before_eot
+
+      self.controller = @controller_before_eot
+      @controller_before_eot = nil
     end
 
     def remove_until_eot_modifiers!
