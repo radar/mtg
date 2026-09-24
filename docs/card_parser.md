@@ -68,8 +68,8 @@ What the rules cover:
   (`Events::LifeGain`), you draw a card (`Events::CardDraw`), and you sacrifice / a player
   sacrifices a/another <type or permanent> (`Events::PermanentSacrificed`). A new trigger is one
   row. A leading ability word ("Landfall — ") is dropped. "When ~ enters, if it was
-  kicked, ..." adds `actor.kicked?` to the enters trigger's `should_perform?`; a spell's
-  "If this spell was kicked, ..." isn't supported yet. "When ~ is turned face up"
+  kicked, ..." adds `actor.kicked?` to the enters trigger's `should_perform?` (a
+  spell's version is in EffectList). "When ~ is turned face up"
   isn't supported: the engine has no face-down permanents (morph, disguise,
   manifest).
 - `Chapter`: saga chapters (`I — ...`, `II, III — ...`), merged into
@@ -161,6 +161,13 @@ whole is split into clauses on ", then" and ", and you" ("exile it, then return 
 stays one effect; "draw a card, then discard a card" is two). A
 "you may <effect>" sentence becomes an `OptionalEffect` (also tried with an implied
 "You"), and following "If you do, <effect>" sentences join it.
+An "If this spell was kicked, <effects>." sentence (`~` too, since "this spell" becomes
+`~`) becomes a `KickedEffect`: its effects render inside `if kicker_cost.paid? ... end`
+(`card.kicker_cost` in a mode). It works only on instants, sorceries and modes; a
+triggered or activated ability raises `UnsupportedCard`. Kicked effects can't target
+(targets are chosen on casting), and a kicked effect that makes a choice (scry, "you
+may") must come last, or the effects after it would run before the choice resolved.
+"… instead" sentences ("it deals 4 damage instead") aren't supported.
 
 Rendering (`render`) walks the effects to the first *choice point* (an
 `OptionalEffect`, a choice effect with `choice_base`/`choice_class_name`/`choice_args`

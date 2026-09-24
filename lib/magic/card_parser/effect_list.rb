@@ -17,6 +17,7 @@ module Magic
       CLAUSE = /,? then |,? and (?=you )/i
       MAY = /\Ayou may /i
       IF_YOU_DO = /\AIf you do, /i
+      KICKED = /\AIf (?:this spell|~) was kicked, /i
 
       # Where effects are rendered: `this` is Ruby for the card or permanent the
       # effects belong to (and the actor of any Choice they add); a spell has its
@@ -31,10 +32,15 @@ module Magic
 
         effects = []
         clauses = text.split(SENTENCE).flat_map do |sentence|
+          next [sentence] if KICKED.match?(sentence)
+
           parse_sentence(sentence.sub(IF_YOU_DO, "").sub(MAY, "")) ? [sentence] : sentence.split(CLAUSE)
         end
         clauses.each do |sentence|
-          if IF_YOU_DO.match?(sentence)
+          if KICKED.match?(sentence)
+            effect = kicked(sentence.sub(KICKED, "")) or return
+            effects << effect
+          elsif IF_YOU_DO.match?(sentence)
             return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DO, "")))
 
             effects[-1] = effects.last.with(if_you_do: effects.last.if_you_do + [effect])
@@ -49,6 +55,16 @@ module Magic
         new(effects:) if effects.any?
       end
 
+      # The rest of an "If this spell was kicked, ..." sentence. Targets are chosen as
+      # the spell is cast, before anyone knows whether it was kicked, so kicked effects
+      # can't target.
+      def self.kicked(text)
+        list = parse(text) or return
+        raise UnsupportedCard, "targeted effects after \"if this spell was kicked\" are not supported" if list.targeted?
+
+        KickedEffect.new(effects: list.effects)
+      end
+
       # One sentence, capitalised; after "you may", also with its implied "You"
       # ("you may gain 3 life").
       def self.parse_sentence(sentence)
@@ -57,12 +73,15 @@ module Magic
 
       def +(other) = self.class.new(effects: effects + other.effects)
 
+      def targeted? = leaves(effects).any?(&:target_choices)
+
       # Class body for an instant or sorcery (`this` = "self"), a mode ("card") or
       # an activated ability ("source"): target_choices and resolve!(target:) when
       # targeted; with several targets, multi_target? with one list of choices per
       # target and resolve!(targets:), each effect using its own targets[i]. Targets
       # are chosen on casting, so they must come before any choice point.
       def spell_source(this: "self")
+        raise UnsupportedCard, "\"if this spell was kicked\" only works on instants and sorceries" if this == "source" && kicked?
         targeted = leaves(effects).select(&:target_choices)
         choices, statements = render(effects, Context.new(this:, targets_in_scope: true))
         sections = definitions + choices
@@ -81,6 +100,7 @@ module Magic
       # Class body for a triggered or chapter ability, whose `entry` method runs
       # the effects. A targeted ability with no legal target does nothing.
       def trigger_source(entry: "call")
+        raise UnsupportedCard, "\"if this spell was kicked\" only works on instants and sorceries" if kicked?
         targeted = leaves(effects).select(&:target_choices)
         choices, statements = render(effects, INSIDE_CHOICE)
         unless targeted.empty? || (targeted.one? && effects.first.equal?(targeted.first))
@@ -96,8 +116,18 @@ module Magic
 
       private
 
-      # Effects with optional ones opened up.
-      def leaves(list) = list.flat_map { _1.is_a?(OptionalEffect) ? _1.effects : [_1] }
+      # Effects with optional and kicked ones opened up.
+      def leaves(list)
+        list.flat_map do |effect|
+          case effect
+          when OptionalEffect then effect.effects
+          when KickedEffect then leaves(effect.effects)
+          else [effect]
+          end
+        end
+      end
+
+      def kicked? = effects.any?(KickedEffect)
 
       def definitions = leaves(effects).filter_map(&:definitions).uniq
 
@@ -107,7 +137,7 @@ module Magic
 
       # [choice classes, statements] for `list` in `context`.
       def render(list, context)
-        index = list.index { choice_point?(_1, context) } or return [[], calls(list, context)]
+        index = list.index { choice_point?(_1, context) } or return statements(list, context)
 
         point, rest = list[index], list[(index + 1)..]
         if context.targets_in_scope && leaves([point, *rest]).any?(&:target_choices)
@@ -119,7 +149,27 @@ module Magic
                       in _ if point.choice_base then effect_choice(point, rest, context)
                       else target_choice(point, rest, context)
                       end
-        [Array(klass), calls(list[...index], context) + adds]
+        before_classes, before = statements(list[...index], context)
+        [before_classes + Array(klass), before + adds]
+      end
+
+      # [choice classes, statements] for effects that aren't choice points; a kicked
+      # effect's statements are wrapped in a check that the kicker was paid.
+      def statements(list, context)
+        list.each_with_index.each_with_object([[], []]) do |(effect, index), (classes, lines)|
+          next lines.concat(calls([effect], context)) unless effect.is_a?(KickedEffect)
+
+          # Anything after a choice would run before that choice resolved.
+          if leaves(effect.effects).any? { choice_point?(_1, context) } && index < list.size - 1
+            raise UnsupportedCard, "effects after a choice in \"if this spell was kicked\" are not supported"
+          end
+
+          inner_classes, inner = render(effect.effects, context)
+
+          classes.concat(inner_classes)
+          kicker = context.this == "self" ? "kicker_cost" : "#{context.this}.kicker_cost"
+          lines << "if #{kicker}.paid?\n#{inner.join("\n").lines.map { "  #{_1.chomp}\n" }.join}end"
+        end
       end
 
       # Asks first; accepted runs the optional effects, and the effects after
