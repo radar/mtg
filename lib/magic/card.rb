@@ -220,11 +220,12 @@ module Magic
       controller.hand
     end
 
-    def resolve!(enters_tapped: enters_tapped?, kicked: false)
+    def resolve!(enters_tapped: enters_tapped?, kicked: false, controller: owner)
       if permanent?
         permanent = Magic::Permanent.resolve(
           game: game,
           owner: owner,
+          controller: controller,
           card: self,
           from_zone: zone,
           enters_tapped: enters_tapped,

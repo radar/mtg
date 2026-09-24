@@ -190,6 +190,28 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Search your library for two basic land cards, put them onto the battlefield, then shuffle.")).to be_nil
   end
 
+  it "targets nonland permanents" do
+    expect(described_class.parse("Destroy target nonland permanent an opponent controls.").target_choices)
+      .to eq("battlefield.not_controlled_by(controller).nonland")
+  end
+
+  it "parses putting a creature or planeswalker card from a graveyard onto the battlefield under your control" do
+    reanimate = described_class.parse("Put target creature or planeswalker card from a graveyard onto the battlefield under your control.")
+    expect(reanimate).to eq(e.const_get(:Reanimate).new(%w[Creature Planeswalker], true))
+    expect(reanimate.target_choices).to eq('game.graveyard_cards.by_any_type("Creature", "Planeswalker")')
+    expect(reanimate.resolve_call).to eq("trigger_effect(:return_target_from_graveyard_to_battlefield, target: target, controller: controller)")
+    expect(described_class.parse("Put target creature card from your graveyard onto the battlefield under your control.").target_choices)
+      .to eq('controller.graveyard.cards.by_any_type("Creature")')
+  end
+
+  it "parses each opponent sacrificing a permanent of a type" do
+    sacrifice = described_class.parse("Each opponent sacrifices a creature or planeswalker of their choice.")
+    expect(sacrifice).to eq(e.const_get(:EachOpponentSacrifices).new(%w[Creature Planeswalker]))
+    expect(sacrifice.target_choices).to be_nil
+    expect(sacrifice.definitions).to include("class SacrificeChoice < Magic::Choice::Targeted", 'by_any_type("Creature", "Planeswalker")')
+    expect(described_class.parse("Each opponent sacrifices an artifact.").permanent_types).to eq(%w[Artifact])
+  end
+
   it "has no targets for untargeted effects" do
     expect(e.const_get(:DrawCards).new(1).target_choices).to be_nil
   end
