@@ -78,9 +78,13 @@ What the rules cover:
   stay with the TapForMana rules, since "Add ..." isn't an effect.
 - `StaticBuff`: "[Other] creatures you control get +N/+N[ and have <keywords>]." /
   "... have <keywords>.", and the same for "Equipped creature" (Equipment only) and
-  "Enchanted creature" (Auras only) → `PowerAndToughnessModification` / `KeywordGrant`
-  static abilities (`applicable_targets { ... }`, or `applies_to_target` for the
-  attached creature). A line with both becomes two abilities. `TribalLord` handles
+  "Enchanted creature" (Auras only) and "~" (a creature buffing itself) →
+  `PowerAndToughnessModification` / `KeywordGrant` static abilities
+  (`applicable_targets { ... }`, or `applies_to_target` for the attached creature). A
+  line with both becomes two abilities. "gets +N/+N for each <thing>" uses `Count`
+  (`lib/magic/card_parser/count.rb`: "[other] <type> you control", "card in your hand",
+  "[<type>] card in your graveyard") and renders `def power_modification = N * <count>`,
+  recomputed with continuous effects. `TribalLord` handles
   "Other <type>s you control get +N/+N."
 - `EntersWithCounters`: "~ enters with N <type> counters on it." (+1/+1 on creatures,
   or any type `Magic::Counters[]` knows, e.g. time) → the
