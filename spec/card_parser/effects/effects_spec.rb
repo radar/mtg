@@ -85,6 +85,13 @@ RSpec.describe Magic::CardParser::Effect do
       .to eq('filter: ->(card) { card.type?("Creature") }')
   end
 
+  it "parses discarding unless you discard a card of a type, as a choice" do
+    discard = described_class.parse("Then discard two cards unless you discard a creature card.")
+    expect(discard).to eq(e.const_get(:DiscardUnless).new(2, "Creature"))
+    expect(discard.choice_base).to eq("Magic::Choice::DiscardUnless")
+    expect(discard.choice_args).to eq(["amount: 2", 'card_type: "Creature"'])
+  end
+
   it "parses discarding" do
     expect(described_class.parse("Discard a card.").resolve_call).to eq("game.add_choice(Magic::Choice::Discard.new(player: controller))")
     two = described_class.parse("Target player discards two cards.")
