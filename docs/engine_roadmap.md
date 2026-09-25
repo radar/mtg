@@ -183,6 +183,11 @@ Still open: A2 (real priority model) and A3 (one-item-at-a-time stack resolution
 
 ## E. Keyword and ability framework
 
+**Status (2026-09-26): E1–E3 done; E4–E6 open.** Specs: `spec/game/integration/{targeting_keywords,destruction_keywords}_spec.rb`. Details and gotchas are in `CLAUDE.md` ("Targeting Keywords", "Indestructible, Regeneration, Protection from Damage"). Deviations and leftovers:
+- E1: `script/keyword_audit.rb` generates `docs/keywords.md` (edit the status tables in the script, then rerun it). Most rows are "missing" by default; many of those are really n.a. and haven't been triaged.
+- E2: one `can_be_targeted_by?(source, controller:)` on `Permanent` and `Player`, called from `Cast`, `Cast::Mode` and `Ability#valid_targets?` (activated and loyalty abilities). Ward is a spell trigger plus an ability trigger. **Not done:** targets chosen through `Choice::Targeted` (triggered abilities) are not filtered, because that class cannot tell "target" from "choose". Fix by giving targeting choices their own subclass or flag. Player hexproof/shroud (Leyline of Sanctity, Witchbane Orb) is not modelled either.
+- E3: indestructible was already handled in `Permanent#destroy!`; regeneration is now a shield (`regenerate!`/`regenerated!`, expires in `cleanup!`, removes from combat), and protection prevents damage. "Can't be regenerated" is not modelled. `Permanent#regenerate!` callers (Rhys the Exiled) now get a shield rather than an immediate untap-and-tap.
+
 **Problem.** Keyword behaviour is spread across `Cards::Keywords` predicates, per-effect checks and one handler module. Adding a keyword means hunting for every place it must be checked. No generic `Fight`; `CopyEffect` exists (`lib/magic/copy_effect.rb`) but copy-spell semantics are card-by-card (**verify**).
 
 **Scope.**
