@@ -1,7 +1,7 @@
 module Magic
   module Cards
     SilentDart = Artifact("Silent Dart") do
-      cost 1
+      cost generic: 1
     end
 
     class SilentDart < Artifact

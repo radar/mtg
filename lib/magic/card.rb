@@ -119,20 +119,27 @@ module Magic
         end
       end
 
+      # "Whenever this becomes the target of a spell or ability an opponent controls, counter it
+      # unless that player pays the ward cost." One trigger for spells, one for abilities.
       def ward(life: nil, generic: nil)
-        ward_trigger = Class.new(TriggeredAbility::SpellCast) do
-          define_method(:should_perform?) do
-            opponents.include?(event.player) && event.targets.include?(actor)
-          end
-          define_method(:call) do
-            if life
-              trigger_effect(:lose_life, target: event.player, life: life)
-            else
-              game.choices.add(Choice::Ward.new(actor: actor, payer: event.player, spell: event.spell, generic: generic))
-            end
+        ward_call = lambda do |trigger, spell: nil, ability: nil|
+          if life
+            trigger.trigger_effect(:lose_life, target: trigger.event.player, life: life)
+          else
+            trigger.game.choices.add(Choice::Ward.new(actor: trigger.actor, payer: trigger.event.player, spell: spell, ability: ability, generic: generic))
           end
         end
-        const_set(:WARD_TRIGGER, ward_trigger)
+
+        spell_trigger = Class.new(TriggeredAbility::SpellCast) do
+          define_method(:should_perform?) { opponents.include?(event.player) && event.targets.include?(actor) }
+          define_method(:call) { ward_call.call(self, spell: event.spell) }
+        end
+        ability_trigger = Class.new(TriggeredAbility) do
+          define_method(:should_perform?) { opponents.include?(event.player) && event.targets.include?(actor) }
+          define_method(:call) { ward_call.call(self, ability: event.ability) }
+        end
+        const_set(:WARD_TRIGGER, spell_trigger)
+        const_set(:WARD_ABILITY_TRIGGER, ability_trigger)
       end
     end
 

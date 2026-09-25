@@ -5,7 +5,10 @@ module Magic
         def event_handlers
           handlers = @event_handlers ||= {}
           if self.class.const_defined?(:WARD_TRIGGER, false)
-            handlers = { Magic::Events::SpellCast => self.class::WARD_TRIGGER }.merge(handlers)
+            handlers = handlers.merge(
+              Magic::Events::SpellCast => [self.class::WARD_TRIGGER, *handlers[Magic::Events::SpellCast]],
+              Magic::Events::AbilityActivated => [self.class::WARD_ABILITY_TRIGGER, *handlers[Magic::Events::AbilityActivated]],
+            )
           end
           handlers
         end

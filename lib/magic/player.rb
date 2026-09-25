@@ -181,8 +181,10 @@ module Magic
       lands_played < max_lands_per_turn
     end
 
-    def can_be_targeted_by?(source)
-      true
+    def can_be_targeted_by?(source, controller: source&.controller)
+      return true if source.nil?
+
+      !protected_from?(source)
     end
 
     def add_mana(mana)

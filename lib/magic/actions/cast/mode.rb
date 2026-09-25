@@ -6,8 +6,10 @@ module Magic
 
         attr_reader :mode, :targets
 
-        def initialize(mode)
+        def initialize(mode, source: nil, controller: nil)
           @mode = mode
+          @source = source
+          @controller = controller
           @targets = []
         end
 
@@ -17,11 +19,8 @@ module Magic
         end
 
         def can_target?(target, index = nil)
-          if index
-            target_choices[index].include?(target)
-          else
-            target_choices.include?(target)
-          end
+          choices = index ? target_choices[index] : target_choices
+          choices.include?(target) && Targetable.targetable_by?(target, source: @source, controller: @controller)
         end
 
         def targeting(*targets)

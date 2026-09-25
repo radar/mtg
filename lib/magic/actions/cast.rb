@@ -115,11 +115,8 @@ module Magic
       end
 
       def can_target?(target, index = nil)
-        if index
-          target_choices[index].include?(target)
-        else
-          target_choices.include?(target)
-        end
+        choices = index ? target_choices[index] : target_choices
+        choices.include?(target) && Targetable.targetable_by?(target, source: card, controller: player)
       end
 
       def targeting(*targets)
@@ -214,7 +211,7 @@ module Magic
       end
 
       def choose_mode(mode_class, &)
-        mode = Mode.new(mode_class.new(game: game, card: card))
+        mode = Mode.new(mode_class.new(game: game, card: card), source: card, controller: player)
         yield mode if block_given?
         @modes << mode
       end

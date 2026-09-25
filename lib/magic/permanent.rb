@@ -119,6 +119,7 @@ module Magic
       @tapped = false
       @types = card.types
       @keyword_grants = card.keyword_grants
+      @keywords = card.keywords.dup
       @activated_abilities = card.activated_abilities
       @counters = Counters::Collection.new([])
       @damage = 0
@@ -423,8 +424,18 @@ module Magic
       card.can_activate_ability?(ability) && attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
     end
 
-    def can_be_targeted_by?(source)
-      true
+    # Can `source` (a card, permanent or token) target this permanent when `controller` is the
+    # player casting the spell or controlling the ability? Every targeting path asks this, so
+    # shroud, hexproof, "hexproof from" and protection are enforced in one place.
+    def can_be_targeted_by?(source, controller: source.controller)
+      return true if source.nil?
+      return false if shroud?
+
+      opposing = opponents.include?(controller)
+      return false if opposing && hexproof?
+      return false if opposing && source.colors.any? { hexproof_from?(_1) }
+
+      !protected_from?(source)
     end
 
     def can_attack?

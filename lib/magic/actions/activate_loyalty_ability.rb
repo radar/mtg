@@ -33,6 +33,8 @@ module Magic
       end
 
       def targeting(*targets)
+        raise "Invalid target specified for #{ability}: #{targets}" if ability.respond_to?(:target_choices) && !ability.valid_targets?(*targets)
+
         @targets = targets
         self
       end
@@ -44,7 +46,7 @@ module Magic
 
       def perform
         planeswalker.change_loyalty!(loyalty_change)
-        game.notify!(Events::AbilityActivated.new(ability: ability, player: player))
+        game.notify!(Events::AbilityActivated.new(ability: ability, player: player, targets: targets))
         game.stack.add(self)
       end
 
