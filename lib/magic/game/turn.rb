@@ -52,6 +52,10 @@ module Magic
           turn.checkpoint!
         end
 
+        before_transition to: :combat_damage do |turn|
+          turn.combat.validate_blocks!
+        end
+
         after_transition to: :combat_damage do |turn|
           turn.deal_combat_damage
         end
