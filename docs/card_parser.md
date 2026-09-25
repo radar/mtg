@@ -103,6 +103,7 @@ What the rules cover:
 - `TokenDoubler`: "If an effect would create one or more tokens under your control, it
   creates twice that many of those tokens instead." → `ReplacementEffect::TokenDoubler`
   registered on `Effects::CreateToken` (see `AnointedProcession`).
+- `CounterAmountChange`: Vorinclex's "If you would put one or more counters ... twice that many" and "If an opponent would ... half that many ... rounded down" → `ReplacementEffect::CountersYouPutDoubler` / `CountersOpponentPutHalver` (both variants merge into one `replacement_effects` method built from their `registrations`; see `VorinclexMonstrousRaider`).
 - `Changeling`: the keyword line lists `Abilities::Static::Changeling` itself in
   `static_abilities`. A rule does that by returning `class_reference` (an existing class
   name) instead of a nested class from `class_source`.

@@ -14,13 +14,6 @@ module Magic
         @attacking = attacking
       end
 
-      # A copy of this effect that creates a different number of tokens. Used by
-      # replacement effects (Doubling Season etc.): everything else the original
-      # effect specified (tapped, attacking, base P/T) carries over to the extra tokens.
-      def with_amount(amount)
-        dup.tap { |effect| effect.instance_variable_set(:@amount, amount) }
-      end
-
       def inspect
         "#<Effects::CreateToken source:#{source} token_class:#{token_class} amount:#{amount} controller:#{controller}>"
       end

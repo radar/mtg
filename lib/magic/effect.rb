@@ -31,6 +31,12 @@ module Magic
       targets.first
     end
 
+    # A copy of this effect with a different amount. Replacement effects that double or halve an
+    # effect use this so everything else the original specified carries over.
+    def with_amount(amount)
+      dup.tap { |effect| effect.instance_variable_set(:@amount, amount) }
+    end
+
     def multiple_targets?
       targets > 1
     end

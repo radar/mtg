@@ -15,6 +15,8 @@ module Magic
       end
 
       def resolve!
+        return if amount <= 0
+
         target.add_counter(counter_type, amount:)
 
         game.notify!(
