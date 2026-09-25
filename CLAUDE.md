@@ -241,3 +241,7 @@ Moved to `docs/card_patterns.md` (Common Card Ability Patterns, TriggeredAbility
 - `lib/magic/cards/`: All ~280 card implementations
 - `.github/copilot-instructions.md`: Extended card implementation guidance
 - `spec/spec_helper.rb`: Test setup and helpers
+
+## Priority (opt-in)
+
+`Game.new(enforce_priority: true)` turns on the priority model: `game.priority_player` holds priority, `game.pass_priority!` passes it (both players passing resolves the top stack item via `Stack#resolve_top!`, or ends the step via `Turn#advance_step!` when the stack is empty), and `Turn#take_action` raises `IllegalAction` ("does not have priority") for other players. Steps don't auto-resolve triggers in this mode (`Turn#checkpoint!` only runs SBAs and queues triggers), so a spec must pass priority to resolve them. Default is off (specs drive both players directly). See `spec/game/integration/priority_spec.rb`. Actions that never use priority override `uses_priority?` to `false`.

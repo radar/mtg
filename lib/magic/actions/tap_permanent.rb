@@ -1,6 +1,10 @@
 module Magic
   module Actions
     class TapPermanent < Action
+      def uses_priority?
+        false
+      end
+
       attr_reader :permanent
       def initialize(permanent:, **args)
         @permanent = permanent

@@ -1,6 +1,10 @@
 module Magic
   module Actions
     class DeclareAttacker < Action
+      def uses_priority?
+        false
+      end
+
       attr_reader :attacker, :target
       def initialize(attacker:, target:, **args)
         @attacker = attacker

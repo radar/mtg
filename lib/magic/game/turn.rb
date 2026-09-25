@@ -12,6 +12,7 @@ module Magic
 
         after_transition do |turn, transition|
           turn.logger.debug "STEP: #{transition.from} -> #{transition.to}"
+          turn.grant_step_priority!
         end
         event :untap do
           transition beginning: :untap
@@ -26,7 +27,7 @@ module Magic
           turn.notify!(
             Events::BeginningOfUpkeep.new(player: turn.active_player)
           )
-          turn.settle!
+          turn.checkpoint!
         end
 
         after_transition to: :draw do |turn|
@@ -34,21 +35,21 @@ module Magic
             Events::DrawStep.new
           )
           turn.active_player.draw!
-          turn.settle!
+          turn.checkpoint!
         end
 
         after_transition to: :first_main do |turn|
           turn.notify!(
             Events::FirstMainPhase.new(active_player: turn.active_player)
           )
-          turn.settle!
+          turn.checkpoint!
         end
 
         after_transition to: :beginning_of_combat do |turn|
           turn.notify!(
             Events::BeginningOfCombat.new(active_player: turn.active_player)
           )
-          turn.settle!
+          turn.checkpoint!
         end
 
         after_transition to: :combat_damage do |turn|
@@ -71,7 +72,7 @@ module Magic
           turn.notify!(
             Events::BeginningOfEndStep.new(active_player: turn.active_player)
           )
-          turn.settle!
+          turn.checkpoint!
         end
 
         after_transition to: :cleanup do |turn|
@@ -148,6 +149,56 @@ module Magic
         super()
       end
 
+      # Rules 502.4, 514.3: nobody receives priority in the untap step, and normally not in cleanup.
+      NO_PRIORITY_STEPS = %i[beginning untap cleanup].freeze
+
+      # The event that leaves each step once all players have passed in succession with an empty stack.
+      NEXT_STEP_EVENTS = {
+        beginning: :untap,
+        untap: :upkeep,
+        upkeep: :draw,
+        draw: :first_main,
+        first_main: :beginning_of_combat,
+        beginning_of_combat: :declare_attackers,
+        declare_attackers: :attackers_declared!,
+        finalize_attackers: :attackers_finalized,
+        declare_blockers: :combat_damage,
+        combat_damage: :end_of_combat,
+        end_of_combat: :second_main,
+        second_main: :end,
+        end: :cleanup,
+      }.freeze
+
+      # What happens at each step boundary. Normally: resolve everything that is queued
+      # (settle!). With enforce_priority the players must be able to respond, so only
+      # SBAs and trigger queueing run, then the active player receives priority.
+      def checkpoint!
+        if game.enforce_priority?
+          game.receive_priority!(active_player)
+        else
+          game.settle!
+        end
+      end
+
+      def grant_step_priority!
+        if NO_PRIORITY_STEPS.include?(step.to_sym)
+          game.revoke_priority!
+        else
+          game.grant_priority!(active_player)
+        end
+      end
+
+      # Moves to the next step of the turn. Called by Game#pass_priority! when every
+      # player has passed with an empty stack.
+      def advance_step!
+        event = NEXT_STEP_EVENTS.fetch(step.to_sym) { raise "No next step after #{step}" }
+        if event == :attackers_declared!
+          combat.attackers_declared? ? attackers_declared! : end_of_combat
+        else
+          public_send(event)
+        end
+      end
+
       def queue_additional_combat!
         @additional_combats += 1
       end
@@ -161,12 +212,13 @@ module Magic
       end
 
       def take_action(action)
-        reason = action.illegal_reason
+        reason = action.illegal_reason || game.priority_reason(action)
         raise IllegalAction.new(action, reason) if reason
 
         @actions << action
         logger.debug "ACTION: #{action.inspect}"
         action.perform
+        game.priority_action_taken!(action)
         game.state_based_actions_checkpoint!
       end
 
@@ -189,7 +241,7 @@ module Magic
           turn: number,
           attacks: attacks,
         ))
-        settle!
+        checkpoint!
 
         if combat.attackers_without_targets?
           finalize_attackers!
@@ -205,14 +257,14 @@ module Magic
           attacks: attacks,
         ))
           game.notify!(*attacks.map { Events::CreatureAttacked.new(attacker: _1.attacker, target: _1.target) })
-          settle!
+          checkpoint!
       end
 
       def deal_combat_damage
         combat.deal_first_strike_damage
-        game.settle!
+        checkpoint!
         combat.deal_combat_damage
-        game.settle!
+        checkpoint!
       end
 
       def notify!(*events)

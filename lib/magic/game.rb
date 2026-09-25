@@ -43,7 +43,8 @@ module Magic
       players: [],
       stack: nil,
       logger: nil,
-      queue_triggers: true
+      queue_triggers: true,
+      enforce_priority: false
     )
       @logger = Logger.new(STDOUT)
       @battlefield = battlefield
@@ -59,7 +60,75 @@ module Magic
       @monarch = nil
       @queue_triggers = queue_triggers
       @pending_triggers = []
+      @enforce_priority = enforce_priority
+      @priority_player = nil
+      @priority_passes = 0
       subscribe(self)
+    end
+
+    attr_reader :priority_player, :priority_passes
+
+    # When true, Turn#take_action rejects actions from a player who doesn't hold priority.
+    # Off by default so specs that drive several players' actions directly keep working.
+    def enforce_priority?
+      @enforce_priority
+    end
+
+    # Rule 117.3: +player+ receives priority and the pass count restarts.
+    def grant_priority!(player)
+      @priority_player = player
+      @priority_passes = 0
+    end
+
+    # Steps with no priority (untap, cleanup).
+    def revoke_priority!
+      @priority_player = nil
+      @priority_passes = 0
+    end
+
+    def priority_reason(action)
+      return unless enforce_priority? && action.uses_priority?
+      return if priority_player == action.player
+
+      "#{action.player.inspect} does not have priority"
+    end
+
+    # Rule 117.3c: a player who takes an action that uses priority keeps priority afterwards,
+    # and the players who had already passed must pass again.
+    def priority_action_taken!(action)
+      grant_priority!(action.player) if action.uses_priority? && priority_player
+    end
+
+    # Rule 117.3d: the priority player passes. When every remaining player has passed in
+    # succession, the top item of the stack resolves (and the active player gets priority
+    # again), or, with an empty stack, the step ends. Returns :passed, :resolved, :step_ended
+    # or :choice_pending (a choice must be resolved before priority can move on).
+    def pass_priority!
+      raise "No player has priority" unless priority_player
+      return :choice_pending if stack.pending_choices?
+
+      @priority_passes += 1
+      if @priority_passes < remaining_players.size
+        @priority_player = player_after(priority_player)
+        return :passed
+      end
+
+      if stack.empty?
+        current_turn.advance_step!
+        :step_ended
+      else
+        stack.resolve_top!
+        receive_priority!(current_turn.active_player)
+        :resolved
+      end
+    end
+
+    # Rule 117.5: SBAs are checked and pending triggers go on the stack before a player
+    # receives priority; if anything went on the stack the active player receives it.
+    def receive_priority!(player)
+      stack_size = stack.count
+      check_state_based_actions!
+      grant_priority!(stack.count > stack_size ? current_turn.active_player : player)
     end
 
     def queue_triggers?
@@ -296,6 +365,12 @@ module Magic
     end
 
     private
+
+    # The next player in turn order (skipping players who have lost).
+    def player_after(player)
+      order = remaining_players
+      order[(order.index(player) + 1) % order.size]
+    end
 
     # Rule 603.3b: each player, in APNAP order, puts the triggered abilities they
     # control on the stack (choosing their own order for simultaneous ones). +players+

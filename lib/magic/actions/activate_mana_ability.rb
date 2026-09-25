@@ -1,6 +1,10 @@
 module Magic
   module Actions
     class ActivateManaAbility < ActivateAbility
+      def uses_priority?
+        false
+      end
+
       def perform
         game.notify!(Events::AbilityActivated.new(ability: ability, player: player))
         resolve!

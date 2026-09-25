@@ -20,6 +20,12 @@ module Magic
       illegal_reason.nil?
     end
 
+    # Special actions and turn-based actions (mana abilities, declaring attackers, ...)
+    # don't need priority and don't restart the "everyone passed" count.
+    def uses_priority?
+      true
+    end
+
     private
 
     # Whether +card+ is somewhere its owner may cast or play it from: hand (or graveyard, for

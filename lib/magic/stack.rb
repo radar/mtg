@@ -92,11 +92,19 @@ module Magic
       resolve_effects!
     end
 
+    # Resolves the whole stack (spec-friendly "everyone passes until it is empty").
     def resolve_stack!
-      return if @stack.empty?
+      nil while resolve_top!
+    end
+
+    # Rule 608: resolves only the top item, then its effects, then SBAs/triggers.
+    # Returns true if an item was resolved, false if the stack was empty or a
+    # choice is pending.
+    def resolve_top!
+      return false if @stack.empty?
       if pending_choices?
         logger.debug "Pending choices, pausing stack resolution."
-        return
+        return false
       end
 
       item = @stack.shift
@@ -105,8 +113,7 @@ module Magic
 
       resolve_effects!
       game&.state_based_actions_checkpoint!
-
-      resolve_stack!
+      true
     end
 
     def unresolved_effects
