@@ -98,6 +98,15 @@ RSpec.describe Magic::CardParser::Effect do
     expect(exile.resolve_call).to include("target.register_turn_replacement", "ExileInsteadOfDying")
   end
 
+  it "parses countering a spell, optionally by type or mana value" do
+    expect(described_class.parse("Counter target spell.").target_choices).to eq("game.stack.spells")
+    expect(described_class.parse("Counter target spell with mana value 2.").target_choices)
+      .to eq("game.stack.spells.select { _1.card.mana_value == 2 }")
+    expect(described_class.parse("Counter target noncreature spell.").target_choices)
+      .to eq('game.stack.spells.select { !_1.card.type?("Creature") }')
+    expect(described_class.parse("Counter target creature spell.").resolve_call).to eq("trigger_effect(:counter_spell, target: target)")
+  end
+
   it "parses discarding" do
     expect(described_class.parse("Discard a card.").resolve_call).to eq("game.add_choice(Magic::Choice::Discard.new(player: controller))")
     two = described_class.parse("Target player discards two cards.")
