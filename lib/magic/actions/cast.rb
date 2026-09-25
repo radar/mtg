@@ -180,6 +180,31 @@ module Magic
         kicker_cost.pay(player:, payment:)
       end
 
+      # Offspring {N}: the card's own, or one a static ability grants as it's cast
+      # (Zinnia, Valley's Voice). nil when the spell has no offspring.
+      def offspring_cost
+        return @offspring_cost if defined?(@offspring_cost)
+
+        cost = card.offspring_cost if card.respond_to?(:offspring_cost)
+        cost ||= game.battlefield.static_abilities
+          .of_type(Abilities::Static::GrantOffspring)
+          .filter_map { |ability| ability.offspring_cost_for(card, player) }
+          .first
+        @offspring_cost = cost && Costs::Kicker.new(cost)
+      end
+
+      def pay_offspring(payment)
+        raise "#{card.name} has no offspring cost" unless offspring_cost
+
+        offspring_cost.pay(player:, payment:)
+        @offspring_paid = true
+        self
+      end
+
+      def offspring_paid?
+        !!@offspring_paid
+      end
+
       def pay_sacrifice(target)
         cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::Sacrifice) }
         raise "Unknown additional sacrifice cost" unless cost
@@ -213,6 +238,7 @@ module Magic
         card.controller = player
 
         mana_cost.finalize!(player)
+        offspring_cost.finalize!(player) if offspring_paid?
         player.consume_spell_cast!
         game.stack.add(self)
 
@@ -252,6 +278,8 @@ module Magic
           resolved.register_turn_trigger(Events::BeginningOfEndStep, Blitz::EndStepSacrificeTrigger)
         end
 
+        queue_offspring_trigger(resolved) if offspring_paid?
+
         if @adventure
           card.exile!
           card.on_adventure = true
@@ -271,6 +299,16 @@ module Magic
       end
 
       private
+
+      # "If you do, when that creature enters, create a 1/1 token copy of it."
+      def queue_offspring_trigger(resolved)
+        return unless resolved.is_a?(Permanent) && resolved.zone&.battlefield?
+
+        entered = game.current_turn.events.reverse.find do |event|
+          event.is_a?(Events::EnteredTheBattlefield) && event.permanent == resolved
+        end
+        resolved.perform_trigger!(Offspring::TokenCopyTrigger, entered) if entered
+      end
 
       def castable_from_current_zone?
         in_permitted_zone?(card, flashback: @flashback)

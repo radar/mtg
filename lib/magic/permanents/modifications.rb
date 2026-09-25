@@ -15,9 +15,10 @@ module Magic
         apply_continuous_effects!
       end
 
-      def modify_base_power(power)
+      def modify_base_power(power, until_eot: true)
         modifiers << BasePower.new(
           base_power: power,
+          until_eot:,
         )
       end
 
@@ -27,9 +28,10 @@ module Magic
         )
       end
 
-      def modify_base_toughness(toughness)
+      def modify_base_toughness(toughness, until_eot: true)
         modifiers << BaseToughness.new(
           base_toughness: toughness,
+          until_eot:,
         )
       end
 

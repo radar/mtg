@@ -659,6 +659,25 @@ module Magic
       card.cost.send(color) || 0
     end
 
+    # Fires +trigger_class+ for this permanent (queued or run at once), counting
+    # trigger doublers. Public for triggers the engine adds itself (offspring).
+    def perform_trigger!(trigger_class, event)
+      additional_triggers = game.battlefield.static_abilities
+        .of_type(Abilities::Static::TriggeredAbilityDoubler)
+        .count { |doubler| doubler.doubles_trigger_for?(self, event) }
+
+      (1 + additional_triggers).times do
+        ability = trigger_class.new(actor: self, event: event)
+        next unless ability.trigger!
+
+        if game.queue_triggers?
+          game.queue_trigger!(ability)
+        else
+          ability.call
+        end
+      end
+    end
+
     private
 
     def dispatch_lifecycle_triggers(event)
@@ -685,23 +704,6 @@ module Magic
       Array(card.event_handlers[event.class]).each do |handler_class|
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
         perform_trigger!(handler_class, event)
-      end
-    end
-
-    def perform_trigger!(trigger_class, event)
-      additional_triggers = game.battlefield.static_abilities
-        .of_type(Abilities::Static::TriggeredAbilityDoubler)
-        .count { |doubler| doubler.doubles_trigger_for?(self, event) }
-
-      (1 + additional_triggers).times do
-        ability = trigger_class.new(actor: self, event: event)
-        next unless ability.trigger!
-
-        if game.queue_triggers?
-          game.queue_trigger!(ability)
-        else
-          ability.call
-        end
       end
     end
 
