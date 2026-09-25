@@ -9,6 +9,8 @@ module Magic
       end
 
       def resolve!
+        return if damage_prevented?
+
         if target.player? && source.has_keyword?(Magic::Keywords::Toxic)
           source.trigger_effect(
             :add_counter,

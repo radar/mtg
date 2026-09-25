@@ -123,6 +123,7 @@ module Magic
       @activated_abilities = card.activated_abilities
       @counters = Counters::Collection.new([])
       @damage = 0
+      @regeneration_shields = 0
       @protections = Protections.new(card.protections.dup)
       @exiled_cards = Magic::CardList.new([])
       @pending_mana_ability_uses = 0
@@ -372,9 +373,25 @@ module Magic
       !tapped?
     end
 
+    # Rule 701.19: creates a regeneration shield, a replacement effect for the next time this
+    # permanent would be destroyed this turn (see #destroy!). Shields expire in the cleanup step.
     def regenerate!
+      @regeneration_shields += 1
+    end
+
+    def regeneration_shield?
+      @regeneration_shields.positive?
+    end
+
+    # Uses a shield: instead of being destroyed, the permanent is tapped, has all damage removed
+    # from it and is removed from combat.
+    def regenerated!
+      @regeneration_shields -= 1
       @damage = 0
+      @marked_for_death = false
       tap!
+      game.current_turn&.combat&.remove_from_combat(self)
+      game.notify!(Events::Regenerated.new(permanent: self))
     end
 
     def static_abilities
@@ -391,6 +408,11 @@ module Magic
     # Rule 701.7: indestructible permanents can't be destroyed. Returns whether it was destroyed.
     def destroy!
       return false if indestructible?
+
+      if regeneration_shield?
+        regenerated!
+        return false
+      end
 
       put_into_graveyard!
       true
@@ -450,6 +472,7 @@ module Magic
     def cleanup!
       @turn_triggers = {}
       @turn_replacements = []
+      @regeneration_shields = 0
       @modes_chosen_this_turn = []
       @triggered_once_keys_this_turn = []
       remove_until_eot_keyword_grants!

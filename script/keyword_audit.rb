@@ -10,6 +10,12 @@ require "json"
 LAYOUTS = %w[normal saga adventure transform modal_dfc split flip meld leveler class case prototype mutate].freeze
 
 IMPLEMENTED = {
+  "Hexproof" => "permanent.rb (can_be_targeted_by?), targetable.rb; enforced by Cast, Cast::Mode and Ability#valid_targets?. Trigger targets (Choice::Targeted) are not filtered.",
+  "Shroud" => "As Hexproof.",
+  "Protection" => "protection.rb; targeting (as Hexproof), blocking, aura attachment (SBA) and damage prevention (TargetedEffect#damage_prevented?).",
+  "Ward" => "card.rb (ward): WARD_TRIGGER for spells, WARD_ABILITY_TRIGGER for abilities; choice/ward.rb.",
+  "Indestructible" => "permanent.rb (destroy!); game/state_based_actions.rb (lethal damage, deathtouch).",
+  "Regenerate" => "permanent.rb (regenerate! shield, regenerated!, destroy!); combat_phase.rb (remove_from_combat). Shields expire in cleanup!.",
   "Flying" => "cards/keywords.rb; game/combat_phase.rb (block legality)",
   "Reach" => "cards/keywords.rb; game/combat_phase.rb",
   "Trample" => "game/combat_phase.rb (damage assignment)",
@@ -44,12 +50,6 @@ IMPLEMENTED = {
 }.freeze
 
 PARTIAL = {
-  "Hexproof" => "Flag only (`Keywords#hexproof?`, `HexproofFrom`). `Permanent#can_be_targeted_by?` is a stub that returns true, so targeting is not blocked. E2.",
-  "Shroud" => "Flag only, as Hexproof. E2.",
-  "Protection" => "`protection.rb`: enforced for blocking, aura attachment (SBA) and player protection. Not enforced for targeting or damage prevention. E2.",
-  "Ward" => "`Card.ward` DSL: reacts to spells (`SpellCast`) only, not abilities; pays through `Choice::Ward`. E2.",
-  "Indestructible" => "Checked in SBA and destroy effects. Not modelled as a replacement effect. E3.",
-  "Regenerate" => "`Permanent#regenerate!` only taps and clears damage. No shield, no removal from combat. E3.",
   "Kicker" => "`Card.kicker_cost`, `Costs::Kicker`. Single kicker only; no multikicker or variants. E4.",
   "Fight" => "`Creature#fight` helper. No `Effects::Fight`. E6.",
   "Transform" => "`Permanent#transform!` only. No daybound/nightbound, no disturb.",

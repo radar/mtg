@@ -9,6 +9,8 @@ module Magic
       end
 
       def resolve!
+        return if damage_prevented?
+
         target.take_damage(damage)
 
         game.notify!(

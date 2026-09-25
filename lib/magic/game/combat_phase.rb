@@ -20,6 +20,10 @@ module Magic
           @target = new_target
         end
 
+        def remove_blocker(blocker)
+          @blockers.delete(blocker)
+        end
+
         def declare_blocker(blocker)
           @blocked = true
           @blockers << blocker
@@ -129,6 +133,13 @@ module Magic
         else
           @attacks << Attack.new(attacker: attacker, target: target)
         end
+      end
+
+      # Rule 506.4: a permanent removed from combat (by regeneration, for instance) stops being an
+      # attacking or blocking creature. An attacker that was blocked stays blocked.
+      def remove_from_combat(permanent)
+        @attacks.reject! { |attack| attack.attacker == permanent }
+        @attacks.each { |attack| attack.remove_blocker(permanent) }
       end
 
       def choose_attacker_target(attacker, target:)
