@@ -1,17 +1,11 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../card_parser/card_parser_helpers"
+require_relative "keyword_card_helpers"
 
 RSpec.describe "Destruction keywords: indestructible, regeneration and protection from damage" do
-  include CardParserHelpers
+  include KeywordCardHelpers
   include_context "two player game"
-
-  def creature(text, owner:)
-    name = text.lines.first[/\A(.+?) \{/, 1]
-    load_card(text)
-    ResolvePermanent(name, owner: owner)
-  end
 
   def deal_damage(source, target, amount)
     source.trigger_effect(:deal_damage, source: source, target: target, damage: amount)

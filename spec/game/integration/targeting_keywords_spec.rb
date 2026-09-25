@@ -1,17 +1,11 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require_relative "../../card_parser/card_parser_helpers"
+require_relative "keyword_card_helpers"
 
 RSpec.describe "Targeting keywords: hexproof, shroud, protection and ward" do
-  include CardParserHelpers
+  include KeywordCardHelpers
   include_context "two player game"
-
-  def creature(text, owner:)
-    name = text.lines.first[/\A(.+?) \{/, 1]
-    load_card(text)
-    ResolvePermanent(name, owner: owner)
-  end
 
   def shock(player)
     player.add_mana(red: 1)
@@ -89,7 +83,11 @@ RSpec.describe "Targeting keywords: hexproof, shroud, protection and ward" do
     let!(:target) { creature("Ward Test Bear {1}{G}\nCreature — Bear\nWard {2}\n2/2\n", owner: p1) }
 
     context "targeted by a spell" do
-      before { shock(p2) { _1.targeting(target) } }
+      # The ward trigger goes on the stack above the spell; resolve it to get the payment choice.
+      before do
+        shock(p2) { _1.targeting(target) }
+        game.stack.resolve_top!
+      end
 
       it "asks the opponent to pay" do
         expect(game.choices.last).to be_a(Magic::Choice::Ward)
@@ -118,6 +116,7 @@ RSpec.describe "Targeting keywords: hexproof, shroud, protection and ward" do
         p2.activate_ability(ability: dart.activated_abilities.first) do
           _1.targeting(target).pay_mana(generic: { black: 4 }).pay(:self_sacrifice, dart)
         end
+        game.stack.resolve_top!
       end
 
       it "asks the opponent to pay" do
@@ -144,6 +143,7 @@ RSpec.describe "Targeting keywords: hexproof, shroud, protection and ward" do
     it "does not trigger for its controller's own spell" do
       shock(p1) { _1.targeting(target) }
 
+      expect(game.stack.count).to eq(1)
       expect(game.choices).to be_empty
     end
   end
