@@ -21,6 +21,14 @@ RSpec.describe Magic::Cards::AnointedProcession do
     expect(game.battlefield.controlled_by(p1).creatures.by_name("Angel").count).to eq(2)
   end
 
+  it "creates the additional tokens tapped when the original effect says so" do
+    wood_elves.trigger_effect(:create_token, token_class: Magic::Cards::FalconerAdept::BirdToken, enters_tapped: true)
+
+    birds = game.battlefield.controlled_by(p1).creatures.by_name("Bird")
+    expect(birds.count).to eq(2)
+    expect(birds).to all(be_tapped)
+  end
+
   it "doesn't double tokens an opponent creates" do
     opponent_elves = ResolvePermanent("Wood Elves", owner: p2)
     cast_ascension(p2, opponent_elves)

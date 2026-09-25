@@ -15,7 +15,6 @@ RSpec.describe Magic::CardParser::Rules::TokenDoubler do
 
   it "renders a token-doubling replacement effect" do
     source = described_class.new.body_source
-    expect(source).to include("class TokenDoubler < ReplacementEffect", "amount: effect.amount * 2",
-                              "def replacement_effects = { Effects::CreateToken => TokenDoubler }")
+    expect(source).to include("def replacement_effects = { Effects::CreateToken => ReplacementEffect::TokenDoubler }")
   end
 end

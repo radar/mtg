@@ -101,8 +101,8 @@ What the rules cover:
   color" → `choices ...`; "any color in your commander's color identity" →
   `def choices = controller.commander.color_identity`).
 - `TokenDoubler`: "If an effect would create one or more tokens under your control, it
-  creates twice that many of those tokens instead." → a `ReplacementEffect` on
-  `Effects::CreateToken` (see `AnointedProcession`).
+  creates twice that many of those tokens instead." → `ReplacementEffect::TokenDoubler`
+  registered on `Effects::CreateToken` (see `AnointedProcession`).
 - `Changeling`: the keyword line lists `Abilities::Static::Changeling` itself in
   `static_abilities`. A rule does that by returning `class_reference` (an existing class
   name) instead of a nested class from `class_source`.

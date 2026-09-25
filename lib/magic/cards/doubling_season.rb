@@ -4,17 +4,6 @@ module Magic
       card_name "Doubling Season"
       cost generic: 4, green: 1
 
-      class TokenDoubler < ReplacementEffect
-        # If an effect would create one or more tokens under _your control_ ...
-        def applies?(effect)
-          effect.controller == receiver.controller
-        end
-
-        def call(effect)
-          effect.with_amount(effect.amount * 2)
-        end
-      end
-
       class CounterDoubler < ReplacementEffect
         # If an effect would put one or more counters on a permanent you control ...
         def applies?(effect)
@@ -33,7 +22,7 @@ module Magic
 
       def replacement_effects
         {
-          Effects::CreateToken => TokenDoubler,
+          Effects::CreateToken => ReplacementEffect::TokenDoubler,
           Effects::AddCounterToPermanent => CounterDoubler,
         }
       end
