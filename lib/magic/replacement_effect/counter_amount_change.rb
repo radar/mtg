@@ -4,10 +4,11 @@ module Magic
     # (Vorinclex, Monstrous Raider; Hardened Scales-style cards). Subclasses decide which player's
     # counters they affect (`applies?`) and how the amount changes (`new_amount`).
     class CounterAmountChange < ReplacementEffect
-      MATCHERS = [Effects::AddCounterToPermanent, Effects::AddCounterToPlayer].freeze
+      # The effect classes this replacement watches; override to narrow (e.g. permanents only).
+      def self.matchers = [Effects::AddCounterToPermanent, Effects::AddCounterToPlayer]
 
       # Pairs for a card's `replacement_effects` (an array of [matcher, replacement_effect]).
-      def self.registrations = MATCHERS.map { |matcher| [matcher, self] }
+      def self.registrations = matchers.map { |matcher| [matcher, self] }
 
       def call(effect)
         effect.with_amount(new_amount(effect.amount))

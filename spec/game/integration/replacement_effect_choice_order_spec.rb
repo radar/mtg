@@ -19,7 +19,7 @@ RSpec.describe Magic::Game, "replacement effects -- chooser controls application
   context "when chooser applies doubling season first" do
     before do
       allow(p1).to receive(:choose_replacement_effect) do |replacement_effects:, **_args|
-        replacement_effects.find { |effect| effect.is_a?(Magic::Cards::DoublingSeason::CounterDoubler) } || replacement_effects.first
+        replacement_effects.find { |effect| effect.is_a?(Magic::ReplacementEffect::CountersOnYourPermanentsDoubler) } || replacement_effects.first
       end
     end
 

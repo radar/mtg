@@ -20,6 +20,13 @@ RSpec.describe Magic::Cards::DoublingSeason do
       expect(angels.count).to eq(2)
     end
 
+    it "does not double counters put on an opponent's permanent" do
+      opponent_elves = ResolvePermanent("Wood Elves", owner: p2)
+      wood_elves.trigger_effect(:add_counter, counter_type: Magic::Counters::Plus1Plus1, target: opponent_elves)
+
+      expect(opponent_elves.counters.count).to eq(1)
+    end
+
     it "doubles counters" do
       wood_elves.trigger_effect(:add_counter, counter_type: Magic::Counters::Plus1Plus1, target: wood_elves)
 
