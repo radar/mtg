@@ -42,6 +42,9 @@ module Magic
     end
 
     attr_accessor :zone
+    # The zone the card was in when it entered the battlefield (nil for tokens and copies).
+    # A spell cast from a graveyard keeps its graveyard zone until it resolves.
+    attr_accessor :entered_from_zone
     # The number of the turn during which the current controller gained control of this permanent.
     attr_accessor :controlled_since_turn
 
@@ -60,6 +63,7 @@ module Magic
         copy: copy,
       )
 
+      permanent.entered_from_zone = card_zone
       permanent.tap! if enters_tapped
       card.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       permanent.move_zone!(from: from_zone, to: game.battlefield)
@@ -227,6 +231,8 @@ module Magic
     def cast?
       @cast
     end
+
+    def entered_from_graveyard? = entered_from_zone&.graveyard? || false
 
     def move_zone!(from: zone, to:)
       trigger_effect(:move_permanent_zone, target: self, from: from, to: to)
