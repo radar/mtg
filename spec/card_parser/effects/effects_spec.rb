@@ -67,7 +67,16 @@ it "parses life loss" do
     expect(described_class.parse("You lose 3 life.").resolve_call).to eq("trigger_effect(:lose_life, target: controller, life: 3)")
   end
 
-  it "parses discarding" do
+it "parses mill" do
+  expect(described_class.parse("Mill two cards.")).to eq(e.const_get(:Mill).new("you", 2))
+  expect(described_class.parse("Mill two cards.").resolve_call).to eq("controller.mill(2)")
+  expect(described_class.parse("Each opponent mills three cards.").resolve_call).to eq("game.opponents(controller).each { |opponent| opponent.mill(3) }")
+  target = described_class.parse("Target player mills 4 cards.")
+  expect(target.target_choices).to eq("game.players")
+  expect(target.resolve_call).to eq("target.mill(4)")
+end
+
+it "parses discarding" do
     expect(described_class.parse("Discard a card.").resolve_call).to eq("game.add_choice(Magic::Choice::Discard.new(player: controller))")
     two = described_class.parse("Target player discards two cards.")
     expect(two.target_choices).to eq("game.players")

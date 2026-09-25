@@ -18,7 +18,7 @@ RSpec.describe Magic::CardParser::Rules::Chapter do
   end
 
   it "rejects chapters with unsupported effects" do
-    expect { described_class.parse("I — Mill two cards.") }.to raise_error(Magic::CardParser::UnsupportedCard, /Mill two cards/)
+    expect { described_class.parse("I — Exile the top card of your library.") }.to raise_error(Magic::CardParser::UnsupportedCard, /Exile the top card of your library/)
   end
 
   it "merges a card's chapters, requiring them in order" do
