@@ -61,7 +61,7 @@ What the rules cover:
   creature is exiled from the battlefield (`Events::LeftTheBattlefield` to exile), another
   creature you control enters, landfall, you / an opponent / a player gain(s) life
   (`Events::LifeGain`), your upkeep, beginning of combat on your turn
-  (`Events::BeginningOfCombat`), your end step, each end step, ~ attacks, you attack
+  (`Events::BeginningOfCombat`), your end step [`, if another creature entered the battlefield under your control this turn`], each end step, ~ attacks, you attack
   (`event.active_player == controller && event.attacks.any?`), ~ deals combat damage
   to a player (`Events::CombatDamageDealt`), the last <type> counter is removed from ~
   (`Events::CounterRemoved`; the type must be one `Magic::Counters[]` knows), and you

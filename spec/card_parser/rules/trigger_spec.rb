@@ -226,6 +226,13 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
                               "def should_perform?\n    you? && !controllers_turn?\n  end")
   end
 
+  it "parses an end step trigger conditional on another creature having entered" do
+    source = parse("At the beginning of your end step, if another creature entered the battlefield under your control this turn, draw a card.")
+      .class_source("EndStepIfCreatureEnteredTrigger")
+    expect(source).to include("class EndStepIfCreatureEnteredTrigger < TriggeredAbility::BeginningOfEndStep",
+                              "controllers_end_step? && game.current_turn.events.any?", "trigger_effect(:draw_cards")
+  end
+
   it "chooses targets with a choice, running later effects there too" do
     source = parse("When ~ enters, it deals 2 damage to any target. You gain 1 life.").class_source("EntersTrigger")
     expect(source).to include("class TargetChoice < Magic::Choice::Targeted", "game.any_target",
