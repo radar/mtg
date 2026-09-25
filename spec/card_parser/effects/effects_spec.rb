@@ -92,6 +92,12 @@ RSpec.describe Magic::CardParser::Effect do
     expect(discard.choice_args).to eq(["amount: 2", 'card_type: "Creature"'])
   end
 
+  it "parses exiling a creature instead if it would die this turn" do
+    exile = described_class.parse("If that creature would die this turn, exile it instead.")
+    expect(exile).to be_a(e.const_get(:ExileInsteadIfDies))
+    expect(exile.resolve_call).to include("target.register_turn_replacement", "ExileInsteadOfDying")
+  end
+
   it "parses discarding" do
     expect(described_class.parse("Discard a card.").resolve_call).to eq("game.add_choice(Magic::Choice::Discard.new(player: controller))")
     two = described_class.parse("Target player discards two cards.")

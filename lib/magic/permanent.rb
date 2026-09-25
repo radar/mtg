@@ -114,6 +114,7 @@ module Magic
       @base_types = card.types
       @attachments = []
       @turn_triggers = {}
+      @turn_replacements = []
       @modifiers = []
       @tapped = false
       @types = card.types
@@ -244,7 +245,7 @@ module Magic
     end
 
     def replacement_effect_for(context)
-      card.replacement_effects.each do |matcher, replacement_effect|
+      (card.replacement_effects.to_a + @turn_replacements).each do |matcher, replacement_effect|
         next unless replacement_matcher_applies?(matcher, context.effect)
 
         replacement_key = [object_id, replacement_effect]
@@ -272,6 +273,11 @@ module Magic
       dispatch_lifecycle_triggers(event)
       dispatch_event_handlers(event)
       dispatch_turn_triggers(event)
+    end
+
+    # A replacement effect that lasts until end of turn ("if it would die this turn, exile it instead").
+    def register_turn_replacement(matcher, replacement_effect)
+      @turn_replacements << [matcher, replacement_effect]
     end
 
     def register_turn_trigger(event_class, trigger_class)
@@ -432,6 +438,7 @@ module Magic
 
     def cleanup!
       @turn_triggers = {}
+      @turn_replacements = []
       @modes_chosen_this_turn = []
       @triggered_once_keys_this_turn = []
       remove_until_eot_keyword_grants!
