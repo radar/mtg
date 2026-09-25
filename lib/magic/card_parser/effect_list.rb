@@ -173,7 +173,8 @@ module Magic
       # A target chosen on resolution (triggered abilities).
       def target_choice(point, rest, context)
         classes, after = render(rest, INSIDE_CHOICE)
-        body = [method("choices", [expand(point.target_choices, "actor")]), "def choice_amount = 1\n", *classes,
+        up_to_one = point.respond_to?(:up_to_one?) && point.up_to_one? ? ["def single_target? = false\n"] : []
+        body = [method("choices", [expand(point.target_choices, "actor")]), "def choice_amount = 1\n", *up_to_one, *classes,
                 method("resolve!(target:)", [expand(point.resolve_call, "actor"), *after])]
         [class_source("TargetChoice", "Magic::Choice::Targeted", body),
          ["choice = TargetChoice.new(actor: #{context.this})", "game.add_choice(choice) if choice.choices.any?"]]

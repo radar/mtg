@@ -107,6 +107,14 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Counter target creature spell.").resolve_call).to eq("trigger_effect(:counter_spell, target: target)")
   end
 
+  it "parses an up-to-one target getting base power and toughness and all creature types until end of turn" do
+    base = described_class.parse("Choose up to one other target creature. Until end of turn, that creature has base power and toughness 4/4 and gains all creature types.")
+    expect(base).to eq(e.const_get(:BaseStatsUntilEndOfTurn).new(true, 4, 4, true))
+    expect(base.up_to_one?).to eq(true)
+    expect(base.target_choices).to eq("(battlefield.creatures - [#{Magic::CardParser::Effect::THIS}])")
+    expect(base.resolve_call).to include("target.modify_base_power(4)", "target.modify_base_toughness(4)", "target.add_types")
+  end
+
   it "parses discarding" do
     expect(described_class.parse("Discard a card.").resolve_call).to eq("game.add_choice(Magic::Choice::Discard.new(player: controller))")
     two = described_class.parse("Target player discards two cards.")
