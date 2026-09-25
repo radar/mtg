@@ -3,7 +3,8 @@
 module Magic
   class CardParser
     module Effects
-      # "Mill two cards." / "Each opponent mills three cards." / "Target player mills two cards."
+      # "Target player mills three cards." / "Each opponent mills two cards." /
+      # "Mill four cards." / "You mill a card."
       class Mill < Data.define(:who, :amount)
         include Effect
 
@@ -17,7 +18,7 @@ module Magic
 
         def resolve_call
           case who
-          when "each opponent" then "game.opponents(controller).each { |opponent| opponent.mill(#{amount}) }"
+          when "each opponent" then "game.opponents(controller).each { _1.mill(#{amount}) }"
           when "you" then "controller.mill(#{amount})"
           else "target.mill(#{amount})"
           end

@@ -4,13 +4,14 @@ module Magic
   class CardParser
     module Effects
       # Until end of turn: "~ gets +1/+0", "Target creature gets +2/+2 and gains
-      # trample", "[Other] creatures you control gain flying and haste", "Target
-      # creature gets +1/+1 for each Elf you control" (the count, `per`, may also
-      # follow "until end of turn"; it's taken once, as the effect resolves).
-      class Pump < Data.define(:who, :targets, :power, :toughness, :per, :keywords)
+      # trample", "[Other] creatures you control gain flying and haste", "It gains
+      # haste" (an earlier target), "Target creature gets +1/+1 for each Elf you
+      # control" (the count, `per`, may also follow "until end of turn"; it's
+      # taken once, as the effect resolves).
+      class Pump < Data.define(:who, :reference, :power, :toughness, :per, :keywords)
         include Effect
 
-        WHO = /(?:(?<self>~)|(?<each>(?:other )?creatures you control)|#{PermanentTarget::PATTERN})/i
+        WHO = /(?:(?<self>~)|(?<each>(?:other )?creatures you control)|#{PermanentTarget::REFERENCE})/i
         KEYWORDS = /[\w ,]+?/
         PER = /[^.]+?/
         LINE = %r{\A#{WHO} (?:gets? (?<power>[+-]\d+)/(?<toughness>[+-]\d+)(?: for each (?<per>#{PER}))?(?: and gains? (?<with>#{KEYWORDS}))?|gains? (?<only>#{KEYWORDS})) until end of turn(?: for each (?<per_after>#{PER}))?\.?\z}i
@@ -27,16 +28,18 @@ module Magic
             return unless m[:power] && (per = Count.parse(phrase, this: THIS))
           end
           who = m[:self] ? :self : m[:each]&.downcase || :target
-          new(who:, targets: m[:kind] && PermanentTarget.choices(m), power: m[:power]&.to_i, toughness: m[:toughness]&.to_i, per:,
+          reference = PermanentTarget.reference(m) if who == :target
+          new(who:, reference:, power: m[:power]&.to_i, toughness: m[:toughness]&.to_i, per:,
               keywords:)
         end
 
-        def target_choices = who == :target ? targets : nil
+        def target_choices = reference&.choices
+        def earlier_target? = !!reference&.earlier_target?
 
         def resolve_call
           case who
           when :self then calls(THIS)
-          when :target then calls("target")
+          when :target then calls(reference.object)
           when "creatures you control" then each("battlefield.controlled_by(controller).creatures")
           else each("(battlefield.controlled_by(controller).creatures - [#{THIS}])")
           end

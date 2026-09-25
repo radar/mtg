@@ -78,6 +78,45 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     expect(parse("When ~ enters, draw a card, then discard a card.").effect_list.effects.size).to eq(2)
   end
 
+  it "chooses each of several targets in turn, doing nothing unless all have one" do
+    source = parse("When ~ enters, put a +1/+1 counter on target creature you control. Tap target creature an opponent controls.")
+      .class_source("EntersTrigger")
+    expect(source).to include("class TargetChoice < Magic::Choice::Targeted", "class TargetChoice2 < Magic::Choice::Targeted",
+                              "choice = TargetChoice2.new(actor: actor)",
+                              "return if battlefield.controlled_by(controller).creatures.none? || battlefield.not_controlled_by(controller).creatures.none?")
+  end
+
+  it "parses life gain, card draw and sacrifice triggers" do
+    expect([parse("Whenever you gain life, draw a card.").handled_event, parse("Whenever you gain life, draw a card.").condition])
+      .to eq(["Events::LifeGain", "you?"])
+    expect(parse("Whenever you draw a card, you gain 1 life.").handled_event).to eq("Events::CardDraw")
+    conditions = {
+      "Whenever you sacrifice a Treasure, draw a card." => 'event.permanent.controller == controller && event.permanent.type?("Treasure")',
+      "Whenever you sacrifice another creature, draw a card." =>
+        'event.permanent.controller == controller && event.permanent != actor && event.permanent.type?("Creature")',
+      "Whenever you sacrifice a permanent, draw a card." => "event.permanent.controller == controller",
+      "Whenever a player sacrifices a permanent, draw a card." => nil
+    }
+    conditions.each do |line, condition|
+      rule = parse(line)
+      expect([rule.handled_event, rule.condition]).to eq(["Events::PermanentSacrificed", condition]), line
+    end
+  end
+
+  it "parses becoming tapped" do
+    rule = parse("Whenever ~ becomes tapped, draw a card, then discard a card.")
+    expect([rule.class_base_name, rule.handled_event, rule.condition]).to eq(["BecomesTappedTrigger", "Events::PermanentTapped", "event.permanent == actor"])
+    expect(rule.effect_list.effects.map(&:class).map { _1.name.split("::").last }).to eq(%w[DrawCards Discard])
+  end
+
+  it "runs the effects after an \"up to one\" target whether or not one is chosen" do
+    source = parse("When ~ enters, ~ fights up to one target creature you don't control. You gain 2 life.").class_source("EntersTrigger")
+    expect(source).to include("def choice_amount = 0..1", "def decline! = finish",
+                              "def finish\n      trigger_effect(:gain_life, target: controller, life: 2)",
+                              "choice.choices.any? ? game.add_choice(choice) : choice.finish")
+    expect(source).not_to include("return if")
+  end
+
   it "treats When and Whenever alike" do
     expect(parse("Whenever ~ enters, draw a card.").class_base_name).to eq("EntersTrigger")
     expect(parse("When ~ attacks, draw a card.").class_base_name).to eq("AttacksTrigger")
@@ -201,7 +240,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
   it "ignores other lines and unknown effects" do
     expect(parse("Whenever ~ becomes blocked, draw a card.")).to be_nil
     expect(parse("Whenever you cast a creature spell, if you do, draw a card.")).to be_nil
-    expect(parse("When ~ enters, return target creature to its owner's hand.")).to be_nil
+    expect(parse("When ~ enters, investigate.")).to be_nil
   end
 
   it "renders an untargeted trigger" do

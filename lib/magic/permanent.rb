@@ -30,7 +30,7 @@ module Magic
     attr_accessor :copied_card, :chosen_creature_type, :exile_cast_permission_turn, :ring_bearer, :prevent_opponent_lifegain_turn, :pending_mana_ability_uses
 
     # Set by ContinuousEffects from Abilities::Static::CharacteristicSetting.
-    attr_accessor :color_override, :lost_all_abilities
+    attr_accessor :color_override, :lost_all_abilities_by_effect
 
     def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :additional_lands_per_turn, :power_modification, :toughness_modification, :type_grants
     def_delegators :@game, :logger
@@ -48,7 +48,7 @@ module Magic
     # The number of the turn during which the current controller gained control of this permanent.
     attr_accessor :controlled_since_turn
 
-    def self.resolve(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false)
+    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner)
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:)
       card_zone = card.zone unless token || copy
 
@@ -65,6 +65,7 @@ module Magic
 
       permanent.entered_from_zone = card_zone
       permanent.tap! if enters_tapped
+      permanent.attach_to!(attach_to) if attach_to
       card.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       add_additional_counters_for_entering(game:, permanent:) if card.creature?
@@ -144,8 +145,16 @@ module Magic
     def name = copiable_card.name
     def cmc = copiable_card.cmc
     def mana_value = copiable_card.mana_value
-    def colors = color_override || copiable_card.colors
+    # A color set by continuous effects, else the latest color-changing modifier ("becomes that color
+    # until end of turn"), else the card's colors.
+    def colors
+      color_override ||
+        modifiers.reverse.find { _1.is_a?(Permanents::Modifications::Color) }&.colors ||
+        copiable_card.colors
+    end
+
     def colorless? = colors.empty?
+    def multi_colored? = colors.count > 1
 
     def apply_continuous_effects!
       Magic::Permanents::ContinuousEffects.new(game: game, permanent: self).apply!
@@ -204,6 +213,13 @@ module Magic
       @controlled_since_turn = game.current_turn&.number
     end
 
+    # "Gain control of target creature until end of turn": control returns to the
+    # previous controller at cleanup.
+    def gain_control_until_eot!(player)
+      @controller_before_eot ||= controller
+      self.controller = player
+    end
+
     # Rule 302.6: a creature's {T} abilities and its ability to attack need it to have been under its
     # controller's control continuously since their most recent turn began, unless it has haste.
     def summoning_sick?
@@ -221,6 +237,10 @@ module Magic
 
     def token?
       @token
+    end
+
+    def all_creature_types?
+      copiable_card.all_creature_types? || attachments.any? { _1.card.grants_all_creature_types? }
     end
 
     def ring_bearer?
@@ -247,6 +267,8 @@ module Magic
     end
 
     def replacement_effect_for(context)
+      return nil if lost_all_abilities?
+
       (card.replacement_effects.to_a + @turn_replacements).each do |matcher, replacement_effect|
         next unless replacement_matcher_applies?(matcher, context.effect)
 
@@ -339,6 +361,19 @@ module Magic
       @triggered_once_keys_this_turn ||= []
     end
 
+    # For "activate only once each turn": the ability classes activated this turn.
+    def activated_this_turn?(ability_class)
+      abilities_activated_this_turn.include?(ability_class)
+    end
+
+    def activated_this_turn!(ability_class)
+      abilities_activated_this_turn << ability_class
+    end
+
+    def abilities_activated_this_turn
+      @abilities_activated_this_turn ||= []
+    end
+
     def untap_during_untap_step
       if @counters.of_type(Counters::Stun).any?
         @counters.remove_first(Counters::Stun)
@@ -357,6 +392,7 @@ module Magic
 
     def untap!
       return if untapped?
+      return if attachments.any? { _1.card.prevents_untapping? }
       @tapped = false
 
       untapped_event = Events::PermanentUntapped.new(
@@ -395,9 +431,21 @@ module Magic
     end
 
     def static_abilities
-      return [] if lost_all_abilities
+      return [] if lost_all_abilities?
 
       card.static_abilities.map { |ability| ability.new(source: self) }
+    end
+
+    # "It loses all abilities": its own keywords, activated, triggered, static and
+    # replacement abilities stop working for as long as it stays on the battlefield.
+    # Abilities other effects grant it still apply.
+    def lose_all_abilities!
+      @lost_all_abilities = true
+      apply_continuous_effects!
+    end
+
+    def lost_all_abilities?
+      !!(@lost_all_abilities || lost_all_abilities_by_effect)
     end
 
     def alive?
@@ -420,10 +468,12 @@ module Magic
 
     # Moves the permanent to its controller's graveyard whether or not it is indestructible.
     # Use this (not #destroy!) for sacrifice and for state-based actions that aren't "destroy".
+    # A token or copy has no card of its own to move (a token copy of a card
+    # leaves that card where it is).
     def put_into_graveyard!
-      move_zone!(to: controller.graveyard)
-      unless copy? || card.zone&.exile?
-        card.move_zone!(to: controller.graveyard)
+      move_zone!(to: owner.graveyard)
+      unless copy? || token? || card.zone&.exile?
+        card.move_zone!(to: owner.graveyard)
       end
     end
 
@@ -434,7 +484,7 @@ module Magic
 
     def exile!
       move_zone!(to: game.exile)
-      card.move_zone!(to: game.exile) unless copy? || card.zone&.exile?
+      card.move_zone!(to: game.exile) unless copy? || token? || card.zone&.exile?
     end
 
     def return_to_hand
@@ -461,11 +511,20 @@ module Magic
     end
 
     def can_attack?
-      card.can_attack? && attachments.all?(&:can_attack?)
+      (lost_all_abilities? || card.can_attack?) && attachments.all?(&:can_attack?)
     end
 
     def can_block?(permanent)
-      !prevented_from_blocking? && card.can_block?(permanent) && attachments.all? { |attachment| attachment.can_block?(permanent) }
+      !prevented_from_blocking? && (lost_all_abilities? || card.can_block?(permanent)) &&
+        attachments.all? { |attachment| attachment.can_block?(permanent) }
+    end
+
+    def can_be_blocked?(blocker)
+      lost_all_abilities? || card.can_be_blocked?(blocker)
+    end
+
+    def maximum_attackers_blocked
+      lost_all_abilities? ? 1 : card.maximum_attackers_blocked
     end
 
 
@@ -475,10 +534,16 @@ module Magic
       @regeneration_shields = 0
       @modes_chosen_this_turn = []
       @triggered_once_keys_this_turn = []
+      @abilities_activated_this_turn = []
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
       remove_until_eot_modifiers!
+      revert_until_eot_control!
       apply_continuous_effects!
+    end
+
+    def can_have_counters?
+      attachments.none? { _1.card.prevents_counters? }
     end
 
     def add_counter(counter_type, amount: 1)
@@ -509,6 +574,44 @@ module Magic
 
     def target_choices
       card.target_choices(self)
+    end
+
+    # "Exile target permanent until ~ leaves the battlefield" (rule 610.3). Does nothing if
+    # this permanent has already left; a token exiled this way is gone for good.
+    def exile_until_leaves!(target)
+      return unless zone&.battlefield?
+
+      target.exile!
+      cards_exiled_until_leaves << target.card unless target.token?
+    end
+
+    def cards_exiled_until_leaves
+      @cards_exiled_until_leaves ||= []
+    end
+
+    # Called as this permanent leaves the battlefield: the cards come back under their
+    # owners' control.
+    def return_cards_exiled_until_leaves!
+      cards, @cards_exiled_until_leaves = cards_exiled_until_leaves, []
+      cards.select { _1.zone&.exile? }.each do |card|
+        Permanent.resolve(game:, card:, owner: card.owner, from_zone: card.zone, cast: false)
+      end
+    end
+
+    # Exiles a card "with" this permanent, remembering the turn ("cards exiled with
+    # Maralen this turn").
+    def exile_with_this!(card)
+      trigger_effect(:exile, target: card)
+      exiled_cards << card
+      turns_cards_were_exiled[card] = game.current_turn.number
+    end
+
+    def exiled_with_this_this_turn?(card)
+      exiled_cards.include?(card) && card.zone&.exile? && turns_cards_were_exiled[card] == game.current_turn.number
+    end
+
+    def turns_cards_were_exiled
+      @turns_cards_were_exiled ||= {}.compare_by_identity
     end
 
     def remove_from_exile(card)
@@ -559,7 +662,7 @@ module Magic
     private
 
     def dispatch_lifecycle_triggers(event)
-      return if lost_all_abilities
+      return if lost_all_abilities?
       return unless event.respond_to?(:permanent) && event.permanent == self
 
       lifecycle_triggers_for(event).each do |trigger_class|
@@ -577,7 +680,7 @@ module Magic
     end
 
     def dispatch_event_handlers(event)
-      return if lost_all_abilities
+      return if lost_all_abilities?
 
       Array(card.event_handlers[event.class]).each do |handler_class|
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
@@ -614,6 +717,13 @@ module Magic
       until_eot_protections.each do |protection|
         protections.delete(protection)
       end
+    end
+
+    def revert_until_eot_control!
+      return unless @controller_before_eot
+
+      self.controller = @controller_before_eot
+      @controller_before_eot = nil
     end
 
     def remove_until_eot_modifiers!

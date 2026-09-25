@@ -3,8 +3,8 @@
 module Magic
   class CardParser
     module Effects
-      # "Surveil 2." Like scry, surveil is a player choice, so the effects after it in the
-      # same spell run when that choice resolves (see Rules::SpellEffect).
+      # "Surveil 2." Surveil is a player choice, so the effects after it in the same
+      # spell run when that choice resolves (see Rules::SpellEffect).
       class Surveil < Data.define(:amount)
         include Effect
 

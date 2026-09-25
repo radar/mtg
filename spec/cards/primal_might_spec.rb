@@ -20,5 +20,6 @@ RSpec.describe Magic::Cards::PrimalMight do
 
     expect(wood_elves.power).to eq(4)
     expect(alpine_watchdog.damage).to eq(4)
+    expect(wood_elves.damage).to eq(2)
   end
 end

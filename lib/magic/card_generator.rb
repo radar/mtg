@@ -3,12 +3,14 @@
 module Magic
   # Renders a CardParser::Result as Ruby source for lib/magic/cards/.
   class CardGenerator
+    # A hyphen separates words ("First-Year" -> first_year / FirstYear), as in the
+    # hand-written cards and the specs' Card() helper.
     def self.snake_name(name)
       name.downcase.tr("-", " ").gsub(/[^a-z0-9\s]/, "").split.join("_")
     end
 
     def self.const_name(name)
-      name.tr("-", " ").gsub(/[^A-Za-z0-9\s]/, "").split.map(&:capitalize).join
+      name.tr("-", " ").gsub(/[^A-Za-z0-9\s]/, "").split.map { _1[0].upcase + _1[1..] }.join
     end
 
     def self.generate(result)
@@ -36,7 +38,7 @@ module Magic
 
     # What sort of card this is, or UnsupportedCard for type lines not handled yet.
     def kind
-      types = @result.types
+      types = @result.types - ["Kindred"]
       subtypes = @result.subtypes
       return :creature if types.include?("Creature")
       raise CardParser::UnsupportedCard, "unsupported type line: #{types.join(' ')}" if types.size != 1
@@ -51,9 +53,11 @@ module Magic
       end
     end
 
-    # Card types with no subtypes to worry about.
+    def kindred? = @result.types.include?("Kindred")
+
+    # Card types with no subtypes to worry about (a Kindred card's are creature types).
     def plain(kind)
-      raise CardParser::UnsupportedCard, "subtypes not supported for #{kind}: #{@result.subtypes.join(' ')}" if @result.subtypes.any?
+      raise CardParser::UnsupportedCard, "subtypes not supported for #{kind}: #{@result.subtypes.join(' ')}" if @result.subtypes.any? && !kindred?
 
       kind
     end
@@ -108,6 +112,8 @@ module Magic
     end
 
     def type_lines(kind)
+      return kindred_type_lines(kind) if kindred?
+
       case kind
       when :creature then creature_type_lines
       when :artifact then @result.legendary? ? ["legendary_artifact"] : []
@@ -116,6 +122,18 @@ module Magic
 
         []
       end
+    end
+
+    # "Kindred Artifact — Shapeshifter" -> type T::Kindred, T::Artifact, T::Creatures["Shapeshifter"]
+    def kindred_type_lines(kind)
+      raise CardParser::UnsupportedCard, "unsupported Kindred card: #{kind}" unless %i[artifact enchantment instant sorcery].include?(kind)
+      raise CardParser::UnsupportedCard, "legendary Kindred cards not supported" if @result.legendary?
+      unless (@result.subtypes - Types::Creatures.values).empty?
+        raise CardParser::UnsupportedCard, "Kindred subtypes must be creature types: #{@result.subtypes.join(' ')}"
+      end
+
+      creature_types = @result.subtypes.map { "T::Creatures[#{_1.inspect}]" }
+      ["type #{['T::Kindred', "T::#{kind.to_s.capitalize}", *creature_types].join(', ')}"]
     end
 
     def creature_type_lines

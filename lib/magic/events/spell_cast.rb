@@ -17,7 +17,7 @@ module Magic
       end
 
       def type?(type)
-        spell.types.include?(type)
+        spell.type?(type)
       end
     end
   end

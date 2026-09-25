@@ -8,33 +8,19 @@ module Magic
     end
 
     class TirelessTracker < Creature
-      ClueToken = Token.create("Clue") do
-        type T::Artifact
-
-        class Ability < Magic::ActivatedAbility
-          costs "{2}, Sacrifice {this}"
-
-          def resolve!
-            controller.draw!
-          end
-        end
-
-        def self.activated_abilities = [Ability]
-      end
-
       class LandfallTrigger < TriggeredAbility::Landfall
         def should_perform?
           event.player == controller
         end
 
         def call
-          actor.create_token(token_class: ClueToken)
+          actor.create_token(token_class: Tokens::Clue)
         end
       end
 
       class ClueSacrificedTrigger < TriggeredAbility
         def should_perform?
-          event.permanent.artifact? && event.permanent.name == "Clue"
+          event.permanent.controller == controller && event.permanent.type?("Clue")
         end
 
         def call

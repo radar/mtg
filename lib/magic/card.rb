@@ -61,6 +61,11 @@ module Magic
         const_set(:CYCLING_COST, cost)
       end
 
+      # "This spell can't be countered."
+      def cant_be_countered
+        define_method(:can_be_countered?) { false }
+      end
+
       def buyback
         define_method(:buyback?) do
           true
@@ -208,8 +213,13 @@ module Magic
 
     def zone=(zone)
       @on_adventure = false unless zone&.exile?
+      # Only a spell (or a permanent's card) can be controlled by someone other than its owner.
+      @controller = owner unless zone&.battlefield?
       @zone = zone
     end
+
+    # Set as the card is cast (Actions::Cast#perform), for a player casting a card they don't own.
+    attr_writer :controller
 
     def move_zone!(to:)
       @revealed = false
@@ -227,7 +237,7 @@ module Magic
       controller.hand
     end
 
-    def resolve!(enters_tapped: enters_tapped?, kicked: false, controller: owner)
+    def resolve!(enters_tapped: enters_tapped?, kicked: false, attach_to: nil, controller: owner)
       if permanent?
         permanent = Magic::Permanent.resolve(
           game: game,
@@ -236,7 +246,8 @@ module Magic
           card: self,
           from_zone: zone,
           enters_tapped: enters_tapped,
-          kicked: kicked
+          kicked: kicked,
+          attach_to: attach_to,
         )
         # A card resolving from the stack has no zone, so Permanent.resolve can't move it.
         move_zone!(to: battlefield) unless zone&.battlefield?
@@ -329,6 +340,10 @@ module Magic
       false
     end
 
+    def all_creature_types?
+      changeling?
+    end
+
     def rebound?
       false
     end
@@ -365,6 +380,9 @@ module Magic
 
     def can_attack? = !defender?
     def can_block?(_) = true
+    def can_be_blocked?(_) = true
+    # How many attackers this creature can block at once; override for "can block an additional creature".
+    def maximum_attackers_blocked = 1
     def can_activate_ability?(_) = true
 
     def add_choice(choice, **args)

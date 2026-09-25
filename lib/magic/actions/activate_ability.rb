@@ -15,7 +15,7 @@ module Magic
       end
 
       def can_be_activated?(player)
-        costs.all? { |cost| cost.can_pay?(player) } && @ability.requirements_met?
+        costs.all? { |cost| cost.can_pay?(player) } && @ability.requirements_met? && !@ability.activation_limit_reached?
       end
 
       def name
@@ -26,6 +26,7 @@ module Magic
         source = ability.source
         return "#{player.inspect} does not control #{source.name}" if source.respond_to?(:controller) && source.controller != player
         return "#{source.name}'s ability cannot be activated" if source.respond_to?(:can_activate_ability?) && !source.can_activate_ability?(ability)
+        return "#{source.name}'s ability can only be activated once each turn" if ability.activation_limit_reached?
 
         "the requirements to activate #{source.name}'s ability are not met" unless ability.requirements_met?
       end
@@ -38,6 +39,11 @@ module Magic
         raise "Invalid target specified for #{ability}: #{targets}" unless valid_targets?(*targets)
         @targets = targets
         self
+      end
+
+      # For "activate only once each turn".
+      def record_activation!
+        ability.source.activated_this_turn!(ability.class) if ability.once_each_turn?
       end
 
       def countered!
@@ -82,6 +88,7 @@ module Magic
       end
 
       def perform
+        record_activation!
         game.stack.add(self)
 
         game.notify!(Events::AbilityActivated.new(ability: ability, player: player, targets: targets))

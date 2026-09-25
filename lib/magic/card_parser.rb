@@ -86,8 +86,11 @@ module Magic
       [supertypes, words - supertypes, right.to_s.split]
     end
 
+    # An italic ability word ("Vivid — ", "Landfall — ") is flavour.
+    ABILITY_WORD = /\A[A-Z][a-z]+(?: [a-z]+)* — /
+
     def parse_rules(lines)
-      parsed = lines.map do |line|
+      parsed = lines.map { _1.sub(ABILITY_WORD, "") }.map do |line|
         Rule.all.lazy.filter_map { |rule| rule.parse(line) }.first or
           raise UnsupportedCard, "rules text not supported: #{line}"
       end

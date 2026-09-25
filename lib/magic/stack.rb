@@ -75,7 +75,8 @@ module Magic
       @choices.add(choice)
 
       if choice.is_a?(Magic::Choice::Targeted)
-        if choice.single_target? && choice.single_choice?
+        # An "up to one" target (a minimum of 0) may be left unchosen, so it's not automatic.
+        if choice.single_target? && choice.single_choice? && choice.target_choices.min.positive?
           logger.debug "  Only one valid target for choice, resolving choice immediately."
           resolve_choice!(target: choice.target_choices.first)
         end

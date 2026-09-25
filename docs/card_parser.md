@@ -14,10 +14,17 @@ writes `lib/magic/cards/<name>.rb` from plain card text (`Magic::CardParser` →
 chapters parses under a C locale. Unrecognised rules text raises `UnsupportedCard`.
 
 Supported card kinds: creature (also Artifact/Enchantment Creature), instant,
-sorcery, enchantment, artifact (incl. legendary), Equipment (needs an `Equip` line),
+sorcery, enchantment, artifact (incl. legendary), Kindred artifact/enchantment/instant/
+sorcery (`type T::Kindred, T::Artifact, T::Creatures[...]`), Equipment (needs an `Equip` line),
 Aura (needs an `Enchant` line), Saga (needs chapter lines), land and basic land.
 Instants and sorceries need effect lines or a modal block. Other type lines/subtypes
 raise `UnsupportedCard`.
+
+Mana costs may use hybrid symbols: `{G/U}` → `blue_or_green: 1`, the key
+`Costs::Parsers::Mana` uses. Names with hyphens become separate words (`First-Year` →
+`FirstYear`, `first_year`), like the hand-written cards and the specs' `Card()` helper.
+
+A leading ability word on any rules line ("Vivid — ", "Landfall — ") is dropped.
 
 Parenthesised reminder text is stripped before parsing, and the card's own name in
 rules text is replaced with `~`, as is "this creature" / "this artifact" / "this
@@ -80,23 +87,40 @@ What the rules cover:
   `Costs::Parser` as a `costs "..."` string (`~` → `{this}`; only mana, `{T}`,
   `Sacrifice ~`/`a creature`, `Exile ~`, `Discard a card`, `Remove N <type> counters from ~` [`and sacrifice it`,
   as a second cost; the type must be one `Magic::Counters[]` knows]); the sorcery restriction
-  becomes `requirements_met? = game.can_cast_sorcery?(controller)`. Mana abilities
+  becomes `requirements_met? = game.can_cast_sorcery?(controller)`. and "Activate only once each turn." becomes `once_each_turn`. Mana abilities
   stay with the TapForMana rules, since "Add ..." isn't an effect.
 - `StaticBuff`: "[Other] creatures you control get +N/+N[ and have <keywords>]." /
   "... have <keywords>.", and the same for "Equipped creature" (Equipment only) and
   "Enchanted creature" (Auras only) and "~" (a creature buffing itself) →
   `PowerAndToughnessModification` / `KeywordGrant` static abilities
   (`applicable_targets { ... }`, or `applies_to_target` for the attached creature). A
-  line with both becomes two abilities. "gets +N/+N for each <thing>" uses `Count`
+  line with both becomes two abilities. "... as long as <condition>" adds `conditions { }`
+  from `Condition` (`lib/magic/card_parser/condition.rb`: you control a/another <type>,
+  N or more <types>, no [other] <types>; it's [not] your turn; you have no cards in hand;
+  you have / an opponent has N or more/less life; N or more cards in your graveyard;
+  ~ is tapped/untapped/equipped/enchanted). "gets +N/+N for each <thing>" uses `Count`
   (`lib/magic/card_parser/count.rb`: "[other] <type> you control", "card in your hand",
   "[<type>] card in your graveyard") and renders `def power_modification = N * <count>`,
   recomputed with continuous effects. `TribalLord` handles
   "Other <type>s you control get +N/+N."
+- `AttachedRestriction`: "Enchanted/Equipped creature can't attack [or block] / can't
+  block / can't become untapped / doesn't untap during its controller's untap step /
+  can't have counters put on it / its activated abilities can't be activated", clauses
+  joined by "and" or commas → methods on the Attachment card (`can_attack?`,
+  `prevents_untapping?`, `prevents_counters?`, ...), which `Permanent` checks.
+- `CantBeCountered`: "This spell can't be countered." → `cant_be_countered`
+  (`Card#can_be_countered?` false, which `Effects::CounterSpell` checks).
+- `CostReduction`: "[<type>[ and <type>] / non<type>] spells you cast cost {N} less to
+  cast." → a `ManaCostAdjustment` static ability.
+- `BlockingRestriction`: "~ can't block." / "~ can't be blocked." → `can_block?` /
+  `can_be_blocked?` returning false, which `CombatPhase#can_block?` checks.
 - `EntersWithCounters`: "~ enters with N <type> counters on it." (+1/+1 on creatures,
   or any type `Magic::Counters[]` knows, e.g. time) → the
   `enters_with_counters "+1/+1", N` class macro (`Card#entering_counters`, added by
   `Permanent.resolve` before the permanent enters).
 - Lands: `EntersTapped` (→ `enters_tapped`), `TapForMana`, `TapForManaPerPermanent`,
+  `TapForManaPerColor` ("{T}: For each color among permanents you control, add one mana
+  of that color."),
   `TapForManaChoice` ("{T}: Add {W} or {U}.", "{R}, {G}, or {W}", "one mana of any
   color" → `choices ...`; "any color in your commander's color identity" →
   `def choices = controller.commander.color_identity`).
@@ -107,8 +131,21 @@ What the rules cover:
 - `Changeling`: the keyword line lists `Abilities::Static::Changeling` itself in
   `static_abilities`. A rule does that by returning `class_reference` (an existing class
   name) instead of a nested class from `class_source`.
-- Also: `Keywords` (`Keywords.phrase` reads "flying, first strike, and haste"),
-  `Equip`, `Enchant`.
+- `Keywords`: a line of comma-separated keywords → `keywords :flying, ...`. Keywords
+  with a value: toxic N and hexproof from <colour> go into the same `keywords` call as
+  objects (`Keywords.list` takes `Keyword` instances as well as symbols); ward {N} /
+  ward—pay N life → `ward generic:`/`ward life:`; protection from <colour>[ and from
+  <colour>], multicolored or a card type (plural) → `protections [...]`; kicker,
+  flashback and cycling with a mana cost → `kicker_cost`, `flashback Costs::Mana.new(...)`,
+  `cycling`. Ward, protection, kicker, flashback and cycling each allow only one per
+  card; other costs (ward—discard, kicker—sacrifice, landcycling) are unsupported.
+  `Keywords.phrase` (used by pumps and static buffs) still reads only the plain keywords
+  in `KNOWN` ("flying, first strike, and haste").
+  Hexproof and hexproof from don't stop targeting yet (roadmap E2), so their specs only
+  check that the keyword is there.
+- `StaticBuff` also reads "Equipped/Enchanted creature gets +N/+N and is all creature
+  types." (`merge` splits off `def grants_all_creature_types? = true` as a body).
+- Also: `Equip`, `Enchant`.
 
 ## Effects
 
@@ -116,9 +153,12 @@ One-sentence game effects are reusable classes in `lib/magic/card_parser/effects
 (`include Effect`; `.parse(text)`, `target_choices`, `resolve_call`; `definitions`
 returns Ruby for a constant the call needs, e.g. `CreateToken`'s `Token.create`
 class). Current effects: damage to a target or each opponent, draw, gain/lose life,
-destroy/exile target (`PermanentTarget`: [another] target
-creature/artifact/enchantment/land/nonland permanent [you control / an opponent controls]; "another"
-leaves out `Effect::THIS`), flicker ("exile <target>, then return that card to the
+destroy/exile/tap/untap/bounce target (`PermanentTarget`: [another] target
+creature/artifact/enchantment/land/[nonland] permanent [you control / an opponent
+controls]; "another" leaves out `Effect::THIS`), counter target [<type>/non<type>] spell
+(targets `game.stack.spells`), mill, search your library for a basic land/land/creature
+card (onto the battlefield [tapped] or into your hand; a `Choice::SearchLibrary` choice
+point), flicker ("exile <target>, then return that card to the
 battlefield under its owner's control"), discard, +1/+1 counters on a target, each
 creature you control or ~, until-end-of-turn pumps and
 keyword grants for ~ / a target creature / [other] creatures you control, optionally
@@ -135,10 +175,18 @@ scry, look at the top N cards and take a <Type>, <Type>, or <Type> card into you
 (a `Choice::Blight`, and "If you do" effects run only if a creature was there to blight), each
 opponent or a target opponent; `Costs::Blight` is paid with `pay_blight(creature)`). A creature
 type is also a target: "target Elf you control", "target attacking Goblin you control",
+create Treasure/Food/Clue tokens (`Magic::Tokens::Treasure`/`Food`/`Clue`), surveil (`Choice::Surveil`), gain control of a target [until end of turn] (`Permanent#gain_control_until_eot!`), "If that creature is a <type>, it [also] <effect on it>" (`IfTargetIsType`), "~ / enchanted creature / equipped creature fights [up to one] target creature ..." (`Fight`), "exile [up to one] target ... until ~ leaves the battlefield" (`ExileUntilLeaves`), "~ becomes an N/N [<types>] creature [with <keywords>] until end of turn" (`BecomeCreature`), and "<target / ~ / it> becomes all colors / colorless / <colour> until end of turn" (`ChangeColors`). Also: bounce and tap a target permanent, and `Counter target [<type>/non<type>] spell [with mana value N]` (`CounterSpell`).
 "another target Merfolk you control" (`PermanentTarget`). Together, `EntersWithCounters`, an upkeep "remove a time counter" and a
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 
+- "It" / "that creature" ("Untap it.", "It gains haste until end of turn.") is
+  `PermanentTarget::PRONOUN`: the effect's `earlier_target?` is true and it acts on
+  `target`, the target of an earlier effect in the same ability. `EffectList.parse`
+  rejects one with no targeted effect before it; in a multi-target spell it uses the
+  `targets[i]` of the last targeted effect before it; in a trigger it runs inside that
+  effect's `TargetChoice`. Tap, untap and pumps also take "enchanted creature" /
+  "equipped creature" (`PermanentTarget::ATTACHED`, `Effect::THIS.attached_to`).
 - An effect refers to its own card/permanent as `Effect::THIS`, which `EffectList`
   expands per context (`self` in a spell, `source` in an activated ability, `card` in a
   mode, `actor` in a trigger or inside a Choice). Never write `self`/`actor`/`source` in
@@ -161,6 +209,13 @@ stays one effect; "draw a card, then discard a card" is two). A
 "You"), and following "If you do, <effect>" / "When you do, <effect>" sentences join it;
 "If you don't, <effect>" runs when it is declined (`OptionalEffect#if_you_dont`). Every
 clause of an "If you do" sentence stays conditional ("you draw a card and lose 1 life").
+An "If this spell was kicked, <effects>." sentence (`~` too, since "this spell" becomes
+`~`) becomes a `KickedEffect`: its effects render inside `if kicker_cost.paid? ... end`
+(`card.kicker_cost` in a mode). It works only on instants, sorceries and modes; a
+triggered or activated ability raises `UnsupportedCard`. Kicked effects can't target
+(targets are chosen on casting), and a kicked effect that makes a choice (scry, "you
+may") must come last, or the effects after it would run before the choice resolved.
+"… instead" sentences ("it deals 4 damage instead") aren't supported.
 
 Rendering (`render`) walks the effects to the first *choice point* (an
 `OptionalEffect`, a choice effect with `choice_base`/`choice_class_name`/`choice_args`
@@ -178,11 +233,19 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   auto-resolves a lone legal target and needs `choice_amount`.
 - `spell_source(this:)` renders an instant/sorcery (`"self"`), mode (`"card"`) or
   activated ability (`"source"`): the target is chosen on cast, so `target_choices` +
-  `resolve!(target:)`, and a targeted effect after a choice point raises.
-- `trigger_source(entry:)` renders a triggered/chapter ability's `call`/`resolve!`; if
-  it targets anywhere but its first effect, it starts with
-  `return if (<targets>).none?`: an ability with no legal target does nothing.
-- At most one targeted effect per spell, mode or ability.
+  `resolve!(target:)`, and a targeted effect after a choice point raises. Several
+  targeted effects make it `multi_target?` with one list of choices per target and
+  `resolve!(targets:)`, each effect's `target` rewritten to its `targets[i]`
+  (`ActivatedAbility#valid_targets?` checks each target against its own list).
+- "up to one target ..." (`PermanentTarget` `up_to`, an effect's `optional_target?`) is
+  only supported in triggered abilities (`spell_source` raises). Its `TargetChoice` has
+  `choice_amount = 0..1` (so `Stack#add_choice` doesn't pick a lone target for you),
+  and effects after it run in `finish`, from `resolve!`, from `decline!`
+  (`game.skip_choice!`) or straight away when there is nothing to target.
+- `trigger_source(entry:)` renders a triggered/chapter ability's `call`/`resolve!`. Each
+  targeted effect is its own choice, nested in turn (`TargetChoice`, `TargetChoice2`,
+  ...). Unless its only target is its first effect, it starts with
+  `return if <targets>.none? || ...`: an ability missing a legal target does nothing.
 
 ## Testing
 
@@ -201,7 +264,9 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   into `lib/magic/cards/`, run its spec, then restore the original. Cards checked this
   way: Temple of Mystery, Jungle Hollow, Dismal Backwater, Mind Stone, Enchantress's
   Presence, Phyrexian Arena, Beast Whisperer, Firebrand Archer, Kessig Flamebreather,
-  Glorious Anthem, Titanic Growth, Short Sword, Swiftfoot Boots, Setessan Training.
+  Glorious Anthem, Titanic Growth, Short Sword, Swiftfoot Boots, Setessan Training,
+  Cancel, Lorescale Coatl, Herald of the Pantheon, Rampant Growth (its spec names the
+  hand-written choice class; the rest passes).
   Soulherder is covered by
   `spec/card_parser/generated_soulherder_spec.rb` instead: its hand-written spec names
   its own choice classes and expects a lone target to be offered rather than chosen

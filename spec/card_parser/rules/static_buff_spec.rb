@@ -16,6 +16,13 @@ RSpec.describe Magic::CardParser::Rules::StaticBuff do
     expect(described_class.parse("Equipped creature has hexproof and haste.")).to eq(described_class.new("equipped creature", nil, nil, nil, %i[hexproof haste]))
   end
 
+  it "splits \"is all creature types\" on an Equipment or Aura into a method on the card" do
+    rules = described_class.merge([described_class.parse("Equipped creature gets +1/+1 and is all creature types.")])
+    expect(rules.map(&:hook)).to eq([:static_abilities, nil])
+    expect(rules.map(&:body_source)).to eq([nil, "def grants_all_creature_types? = true"])
+    expect(described_class.parse("Creatures you control get +1/+1 and is all creature types.")).to be_nil
+  end
+
   it "limits each subject to the cards it makes sense on" do
     expect(described_class.parse("Equipped creature gets +2/+0.").kinds).to eq(%i[equipment])
     expect(described_class.parse("Enchanted creature gets +2/+0.").kinds).to eq(%i[aura])
@@ -24,7 +31,7 @@ RSpec.describe Magic::CardParser::Rules::StaticBuff do
 
   it "parses a buff that counts something, for any subject" do
     blade = described_class.parse("Equipped creature gets +1/+1 for each Equipment you control.")
-    expect([blade.power, blade.toughness, blade.per]).to eq([1, 1, 'controller.permanents.count { _1.type?("Equipment") }'])
+    expect([blade.power, blade.toughness, blade.per]).to eq([1, 1, "controller.equipment.count"])
     expect(described_class.parse("~ gets +1/+1 for each other Elf you control.").subject).to eq("~")
     expect(described_class.parse("~ gets +1/+1 for each other Elf you control.").kinds).to eq(%i[creature])
     expect(described_class.parse("Equipped creature gets +1/+1 for each opponent you have.")).to be_nil
@@ -39,6 +46,15 @@ RSpec.describe Magic::CardParser::Rules::StaticBuff do
         def power_modification = 2 * controller.hand.count
       end
     RUBY
+  end
+
+  it "applies a buff only as long as a condition holds" do
+    rule = described_class.parse("~ has flying as long as you control another artifact.")
+    expect(rule.condition).to eq("controller.artifacts.except(source).any?")
+    expect(rule.class_source("SelfKeywords")).to include("keyword_grants Keywords::FLYING", "conditions { controller.artifacts.except(source).any? }")
+    buff = described_class.merge([described_class.parse("~ gets +1/+1 and has trample as long as it's your turn.")])
+    expect(buff.map(&:condition).uniq).to eq(["game.current_turn.active_player == controller"])
+    expect(described_class.parse("~ has flying as long as you have 30 or more poison counters.")).to be_nil
   end
 
   it "ignores other lines" do

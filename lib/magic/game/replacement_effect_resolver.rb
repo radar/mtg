@@ -5,9 +5,9 @@ module Magic
         @game = game
       end
 
-      def resolve(effect)
+      def resolve(effect, applied_replacement_keys: [])
         current_effect = effect
-        applied_replacement_keys = []
+        applied_replacement_keys = applied_replacement_keys.dup
 
         loop do
           context = ReplacementEffectContext.new(
@@ -38,6 +38,15 @@ module Magic
 
           applied_replacement_keys << replacement_key_for(replacement_effect)
           current_effect = new_effect
+
+          # Each event a replacement split the original into is still subject to the
+          # replacement effects that haven't been applied yet.
+          if current_effect.is_a?(Effects::Multiple)
+            return Effects::Multiple.new(
+              source: current_effect.source,
+              effects: current_effect.effects.map { resolve(_1, applied_replacement_keys: applied_replacement_keys) },
+            )
+          end
         end
 
         current_effect

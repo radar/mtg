@@ -17,14 +17,21 @@ module Magic
             result[:generic] += symbol.to_i
           elsif (color = SYMBOL_TO_COLOR[symbol])
             result[color] += 1
-          elsif (hybrid = HYBRID.match(symbol))
-            result[:"#{hybrid.captures.map { SYMBOL_TO_COLOR.fetch(_1) }.sort.join('_or_')}"] += 1
+          elsif (hybrid = hybrid_key(symbol))
+            result[hybrid] += 1
           elsif symbol == "X"
             result[:x] += 1
           else
             raise UnsupportedCard, "unsupported mana symbol {#{symbol}}"
           end
         end.to_h
+      end
+
+      def self.hybrid_key(symbol)
+        colors = symbol.split("/").map { SYMBOL_TO_COLOR[_1] }
+        return unless colors.size == 2 && colors.none? { _1.nil? || _1 == :colorless }
+
+        :"#{colors.sort.join('_or_')}"
       end
     end
   end

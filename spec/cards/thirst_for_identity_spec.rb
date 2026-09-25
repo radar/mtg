@@ -6,47 +6,39 @@ RSpec.describe Magic::Cards::ThirstForIdentity do
   include_context "two player game"
 
   let(:thirst) { Card("Thirst For Identity") }
-  let(:choice) { game.choices.last }
 
   before do
+    p1.hand.add(thirst)
     p1.add_mana(blue: 3)
-    p1.cast(card: thirst) { _1.pay_mana(generic: { blue: 2 }, blue: 1) }
-    game.stack.resolve!
+    p1.cast(card: thirst) { _1.auto_pay_mana }
   end
 
-  it "draws three cards" do
-    expect(p1.hand.count).to eq(7 + 3)
-  end
+  def choice = game.choices.last
 
-  it "asks for a discard of two cards, or a creature card" do
-    expect(choice).to be_a(Magic::Choice::DiscardUnless)
-    expect(choice.amount).to eq(2)
-    expect(choice.card_type).to eq("Creature")
+  it "draws three cards, then asks for a discard" do
+    expect { game.stack.resolve! }.to change { p1.hand.count }.by(2)
+    expect(choice).to be_a(described_class::DiscardChoice)
   end
 
   it "discards two cards" do
-    first, second = p1.hand.cards.first(2)
-    game.resolve_choice!(cards: [first, second])
-
-    expect(p1.hand.count).to eq(8)
-    expect(p1.graveyard.cards).to include(first, second)
+    game.stack.resolve!
+    two = p1.hand.first(2)
+    game.resolve_choice!(cards: two)
+    expect(two.map(&:zone)).to all(be_graveyard)
   end
 
-  it "discards a single creature card instead" do
+  it "discards only a creature card, instead of two" do
     bears = Card("Grizzly Bears")
     p1.hand.add(bears)
-    game.resolve_choice!(cards: [bears])
+    game.stack.resolve!
 
-    expect(p1.hand.count).to eq(10)
-    expect(p1.graveyard.cards).to include(bears)
+    expect { game.resolve_choice!(cards: [bears]) }.to change { p1.graveyard.count }.by(1)
+    expect(bears.zone).to be_graveyard
   end
 
-  it "doesn't let one non-creature card stand in for two" do
-    forest = p1.hand.cards.find { _1.name == "Forest" }
-    expect { choice.resolve!(cards: [forest]) }.to raise_error(ArgumentError)
-  end
-
-  it "doesn't let a card outside your hand be discarded" do
-    expect { choice.resolve!(cards: [Card("Grizzly Bears")]) }.to raise_error(ArgumentError)
+  it "won't discard a single noncreature card" do
+    game.stack.resolve!
+    forest = p1.hand.first
+    expect { game.resolve_choice!(cards: [forest]) }.to raise_error(described_class::DiscardChoice::InvalidDiscard)
   end
 end

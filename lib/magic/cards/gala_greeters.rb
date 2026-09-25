@@ -8,19 +8,6 @@ module Magic
     end
 
     class GalaGreeters < Creature
-      TreasureToken = Token.create("Treasure") do
-        type T::Artifact, "Treasure"
-        power 0
-        toughness 0
-
-        class ManaAbility < Magic::ManaAbility
-          costs "{T}, Sacrifice {this}"
-          choices :all
-        end
-
-        def activated_abilities = [ManaAbility]
-      end
-
       class AllianceChoice < Magic::Choice
         COUNTER = :counter
         TREASURE = :treasure
@@ -40,7 +27,7 @@ module Magic
           when COUNTER
             trigger_effect(:add_counter, target: actor, counter_type: "+1/+1")
           when TREASURE
-            actor.trigger_effect(:create_token, token_class: TreasureToken, enters_tapped: true)
+            actor.trigger_effect(:create_token, token_class: Tokens::Treasure, enters_tapped: true)
           when LIFE
             controller.gain_life(2)
           end

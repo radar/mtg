@@ -22,7 +22,7 @@ module Magic
         # Layer 5
         permanent.color_override = characteristic_settings.filter_map(&:set_colors).last
         # Layer 6
-        permanent.lost_all_abilities = characteristic_settings.any?(&:loses_all_abilities?)
+        permanent.lost_all_abilities_by_effect = characteristic_settings.any?(&:loses_all_abilities?)
         permanent.activated_abilities = calculate_activated_abililities
         permanent.keywords = calculate_keywords
         game.logger.debug "Keywords: #{permanent.keywords}"
@@ -95,15 +95,14 @@ module Magic
           *modifiers_by_type(Modifications::AdditionalType).flat_map(&:type_grants),
         ]
 
+        types = types.uniq
         types -= static_abilities_for(permanent).of_type(Abilities::Static::TypeRemoval).flat_map(&:type_removal)
       end
 
       def calculate_keywords
-        return [] if permanent.lost_all_abilities
-
         [
-          *copiable_card.keywords,
-          *keyword_grant_static_abilities.flat_map(&:keyword_grants),
+          *(permanent.lost_all_abilities? ? [] : copiable_card.keywords),
+          *keyword_grant_static_abilities.flat_map { _1.keyword_grants_for(permanent) },
           *modifiers_by_type(Modifications::KeywordGrant).map(&:keyword_grant),
           *permanent.attachments.flat_map(&:keyword_grants),
         ]
@@ -126,11 +125,9 @@ module Magic
       end
 
       def calculate_activated_abililities
-        return [] if permanent.lost_all_abilities
-
-        class_types = permanent.types.select { |type| type.is_a?(Class) }
+        class_types = permanent.lost_all_abilities? ? [] : permanent.types.select { |type| type.is_a?(Class) }
         [
-          *copiable_card.activated_abilities,
+          *(permanent.lost_all_abilities? ? [] : copiable_card.activated_abilities),
           # Land types specifically give one mana ability each
           *class_types.flat_map { |type| type::ManaAbility},
           *granted_activated_abilities,

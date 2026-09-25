@@ -5,66 +5,85 @@ require "spec_helper"
 RSpec.describe Magic::Cards::TwilightDiviner do
   include_context "two player game"
 
-  let!(:diviner) do
-    ResolvePermanent("Twilight Diviner", owner: p1).tap { game.resolve_choice!(top: p1.library.first(2)) if game.choices.any? }
-  end
-
-  def tokens_named(name) = battlefield.creatures.select { |c| c.token? && c.name == name }
-
-  def battlefield = game.battlefield
-
   it "is a 3/3 Elf Cleric" do
-    expect(diviner.power).to eq(3)
-    expect(diviner.toughness).to eq(3)
-    expect(diviner.type?("Elf")).to eq(true)
-    expect(diviner.type?("Cleric")).to eq(true)
+    diviner = ResolvePermanent("Twilight Diviner", owner: p1)
+    game.skip_choice!
+    expect([diviner.power, diviner.toughness]).to eq([3, 3])
+    expect(diviner).to be_type("Elf")
+    expect(diviner).to be_type("Cleric")
   end
 
   it "surveils 2 when it enters" do
-    go_to_main_phase!
-    p1.add_mana(black: 3)
-    card = Card("Twilight Diviner")
-    p1.hand.add(card)
-    p1.cast(card: card) { _1.pay_mana(generic: { black: 2 }, black: 1) }
-    game.stack.resolve!
-    game.settle!
-
+    ResolvePermanent("Twilight Diviner", owner: p1)
     choice = game.choices.last
     expect(choice).to be_a(Magic::Choice::Surveil)
     expect(choice.amount).to eq(2)
+
+    top_two = p1.library.first(2)
+    game.resolve_choice!(graveyard: top_two)
+    expect(top_two.map(&:zone)).to all(be_graveyard)
   end
 
-  context "when another creature enters from a graveyard" do
-    def reanimate(name)
-      card = Card(name)
-      p1.graveyard.add(card)
-      Magic::Permanent.resolve(game: game, owner: p1, card: card)
-      game.settle!
+  context "with Twilight Diviner on the battlefield" do
+    let!(:diviner) { ResolvePermanent("Twilight Diviner", owner: p1) }
+
+    before do
+      game.skip_choice!
+      go_to_main_phase!
     end
 
-    it "creates a token copy of it" do
-      reanimate("Grizzly Bears")
-      expect(tokens_named("Grizzly Bears").count).to eq(1)
+    def rise_again(card)
+      p1.graveyard.add(card)
+      p1.add_mana(black: 5)
+      p1.cast(card: Card("Rise Again")) do
+        _1.auto_pay_mana
+        _1.targeting(card)
+      end
+      game.stack.resolve!
+    end
+
+    it "creates a token copy of a creature that enters from your graveyard" do
+      rise_again(Card("Grizzly Bears"))
+
+      bears = p1.creatures.by_name("Grizzly Bears")
+      expect(bears.count).to eq(2)
+      expect(bears.count(&:token?)).to eq(1)
     end
 
     it "triggers only once each turn" do
-      reanimate("Grizzly Bears")
-      reanimate("Llanowar Elves")
-      expect(tokens_named("Grizzly Bears").count).to eq(1)
-      expect(tokens_named("Llanowar Elves").count).to eq(0)
+      rise_again(Card("Grizzly Bears"))
+      rise_again(Card("Wood Elves"))
+
+      expect(p1.creatures.by_name("Wood Elves").count).to eq(1)
     end
 
-    it "does not trigger for an opponent's creature" do
-      card = Card("Grizzly Bears")
+    it "triggers again on a later turn" do
+      rise_again(Card("Grizzly Bears"))
+      current_turn.end!
+      current_turn.cleanup!
+      go_to_main_phase_for!(p2)
+      go_to_main_phase_for!(p1)
+      rise_again(Card("Wood Elves"))
+
+      expect(p1.creatures.by_name("Wood Elves").count).to eq(2)
+    end
+
+    it "doesn't copy a creature cast from your hand" do
+      bears = Card("Grizzly Bears")
+      p1.hand.add(bears)
+      p1.add_mana(green: 2)
+      p1.cast(card: bears) { _1.auto_pay_mana }
+      game.stack.resolve!
+
+      expect(p1.creatures.by_name("Grizzly Bears").count).to eq(1)
+    end
+
+    it "doesn't copy an opponent's creature entering from their graveyard" do
+      card = Card("Grizzly Bears", owner: p2)
       p2.graveyard.add(card)
-      Magic::Permanent.resolve(game: game, owner: p2, card: card)
-      game.settle!
-      expect(tokens_named("Grizzly Bears")).to be_empty
-    end
-  end
+      card.resolve!
 
-  it "does not trigger for a creature that enters from elsewhere" do
-    ResolvePermanent("Grizzly Bears", owner: p1)
-    expect(tokens_named("Grizzly Bears")).to be_empty
+      expect(game.battlefield.creatures.by_name("Grizzly Bears").count).to eq(1)
+    end
   end
 end

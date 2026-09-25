@@ -17,7 +17,7 @@ module Magic
           new(other: !m[:other].nil?, power: m[:power].to_i, toughness: m[:toughness].to_i, all_types: !m[:all_types].nil?)
         end
 
-        def up_to_one? = true
+        def optional_target? = true
 
         def target_choices = other ? "(battlefield.creatures - [#{THIS}])" : "battlefield.creatures"
 

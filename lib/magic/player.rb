@@ -304,6 +304,18 @@ module Magic
       permanents.lands
     end
 
+    def artifacts
+      permanents.artifacts
+    end
+
+    def enchantments
+      permanents.enchantments
+    end
+
+    def equipment
+      permanents.equipment
+    end
+
     def creatures
       permanents.creatures
     end

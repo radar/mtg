@@ -58,6 +58,69 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Look at the top four cards of your library. You may reveal a Merfolk or Island card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.").types).to eq(%w[Merfolk Island])
   end
 
+  it "parses untapping a target, an earlier target or the enchanted creature" do
+    expect(described_class.parse("Untap target land you control.").target_choices).to eq("battlefield.controlled_by(controller).lands")
+    it = described_class.parse("Untap that creature.")
+    expect([it.target_choices, it.earlier_target?, it.resolve_call]).to eq([nil, true, "target.untap!"])
+    tap = described_class.parse("Tap enchanted creature.")
+    expect([tap.target_choices, tap.earlier_target?]).to eq([nil, false])
+    expect(tap.resolve_call).to eq("trigger_effect(:tap, target: #{Magic::CardParser::Effect::THIS}.attached_to)")
+  end
+
+  it "parses gaining control, for good or until end of turn" do
+    threaten = described_class.parse("Gain control of target creature until end of turn.")
+    expect([threaten.target_choices, threaten.resolve_call]).to eq(["battlefield.creatures", "target.gain_control_until_eot!(controller)"])
+    expect(described_class.parse("Gain control of target artifact.").resolve_call).to eq("target.controller = controller")
+  end
+
+  it "parses an effect on an earlier target that only applies to one type" do
+    goat = described_class.parse("If that creature is a Goat, it also gets +3/+0 until end of turn.")
+    expect(goat.earlier_target?).to eq(true)
+    expect(goat.target_choices).to be_nil
+    expect(goat.resolve_call).to eq("if target.type?(\"Goat\")\n  trigger_effect(:modify_power_toughness, target: target, power: 3, toughness: 0)\nend")
+    expect(described_class.parse("If that creature is a Goat, draw a card.")).to be_nil
+  end
+
+  it "parses fighting, with an optional target" do
+    fight = described_class.parse("~ fights target creature you don't control.")
+    expect([fight.target_choices, fight.optional_target?]).to eq(["battlefield.not_controlled_by(controller).creatures", false])
+    expect(fight.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.fights!(target)")
+    up_to = described_class.parse("Enchanted creature fights up to one target creature an opponent controls.")
+    expect(up_to.optional_target?).to eq(true)
+    expect(up_to.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.attached_to.fights!(target)")
+    expect(described_class.parse("~ fights target artifact.")).to be_nil
+  end
+
+  it "parses exiling until ~ leaves the battlefield" do
+    hold = described_class.parse("Exile up to one target nonland permanent an opponent controls until ~ leaves the battlefield.")
+    expect(hold.target_choices).to eq("battlefield.not_controlled_by(controller).nonland")
+    expect(hold.optional_target?).to eq(true)
+    expect(hold.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.exile_until_leaves!(target)")
+  end
+
+  it "parses becoming a creature until end of turn" do
+    core = described_class.parse("~ becomes a 4/4 artifact creature until end of turn.")
+    expect(core.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.become_creature!(power: 4, toughness: 4, types: [T::Artifact])")
+    land = described_class.parse("~ becomes a 3/3 Elemental creature with haste until end of turn. It's still a land.")
+    expect(land.resolve_call).to include('types: [T::Creatures["Elemental"]]', "keyword: :haste")
+    expect(described_class.parse("~ becomes a 2/2 blue creature until end of turn.")).to be_nil
+  end
+
+  it "parses changing colors until end of turn" do
+    all = described_class.parse("Target creature you control becomes all colors until end of turn.")
+    expect(all.target_choices).to eq("battlefield.controlled_by(controller).creatures")
+    expect(all.resolve_call).to eq("target.change_colors!([:white, :blue, :black, :red, :green])")
+    expect(described_class.parse("~ becomes red until end of turn.").resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.change_colors!([:red])")
+    expect(described_class.parse("It becomes colorless until end of turn.").earlier_target?).to eq(true)
+  end
+
+  it "parses surveil as a choice" do
+    surveil = described_class.parse("Surveil 2.")
+    expect(surveil).to eq(e.const_get(:Surveil).new(2))
+    expect(surveil.choice_base).to eq("Magic::Choice::Surveil")
+    expect(surveil.choice_args).to eq("amount: 2")
+  end
+
   it "parses life loss" do
     expect(described_class.parse("Target player loses 2 life.").resolve_call).to eq("trigger_effect(:lose_life, target: target, life: 2)")
     expect(described_class.parse("Target opponent loses 2 life.").target_choices).to eq("game.opponents(controller)")
@@ -70,7 +133,7 @@ RSpec.describe Magic::CardParser::Effect do
   it "parses mill" do
     expect(described_class.parse("Mill two cards.")).to eq(e.const_get(:Mill).new("you", 2))
     expect(described_class.parse("Mill two cards.").resolve_call).to eq("controller.mill(2)")
-    expect(described_class.parse("Each opponent mills three cards.").resolve_call).to eq("game.opponents(controller).each { |opponent| opponent.mill(3) }")
+    expect(described_class.parse("Each opponent mills three cards.").resolve_call).to eq("game.opponents(controller).each { _1.mill(3) }")
     target = described_class.parse("Target player mills 4 cards.")
     expect(target.target_choices).to eq("game.players")
     expect(target.resolve_call).to eq("target.mill(4)")
@@ -110,7 +173,7 @@ RSpec.describe Magic::CardParser::Effect do
   it "parses an up-to-one target getting base power and toughness and all creature types until end of turn" do
     base = described_class.parse("Choose up to one other target creature. Until end of turn, that creature has base power and toughness 4/4 and gains all creature types.")
     expect(base).to eq(e.const_get(:BaseStatsUntilEndOfTurn).new(true, 4, 4, true))
-    expect(base.up_to_one?).to eq(true)
+    expect(base.optional_target?).to eq(true)
     expect(base.target_choices).to eq("(battlefield.creatures - [#{Magic::CardParser::Effect::THIS}])")
     expect(base.resolve_call).to include("target.modify_base_power(4)", "target.modify_base_toughness(4)", "target.add_types")
   end
@@ -136,7 +199,6 @@ RSpec.describe Magic::CardParser::Effect do
   it "parses two-colour tokens and several keywords" do
     expect(described_class.parse("Create a 2/2 white and blue Knight creature token.").colors).to eq(%i[white blue])
     expect(described_class.parse("Create a 1/1 colorless Thopter creature token with flying and first strike.").keywords).to eq(%i[flying first_strike])
-    expect(described_class.parse("Create a Treasure token.")).to be_nil
   end
 
   it "parses a token with changeling as a static ability, alone or with other keywords" do
@@ -210,10 +272,10 @@ RSpec.describe Magic::CardParser::Effect do
     before = described_class.parse("Target creature gets +1/+1 for each Elf you control until end of turn.")
     after = described_class.parse("Target creature gets +1/+1 until end of turn for each Elf you control.")
     expect(before).to eq(after)
-    expect(before.resolve_call).to eq('trigger_effect(:modify_power_toughness, target: target, power: controller.permanents.count { _1.type?("Elf") }, ' \
-                                      'toughness: controller.permanents.count { _1.type?("Elf") })')
+    expect(before.resolve_call).to eq('trigger_effect(:modify_power_toughness, target: target, power: controller.permanents.by_type("Elf").count, ' \
+                                      'toughness: controller.permanents.by_type("Elf").count)')
     other = described_class.parse("~ gets +2/+0 until end of turn for each other Goblin you control.")
-    expect(other.resolve_call).to include("power: 2 * (controller.permanents - [#{this}]).count", "toughness: 0")
+    expect(other.resolve_call).to include("power: 2 * controller.permanents.by_type(\"Goblin\").except(#{this}).count", "toughness: 0")
     expect(described_class.parse("~ gains flying until end of turn for each Elf you control.")).to be_nil
     expect(described_class.parse("~ gets +1/+1 until end of turn for each opponent you have.")).to be_nil
   end
@@ -321,6 +383,47 @@ RSpec.describe Magic::CardParser::Effect do
     each = described_class.parse("Untap each other Merfolk you control.")
     expect(each.target_choices).to be_nil
     expect(each.resolve_call).to include('by_any_type("Merfolk")', "- [#{Magic::CardParser::Effect::THIS}]", ".each(&:untap!)")
+  end
+
+  it "parses bouncing and tapping a target permanent" do
+    bounce = described_class.parse("Return target nonland permanent an opponent controls to its owner's hand.")
+    expect(bounce.target_choices).to eq("battlefield.not_controlled_by(controller).nonland")
+    expect(bounce.resolve_call).to eq("trigger_effect(:return_to_owners_hand, target: target)")
+    expect(described_class.parse("Return target creature to its owner's hand.").target_choices).to eq("battlefield.creatures")
+    tap = described_class.parse("Tap target creature.")
+    expect([tap.target_choices, tap.resolve_call]).to eq(["battlefield.creatures", "trigger_effect(:tap, target: target)"])
+  end
+
+  it "parses countering a spell on the stack, by type" do
+    expect(described_class.parse("Counter target spell.").target_choices).to eq("game.stack.spells")
+    expect(described_class.parse("Counter target creature spell.").target_choices).to eq('game.stack.spells.select { _1.card.type?("Creature") }')
+    expect(described_class.parse("Counter target noncreature spell.").target_choices).to eq('game.stack.spells.select { !_1.card.type?("Creature") }')
+    expect(described_class.parse("Counter target instant or sorcery spell.").target_choices)
+      .to eq('game.stack.spells.select { _1.card.type?("Instant") || _1.card.type?("Sorcery") }')
+    expect(described_class.parse("Counter target spell.").resolve_call).to eq("trigger_effect(:counter_spell, target: target)")
+  end
+
+  it "parses milling" do
+    expect(described_class.parse("Target player mills three cards.").resolve_call).to eq("target.mill(3)")
+    expect(described_class.parse("Target player mills three cards.").target_choices).to eq("game.players")
+    expect(described_class.parse("Each opponent mills two cards.").resolve_call).to eq("game.opponents(controller).each { _1.mill(2) }")
+    expect(described_class.parse("Mill four cards.").resolve_call).to eq("controller.mill(4)")
+  end
+
+  it "parses searching your library as a choice" do
+    ramp = described_class.parse("Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.")
+    expect(ramp.choice_base).to eq("Magic::Choice::SearchLibrary")
+    expect(ramp.choice_args).to eq(["to_zone: :battlefield", "enters_tapped: true", "upto: 1", "filter: Filter[:basic_lands]"])
+    tutor = described_class.parse("Search your library for a creature card, reveal it, put it into your hand, then shuffle.")
+    expect(tutor.choice_args).to eq(["to_zone: :hand", "enters_tapped: false", "upto: 1", "filter: Filter[:creatures]", "reveal: true"])
+    expect(described_class.parse("Search your library for an artifact card, put it into your hand, then shuffle.")).to be_nil
+  end
+
+  it "parses Treasure, Food and Clue tokens" do
+    expect(described_class.parse("Create a Treasure token.").resolve_call).to eq("trigger_effect(:create_token, token_class: Tokens::Treasure)")
+    expect(described_class.parse("Create two Food tokens.").resolve_call).to eq("trigger_effect(:create_token, token_class: Tokens::Food, amount: 2)")
+    expect(described_class.parse("Create a Clue token.").resolve_call).to include("Tokens::Clue")
+    expect(described_class.parse("Create a Blood token.")).to be_nil
   end
 
   it "has no targets for untargeted effects" do

@@ -5,6 +5,7 @@ module Magic
       end
 
       CANT_BE_BLOCKED = Class.new(Keyword)
+      CHANGELING = Class.new(Keyword)
       DEATHTOUCH = Class.new(Keyword)
       DEFENDER = Class.new(Keyword)
       DOUBLE_STRIKE = Class.new(Keyword)
@@ -54,7 +55,7 @@ module Magic
 
       def self.list(*keywords)
         keywords.map do |keyword|
-          one(keyword)
+          keyword.is_a?(Keyword) ? keyword : one(keyword)
         end
       end
 
@@ -68,6 +69,10 @@ module Magic
         end
 
         keywords.any? { |kw| kw.is_a?(keyword) } || keywords.include?(keyword)
+      end
+
+      def changeling?
+        has_keyword?(Keywords::CHANGELING)
       end
 
       def infect?

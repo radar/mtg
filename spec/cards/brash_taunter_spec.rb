@@ -35,7 +35,6 @@ RSpec.describe Magic::Cards::BrashTaunter do
       current_turn.declare_blocker(taunter, attacker: bear)
       go_to_combat_damage!
 
-      # The lone blocker is assigned all 2 of the Bears' damage (rule 510.1c), not just lethal.
       expect(taunter.damage).to eq(2)
       expect(p2.life).to eq(18)
     end

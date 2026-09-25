@@ -6,6 +6,7 @@ module Magic
       end
 
       def perform
+        record_activation!
         game.notify!(Events::AbilityActivated.new(ability: ability, player: player))
         resolve!
       end

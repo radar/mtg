@@ -15,6 +15,7 @@ module Magic
 
       def resolve!
         return if amount <= 0
+        return unless target.can_have_counters?
 
         target.put_counters!(counter_type, amount:)
 

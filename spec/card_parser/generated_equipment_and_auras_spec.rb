@@ -121,4 +121,20 @@ RSpec.describe "CardParser generated Equipment and Aura buffs in play" do
       expect([bears.power, bears.toughness]).to eq([4, 2])
     end
   end
+
+  it "keeps the enchanted creature from attacking or blocking, and ETB triggers see what it enchants" do
+    load_card("Parsed Shackles {1}{W}\nEnchantment — Aura\nEnchant creature\nWhen this Aura enters, tap enchanted creature.\n" \
+              "Enchanted creature can't attack or block.\n")
+    go_to_main_phase!
+    bears = ResolvePermanent("Grizzly Bears", owner: p2)
+    shackles = Card("Parsed Shackles", owner: p1)
+    p1.hand.add(shackles)
+    p1.add_mana(white: 2)
+    p1.cast(card: shackles) { _1.pay_mana(white: 1, generic: { white: 1 }).targeting(bears) }
+    game.stack.resolve!
+
+    expect(bears).to be_tapped
+    expect(bears.can_attack?).to eq(false)
+    expect(bears.can_block?(ResolvePermanent("Grizzly Bears", owner: p1))).to eq(false)
+  end
 end

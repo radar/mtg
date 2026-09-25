@@ -36,7 +36,7 @@ module Magic
     end
 
     def type?(type)
-      event.permanent.types.include?(type)
+      event.permanent.type?(type)
     end
 
     def creature?

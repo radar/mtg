@@ -163,6 +163,15 @@ Still open: flipping `enforce_priority` on by default (A2/A3 are done), which is
 
 ## D. Combat correctness
 
+**Status (2026-09-24): D1–D3 done.** Specs: `spec/game/integration/combat/{blocking_restrictions,first_strike_blockers,damage_assignment}_spec.rb`. Deviations from the plan below:
+- D1 covers flying/reach, menace, skulk, tapped blockers, blockers the defending player doesn't control, one attacker per blocker, and blocking something that isn't attacking. Fear, intimidate, shadow, horsemanship and landwalk have no keyword in the engine yet, so they're left for E. Menace is checked by `CombatPhase#validate_blocks!` when leaving the declare blockers step.
+- D3 follows the current rules (Foundations removed damage assignment order): the attacking player divides damage however they like, with trample still needing lethal damage on every blocker first. Instead of a `Choice`, the seam is `current_turn.assign_combat_damage(attacker, { blocker => n, player => n })`, validated on the spot; until C2 exists, that's how a spec or caller makes the decision. Without one, the default is lethal damage to each blocker in the order declared, and what's left goes to the player (trample) or the last blocker.
+- A blocked attacker whose blockers have all left combat stays blocked and deals no damage unless it has trample (509.1h). A creature with 0 or less power deals no combat damage.
+- Bug this surfaced: `brash_taunter_spec` expected a 2/2 attacker to deal only 1 damage to its single 1/1 blocker.
+- Lethal damage counts damage already marked and damage other creatures are assigning to the same creature in the same step (510.1c, 702.19c), via `CombatPhase::PendingDamage`. Chosen divisions are worked out first, then default ones in attack order, then blockers. A chosen division is checked against the other attackers' chosen divisions only. So to trample over using another attacker's damage, assign that attacker's division first.
+- A creature can block more than one attacker when its card's `maximum_attackers_blocked` is above 1 (no card uses it yet). It divides its damage between those attackers the same way: lethal damage first, the rest to the last one. The defending player can't choose that division yet.
+- Still open: D4, D5.
+
 **Problem.** See fact 4 above. In addition, `Attack#resolve` assigns `[blocker.toughness, damage].min` to each blocker in turn: it ignores damage already marked, ignores deathtouch when not trampling, and gives the attacking player no ordering or split choice.
 
 **Scope.**

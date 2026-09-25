@@ -4,20 +4,21 @@ module Magic
   class CardParser
     module Rules
       # "{2}{R}, {T}: ~ deals 1 damage to any target." / "{1}, Sacrifice ~: Draw a
-      # card. Activate only as a sorcery." Costs are any Costs::Parser understands;
-      # the effects are anything EffectList parses, rendered like a spell's.
-      class ActivatedAbility < Data.define(:costs, :effect_list, :sorcery_speed)
+      # card. Activate only as a sorcery." / "... Activate only once each turn."
+      # Costs are any Costs::Parser understands; the effects are anything EffectList
+      # parses, rendered like a spell's.
+      class ActivatedAbility < Data.define(:costs, :effect_list, :sorcery_speed, :once_each_turn)
         include Rule
 
         COST = /(?:\{(?:\d+|[WUBRGC])\})+|\{T\}|Sacrifice ~|Sacrifice a creature|Exile ~|Discard a card|Blight \d+|Remove (?:\d+|\w+) [\w+\/-]+ counters? from ~(?: and sacrifice it)?/
-        LINE = /\A(?<costs>#{COST}(?:, #{COST})*): (?<effects>.+?)(?<sorcery> Activate only as a sorcery\.)?\z/
+        LINE = /\A(?<costs>#{COST}(?:, #{COST})*): (?<effects>.+?)(?<sorcery> Activate only as a sorcery\.)?(?<once> Activate only once each turn\.)?\z/
 
         def self.parse(line)
           return unless (m = LINE.match(line))
 
           effect_list = EffectList.parse(m[:effects]) or return
           m[:costs].scan(/Remove \w+ ([\w+\/-]+) counters? from/) { Magic::Counters[$1.downcase] } # raises for an unknown counter type
-          new(costs: costs(m[:costs]), effect_list:, sorcery_speed: !m[:sorcery].nil?)
+          new(costs: costs(m[:costs]), effect_list:, sorcery_speed: !m[:sorcery].nil?, once_each_turn: !m[:once].nil?)
         rescue RuntimeError => e
           raise unless e.message.start_with?("Unknown counter type")
         end
@@ -29,12 +30,15 @@ module Magic
               .gsub("~", "{this}")
         end
 
+        def initialize(costs:, effect_list:, sorcery_speed:, once_each_turn: false) = super
+
         def kinds = PERMANENT_KINDS
         def hook = :activated_abilities
         def class_base_name = "ActivatedAbility"
 
         def class_source(name)
           body = ["costs #{costs.inspect}\n"]
+          body << "once_each_turn\n" if once_each_turn
           body << "def requirements_met? = game.can_cast_sorcery?(controller)\n" if sorcery_speed
           body << effect_list.spell_source(this: "source")
           "class #{name} < Magic::ActivatedAbility\n#{body.join("\n").gsub(/^(?=.)/, '  ')}end\n"

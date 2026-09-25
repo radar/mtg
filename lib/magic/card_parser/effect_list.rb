@@ -18,6 +18,7 @@ module Magic
       MAY = /\Ayou may /i
       IF_YOU_DO = /\A(?:If|When) you do, /i
       IF_YOU_DONT = /\AIf you don't, /i
+      KICKED = /\AIf (?:this spell|~) was kicked, /i
 
       # Where effects are rendered: `this` is Ruby for the card or permanent the
       # effects belong to (and the actor of any Choice they add); a spell has its
@@ -28,10 +29,11 @@ module Magic
       # `text` as one effect (some span two sentences), else every sentence (or,
       # failing that, every clause of it) as an effect; nil unless all of them parse.
       def self.parse(text)
-        effect = Effect.parse(text) and return new(effects: [effect])
+        effect = Effect.parse(text) and return (new(effects: [effect]) unless effect.earlier_target?)
 
         effects = []
         clauses = text.split(SENTENCE).flat_map do |sentence|
+          next [sentence] if KICKED.match?(sentence)
           next [sentence] if parse_sentence(sentence.sub(IF_YOU_DO, "").sub(IF_YOU_DONT, "").sub(MAY, ""))
 
           # Every clause of an "If you do, ..." sentence stays conditional.
@@ -40,7 +42,10 @@ module Magic
           [first, *rest.map { "#{prefix}#{_1}" }]
         end
         clauses.each do |sentence|
-          if IF_YOU_DONT.match?(sentence)
+          if KICKED.match?(sentence)
+            effect = kicked(sentence.sub(KICKED, "")) or return
+            effects << effect
+          elsif IF_YOU_DONT.match?(sentence)
             return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DONT, "")))
 
             effects[-1] = effects.last.with(if_you_dont: effects.last.if_you_dont + [effect])
@@ -56,7 +61,23 @@ module Magic
             effects << effect
           end
         end
-        new(effects:) if effects.any?
+        new(effects:) if effects.any? && earlier_targets?(effects)
+      end
+
+      # "Untap it." needs an earlier effect with a target for "it" to refer to.
+      def self.earlier_targets?(effects)
+        leaves = new(effects:).send(:leaves, effects)
+        leaves.each_with_index.all? { |effect, i| !effect.earlier_target? || leaves[...i].any?(&:target_choices) }
+      end
+
+      # The rest of an "If this spell was kicked, ..." sentence. Targets are chosen as
+      # the spell is cast, before anyone knows whether it was kicked, so kicked effects
+      # can't target.
+      def self.kicked(text)
+        list = parse(text) or return
+        raise UnsupportedCard, "targeted effects after \"if this spell was kicked\" are not supported" if list.targeted?
+
+        KickedEffect.new(effects: list.effects)
       end
 
       # One sentence, capitalised; after "you may", also with its implied "You"
@@ -65,51 +86,74 @@ module Magic
         ConditionalEffect.parse(sentence) || Effect.parse(sentence[0].upcase + sentence[1..]) || Effect.parse("You #{sentence}")
       end
 
-      def initialize(effects:)
-        raise UnsupportedCard, "only one targeted effect per ability is supported" if leaves(effects).count(&:target_choices) > 1
-
-        super
-      end
-
       def +(other) = self.class.new(effects: effects + other.effects)
 
-      # Class body for an instant or sorcery (`this` = "self") or an activated
-      # ability (`this` = "source"): target_choices and resolve!(target:) when
-      # targeted. The target is chosen on casting, so it must come before any
-      # choice point.
-      def spell_source(this: "self")
-        targeted = leaves(effects).find(&:target_choices)
-        multi = targeted.respond_to?(:multi_target?) && targeted.multi_target?
-        raise UnsupportedCard, "multiple targets are only supported in instants and sorceries" if multi && this != "self"
+      def targeted? = leaves(effects).any?(&:target_choices)
 
+      # Class body for an instant or sorcery (`this` = "self"), a mode ("card") or
+      # an activated ability ("source"): target_choices and resolve!(target:) when
+      # targeted; with several targets, multi_target? with one list of choices per
+      # target and resolve!(targets:), each effect using its own targets[i]. Targets
+      # are chosen on casting, so they must come before any choice point.
+      def spell_source(this: "self")
+        raise UnsupportedCard, "\"if this spell was kicked\" only works on instants and sorceries" if this == "source" && kicked?
+        raise UnsupportedCard, "\"up to one target\" is only supported in triggered abilities" if leaves(effects).any?(&:optional_target?)
+        targeted = leaves(effects).select(&:target_choices)
+        # One effect that itself takes several targets ("N damage to any target and M damage to any other target").
+        single_multi = targeted.one? && targeted.first.respond_to?(:multi_target?) && targeted.first.multi_target?
+        raise UnsupportedCard, "multiple targets are only supported in instants and sorceries" if single_multi && this != "self"
         choices, statements = render(effects, Context.new(this:, targets_in_scope: true))
         sections = definitions + choices
-        sections << "def multi_target? = true\n" if multi
-        sections << "def distinct_targets? = true\n" if multi && targeted.distinct_targets?
-        sections << "def target_choices\n  #{expand(targeted.target_choices, this)}\nend\n" if targeted
-        sections << method("resolve!#{multi ? '(targets:)' : ('(target:)' if targeted)}", statements)
+        if single_multi
+          sections << "def multi_target? = true\n"
+          sections << "def distinct_targets? = true\n" if targeted.first.distinct_targets?
+          sections << "def target_choices\n  #{expand(targeted.first.target_choices, this)}\nend\n"
+          sections << method("resolve!(targets:)", statements)
+        elsif targeted.size > 1
+          lists = targeted.map { "  #{expand(_1.target_choices, this)},\n" }.join
+          sections << "def multi_target? = true\n"
+          sections << "def target_choices\n  [\n#{lists.gsub(/^/, '  ')}  ]\nend\n"
+          sections << method("resolve!(targets:)", statements)
+        else
+          sections << "def target_choices\n  #{expand(targeted.first.target_choices, this)}\nend\n" if targeted.any?
+          sections << method("resolve!#{'(target:)' if targeted.any?}", statements)
+        end
         sections.join("\n")
       end
 
       # Class body for a triggered or chapter ability, whose `entry` method runs
-      # the effects. A targeted ability with no legal target does nothing.
+      # the effects. A targeted ability with no legal target does nothing, unless its
+      # targets are all "up to one".
       def trigger_source(entry: "call")
-        targeted = leaves(effects).find(&:target_choices)
-        raise UnsupportedCard, "multiple targets are only supported in instants and sorceries" if targeted.respond_to?(:multi_target?) && targeted.multi_target?
-
+        raise UnsupportedCard, "\"if this spell was kicked\" only works on instants and sorceries" if kicked?
+        raise UnsupportedCard, "multiple targets are only supported in instants and sorceries" if leaves(effects).any? { _1.respond_to?(:multi_target?) && _1.multi_target? }
+        targeted = leaves(effects).select(&:target_choices).reject(&:optional_target?)
         choices, statements = render(effects, INSIDE_CHOICE)
-        if targeted && !effects.first.equal?(targeted)
-          targets = expand(targeted.target_choices, "actor")
-          targets = "(#{targets})" unless targets.match?(/\A\(.*\)\z/) || targets.match?(/\A[\w.()]+\z/)
-          statements.unshift("return if #{targets}.none?")
+        unless targeted.empty? || (targeted.one? && effects.first.equal?(targeted.first))
+          checks = targeted.map do |effect|
+            targets = expand(effect.target_choices, "actor")
+            targets = "(#{targets})" unless targets.match?(/\A\(.*\)\z/) || targets.match?(/\A[\w.()]+\z/)
+            "#{targets}.none?"
+          end
+          statements.unshift("return if #{checks.join(' || ')}")
         end
         (definitions + choices + [method(entry, statements)]).join("\n")
       end
 
       private
 
-      # Effects with optional ones opened up.
-      def leaves(list) = list.flat_map { _1.is_a?(OptionalEffect) ? _1.all_effects : [_1] }
+      # Effects with optional and kicked ones opened up.
+      def leaves(list)
+        list.flat_map do |effect|
+          case effect
+          when OptionalEffect then effect.all_effects
+          when KickedEffect then leaves(effect.effects)
+          else [effect]
+          end
+        end
+      end
+
+      def kicked? = effects.any?(KickedEffect)
 
       def definitions = leaves(effects).filter_map(&:definitions).uniq
 
@@ -119,7 +163,7 @@ module Magic
 
       # [choice classes, statements] for `list` in `context`.
       def render(list, context)
-        index = list.index { choice_point?(_1, context) } or return [[], calls(list, context)]
+        index = list.index { choice_point?(_1, context) } or return statements(list, context)
 
         point, rest = list[index], list[(index + 1)..]
         if context.targets_in_scope && leaves([point, *rest]).any?(&:target_choices)
@@ -131,7 +175,27 @@ module Magic
                       in _ if point.choice_base then effect_choice(point, rest, context)
                       else target_choice(point, rest, context)
                       end
-        [Array(klass), calls(list[...index], context) + adds]
+        before_classes, before = statements(list[...index], context)
+        [before_classes + Array(klass), before + adds]
+      end
+
+      # [choice classes, statements] for effects that aren't choice points; a kicked
+      # effect's statements are wrapped in a check that the kicker was paid.
+      def statements(list, context)
+        list.each_with_index.each_with_object([[], []]) do |(effect, index), (classes, lines)|
+          next lines.concat(calls([effect], context)) unless effect.is_a?(KickedEffect)
+
+          # Anything after a choice would run before that choice resolved.
+          if leaves(effect.effects).any? { choice_point?(_1, context) } && index < list.size - 1
+            raise UnsupportedCard, "effects after a choice in \"if this spell was kicked\" are not supported"
+          end
+
+          inner_classes, inner = render(effect.effects, context)
+
+          classes.concat(inner_classes)
+          kicker = context.this == "self" ? "kicker_cost" : "#{context.this}.kicker_cost"
+          lines << "if #{kicker}.paid?\n#{inner.join("\n").lines.map { "  #{_1.chomp}\n" }.join}end"
+        end
       end
 
       # Asks first; accepted runs the optional effects, and the effects after
@@ -171,16 +235,52 @@ module Magic
       end
 
       # A target chosen on resolution (triggered abilities).
+      # A target chosen on resolution (triggered abilities). A second target's
+      # choice nests inside the first's, as TargetChoice2.
       def target_choice(point, rest, context)
+        index = leaves(effects).select(&:target_choices).index { _1.equal?(point) }
+        name = index.to_i.zero? ? "TargetChoice" : "TargetChoice#{index + 1}"
         classes, after = render(rest, INSIDE_CHOICE)
-        up_to_one = point.respond_to?(:up_to_one?) && point.up_to_one? ? ["def single_target? = false\n"] : []
-        body = [method("choices", [expand(point.target_choices, "actor")]), "def choice_amount = 1\n", *up_to_one, *classes,
+        return optional_target_choice(name, point, classes, after, context) if point.optional_target?
+
+        body = [method("choices", [expand(point.target_choices, "actor")]), "def choice_amount = 1\n", *classes,
                 method("resolve!(target:)", [expand(point.resolve_call, "actor"), *after])]
-        [class_source("TargetChoice", "Magic::Choice::Targeted", body),
-         ["choice = TargetChoice.new(actor: #{context.this})", "game.add_choice(choice) if choice.choices.any?"]]
+        [class_source(name, "Magic::Choice::Targeted", body),
+         ["choice = #{name}.new(actor: #{context.this})", "game.add_choice(choice) if choice.choices.any?"]]
       end
 
-      def calls(list, context) = list.map { expand(_1.resolve_call, context.this) }
+      # "up to one target": choosing none (skip_choice! -> decline!), or having
+      # nothing to choose, still runs the effects after it.
+      def optional_target_choice(name, point, classes, after, context)
+        body = [method("choices", [expand(point.target_choices, "actor")]), "def choice_amount = 0..1\n", *classes]
+        if after.empty?
+          body << method("resolve!(target:)", [expand(point.resolve_call, "actor")])
+          adds = ["choice = #{name}.new(actor: #{context.this})", "game.add_choice(choice) if choice.choices.any?"]
+        else
+          body << method("resolve!(target:)", [expand(point.resolve_call, "actor"), "finish"])
+          body << "def decline! = finish\n"
+          body << method("finish", after)
+          adds = ["choice = #{name}.new(actor: #{context.this})", "choice.choices.any? ? game.add_choice(choice) : choice.finish"]
+        end
+        [class_source(name, "Magic::Choice::Targeted", body), adds]
+      end
+
+      # With several targets in scope (a multi-target spell), each targeted effect
+      # uses its own targets[i] in place of `target`, and an effect on an earlier
+      # target ("untap it") that of the last targeted effect before it.
+      def calls(list, context)
+        all = leaves(effects)
+        targeted = all.select(&:target_choices)
+        list.map do |effect|
+          call = expand(effect.resolve_call, context.this)
+          index = targeted.index { _1.equal?(effect) }
+          if effect.earlier_target?
+            before = all[...all.index { _1.equal?(effect) }].select(&:target_choices)
+            index = targeted.index { _1.equal?(before.last) }
+          end
+          context.targets_in_scope && targeted.size > 1 && index ? call.gsub(/\btarget\b(?!:)/, "targets[#{index}]") : call
+        end
+      end
 
       # Effects refer to the card or permanent they belong to as Effect::THIS.
       def expand(ruby, this) = ruby.gsub(Effect::THIS, this)

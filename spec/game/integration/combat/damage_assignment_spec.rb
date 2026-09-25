@@ -2,145 +2,114 @@
 
 require "spec_helper"
 
-RSpec.describe Magic::Game, "combat -- damage assignment" do
+RSpec.describe Magic::Game, "combat -- dividing an attacker's damage among blockers" do
   include_context "two player game"
 
-  let(:keywords) { Magic::Cards::Keywords }
-  let(:invalid) { Magic::Game::CombatPhase::InvalidDamageAssignment }
+  let!(:dreadmaw) { ResolvePermanent("Colossal Dreadmaw", owner: p1) }
+  let!(:first_bear) { ResolvePermanent("Grizzly Bears", owner: p2) }
+  let!(:second_bear) { ResolvePermanent("Balduvian Bears", owner: p2) }
 
-  def attack_with(attacker, *blockers)
+  def attack_and_block(*blockers)
     skip_to_combat!
+    game.tick!
     current_turn.declare_attackers!
-    current_turn.declare_attacker(attacker, target: p2)
+    current_turn.declare_attacker(dreadmaw, target: p2)
     current_turn.attackers_declared!
-    blockers.each { |blocker| current_turn.declare_blocker(blocker, attacker: attacker) }
+    blockers.each { current_turn.declare_blocker(_1, attacker: dreadmaw) }
   end
 
-  describe "default assignment" do
-    it "assigns lethal damage to each blocker in turn, and the rest to the last" do
-      gorger = ResolvePermanent("Vastwood Gorger", owner: p1)
-      elves = ResolvePermanent("Wood Elves", owner: p2)
-      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+  it "assigns all of its damage to a single blocker" do
+    gorger = ResolvePermanent("Vastwood Gorger", owner: p2)
+    attack_and_block(gorger)
 
-      attack_with(gorger, elves, bears)
-      go_to_combat_damage!
+    go_to_combat_damage!
 
-      expect(elves).to be_dead
-      expect(bears).to be_dead
-      expect(p2.life).to eq(20)
-    end
-
-    it "accounts for damage already marked on a blocker" do
-      dreadmaw = ResolvePermanent("Colossal Dreadmaw", owner: p1)
-      gorger = ResolvePermanent("Vastwood Gorger", owner: p2)
-      gorger.take_damage(4)
-
-      attack_with(dreadmaw, gorger)
-      go_to_combat_damage!
-
-      # Only 2 more damage is lethal to the 5/6, so 4 of the Dreadmaw's 6 trample over.
-      expect(gorger).to be_dead
-      expect(p2.life).to eq(16)
-    end
-
-    it "treats 1 damage from a deathtouch attacker as lethal for every blocker" do
-      gorger = ResolvePermanent("Vastwood Gorger", owner: p1)
-      gorger.grant_keyword(keywords::DEATHTOUCH)
-      first = ResolvePermanent("Vastwood Gorger", owner: p2)
-      second = ResolvePermanent("Vastwood Gorger", owner: p2)
-      third = ResolvePermanent("Vastwood Gorger", owner: p2)
-
-      attack_with(gorger, first, second, third)
-      go_to_combat_damage!
-
-      expect([first, second, third]).to all(be_dead)
-    end
-
-    it "assigns all damage to a lone blocker even beyond lethal" do
-      bears = ResolvePermanent("Grizzly Bears", owner: p1)
-      gorger = ResolvePermanent("Vastwood Gorger", owner: p2)
-
-      attack_with(bears, gorger)
-      go_to_combat_damage!
-
-      expect(gorger.damage).to eq(2)
-    end
+    expect(gorger.zone).to be_nil
   end
 
-  describe "an attacker whose blockers all left combat" do
-    it "stays blocked and deals no damage without trample" do
-      bears = ResolvePermanent("Grizzly Bears", owner: p1)
-      elves = ResolvePermanent("Wood Elves", owner: p2)
+  it "counts damage already marked on a blocker toward lethal damage when trampling" do
+    gorger = ResolvePermanent("Vastwood Gorger", owner: p2)
+    gorger.take_damage(2)
+    dreadmaw.grant_keyword(Magic::Keywords::TRAMPLE)
+    attack_and_block(gorger)
 
-      attack_with(bears, elves)
-      elves.destroy!
-      game.settle!
-      go_to_combat_damage!
-
-      expect(p2.life).to eq(20)
-    end
-
-    it "assigns all its damage to the defending player with trample" do
-      dreadmaw = ResolvePermanent("Colossal Dreadmaw", owner: p1)
-      elves = ResolvePermanent("Wood Elves", owner: p2)
-
-      attack_with(dreadmaw, elves)
-      elves.destroy!
-      game.settle!
-      go_to_combat_damage!
-
-      expect(p2.life).to eq(14)
-    end
+    expect { go_to_combat_damage! }.to change { p2.life }.by(-2)
+    expect(gorger.zone).to be_nil
   end
 
-  describe "choosing the assignment" do
-    let!(:bears) { ResolvePermanent("Grizzly Bears", owner: p1) }
-    let!(:gorger) { ResolvePermanent("Vastwood Gorger", owner: p2) }
-    let!(:elves) { ResolvePermanent("Wood Elves", owner: p2) }
+  it "with deathtouch, one damage is lethal to each blocker" do
+    gorger = ResolvePermanent("Vastwood Gorger", owner: p2)
+    dreadmaw.grant_keyword(Magic::Keywords::DEATHTOUCH)
+    attack_and_block(gorger, first_bear, second_bear)
 
-    before { attack_with(bears, gorger, elves) }
+    go_to_combat_damage!
 
-    it "uses the attacking player's split" do
-      current_turn.combat.assign_combat_damage(bears, gorger => 1, elves => 1)
+    expect([gorger, first_bear, second_bear].map(&:zone)).to all(be_nil)
+  end
+
+  context "when the attacking player divides the damage" do
+    it "uses the division they choose" do
+      attack_and_block(first_bear, second_bear)
+      current_turn.assign_combat_damage(dreadmaw, { first_bear => 1, second_bear => 5 })
+
       go_to_combat_damage!
 
-      expect(elves).to be_dead
-      expect(gorger.damage).to eq(1)
+      expect(first_bear.zone).to be_battlefield
+      expect(first_bear.damage).to eq(1)
+      expect(second_bear.zone).to be_nil
     end
 
-    it "rejects a split that leaves damage unassigned" do
-      expect { current_turn.combat.assign_combat_damage(bears, gorger => 1, elves => 0) }
-        .to raise_error(invalid, /all combat damage must be assigned/)
+    it "lets a trampler send damage to the player once each blocker has lethal damage" do
+      dreadmaw.grant_keyword(Magic::Keywords::TRAMPLE)
+      attack_and_block(first_bear)
+      current_turn.assign_combat_damage(dreadmaw, { first_bear => 3, p2 => 3 })
+
+      expect { go_to_combat_damage! }.to change { p2.life }.by(-3)
     end
 
-    it "rejects a split that assigns more damage than the attacker has" do
-      expect { current_turn.combat.assign_combat_damage(bears, gorger => 2, elves => 2) }
-        .to raise_error(invalid, /more than 2/)
+    it "doesn't let a trampler skip lethal damage to a blocker" do
+      dreadmaw.grant_keyword(Magic::Keywords::TRAMPLE)
+      attack_and_block(first_bear)
+
+      expect { current_turn.assign_combat_damage(dreadmaw, { first_bear => 1, p2 => 5 }) }
+        .to raise_error(Magic::Game::CombatPhase::IllegalDamageAssignment, /lethal/)
     end
 
-    it "rejects a split that leaves out a blocker" do
-      expect { current_turn.combat.assign_combat_damage(bears, gorger => 2) }
-        .to raise_error(invalid, /among the blockers/)
+    it "doesn't let a creature without trample assign damage to the player" do
+      ogre = ResolvePermanent("Onakke Ogre", owner: p1)
+      skip_to_combat!
+      current_turn.declare_attackers!
+      current_turn.declare_attacker(ogre, target: p2)
+      current_turn.attackers_declared!
+      current_turn.declare_blocker(first_bear, attacker: ogre)
+
+      expect { current_turn.assign_combat_damage(ogre, { first_bear => 2, p2 => 2 }) }
+        .to raise_error(Magic::Game::CombatPhase::IllegalDamageAssignment, /trample/)
+    end
+
+    it "must assign all of the attacker's damage" do
+      attack_and_block(first_bear, second_bear)
+
+      expect { current_turn.assign_combat_damage(dreadmaw, { first_bear => 2, second_bear => 2 }) }
+        .to raise_error(Magic::Game::CombatPhase::IllegalDamageAssignment, /exactly 6/)
+    end
+
+    it "can only assign damage to creatures blocking it" do
+      bystander = ResolvePermanent("Onakke Ogre", owner: p2)
+      attack_and_block(first_bear)
+
+      expect { current_turn.assign_combat_damage(dreadmaw, { first_bear => 2, bystander => 4 }) }
+        .to raise_error(Magic::Game::CombatPhase::IllegalDamageAssignment, /isn't blocking/)
     end
   end
 
-  describe "choosing the assignment with trample" do
-    let!(:dreadmaw) { ResolvePermanent("Colossal Dreadmaw", owner: p1) }
-    let!(:elves) { ResolvePermanent("Wood Elves", owner: p2) }
+  it "a creature with no power deals no combat damage" do
+    allow(dreadmaw).to receive(:power).and_return(0)
+    attack_and_block(first_bear)
 
-    before { attack_with(dreadmaw, elves) }
+    go_to_combat_damage!
 
-    it "requires lethal damage to each blocker before trampling over" do
-      expect { current_turn.combat.assign_combat_damage(dreadmaw, elves => 0) }
-        .to raise_error(invalid, /lethal/)
-    end
-
-    it "tramples over whatever isn't assigned to the blockers" do
-      current_turn.combat.assign_combat_damage(dreadmaw, elves => 2)
-      go_to_combat_damage!
-
-      expect(elves).to be_dead
-      expect(p2.life).to eq(16)
-    end
+    expect(first_bear.damage).to eq(0)
+    expect(game.current_turn.events.select { _1.is_a?(Magic::Events::CombatDamageDealt) && _1.source == dreadmaw }).to be_empty
   end
 end
