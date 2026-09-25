@@ -233,6 +233,13 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
                               "controllers_end_step? && game.current_turn.events.any?", "trigger_effect(:draw_cards")
   end
 
+  it "parses an each-end-step trigger conditional on you having put a counter on a creature" do
+    source = parse("At the beginning of each end step, if you put a counter on a creature this turn, ~ deals 2 damage to each opponent.")
+      .class_source("EachEndStepIfCounterPutTrigger")
+    expect(source).to include("class EachEndStepIfCounterPutTrigger < TriggeredAbility::BeginningOfEndStep",
+                              "Events::CounterAddedToPermanent", "e.source&.controller == controller")
+  end
+
   it "chooses targets with a choice, running later effects there too" do
     source = parse("When ~ enters, it deals 2 damage to any target. You gain 1 life.").class_source("EntersTrigger")
     expect(source).to include("class TargetChoice < Magic::Choice::Targeted", "game.any_target",

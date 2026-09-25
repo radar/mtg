@@ -4,6 +4,7 @@ module Magic
       attr_reader :source, :target, :counter_type, :amount
 
       def initialize(source:, target:, counter_type:, amount: 1)
+        @source = source
         @target = target
         @counter_type = counter_type
         @amount = amount
