@@ -111,7 +111,9 @@ module Magic
                      end
                      "you? && #{types.size == 1 ? types.first : "(#{types.join(' || ')})"}"
                    },
-                   PERMANENT_KINDS)
+                   PERMANENT_KINDS),
+          Kind.new(/#{WHEN} you cast a spell during an opponent's turn/, "OpponentsTurnSpellCastTrigger", "TriggeredAbility::SpellCast",
+                   :event_handlers, "Events::SpellCast", "you? && !controllers_turn?", PERMANENT_KINDS)
         ].freeze
 
         # An italic ability word ("Landfall — ") is flavour; the rest is the trigger.

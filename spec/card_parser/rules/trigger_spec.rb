@@ -220,6 +220,12 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
                               "def should_perform?\n    you? && spell.type?(\"Creature\")\n  end", "trigger_effect(:draw_cards")
   end
 
+  it "parses casting a spell during an opponent's turn" do
+    source = parse("Whenever you cast a spell during an opponent's turn, draw a card.").class_source("OpponentsTurnSpellCastTrigger")
+    expect(source).to include("class OpponentsTurnSpellCastTrigger < TriggeredAbility::SpellCast",
+                              "def should_perform?\n    you? && !controllers_turn?\n  end")
+  end
+
   it "chooses targets with a choice, running later effects there too" do
     source = parse("When ~ enters, it deals 2 damage to any target. You gain 1 life.").class_source("EntersTrigger")
     expect(source).to include("class TargetChoice < Magic::Choice::Targeted", "game.any_target",

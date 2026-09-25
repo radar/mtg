@@ -65,7 +65,7 @@ What the rules cover:
   (`event.active_player == controller && event.attacks.any?`), ~ deals combat damage
   to a player (`Events::CombatDamageDealt`), the last <type> counter is removed from ~
   (`Events::CounterRemoved`; the type must be one `Magic::Counters[]` knows), and you
-  cast a <type>[ or <type>] spell (`non<type>` → `!spell.type?`), your first main phase
+  cast a <type>[ or <type>] spell (`non<type>` → `!spell.type?`), you cast a spell during an opponent's turn (`you? && !controllers_turn?`), your first main phase
   (`Events::FirstMainPhase`), ~ becomes tapped (`Events::PermanentTapped`), and the
   creature-type-qualified forms: another <Type> [or <Type>] you control dies, a <Type>
   creature you control dies, [~ or] another <Type> [or <Type>] you control enters (the
