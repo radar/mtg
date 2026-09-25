@@ -79,10 +79,15 @@ module Magic
       # choice point.
       def spell_source(this: "self")
         targeted = leaves(effects).find(&:target_choices)
+        multi = targeted.respond_to?(:multi_target?) && targeted.multi_target?
+        raise UnsupportedCard, "multiple targets are only supported in instants and sorceries" if multi && this != "self"
+
         choices, statements = render(effects, Context.new(this:, targets_in_scope: true))
         sections = definitions + choices
+        sections << "def multi_target? = true\n" if multi
+        sections << "def distinct_targets? = true\n" if multi && targeted.distinct_targets?
         sections << "def target_choices\n  #{expand(targeted.target_choices, this)}\nend\n" if targeted
-        sections << method("resolve!#{'(target:)' if targeted}", statements)
+        sections << method("resolve!#{multi ? '(targets:)' : ('(target:)' if targeted)}", statements)
         sections.join("\n")
       end
 
@@ -90,6 +95,8 @@ module Magic
       # the effects. A targeted ability with no legal target does nothing.
       def trigger_source(entry: "call")
         targeted = leaves(effects).find(&:target_choices)
+        raise UnsupportedCard, "multiple targets are only supported in instants and sorceries" if targeted.respond_to?(:multi_target?) && targeted.multi_target?
+
         choices, statements = render(effects, INSIDE_CHOICE)
         if targeted && !effects.first.equal?(targeted)
           targets = expand(targeted.target_choices, "actor")

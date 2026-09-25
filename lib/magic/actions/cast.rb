@@ -134,6 +134,10 @@ module Magic
         targets.each_with_index do |target, index|
           raise InvalidTarget, "Invalid target for #{card.name}: #{target}" unless can_target?(target, index)
         end
+        if card.respond_to?(:distinct_targets?) && card.distinct_targets? && targets.uniq.size != targets.size
+          raise InvalidTarget, "#{card.name} needs different targets"
+        end
+
         @targets = targets
         self
       end
