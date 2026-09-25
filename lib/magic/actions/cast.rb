@@ -146,11 +146,14 @@ module Magic
         self
       end
 
-      def pay_mana(payment)
+      # Pays the spell's cost: a mana hash for a mana cost, or the card/permanent
+      # for a non-mana (flashback/alternative) cost.
+      def pay_cost(payment)
         mana_cost.treat_any_color_as_any! if any_color_for_any_cost?
         mana_cost.pay(player:, payment:)
         self
       end
+      alias_method :pay_mana, :pay_cost
 
       def any_color_for_any_cost?
         game.battlefield.static_abilities

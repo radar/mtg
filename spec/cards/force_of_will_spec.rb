@@ -50,7 +50,7 @@ RSpec.describe Magic::Cards::ForceOfWill do
 
       action = cast_action(card: force, player: p1, alternative: true)
       expect(action.can_perform?).to eq(true)
-      action.pay_mana(blue_card)
+      action.pay_cost(blue_card)
       action.targeting(spell)
       action.perform
       game.stack.resolve!
@@ -72,7 +72,7 @@ RSpec.describe Magic::Cards::ForceOfWill do
       p1.hand.add(red_card)
 
       action = Magic::Actions::Cast.new(card: force, player: p1, game: game, alternative: true)
-      expect { action.pay_mana(red_card) }.to raise_error(RuntimeError, /Invalid card/)
+      expect { action.pay_cost(red_card) }.to raise_error(RuntimeError, /Invalid card/)
     end
   end
 end
