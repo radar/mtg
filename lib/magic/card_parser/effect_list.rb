@@ -62,7 +62,7 @@ module Magic
       # One sentence, capitalised; after "you may", also with its implied "You"
       # ("you may gain 3 life").
       def self.parse_sentence(sentence)
-        Effect.parse(sentence[0].upcase + sentence[1..]) || Effect.parse("You #{sentence}")
+        ConditionalEffect.parse(sentence) || Effect.parse(sentence[0].upcase + sentence[1..]) || Effect.parse("You #{sentence}")
       end
 
       def initialize(effects:)

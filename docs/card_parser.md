@@ -150,6 +150,8 @@ isn't supported.
 
 ## EffectList
 
+`ConditionalEffect` (`lib/magic/card_parser/conditional_effect.rb`, not an `Effects::` class) wraps "[Then] if there is a <Type> card in your graveyard, <effects>": the effects must be plain (no choice or target) and render inside an `if` on the graveyard. `EffectList.parse_sentence` tries it first.
+
 Turns effect text into Ruby: the whole text as one effect if that parses (`CopyTokens`
 spans two sentences), else each sentence, and a sentence that isn't one effect as a
 whole is split into clauses on ", then" and ", and you" ("exile it, then return it"
