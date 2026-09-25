@@ -42,11 +42,14 @@ module Magic
 
         # "When ~ enters or attacks" (see merge).
         ENTERS_OR_ATTACKS = "EntersOrAttacksTrigger"
+        # "When ~ enters or dies" (see merge).
+        ENTERS_OR_DIES = "EntersOrDiesTrigger"
 
         KINDS = [
           Kind.new(/#{WHEN} ~ enters(?: the battlefield)?/, "EntersTrigger", "TriggeredAbility::EnterTheBattlefield",
                    :etb_triggers, nil, nil, PERMANENT_KINDS),
           Kind.new(/#{WHEN} ~ enters(?: the battlefield)? or attacks/, ENTERS_OR_ATTACKS, nil, nil, nil, nil, %i[creature]),
+          Kind.new(/#{WHEN} ~ enters(?: the battlefield)? or dies/, ENTERS_OR_DIES, nil, nil, nil, nil, %i[creature]),
           Kind.new(/#{WHEN} ~ dies/, "DiesTrigger", "TriggeredAbility::Death", :death_triggers, nil, nil, %i[creature]),
           Kind.new(/#{WHEN} ~ leaves the battlefield/, "LeavesTrigger", "TriggeredAbility::LeaveTheBattlefield",
                    :ltb_triggers, nil, nil, PERMANENT_KINDS),
@@ -128,12 +131,15 @@ module Magic
           raise unless e.message.start_with?("Unknown counter type")
         end
 
-        # "When ~ enters or attacks" is two triggers with the same effects.
+        # "When ~ enters or attacks" / "enters or dies" are two triggers with the same effects.
+        SPLIT_KINDS = { ENTERS_OR_ATTACKS => "AttacksTrigger", ENTERS_OR_DIES => "DiesTrigger" }.freeze
+
         def self.merge(rules)
           rules.flat_map do |rule|
-            next [rule] unless rule.kind.name == ENTERS_OR_ATTACKS
+            second = SPLIT_KINDS[rule.kind.name]
+            next [rule] unless second
 
-            [rule.with(kind: kind_named("EntersTrigger")), rule.with(kind: kind_named("AttacksTrigger"), condition: kind_named("AttacksTrigger").condition)]
+            [rule.with(kind: kind_named("EntersTrigger")), rule.with(kind: kind_named(second), condition: kind_named(second).condition)]
           end
         end
 

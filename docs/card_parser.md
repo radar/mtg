@@ -56,7 +56,7 @@ What the rules cover:
   trigger (pattern, class name, `TriggeredAbility` base, hook, event,
   `should_perform?` condition, allowed card kinds). "When" and "Whenever" are
   interchangeable. Rows: ~ enters, ~ enters or attacks (`merge` splits it into an enters
-  trigger and an attacks trigger with the same effects), ~ dies, ~ leaves the
+  trigger and an attacks trigger with the same effects), ~ enters or dies (same, with a dies trigger), ~ dies, ~ leaves the
   battlefield, a/another creature [you control / an opponent controls] dies, a/another
   creature is exiled from the battlefield (`Events::LeftTheBattlefield` to exile), another
   creature you control enters, landfall, you / an opponent / a player gain(s) life

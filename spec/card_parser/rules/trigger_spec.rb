@@ -91,6 +91,12 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     expect(rules.map(&:effect_list).uniq.size).to eq(1)
   end
 
+  it "splits enters-or-dies into an enters trigger and a dies trigger" do
+    rules = described_class.merge([parse("When ~ enters or dies, draw a card.")])
+    expect(rules.map { [_1.class_base_name, _1.hook] }).to eq([["EntersTrigger", :etb_triggers], ["DiesTrigger", :death_triggers]])
+    expect(rules.map(&:effect_list).uniq.size).to eq(1)
+  end
+
   it "doesn't parse face-down triggers, which the engine can't do" do
     expect(parse("When ~ is turned face up, draw a card.")).to be_nil
   end
