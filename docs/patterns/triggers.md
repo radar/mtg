@@ -65,3 +65,5 @@ Pre-built subclasses in `lib/magic/triggered_ability/` — use these to avoid re
 
 
 **"If they entered or were cast from a graveyard"**: `Permanent#entered_from_graveyard?` (set in `Permanent.resolve` from the card's zone before it moves; a spell cast from a graveyard keeps its graveyard zone until it resolves; tokens/copies are nil). Gate an `Events::EnteredTheBattlefield` handler on it. The engine enters creatures one at a time, so "one or more" triggers fire per creature; for "only once each turn" on the *watcher*, `TriggeredAbility::OncePerTurn` doesn't fit (it keys on `event.permanent`) — mark `actor.trigger_once_this_turn!(self.class)` in `trigger!`. Example: `TwilightDiviner`.
+
+- **Token creation options**: `Effects::CreateToken` takes `enters_tapped:`, `attacking:` (tapped-and-attacking: declares each created token as an attacker) and `base_power:/base_toughness:`. Set them on the effect, not by patching `.first` afterwards, so replacement effects that make extra tokens (Doubling Season) carry them over. Replacements must build the new effect with `effect.with_amount(n)`, never a fresh `CreateToken.new`. Examples: `FalconerAdept`, `DoublingSeason`.

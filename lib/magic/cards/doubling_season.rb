@@ -11,12 +11,7 @@ module Magic
         end
 
         def call(effect)
-          Effects::CreateToken.new(
-            source: receiver,
-            token_class: effect.token_class,
-            controller: receiver.controller,
-            amount: effect.amount * 2,
-          )
+          effect.with_amount(effect.amount * 2)
         end
       end
 

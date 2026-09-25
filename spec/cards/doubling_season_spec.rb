@@ -75,4 +75,31 @@ RSpec.describe Magic::Cards::DoublingSeason do
       expect(wood_elves.counters.count).to eq(1)
     end
   end
+
+  context "when the original effect specifies token state" do
+    let!(:doubling_season) { ResolvePermanent("Doubling Season", owner: p1) }
+    let!(:falconer_adept) { ResolvePermanent("Falconer Adept", owner: p1) }
+
+    it "creates the additional tokens tapped too" do
+      falconer_adept.trigger_effect(:create_token, token_class: Magic::Cards::FalconerAdept::BirdToken, enters_tapped: true)
+
+      birds = game.battlefield.controlled_by(p1).creatures.by_name("Bird")
+      expect(birds.count).to eq(2)
+      expect(birds).to all(be_tapped)
+    end
+
+    it "creates the additional tokens tapped and attacking" do
+      skip_to_combat!
+      current_turn.declare_attackers!
+      p1.declare_attacker(attacker: falconer_adept, target: p2)
+      current_turn.attackers_declared!
+
+      birds = game.battlefield.controlled_by(p1).creatures.by_name("Bird")
+      expect(birds.count).to eq(2)
+      birds.each do |bird|
+        expect(bird).to be_tapped
+        expect(current_turn.attacks.map(&:attacker)).to include(bird)
+      end
+    end
+  end
 end

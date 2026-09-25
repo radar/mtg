@@ -46,8 +46,7 @@ module Magic
           attackers = game.current_turn.attacks.count
 
           attackers.times do
-            token = trigger_effect(:create_token, token_class: SoldierToken, enters_tapped: true).first
-            game.current_turn.declare_attacker(token)
+            trigger_effect(:create_token, token_class: SoldierToken, enters_tapped: true, attacking: true)
           end
         end
       end

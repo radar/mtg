@@ -22,8 +22,7 @@ module Magic
         end
 
         def call
-          token = trigger_effect(:create_token, token_class: BirdToken, enters_tapped: true).first
-          game.current_turn.declare_attacker(token)
+          trigger_effect(:create_token, token_class: BirdToken, enters_tapped: true, attacking: true)
         end
       end
 
