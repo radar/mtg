@@ -128,9 +128,6 @@ What the rules cover:
   creates twice that many of those tokens instead." → `ReplacementEffect::TokenDoubler`
   registered on `Effects::CreateToken` (see `AnointedProcession`).
 - `CounterAmountChange`: Vorinclex's "If you would put one or more counters ... twice that many" and "If an opponent would ... half that many ... rounded down" → `ReplacementEffect::CountersYouPutDoubler` / `CountersOpponentPutHalver` (both variants merge into one `replacement_effects` method built from their `registrations`; see `VorinclexMonstrousRaider`).
-- `Changeling`: the keyword line lists `Abilities::Static::Changeling` itself in
-  `static_abilities`. A rule does that by returning `class_reference` (an existing class
-  name) instead of a nested class from `class_source`.
 - `Keywords`: a line of comma-separated keywords → `keywords :flying, ...`. Keywords
   with a value: toxic N and hexproof from <colour> go into the same `keywords` call as
   objects (`Keywords.list` takes `Keyword` instances as well as symbols); ward {N} /
@@ -170,7 +167,7 @@ sacrifices a [type or type] (`EachOpponentSacrifices`; its `SacrificeChoice` cla
 `definitions`), search your library for a basic land / <Type> card(s) onto the battlefield
 [tapped], then shuffle (`SearchLibrary`, a choice effect), put a <type> counter on ~
 (`AddCounters`; named counter types only on ~), remove N <type> counters
-from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens ("with changeling" gives the token `Abilities::Static::Changeling`), copy tokens,
+from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens ("with changeling" gives the token the `changeling` keyword), copy tokens,
 scry, look at the top N cards and take a <Type>, <Type>, or <Type> card into your hand with the rest on the bottom (`LookAtTopCards`, `Choice::LookAtTopCards`), mill (`Mill`: you, each opponent, target player/opponent), mill then may return a <type>/permanent card from among them (`MillThenReturn`, `Choice::ReturnFromAmong`), discard N cards unless you discard a <type> card (`DiscardUnless`, `Choice::DiscardUnless`), "If that creature would die this turn, exile it instead" after a targeted effect (`ExileInsteadIfDies`, `Permanent#register_turn_replacement`), two-target damage "~ deals N damage to any target and M damage to any other target" (`DealDamageTwoTargets`: `multi_target?`, `distinct_targets?`, `resolve!(targets:)`; instants and sorceries only), counter target [creature/noncreature] spell [with mana value N] (`CounterSpell`), "choose up to one [other] target creature. Until end of turn, that creature has base power and toughness N/M [and gains all creature types]" (`BaseStatsUntilEndOfTurn`; `up_to_one?` makes its `TargetChoice` skippable and never auto-resolved), surveil (`Surveil`, a `Choice::Surveil`, like scry), untap (`Untap`: target, ~, "each other <Type> you control"), blight (`Blight`: you
 (a `Choice::Blight`, and "If you do" effects run only if a creature was there to blight), each
 opponent or a target opponent; `Costs::Blight` is paid with `pay_blight(creature)`). A creature

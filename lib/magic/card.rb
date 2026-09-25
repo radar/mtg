@@ -313,9 +313,11 @@ module Magic
       []
     end
 
-    # Rule 702.73a: changeling works in every zone, not just on the battlefield.
+    # Rule 702.73a: changeling is a characteristic-defining ability, so a card with the keyword is
+    # every creature type in every zone, not just on the battlefield. (Abilities::Static::Changeling
+    # does the same for a source that is all creature types without the keyword.)
     def types
-      return @types unless static_abilities.include?(Abilities::Static::Changeling)
+      return @types unless changeling? || static_abilities.include?(Abilities::Static::Changeling)
 
       (@types + Types::Creatures.values).uniq
     end

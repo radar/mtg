@@ -39,8 +39,8 @@ module Magic
         def definitions
           lines = ["#{artifact ? 'artifact_creature_type' : 'creature_type'} #{subtypes.inspect}", "power #{power}", "toughness #{toughness}"]
           lines << "colors #{colors.map(&:inspect).join(', ')}" if colors.any?
-          lines << "keywords #{keywords.map(&:inspect).join(', ')}" if keywords.any?
-          lines << "def static_abilities = [Magic::Abilities::Static::Changeling]" if changeling
+          all_keywords = changeling ? [*keywords, :changeling] : keywords
+          lines << "keywords #{all_keywords.map(&:inspect).join(', ')}" if all_keywords.any?
           "#{token_const} = Token.create #{subtypes.inspect} do\n#{lines.map { "  #{_1}\n" }.join}end\n"
         end
       end

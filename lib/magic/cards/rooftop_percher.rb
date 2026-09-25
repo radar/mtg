@@ -5,7 +5,7 @@ module Magic
       cost generic: 5
       power 3
       toughness 3
-      keywords :flying
+      keywords :flying, :changeling
     end
 
     class RooftopPercher < Creature
@@ -29,7 +29,6 @@ module Magic
         end
       end
 
-      def static_abilities = [Abilities::Static::Changeling]
       def etb_triggers = [ETB]
     end
   end

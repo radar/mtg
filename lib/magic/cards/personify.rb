@@ -9,7 +9,7 @@ module Magic
         creature_type "Shapeshifter"
         power 1
         toughness 1
-        def static_abilities = [Magic::Abilities::Static::Changeling]
+        keywords :changeling
       end
 
       def target_choices

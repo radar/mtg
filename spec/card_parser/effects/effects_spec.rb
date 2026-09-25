@@ -201,16 +201,16 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Create a 1/1 colorless Thopter creature token with flying and first strike.").keywords).to eq(%i[flying first_strike])
   end
 
-  it "parses a token with changeling as a static ability, alone or with other keywords" do
+  it "parses a token with changeling as a keyword, alone or with other keywords" do
     shapeshifter = described_class.parse("Create a 1/1 colorless Shapeshifter creature token with changeling.")
     expect(shapeshifter.changeling).to eq(true)
     expect(shapeshifter.keywords).to eq([])
-    expect(shapeshifter.definitions).to include("def static_abilities = [Magic::Abilities::Static::Changeling]")
-    expect(shapeshifter.definitions).not_to include("keywords")
+    expect(shapeshifter.definitions).to include("keywords :changeling")
+    expect(shapeshifter.definitions).not_to include("static_abilities")
 
     flyer = described_class.parse("Create a 1/1 colorless Shapeshifter creature token with flying and changeling.")
     expect(flyer.changeling).to eq(true)
-    expect(flyer.definitions).to include("keywords :flying")
+    expect(flyer.definitions).to include("keywords :flying, :changeling")
   end
 
   it "parses token creation" do

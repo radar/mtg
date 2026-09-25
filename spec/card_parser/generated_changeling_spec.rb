@@ -7,9 +7,9 @@ RSpec.describe "CardParser generated changelings in play" do
   include CardParserHelpers
   include_context "two player game"
 
-  it "lists the engine's static ability rather than defining a subclass" do
+  it "is a plain keyword, not a subclass" do
     source = generate("Parsed Shifter {1}{G}\nCreature — Shapeshifter\nChangeling\n2/2\n")
-    expect(source).to include("def static_abilities = [Abilities::Static::Changeling]")
+    expect(source).to include("keywords :changeling")
     expect(source).not_to include("class Changeling")
   end
 

@@ -33,7 +33,7 @@ RSpec.describe "CardParser card kinds" do
 
   it "generates Kindred cards with their creature types" do
     expect(generate("Kin Idol {3}\nKindred Artifact — Shapeshifter\nChangeling\n"))
-      .to include('Artifact("Kin Idol")', 'type T::Kindred, T::Artifact, T::Creatures["Shapeshifter"]', "def static_abilities = [Abilities::Static::Changeling]")
+      .to include('Artifact("Kin Idol")', 'type T::Kindred, T::Artifact, T::Creatures["Shapeshifter"]', "keywords :changeling")
     expect(generate("Elf Rite {G}\nKindred Sorcery — Elf\nYou gain 3 life.\n")).to include('type T::Kindred, T::Sorcery, T::Creatures["Elf"]')
     expect { generate("Kin Blade {1}\nKindred Artifact — Elf Equipment\nEquip {1}\n") }.to raise_error(Magic::CardParser::UnsupportedCard)
   end

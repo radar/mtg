@@ -3,6 +3,7 @@ module Magic
     ChangelingWayfinder = Creature("Changeling Wayfinder") do
       type T::Creature, T::Creatures["Shapeshifter"]
       cost generic: 3
+      keywords :changeling
       power 1
       toughness 2
     end
@@ -26,7 +27,6 @@ module Magic
         end
       end
 
-      def static_abilities = [Abilities::Static::Changeling]
       def etb_triggers = [ETB]
     end
   end
