@@ -130,7 +130,7 @@ sacrifices a [type or type] (`EachOpponentSacrifices`; its `SacrificeChoice` cla
 [tapped], then shuffle (`SearchLibrary`, a choice effect), put a <type> counter on ~
 (`AddCounters`; named counter types only on ~), remove N <type> counters
 from ~ (skipped if it has too few), sacrifice ~ / it, creature tokens, copy tokens,
-scry, surveil (`Surveil`, a `Choice::Surveil`, like scry), untap (`Untap`: target, ~, "each other <Type> you control"), blight (`Blight`: you
+scry, look at the top N cards and take a <Type>, <Type>, or <Type> card into your hand with the rest on the bottom (`LookAtTopCards`, `Choice::LookAtTopCards`), surveil (`Surveil`, a `Choice::Surveil`, like scry), untap (`Untap`: target, ~, "each other <Type> you control"), blight (`Blight`: you
 (a `Choice::Blight`, and "If you do" effects run only if a creature was there to blight), each
 opponent or a target opponent; `Costs::Blight` is paid with `pay_blight(creature)`). A creature
 type is also a target: "target Elf you control", "target attacking Goblin you control",

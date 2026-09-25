@@ -50,7 +50,15 @@ RSpec.describe Magic::CardParser::Effect do
     expect(surveil.choice_args).to eq("amount: 2")
   end
 
-  it "parses life loss" do
+it "parses look at the top cards and take one to hand as a choice" do
+  look = described_class.parse("Look at the top four cards of your library. You may reveal a Goblin, Swamp, or Mountain card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.")
+  expect(look).to eq(e.const_get(:LookAtTopCards).new(4, %w[Goblin Swamp Mountain]))
+  expect(look.choice_base).to eq("Magic::Choice::LookAtTopCards")
+  expect(look.choice_args).to eq(["amount: 4", "filter: ->(card) { card.any_type?(\"Goblin\", \"Swamp\", \"Mountain\") }"])
+  expect(described_class.parse("Look at the top four cards of your library. You may reveal a Merfolk or Island card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.").types).to eq(%w[Merfolk Island])
+end
+
+it "parses life loss" do
     expect(described_class.parse("Target player loses 2 life.").resolve_call).to eq("trigger_effect(:lose_life, target: target, life: 2)")
     expect(described_class.parse("Target opponent loses 2 life.").target_choices).to eq("game.opponents(controller)")
     each = described_class.parse("Each opponent loses 1 life.")
