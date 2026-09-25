@@ -50,15 +50,15 @@ RSpec.describe Magic::CardParser::Effect do
     expect(surveil.choice_args).to eq("amount: 2")
   end
 
-it "parses look at the top cards and take one to hand as a choice" do
-  look = described_class.parse("Look at the top four cards of your library. You may reveal a Goblin, Swamp, or Mountain card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.")
-  expect(look).to eq(e.const_get(:LookAtTopCards).new(4, %w[Goblin Swamp Mountain]))
-  expect(look.choice_base).to eq("Magic::Choice::LookAtTopCards")
-  expect(look.choice_args).to eq(["amount: 4", "filter: ->(card) { card.any_type?(\"Goblin\", \"Swamp\", \"Mountain\") }"])
-  expect(described_class.parse("Look at the top four cards of your library. You may reveal a Merfolk or Island card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.").types).to eq(%w[Merfolk Island])
-end
+  it "parses look at the top cards and take one to hand as a choice" do
+    look = described_class.parse("Look at the top four cards of your library. You may reveal a Goblin, Swamp, or Mountain card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.")
+    expect(look).to eq(e.const_get(:LookAtTopCards).new(4, %w[Goblin Swamp Mountain]))
+    expect(look.choice_base).to eq("Magic::Choice::LookAtTopCards")
+    expect(look.choice_args).to eq(["amount: 4", "filter: ->(card) { card.any_type?(\"Goblin\", \"Swamp\", \"Mountain\") }"])
+    expect(described_class.parse("Look at the top four cards of your library. You may reveal a Merfolk or Island card from among them and put it into your hand. Put the rest on the bottom of your library in a random order.").types).to eq(%w[Merfolk Island])
+  end
 
-it "parses life loss" do
+  it "parses life loss" do
     expect(described_class.parse("Target player loses 2 life.").resolve_call).to eq("trigger_effect(:lose_life, target: target, life: 2)")
     expect(described_class.parse("Target opponent loses 2 life.").target_choices).to eq("game.opponents(controller)")
     each = described_class.parse("Each opponent loses 1 life.")
@@ -67,16 +67,25 @@ it "parses life loss" do
     expect(described_class.parse("You lose 3 life.").resolve_call).to eq("trigger_effect(:lose_life, target: controller, life: 3)")
   end
 
-it "parses mill" do
-  expect(described_class.parse("Mill two cards.")).to eq(e.const_get(:Mill).new("you", 2))
-  expect(described_class.parse("Mill two cards.").resolve_call).to eq("controller.mill(2)")
-  expect(described_class.parse("Each opponent mills three cards.").resolve_call).to eq("game.opponents(controller).each { |opponent| opponent.mill(3) }")
-  target = described_class.parse("Target player mills 4 cards.")
-  expect(target.target_choices).to eq("game.players")
-  expect(target.resolve_call).to eq("target.mill(4)")
-end
+  it "parses mill" do
+    expect(described_class.parse("Mill two cards.")).to eq(e.const_get(:Mill).new("you", 2))
+    expect(described_class.parse("Mill two cards.").resolve_call).to eq("controller.mill(2)")
+    expect(described_class.parse("Each opponent mills three cards.").resolve_call).to eq("game.opponents(controller).each { |opponent| opponent.mill(3) }")
+    target = described_class.parse("Target player mills 4 cards.")
+    expect(target.target_choices).to eq("game.players")
+    expect(target.resolve_call).to eq("target.mill(4)")
+  end
 
-it "parses discarding" do
+  it "parses mill then return a card from among them as a choice" do
+    mill = described_class.parse("Mill four cards, then you may return a permanent card from among them to your hand.")
+    expect(mill).to eq(e.const_get(:MillThenReturn).new(4, "permanent"))
+    expect(mill.choice_base).to eq("Magic::Choice::ReturnFromAmong")
+    expect(mill.choice_args).to eq(["cards: controller.mill(4)", "filter: ->(card) { card.permanent? }"])
+    expect(described_class.parse("Mill three cards, then you may return a creature card from among them to your hand.").choice_args.last)
+      .to eq('filter: ->(card) { card.type?("Creature") }')
+  end
+
+  it "parses discarding" do
     expect(described_class.parse("Discard a card.").resolve_call).to eq("game.add_choice(Magic::Choice::Discard.new(player: controller))")
     two = described_class.parse("Target player discards two cards.")
     expect(two.target_choices).to eq("game.players")
