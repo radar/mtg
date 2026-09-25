@@ -53,6 +53,10 @@ module Magic
         const_set(:BLITZ_COST, cost)
       end
 
+      def offspring(cost)
+        const_set(:OFFSPRING_COST, cost)
+      end
+
       def adventure(cost)
         const_set(:ADVENTURE_COST, cost)
       end
@@ -352,6 +356,11 @@ module Magic
 
     def blitz_cost
       self.class.const_defined?(:BLITZ_COST, false) ? Costs::Mana.new(self.class::BLITZ_COST.dup) : nil
+    end
+
+    # The card's own offspring cost as a raw cost (Actions::Cast wraps it), or nil.
+    def offspring_cost
+      self.class.const_defined?(:OFFSPRING_COST, false) ? self.class::OFFSPRING_COST.dup : nil
     end
 
     def adventure_cost

@@ -62,7 +62,7 @@ Paths are relative to `lib/magic/`. **Cards** is the number of Oracle cards that
 | Escape | 33 | One-off in a card file. E4. |
 | Delve | 30 | One-off in a card file. E4. |
 | Overload | 28 | One-off in a card file. E4. |
-| Offspring | 21 | `Actions::Cast#offspring_cost`/`#pay_offspring`, `Offspring::TokenCopyTrigger`, `Abilities::Static::GrantOffspring`. No `Card` DSL macro yet (a card defines `offspring_cost` returning a cost hash). |
+| Offspring | 21 | `Card.offspring`, `Actions::Cast#offspring_costs`/`#pay_offspring`, `Offspring::TokenCopyTrigger`, `Abilities::Static::GrantOffspring`. |
 
 ## Missing (788)
 

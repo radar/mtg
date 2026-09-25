@@ -96,14 +96,14 @@ RSpec.describe Magic::Cards::ZinniaValleysVoice do
       p1.hand.add(shock)
       action = Magic::Actions::Cast.new(game: game, player: p1, card: shock)
 
-      expect(action.offspring_cost).to be_nil
+      expect(action.offspring_costs).to be_empty
     end
 
     it "doesn't grant offspring to an opponent's creature spells" do
       opponent_bears = Card("Grizzly Bears", owner: p2)
       action = Magic::Actions::Cast.new(game: game, player: p2, card: opponent_bears)
 
-      expect(action.offspring_cost).to be_nil
+      expect(action.offspring_costs).to be_empty
     end
   end
 end

@@ -180,29 +180,32 @@ module Magic
         kicker_cost.pay(player:, payment:)
       end
 
-      # Offspring {N}: the card's own, or one a static ability grants as it's cast
-      # (Zinnia, Valley's Voice). nil when the spell has no offspring.
-      def offspring_cost
-        return @offspring_cost if defined?(@offspring_cost)
-
-        cost = card.offspring_cost if card.respond_to?(:offspring_cost)
-        cost ||= game.battlefield.static_abilities
-          .of_type(Abilities::Static::GrantOffspring)
-          .filter_map { |ability| ability.offspring_cost_for(card, player) }
-          .first
-        @offspring_cost = cost && Costs::Kicker.new(cost)
+      # Offspring costs: the card's own, then any a static ability grants as it's cast
+      # (Zinnia, Valley's Voice). Each is a separate additional cost, and each one
+      # paid makes its own token copy.
+      def offspring_costs
+        @offspring_costs ||= begin
+          granted = game.battlefield.static_abilities
+            .of_type(Abilities::Static::GrantOffspring)
+            .filter_map { |ability| ability.offspring_cost_for(card, player) }
+          own = card.offspring_cost if card.respond_to?(:offspring_cost)
+          [own, *granted].compact.map { |cost| Costs::Kicker.new(cost) }
+        end
       end
 
+      # Pays the next unpaid offspring cost, in #offspring_costs order.
       def pay_offspring(payment)
-        raise "#{card.name} has no offspring cost" unless offspring_cost
+        # By identity: two equal grants (two Zinnias) are still separate costs.
+        cost = offspring_costs.find { |c| paid_offspring_costs.none? { |paid| paid.equal?(c) } }
+        raise "#{card.name} has no unpaid offspring cost" unless cost
 
-        offspring_cost.pay(player:, payment:)
-        @offspring_paid = true
+        cost.pay(player:, payment:)
+        paid_offspring_costs << cost
         self
       end
 
-      def offspring_paid?
-        !!@offspring_paid
+      def paid_offspring_costs
+        @paid_offspring_costs ||= []
       end
 
       def pay_sacrifice(target)
@@ -238,7 +241,7 @@ module Magic
         card.controller = player
 
         mana_cost.finalize!(player)
-        offspring_cost.finalize!(player) if offspring_paid?
+        paid_offspring_costs.each { |cost| cost.finalize!(player) }
         player.consume_spell_cast!
         game.stack.add(self)
 
@@ -278,7 +281,7 @@ module Magic
           resolved.register_turn_trigger(Events::BeginningOfEndStep, Blitz::EndStepSacrificeTrigger)
         end
 
-        queue_offspring_trigger(resolved) if offspring_paid?
+        queue_offspring_triggers(resolved) if paid_offspring_costs.any?
 
         if @adventure
           card.exile!
@@ -301,13 +304,15 @@ module Magic
       private
 
       # "If you do, when that creature enters, create a 1/1 token copy of it."
-      def queue_offspring_trigger(resolved)
+      def queue_offspring_triggers(resolved)
         return unless resolved.is_a?(Permanent) && resolved.zone&.battlefield?
 
         entered = game.current_turn.events.reverse.find do |event|
           event.is_a?(Events::EnteredTheBattlefield) && event.permanent == resolved
         end
-        resolved.perform_trigger!(Offspring::TokenCopyTrigger, entered) if entered
+        return unless entered
+
+        paid_offspring_costs.size.times { resolved.perform_trigger!(Offspring::TokenCopyTrigger, entered) }
       end
 
       def castable_from_current_zone?
