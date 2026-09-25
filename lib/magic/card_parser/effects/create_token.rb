@@ -5,8 +5,10 @@ module Magic
     module Effects
       # "Create a 1/1 white Human Warrior creature token."
       # "Create two 1/1 colorless Thopter artifact creature tokens with flying."
-      class CreateToken < Data.define(:amount, :power, :toughness, :colors, :subtypes, :artifact, :keywords)
+      class CreateToken < Data.define(:amount, :power, :toughness, :colors, :subtypes, :artifact, :keywords, :changeling)
         include Effect
+
+        def initialize(changeling: false, **fields) = super
 
         COLORS = %w[white blue black red green].freeze
         LINE = %r{\ACreate (?<amount>\w+) (?<power>\d+)/(?<toughness>\d+) (?<colors>colorless|[a-z]+(?: and [a-z]+)?) (?<subtypes>(?:[A-Z][\w-]* )+)(?<artifact>artifact )?creature tokens?(?: with (?<keywords>[\w ,]+?))?\.?\z}
@@ -17,12 +19,14 @@ module Magic
           colors = m[:colors] == "colorless" ? [] : m[:colors].split(" and ")
           return unless (colors - COLORS).empty?
 
-          keywords = m[:keywords] ? Rules::Keywords.parse(m[:keywords].sub(/,? and /, ", ")) : Rules::Keywords.new(keywords: [])
+          words = m[:keywords].to_s.split(/,? and |, /)
+          changeling = !words.delete("changeling").nil?
+          keywords = words.any? ? Rules::Keywords.parse(words.join(", ")) : Rules::Keywords.new(keywords: [])
           return unless keywords
 
           new(amount: Number.parse(m[:amount]), power: m[:power].to_i, toughness: m[:toughness].to_i,
               colors: colors.map(&:to_sym), subtypes: m[:subtypes].strip, artifact: !m[:artifact].nil?,
-              keywords: keywords.keywords)
+              keywords: keywords.keywords, changeling: changeling)
         end
 
         def token_const = "#{CardGenerator.const_name(subtypes)}Token"
@@ -36,6 +40,7 @@ module Magic
           lines = ["#{artifact ? 'artifact_creature_type' : 'creature_type'} #{subtypes.inspect}", "power #{power}", "toughness #{toughness}"]
           lines << "colors #{colors.map(&:inspect).join(', ')}" if colors.any?
           lines << "keywords #{keywords.map(&:inspect).join(', ')}" if keywords.any?
+          lines << "def static_abilities = [Magic::Abilities::Static::Changeling]" if changeling
           "#{token_const} = Token.create #{subtypes.inspect} do\n#{lines.map { "  #{_1}\n" }.join}end\n"
         end
       end
