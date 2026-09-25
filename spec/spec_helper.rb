@@ -41,8 +41,8 @@ module CardHelper
     card
   end
 
-  def cast_action(card:, player: card.owner, targeting: nil, flashback: false, &block)
-    action = Magic::Actions::Cast.new(card: card, player: player, game: game, flashback: flashback)
+  def cast_action(card:, player: card.owner, targeting: nil, flashback: false, alternative: false, &block)
+    action = Magic::Actions::Cast.new(card: card, player: player, game: game, flashback: flashback, alternative: alternative)
     action.targeting(targeting) if targeting
     yield action if block_given?
     action

@@ -14,7 +14,8 @@ module Magic
       #   "you may cast it" during resolution), so its zone and timing restrictions are ignored (rule 608.2g)
       # @param adventure [Boolean] When true, pays the card's adventure cost, resolves via
       #   #adventure_resolve! instead of #resolve!, and exiles the card afterward
-      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, adventure: false, by_effect: false, **args)
+      # @param alternative [Boolean] When true, pays the card's alternative_cost instead of its mana cost
+      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, adventure: false, alternative: false, by_effect: false, **args)
         super(**args)
         @card = card
         @targets = []
@@ -24,6 +25,7 @@ module Magic
         @flashback = flashback
         @blitz = blitz
         @adventure = adventure
+        @alternative = alternative
         @by_effect = by_effect
 
         @value_for_x = value_for_x
@@ -59,6 +61,8 @@ module Magic
             cost = card.blitz_cost
           elsif @adventure
             cost = card.adventure_cost
+          elsif @alternative
+            cost = card.alternative_cost
           else
             cost = card.cost
           end
