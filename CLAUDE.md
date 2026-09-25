@@ -241,3 +241,7 @@ Moved to `docs/card_patterns.md` (Common Card Ability Patterns, TriggeredAbility
 - `lib/magic/cards/`: All ~280 card implementations
 - `.github/copilot-instructions.md`: Extended card implementation guidance
 - `spec/spec_helper.rb`: Test setup and helpers
+
+## Combat
+
+`CombatPhase#declare_blocker` raises `CombatPhase::IllegalBlock` (or `AttackerHasProtection`) for an illegal block; `#can_block?`/`#block_illegal_reason` are the query forms. Menace-style constraints are checked when the turn enters `combat_damage` (`validate_blocks!`), not per blocker. Grant evasion in specs with `grant_keyword(Magic::Cards::Keywords::FLYING)` etc. (`Landwalk.new("Forest")` for landwalk). A creature that enters tapped (e.g. `Forgotten Sentinel`) needs `untap!` before it can block. Combat damage is dealt per step (`deal_first_strike_damage`, `deal_combat_damage`), attackers and blockers together, all computed before applying; a lone blocker is assigned *all* of the attacker's damage, not just lethal. Override the split with `current_turn.combat.assign_combat_damage(attacker, blocker => n)` before damage.

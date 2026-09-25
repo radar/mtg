@@ -4,14 +4,17 @@ module Magic
       class Keyword
       end
 
+      CANT_BE_BLOCKED = Class.new(Keyword)
       DEATHTOUCH = Class.new(Keyword)
       DEFENDER = Class.new(Keyword)
       DOUBLE_STRIKE = Class.new(Keyword)
+      FEAR = Class.new(Keyword)
       FIRST_STRIKE = Class.new(Keyword)
       FLASH = Class.new(Keyword)
       FLYING = Class.new(Keyword)
       HASTE = Class.new(Keyword)
       HEXPROOF = Class.new(Keyword)
+      HORSEMANSHIP = Class.new(Keyword)
 
       class HexproofFrom < Keyword
         attr_reader :color
@@ -22,14 +25,25 @@ module Magic
       end
       INDESTRUCTIBLE = Class.new(Keyword)
       INFECT = Class.new(Keyword)
+      INTIMIDATE = Class.new(Keyword)
       LIFELINK = Class.new(Keyword)
       MENACE = Class.new(Keyword)
       PROWESS = Class.new(Keyword)
       REACH = Class.new(Keyword)
+      SHADOW = Class.new(Keyword)
       SHROUD = Class.new(Keyword)
       SKULK = Class.new(Keyword)
       TRAMPLE = Class.new(Keyword)
       VIGILANCE = Class.new(Keyword)
+
+      # Landwalk of a land subtype, e.g. Landwalk.new("Swamp") for swampwalk.
+      class Landwalk < Keyword
+        attr_reader :land_type
+
+        def initialize(land_type)
+          @land_type = land_type
+        end
+      end
 
       class Toxic < Keyword
         attr_reader :amount
@@ -122,6 +136,30 @@ module Magic
 
       def reach?
         has_keyword?(Keywords::REACH)
+      end
+
+      def menace?
+        has_keyword?(Keywords::MENACE)
+      end
+
+      def skulk?
+        has_keyword?(Keywords::SKULK)
+      end
+
+      def fear?
+        has_keyword?(Keywords::FEAR)
+      end
+
+      def intimidate?
+        has_keyword?(Keywords::INTIMIDATE)
+      end
+
+      def shadow?
+        has_keyword?(Keywords::SHADOW)
+      end
+
+      def horsemanship?
+        has_keyword?(Keywords::HORSEMANSHIP)
       end
     end
   end
