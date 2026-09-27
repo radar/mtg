@@ -15,10 +15,10 @@ module Magic
       def parse
         @costs.map do |cost|
           case cost
-          when /\A\{[^T]}/
-            Mana.new(Costs::Parsers::Mana.parse(cost))
           when "{T}"
             SelfTap.new(source)
+          when /\A(?:\{[^}]+\})+\z/
+            Mana.new(Costs::Parsers::Mana.parse(cost))
           when /Sacrifice a creature with defender/
             Sacrifice.new(source, source.controller.creatures.select(&:defender?))
           when /Sacrifice a creature/
