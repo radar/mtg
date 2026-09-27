@@ -243,6 +243,14 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   targeted effect is its own choice, nested in turn (`TargetChoice`, `TargetChoice2`,
   ...). Unless its only target is its first effect, it starts with
   `return if <targets>.none? || ...`: an ability missing a legal target does nothing.
+- `Rules::ActivatedAbility::COST`'s "remove a counter" alternative accepts an omitted
+  counter type ("Remove a counter from ~", not "Remove a -1/-1 counter from ~") and
+  defaults it to `-1/-1` — the only cards phrased this way already established their
+  one counter type via "This creature enters with N -1/-1 counters on it.", so there's
+  nothing to be ambiguous with. It also accepts a hybrid mana symbol (`{R/W}`) as a cost
+  component, not just a single generic/color character — `lib/magic/costs/parser.rb`
+  (the runtime `costs "..."` string parser) needed the matching fix, since its own mana
+  gate only matched a *single* character between braces.
 - Every `Effect` matching `PermanentTarget::PATTERN` needs its own `optional_target?`
   (usually `PermanentTarget.optional?(match)`, stashed at parse time) to get the
   `0..1`/skippable treatment above for "up to one target ...": the base `Effect#

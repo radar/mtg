@@ -10,14 +10,17 @@ module Magic
       class ActivatedAbility < Data.define(:costs, :effect_list, :sorcery_speed, :once_each_turn)
         include Rule
 
-        COST = /(?:\{(?:\d+|[WUBRGC])\})+|\{T\}|Sacrifice ~|Sacrifice a creature|Exile ~|Discard a card|Blight \d+|Remove (?:\d+|\w+) [\w+\/-]+ counters? from ~(?: and sacrifice it)?/
+        # "Remove a counter from ~" (no type named) means -1/-1: the only cards that
+        # phrase it this way ("enters with N -1/-1 counters on it", then this ability)
+        # have no other counter type to be ambiguous with.
+        COST = /(?:\{(?:\d+|[WUBRGC]|[WUBRG]\/[WUBRG]|\d+\/[WUBRG])\})+|\{T\}|Sacrifice ~|Sacrifice a creature|Exile ~|Discard a card|Blight \d+|Remove (?:\d+|\w+) (?:[\w+\/-]+ )?counters? from ~(?: and sacrifice it)?/
         LINE = /\A(?<costs>#{COST}(?:, #{COST})*): (?<effects>.+?)(?<sorcery> Activate only as a sorcery\.)?(?<once> Activate only once each turn\.)?\z/
 
         def self.parse(line)
           return unless (m = LINE.match(line))
 
           effect_list = EffectList.parse(m[:effects]) or return
-          m[:costs].scan(/Remove \w+ ([\w+\/-]+) counters? from/) { Magic::Counters[$1.downcase] } # raises for an unknown counter type
+          m[:costs].scan(/Remove \w+ (?:([\w+\/-]+) )?counters? from/) { Magic::Counters[($1 || "-1/-1").downcase] } # raises for an unknown counter type
           new(costs: costs(m[:costs]), effect_list:, sorcery_speed: !m[:sorcery].nil?, once_each_turn: !m[:once].nil?)
         rescue RuntimeError => e
           raise unless e.message.start_with?("Unknown counter type")
@@ -26,7 +29,7 @@ module Magic
         # "Remove three quest counters from ~ and sacrifice it" is two costs.
         def self.costs(text)
           text.gsub(" and sacrifice it", ", Sacrifice ~")
-              .gsub(/Remove (\w+) ([\w+\/-]+) counters? from/) { "Remove #{Number.parse($1)} #{$2} counters from" }
+              .gsub(/Remove (\w+) (?:([\w+\/-]+) )?counters? from/) { "Remove #{Number.parse($1)} #{$2 || '-1/-1'} counters from" }
               .gsub("~", "{this}")
         end
 
