@@ -1,39 +1,39 @@
 # Engine Roadmap
 
-Plan for the major rules gaps in the engine, split into workstreams that can be picked up independently by a human or an agent. Written 2026-09-21 against `master` at `863ebad` (1328 specs, all green).
+Plan for the major rules gaps in the engine, split into workstreams that can be picked up independently by a human or an agent. Written 2026-09-21; facts and statuses refreshed 2026-09-26 against `master` at `3a1b5f9d` (2235 specs, all green).
 
-Findings below come from reading the code, not from running experiments. Anything marked **(verify)** was inferred from a failed grep rather than a read; confirm it before building on it.
+Findings below come from reading the code, not from running experiments. Anything marked **(verify)** was inferred from a failed grep rather than a read; confirm it before building on it. The workstream sections keep their original "Problem" text for history; each one's **Status** note says what has changed since.
 
 ## How to use this document
 
 - Each workstream is one or more PRs. Sub-items (e.g. `D2`) are the unit of work: one branch, one PR, one commit series.
 - Every workstream lists **Depends on**. Anything with "none" can start today.
 - Every workstream has a **Done when** list. Those are integration specs, in the style of `spec/game/integration/`, not unit tests of private methods.
-- Keep the suite green at every commit. Baseline: `bundle exec rspec` → 1328 examples, 0 failures.
-- Record new gotchas in `CLAUDE.md` or `docs/patterns/*.md` in the same commit, per the existing workflow rule.
+- Keep the suite green at every commit. Baseline: `bundle exec rspec` → 2235 examples, 0 failures.
+- Record new gotchas in `CLAUDE.md` or `docs/patterns/*.md` (or `docs/card_patterns.md`) in the same commit, per the existing workflow rule.
 - Existing specs lean on manual `game.tick!` calls and synchronous trigger resolution. When a workstream changes those semantics, it owns updating the affected specs. Prefer adding a spec helper (in `spec/spec_helper.rb`) over editing 100 spec files by hand.
 
 ## Where things stand
 
-What exists: turn state machine, a LIFO stack with choices, a synchronous event bus (`Turn#notify!` → every listener's `receive_event`), replacement effects with chooser ordering, counters, sagas, planeswalkers, emblems, monarch, ~570 card files.
+What exists: turn state machine, a LIFO stack with choices, a synchronous event bus (`Turn#notify!` → every listener's `receive_event`), replacement effects with chooser ordering, counters, sagas, planeswalkers, emblems, monarch, ~640 card files, state-based actions (B), action legality (C1), a trigger queue (A1, default on), an opt-in priority loop (A2/A3), blocking legality and per-step combat damage (D1–D3), and generic targeting/destruction keywords (E1–E3).
 
-The big structural facts that drive this plan:
+The structural facts that drive the remaining plan (items 1–5 were gaps when this was written; 1–4 are now closed or partly closed, as noted):
 
-1. **No priority.** `Stack#resolve!` (`lib/magic/stack.rb:88`) drains the whole stack in a loop. Triggered abilities run synchronously inside `notify!` and never touch the stack.
-2. **State-based actions are not a thing.** `Game#tick!` (`game.rb:189`) does continuous effects, state triggers and dead-creature cleanup, and is only called from combat damage. No life ≤ 0 check, legend rule or planeswalker-0-loyalty check turned up **(verify)**.
-3. **Actions are not validated.** `Turn#take_action` (`game/turn.rb:158`) calls `action.perform` directly. `can_perform?` exists on only `Cast`, `Cycle` and `PlayLand`, and nothing calls it.
-4. **Combat is a simplified model.** `CombatPhase#can_block?` only checks protection. Flying, reach, menace and friends are never consulted. `Attack#resolve` makes blockers deal damage in whatever step the attacker's attack resolves, so a first-strike blocker does not strike first.
-5. **No decision-maker.** Specs call `player.cast(...)`, `pay_mana(...)`, `declare_attacker(...)` directly. There is no interface a bot, UI or network player could implement, and no way to ask "what can this player legally do right now?".
-6. **Continuous effects are a fixed pipeline, not layers.** `Permanents::ContinuousEffects#apply!` computes types → abilities/keywords → power/toughness in one pass. No timestamps, no dependency, no colour or control layer, no 7a–7d sublayers.
-7. **Mana is a flat hash** (`Player#mana_pool`). No restrictions, no emptying between steps **(verify)**.
-8. **No game setup.** `Game#start!` draws seven cards. No mulligan, no deck loading, no choice of who goes first **(verify)**.
-9. **Two players assumed** (`Game#next_active_player` rotates the `players` array; specs use `"two player game"`).
-10. **Keywords are scattered.** `lib/magic/cards/keywords.rb` has a fixed list of predicate methods, and `keyword_handlers/` holds only `prowess.rb`.
+1. ~~No priority.~~ **Mostly closed.** Triggers go on the stack (A1, default) and a priority loop exists (`Game#pass_priority!`, `Stack#resolve_top!`), but it is **opt-in** (`Game.new(enforce_priority: true)`); by default specs still drive both players directly and `Stack#resolve!` drains the stack. Split second and combat-damage trigger windows are open.
+2. ~~No state-based actions.~~ **Closed** (B). `Game#check_state_based_actions!` runs after actions, resolutions and checkpoints.
+3. ~~Actions are not validated.~~ **Closed** (C1). `Turn#take_action` asks `illegal_reason` and raises `Magic::IllegalAction`. Costs are still paid before that check (see C1).
+4. ~~Combat is a simplified model.~~ **Closed for D1–D3.** Blocking legality, first-strike steps and damage assignment are done. Attack restrictions/requirements (D4) and trigger windows (D5) are open.
+5. **No decision-maker.** Specs call `player.cast(...)`, `pay_mana(...)`, `declare_attacker(...)` directly. There is no agent interface for a bot, UI or network player, and no `legal_actions` enumeration (C2). Still true.
+6. **Continuous effects are a fixed pipeline, not layers.** `Permanents::ContinuousEffects#apply!` computes types → abilities/keywords → power/toughness in one pass. No timestamps, no dependency, no colour or control layer, no 7a–7d sublayers. Still true. (`Permanent` carries a `timestamp` but layers do not use it; `until_end_of_turn`/`modifiers` are still ad hoc.)
+7. **Mana is a flat hash** (`Player#mana_pool`). No restrictions, and nothing empties it between steps. Still true.
+8. **No game setup.** `Game#start!` (`game.rb:171`) draws seven cards. No mulligan, no deck loading, no seedable RNG, no choice of who goes first. Still true.
+9. **Two players assumed** (`Game#next_active_player` rotates the `players` array; specs use `"two player game"`). `Game#opponents(player)` exists, but it is not audited. Still true.
+10. **Keywords are only partly generic.** E1–E3 added targeting keywords, regeneration and protection, and `lib/magic/keywords.rb` plus per-card handlers cover changeling and others. `docs/keywords.md` lists what is still missing (789 of ~880 Oracle keywords, many of them n.a.). `keyword_handlers/` still holds only `prowess.rb`.
 
 ## Dependency map
 
 ```
-Tier 0 (start now, parallel)     Tier 1                Tier 2
+Tier 0 (start now, parallel)     Tier 1                Tier 2   (B, C1, A1–A3, D1–D3, E1–E3 done)
 ------------------------------   -------------------   -------------------
 B  State-based actions      ---->
 C1 Action legality/timing   ---->  A  Priority + stack --> C2 Decision interface
@@ -48,7 +48,7 @@ L1 Tooling
 H2 Game setup / mulligans (needs C2 for the decisions, but deck loading can start now)
 ```
 
-Recommended order if only one thing can happen at a time: **B → C1 → A → C2**. That is the spine; everything else hangs off it or is orthogonal.
+Recommended order if only one thing can happen at a time: ~~B → C1 → A~~ (done) **→ C2**, then flip `enforce_priority` on by default. That is the spine; everything else hangs off it or is orthogonal.
 
 ## Merge-conflict hotspots
 
@@ -58,7 +58,7 @@ Five files get touched by nearly every workstream. Agree on an owner per wave to
 |---|---|---|
 | `lib/magic/stack.rb` | A | G (fizzle), C1 |
 | `lib/magic/game/turn.rb` | A | H, C1, D |
-| `lib/magic/game.rb` | B (`tick!`), A | I, H2 |
+| `lib/magic/game.rb` | A (priority, `settle!`), B (SBA checkpoint) | I, H2 |
 | `lib/magic/permanent.rb` | F | B, D, J |
 | `lib/magic/game/combat_phase.rb` | D | A (priority in combat), I |
 
@@ -68,7 +68,7 @@ Five files get touched by nearly every workstream. Agree on an owner per wave to
 
 **Status (2026-09-21): B1–B3 done and merged to `master`.** `Game::StateBasedActions` covers 704.5a–d, f–j, m, n and q. Deviations from the plan below: SBAs also run after each `take_action`, stack resolution and choice resolution (skipped while a choice is pending); `Game#tick!` is kept as an alias so specs did not need rewriting (B3 reduced to fixing two specs that relied on the old behaviour: `sublime_epiphany_spec`, `auras_sent_to_graveyards_spec`). Follow-ups found along the way and also done: `Permanent#destroy!` now respects indestructible (raw move is `put_into_graveyard!`); Auras declare `enchant ...` restrictions that SBAs enforce, along with protection; `Game#over?`/`#drawn?`/`#winner`. Still open: nothing stops a game that is over (belongs with A/C2), and the rest of 704.5 that this pass doesn't cover (e.g. the saga, battle, and Role rules) hasn't been audited.
 
-**Problem.** `Game#tick!` is a partial, ad-hoc SBA pass called from two places. Most of rule 704.5 is missing, and SBAs are not checked after stack resolution or between game actions.
+**Original problem (solved; see status).** `Game#tick!` was a partial, ad-hoc SBA pass called from two places. Most of rule 704.5 is missing, and SBAs are not checked after stack resolution or between game actions.
 
 **Scope.**
 - B1. Extract `Game#check_state_based_actions!` that loops until a pass changes nothing. Move dead-creature handling, state triggers and continuous-effect refresh into it. Call it after every resolution, after combat damage, and after every action.
@@ -91,14 +91,14 @@ Two independent halves.
 
 ### C1. Action legality and timing enforcement
 
-**Status (2026-09-21): done and merged to `master` (local, not yet pushed).** `Action#illegal_reason`/`#legal?` plus `Turn#take_action` raising `Magic::IllegalAction`; details, gotchas and the spec-side consequences are in `CLAUDE.md` under "Action Legality". Deviations and leftovers:
+**Status (2026-09-21): done and merged to `master`.** `Action#illegal_reason`/`#legal?` plus `Turn#take_action` raising `Magic::IllegalAction`; details, gotchas and the spec-side consequences are in `CLAUDE.md` under "Action Legality". Deviations and leftovers:
 - `can_perform?` stayed as the advisory affordability check; `illegal_reason` is the new contract, because it runs after costs are paid. So timing/requirement failures can still leave mana spent or a source tapped (only `{T}` is checked as it is paid). Real fix belongs with G3 (cost framework) or A (priority), which should check legality *before* costs are paid.
 - A card with no zone (bare spec fixture) is treated as being in hand. Every spec that casts still needs a real zone before this can be strict; that is a mechanical follow-up.
 - `by_effect: true` on `Cast` is a stopgap for effect-instructed casts (rebound, Idol of Endurance); G3 should replace it with proper alternative-cost/permission objects.
 - Not covered: planeswalker abilities beyond one per turn per walker (no "additional activation" effects), attacking a planeswalker or battle vs a player, attack requirements/costs (D4), flash-granting effects ("cast as though it had flash"), the adventure half's own card type (adventures are treated as sorcery-speed, which is wrong for an instant adventure), abilities activated from non-battlefield zones, `{T}`-cost checks for `Costs::Tap`/`MultiTap`.
 - Bugs this surfaced and fixed: Oracle of Mul Daya and Radha never had a top-of-library permission, Valakut Exploration had no exile permission, `Token` lacked `additional_lands_per_turn`, Speaker of the Heavens leaked `Magic::Cards::ActivatedAbility` (order-dependent World Map failure), and about 20 specs that only passed because timing, tapped state or loyalty cost were never checked.
 
-**Problem.** Nothing stops a player casting a sorcery during combat, playing a second land, attacking with a summoning-sick or tapped creature, or activating a planeswalker ability twice in a turn. `Game::Turn#can_cast_sorcery?` exists (`turn.rb:220`) but is not enforced.
+**Original problem (solved; see status).** Nothing stopped a player casting a sorcery during combat, playing a second land, attacking with a summoning-sick or tapped creature, or activating a planeswalker ability twice in a turn. `Game::Turn#can_cast_sorcery?` (`turn.rb:295`) existed but was not enforced; `Cast#illegal_reason` now uses it.
 
 **Scope.** `Action#legal?` (or make `can_perform?` a real base-class contract) that `Turn#take_action` checks, raising `Magic::IllegalAction` with a reason. Rules to enforce: sorcery-speed timing (main phase, empty stack, active player), flash/instant timing, one land per turn (already partly in `PlayLand`), summoning sickness for attack and `{T}` costs (unless haste), tapped/untapped requirements, planeswalker one-activation-per-turn, `player.spell_cast_limit`, cards must be in the correct zone, costs payable.
 
@@ -132,19 +132,20 @@ Two independent halves.
 
 **Status (2026-09-24): default flipped to `true`.** Migrated the whole suite (1441 examples, 0 failures) rather than leaving it deferred. Collapsed into three structural fixes rather than 350 one-off spec patches: (1) `Game#check_state_based_actions!` auto-resolves a pending `Choice::OrderTriggers` itself (not just `settle!`), so every existing checkpoint transparently absorbs it — found and fixed a real ordering bug here along the way (it was re-batching a still-pending player's remaining triggers into a *second*, duplicate `OrderTriggers` choice each loop iteration, corrupting resolution order — see `Game#put_pending_triggers_on_stack!`'s comment); (2) `Game#settle!` (drain + resolve to quiescence) added and wired into the turn-phase-transition hooks in `turn.rb` that represent genuine atomic priority-equivalent boundaries (upkeep/draw/first_main/beginning_of_combat/end, `final_attackers_declared!`, `deal_combat_damage`, and mid-`attackers_declared!` before the "attackers without targets" check) — deliberately *not* wired into `Turn#notify!` broadly, because that fires mid-way through multi-step engine sequences like `Permanent.resolve` (SBA-checking a still-0/0 permanent before a same-call step like `add_additional_counters_for_entering` gets to run); (3) `ResolvePermanent` (spec helper) auto-settles by default, except Auras. Full account, including the two genuine (pre-existing, now-fixed) card bugs this exposed (`AcademyElite`, `ElderfangRitualist`, `OnduSpiritdancer`) and the "0/0 that becomes something needs a replacement effect, not an ETB trigger" pattern (still an open gap for `Clone`), is in `CLAUDE.md` under "Trigger Queue".
 
-Still open: flipping `enforce_priority` on by default (A2/A3 are done), which is what turns `settle!`'s checkpoint-approximation into the real thing; a genuine "choose as it enters" replacement-effect mechanism (would let `Clone` be implemented correctly).
+Still open from that pass: a genuine "choose as it enters" replacement-effect mechanism (would let `Clone` be implemented correctly).
+
 **Status (2026-09-26): A2/A3 (with A4/A5 as far as the opt-in model goes) done and merged to `master`.** `Stack#resolve_top!` resolves one item (`resolve_stack!`/`resolve!` loop it, so the suite is unchanged). `Game#priority_player`, `#grant_priority!`, `#pass_priority!` (returns `:passed`, `:resolved`, `:step_ended` or `:choice_pending`), `#receive_priority!` (SBAs + queue triggers, then grant; A5) and `Turn#advance_step!` implement the priority loop. Enforcement is opt-in: `Game.new(enforce_priority: true)` makes `Turn#take_action` reject actions from a player without priority and swaps the turn-step `settle!` calls for `Turn#checkpoint!` (SBAs + triggers onto the stack, no auto-resolve) so players can respond to triggers. Actions with `uses_priority? == false` (mana abilities, tap, declare attacker, concede) skip the check. A4 (responses) works for instants/flash/abilities through this. Not done: default flip to `enforce_priority: true` (needs specs to pass priority), split second, combat-damage-step trigger windows (D5).
 
-**Problem.** The single biggest gap. Players cannot respond. Triggered abilities resolve during event dispatch instead of going on the stack, so there is no APNAP ordering and no way to respond to a trigger. Split second, "can't be countered while X", and "in response to" effects are impossible.
+**Original problem (mostly solved; see statuses).** The single biggest gap was that players could not respond. Triggered abilities resolve during event dispatch instead of going on the stack, so there is no APNAP ordering and no way to respond to a trigger. Split second, "can't be countered while X", and "in response to" effects are impossible.
 
 **Scope.**
-- A1. **Trigger queue.** `TriggeredAbility` instances created during `notify!` go into a pending list on the game instead of running. The next time a player would receive priority, put pending triggers on the stack in APNAP order (active player's first, i.e. lowest on the stack), with a `Choice` for ordering a player's own simultaneous triggers.
+- A1 (done). **Trigger queue.** `TriggeredAbility` instances created during `notify!` go into a pending list on the game instead of running. The next time a player would receive priority, put pending triggers on the stack in APNAP order (active player's first, i.e. lowest on the stack), with a `Choice` for ordering a player's own simultaneous triggers.
   - Keep the existing synchronous path behind a switch so the suite can migrate card-by-card. The default flips once the suite is green.
   - Watch out for triggers that currently rely on synchronous resolution: ETB triggers used as replacement-ish behaviour, and "enters tapped" patterns documented in `docs/patterns/triggers.md`.
-- A2. **Priority model.** `Game#priority_player`, `Game#pass_priority!`. Active player gets priority first in each step that grants it; both players passing in succession with an empty stack ends the step; with a non-empty stack, resolves the top item then gives the active player priority again. Steps without priority (untap, cleanup) stay as-is.
-- A3. **Stack resolution one item at a time.** Replace the recursive drain in `Stack#resolve!` with `resolve_top!`. Keep `resolve!` as a spec-friendly "pass priority until the stack is empty" helper.
-- A4. **Responses.** Instants, flash, activated abilities, and mana abilities (which do not use the stack) cast/activated while the stack is non-empty. `can_cast_sorcery?` becomes real.
-- A5. **Interaction with SBAs and choices.** Run B's SBA pass, then put pending triggers on the stack, before each priority grant. Choices pause the loop as they do today.
+- A2 (done, opt-in). **Priority model.** `Game#priority_player`, `Game#pass_priority!`. Active player gets priority first in each step that grants it; both players passing in succession with an empty stack ends the step; with a non-empty stack, resolves the top item then gives the active player priority again. Steps without priority (untap, cleanup) stay as-is.
+- A3 (done). **Stack resolution one item at a time.** Replace the recursive drain in `Stack#resolve!` with `resolve_top!`. Keep `resolve!` as a spec-friendly "pass priority until the stack is empty" helper.
+- A4 (done, opt-in). **Responses.** Instants, flash, activated abilities, and mana abilities (which do not use the stack) cast/activated while the stack is non-empty. `can_cast_sorcery?` becomes real.
+- A5 (done, opt-in). **Interaction with SBAs and choices.** Run B's SBA pass, then put pending triggers on the stack, before each priority grant. Choices pause the loop as they do today.
 - A6. Split second, "counter target spell" edge cases, and stack-item legality on resolution belong in G2/E, not here.
 
 **Entry points.** `lib/magic/stack.rb`, `lib/magic/game/turn.rb` (state machine transitions), `lib/magic/game.rb`, `lib/magic/triggered_ability.rb`, `lib/magic/permanent.rb` (`dispatch_event_handlers`, `perform_trigger!`), `lib/magic/actions/cast.rb`.
@@ -153,7 +154,7 @@ Still open: flipping `enforce_priority` on by default (A2/A3 are done), which is
 - Two simultaneous triggers from different controllers resolve in APNAP order.
 - A player can cast an instant in response to a trigger, and it resolves first.
 - Both players passing with an empty stack advances the step.
-- The whole existing suite passes with the new default.
+- The whole existing suite passes with the new default. (True for A1's `queue_triggers`. For `enforce_priority` this is the remaining item.)
 
 **Depends on.** B (SBAs to slot in) and C1 (timing rules). A1 can begin before either if the switch keeps old behaviour.
 
@@ -172,7 +173,7 @@ Still open: flipping `enforce_priority` on by default (A2/A3 are done), which is
 - A creature can block more than one attacker when its card's `maximum_attackers_blocked` is above 1 (no card uses it yet). It divides its damage between those attackers the same way: lethal damage first, the rest to the last one. The defending player can't choose that division yet.
 - Still open: D4, D5.
 
-**Problem.** See fact 4 above. In addition, `Attack#resolve` assigns `[blocker.toughness, damage].min` to each blocker in turn: it ignores damage already marked, ignores deathtouch when not trampling, and gives the attacking player no ordering or split choice.
+**Original problem (D1–D3 solved).** See fact 4 above. In addition, `Attack#resolve` assigns `[blocker.toughness, damage].min` to each blocker in turn: it ignores damage already marked, ignores deathtouch when not trampling, and gives the attacking player no ordering or split choice.
 
 **Scope.**
 - D1. **Blocking legality.** Make `CombatPhase#declare_blocker` consult `Permanent#can_block?` and evasion: flying/reach, menace (≥ 2 blockers), fear, intimidate, shadow, skulk, horsemanship, landwalk, "can't be blocked", "can't block", protection. Blocker must be an untapped creature the defending player controls. A blocker may block only one attacker unless a card says otherwise. Validate menace-style constraints when blocks are *finalised*, not per blocker.
@@ -186,7 +187,8 @@ Still open: flipping `enforce_priority` on by default (A2/A3 are done), which is
 **Done when.** A spec per keyword above. A first-strike blocker kills a non-first-striking attacker before it deals damage. Deathtouch plus trample assigns 1 and tramples the rest (already covered; keep it passing).
 
 **Depends on.** None for D1–D3. D5 wants A. **Size.** Large, splits cleanly into five PRs. **Good for.** Agent.
-**Status (2026-09-26): D1–D3 done and merged to `master`.** `CombatPhase#block_illegal_reason` enforces blocker legality (untapped creature the defending player controls, not already blocking, `Permanent#can_block?`, protection, flying/reach, shadow, horsemanship, fear, intimidate, skulk, landwalk (`Keywords::Landwalk.new("Swamp")`), `Keywords::CANT_BE_BLOCKED`); menace is checked as a whole by `CombatPhase#validate_blocks!` in a `before_transition to: :combat_damage`. Damage is now worked out per step for attackers *and* blockers together: the first-strike step covers first/double strikers, the regular step covers everyone who didn't strike first plus double strikers, and all damage in a step is computed before any is applied. `Attack#attacker_damage` assigns lethal damage (accounting for marked damage and deathtouch) to each blocker in declaration order and the rest to the last blocker, or over the blockers with trample; `CombatPhase#assign_combat_damage(attacker, blocker => n)` lets the attacking player override this (validated). Deviation from D3: the split is a direct API call, not a `Choice`, because a pending `Choice` blocks the stack and there's no agent yet (C2). Still open: D4 and D5, a blocker blocking more than one creature, and blocks by creatures that "can block an additional creature".
+
+**Status (2026-09-26, implementation summary):** `CombatPhase#block_illegal_reason` enforces blocker legality (untapped creature the defending player controls, not already blocking, `Permanent#can_block?`, protection, flying/reach, shadow, horsemanship, fear, intimidate, skulk, landwalk (`Keywords::Landwalk.new("Swamp")`), `Keywords::CANT_BE_BLOCKED`); menace is checked as a whole by `CombatPhase#validate_blocks!` in a `before_transition to: :combat_damage`. Damage is now worked out per step for attackers *and* blockers together: the first-strike step covers first/double strikers, the regular step covers everyone who didn't strike first plus double strikers, and all damage in a step is computed before any is applied. `Attack#attacker_damage` assigns lethal damage (accounting for marked damage and deathtouch) to each blocker in declaration order and the rest to the last blocker, or over the blockers with trample; `CombatPhase#assign_combat_damage(attacker, blocker => n)` lets the attacking player override this (validated). Deviation from D3: the split is a direct API call, not a `Choice`, because a pending `Choice` blocks the stack and there's no agent yet (C2). Still open: D4 and D5, and letting the defending player choose how a multi-blocker divides its damage.
 
 ---
 
@@ -194,24 +196,24 @@ Still open: flipping `enforce_priority` on by default (A2/A3 are done), which is
 
 **Status (2026-09-26): E1–E3 done; E4–E6 open.** Specs: `spec/game/integration/{targeting_keywords,destruction_keywords}_spec.rb`. Details and gotchas are in `CLAUDE.md` ("Targeting Keywords", "Indestructible, Regeneration, Protection from Damage"). Deviations and leftovers:
 - E1: `script/keyword_audit.rb` generates `docs/keywords.md` (edit the status tables in the script, then rerun it). Most rows are "missing" by default; many of those are really n.a. and haven't been triaged.
-- E2: one `can_be_targeted_by?(source, controller:)` on `Permanent` and `Player`, called from `Cast`, `Cast::Mode` and `Ability#valid_targets?` (activated and loyalty abilities). Ward is a spell trigger plus an ability trigger. **Not done:** targets chosen through `Choice::Targeted` (triggered abilities) are not filtered, because that class cannot tell "target" from "choose". Fix by giving targeting choices their own subclass or flag. Player hexproof/shroud (Leyline of Sanctity, Witchbane Orb) is not modelled either.
+- E2: one `can_be_targeted_by?(source, controller:)` on `Permanent` and `Player`, called from `Cast`, `Cast::Mode` and `Ability#valid_targets?` (activated and loyalty abilities). Ward is a spell trigger plus an ability trigger (`Choice::Ward`). **Not done:** targets chosen through `Choice::Targeted` (triggered abilities) are not filtered, because that class cannot tell "target" from "choose". Fix by giving targeting choices their own subclass or flag. Player hexproof/shroud (Leyline of Sanctity, Witchbane Orb) is not modelled either.
 - E3: indestructible was already handled in `Permanent#destroy!`; regeneration is now a shield (`regenerate!`/`regenerated!`, expires in `cleanup!`, removes from combat), and protection prevents damage. "Can't be regenerated" is not modelled. `Permanent#regenerate!` callers (Rhys the Exiled) now get a shield rather than an immediate untap-and-tap.
 
-**Problem.** Keyword behaviour is spread across `Cards::Keywords` predicates, per-effect checks and one handler module. Adding a keyword means hunting for every place it must be checked. No generic `Fight`; `CopyEffect` exists (`lib/magic/copy_effect.rb`) but copy-spell semantics are card-by-card (**verify**).
+**Problem.** Keyword behaviour is spread across `Magic::Keywords` (`lib/magic/keywords.rb`) predicates, per-effect checks and one handler module. Adding a keyword means hunting for every place it must be checked. There is no generic `Effects::Fight` (the card parser has a `Fight` effect and `BrashTaunter` hand-rolls one); `CopyEffect` exists (`lib/magic/copy_effect.rb`) but copy-spell semantics are card-by-card (**verify**).
 
 **Scope.**
-- E1. **Keyword audit.** Build a table (in `docs/keywords.md`) of every Oracle keyword: implemented / partial / missing / n.a., with the file that owns it. Generate the candidate list from `data/oracle-cards-*.jsonl` (`Magic::Oracle`). This is a research task and the input for E2–E4.
-- E2. **Targeting keywords enforced generically.** Hexproof, shroud, protection (targeting, damage, blocking, enchanting/equipping), ward as a real triggered ability tied to the stack. One central `can_be_targeted_by?(source)` that every targeting path uses.
-- E3. **Evergreen combat/damage keywords.** Coordinate with D. Indestructible, regeneration as a replacement shield, `Permanent#regenerate!` currently just untaps and clears damage.
+- E1 (done). **Keyword audit.** Build a table (in `docs/keywords.md`) of every Oracle keyword: implemented / partial / missing / n.a., with the file that owns it. Generate the candidate list from `data/oracle-cards-*.jsonl` (`Magic::Oracle`). This is a research task and the input for E2–E4.
+- E2 (done, with gaps). **Targeting keywords enforced generically.** Hexproof, shroud, protection (targeting, damage, blocking, enchanting/equipping), ward as a real triggered ability tied to the stack. One central `can_be_targeted_by?(source)` that every targeting path uses.
+- E3 (done). **Evergreen combat/damage keywords.** Indestructible, regeneration as a shield, protection damage prevention.
 - E4. **Cost and cast keywords.** Convoke, delve, affinity, emerge, alternative costs, evoke, overload, cycling variants, flashback/escape/disturb, buyback, kicker variants. Shares a design with G3, so land G3 first or pair them.
 - E5. **Triggered and static keywords as reusable handlers.** Exalted, annihilator, persist, undying, cascade, evolve, extort, prowess (exists), landfall (exists), ninjutsu, etc. Follow the shape of `keyword_handlers/prowess.rb`.
 - E6. **Generic effects.** `Effects::Fight`, `Effects::CopySpell`, `Effects::Bounce`, `Effects::Mill`, etc., so cards stop hand-rolling them.
 
-**Entry points.** `lib/magic/cards/keywords.rb`, `lib/magic/cards/keyword_handlers/`, `lib/magic/effects/`, `lib/magic/protection.rb`, `lib/magic/targetable.rb`.
+**Entry points.** `lib/magic/keywords.rb`, `lib/magic/cards/keyword_handlers/`, `lib/magic/effects/`, `lib/magic/protection.rb`, `lib/magic/targetable.rb`.
 
 **Done when.** Per keyword: one integration spec, and card files that previously hand-rolled the behaviour are migrated or left with a note. E1's table shows no "unknown" rows.
 
-**Depends on.** None (E1–E3, E5–E6). E4 pairs with G3. **Size.** Large; every sub-item is independently shippable. **Good for.** Agents; E1 first.
+**Depends on.** None (E5–E6). E4 pairs with G3. **Size.** Large; every sub-item is independently shippable. **Good for.** Agents; E1 first.
 
 ---
 
@@ -229,6 +231,8 @@ Still open: flipping `enforce_priority` on by default (A2/A3 are done), which is
 
 **Done when.** A spec per layer, plus at least two documented interaction cases (e.g. a P/T setter and a +1/+1 anthem applied in either timestamp order give the right result). Existing static-ability specs unchanged.
 
+**Status (2026-09-26): not started.** A characteristic-defining ability exists for changeling (`Abilities::Static::Changeling`, driven by the changeling keyword) but it is not modelled as layer 4/7a.
+
 **Depends on.** None. J3 (copy) uses layer 1. **Size.** Large. **Good for.** Human-led design; agent implementation of F4.
 
 ---
@@ -237,7 +241,7 @@ Still open: flipping `enforce_priority` on by default (A2/A3 are done), which is
 
 **Scope.**
 - G1. **Mana objects.** Replace the flat `color => count` pool with mana that remembers its source and restrictions ("spend only on creature spells", "…only to activate abilities"). Pool empties at end of each step and phase. Today restricted mana is documented as unenforced (`docs/patterns/costs.md`); this removes that caveat. Keep `add_mana(green: 2)` and `pay_mana(...)` working for specs.
-- G2. **Resolution-time legality.** On resolution, re-check targets. A spell or ability with all targets illegal fizzles (does not resolve); with some illegal targets, resolves without affecting them. `Stack::TargetedCast#validate!` is a starting point.
+- G2. **Resolution-time legality.** (Some spell types have their own target checks; there is no generic fizzle rule **(verify)**.) On resolution, re-check targets. A spell or ability with all targets illegal fizzles (does not resolve); with some illegal targets, resolves without affecting them. `Stack::TargetedCast#validate!` is a starting point.
 - G3. **Cost framework.** A single `CostSet` pipeline for additional costs, alternative costs, cost increases/reductions, and X, with explicit order (601.2f–h). Sits under `Actions::Cast` and `Actions::ActivateAbility`. Includes Phyrexian, hybrid and snow mana.
 - G4. **Choice and cost validation layer.** Modal spells validate mode counts, distributions validate sums, colour choices validate allowed sets. Today these are unenforced and duplicated in card classes (see the many "nothing validates…" notes in `docs/patterns/`).
 
@@ -251,9 +255,9 @@ Still open: flipping `enforce_priority` on by default (A2/A3 are done), which is
 
 ## H. Turn structure and game setup
 
-- H1. **Cleanup step.** Discard to hand size (7) with a choice; remove marked damage; end "until end of turn" effects simultaneously; a second cleanup if triggers fire. Today `Turn` calls only `battlefield.cleanup` → `Creature#cleanup!`. *Depends on:* none for the basics; F4 for durations. *Size:* small.
-- H2. **Game setup.** Deck loading and validation (60-card / Commander), shuffle with a seedable RNG, choose starting player, London mulligan, first player skips their first draw. `Game.start!` today just draws seven. *Depends on:* deck loading and RNG none; mulligan decisions need C2.
-- H3. **Extra and skipped turns, phases and steps.** `take_additional_turn` and `queue_additional_combat!` exist. Add "skip your next draw step", extra main phases, "end the turn" effects (Time Stop), and end-of-game handling (win/draw detection, concession, draw when both lose simultaneously).
+- H1. **Cleanup step.** Discard to hand size (7) with a choice; remove marked damage; end "until end of turn" effects simultaneously; a second cleanup if triggers fire. Still true 2026-09-26: `Turn` calls only `battlefield.cleanup` → `Creature#cleanup!` (no discard, no second cleanup; `Choice::Discard` exists to build on). *Depends on:* none for the basics; F4 for durations. *Size:* small.
+- H2. **Game setup.** Deck loading and validation (60-card / Commander), shuffle with a seedable RNG, choose starting player, London mulligan, first player skips their first draw. `Game#start!` today just draws seven. *Depends on:* deck loading and RNG none; mulligan decisions need C2.
+- H3. **Extra and skipped turns, phases and steps.** `take_additional_turn` and `queue_additional_combat!` exist. Add "skip your next draw step", extra main phases, "end the turn" effects (Time Stop), and end-of-game handling. `Game#over?`/`#drawn?`/`#winner` and `Actions::Concede` exist (B); what is left is refusing actions once the game is over.
 
 **Entry points.** `lib/magic/game/turn.rb`, `lib/magic/game.rb`, `lib/magic/zones/library.rb`.
 
@@ -296,7 +300,6 @@ Independent, card-driven features. Pick them up when a card needs one, or batch 
 - Day/night, initiative and dungeons, energy, experience, poison variants (toxic, proliferate exists).
 - Alternative casting zones: escape, disturb, foretell, adventure, plot, impending, prototype.
 - Face-down permanents: morph, manifest, disguise, cloak.
-- Planeswalker uniqueness (`loyalty` rules) once B lands.
 - Replacement-effect completeness beyond the current chooser (self-replacement ordering, "instead" text, prevention effects and damage prevention shields).
 
 **Depends on.** Varies; most depend on nothing. **Good for.** Agent per item.
@@ -316,11 +319,11 @@ Independent, card-driven features. Pick them up when a card needs one, or batch 
 
 ## Suggested waves
 
-**Wave 1 (parallel; no dependencies):** B (done), C1 (done), D1–D3 (done), E1, F1–F2, G1, G2, H1, J2, J4, L1, L3.
-**Wave 2:** A (A1–A3 done; needs B, C1), D4–D5, E2–E6, F3–F4, G3–G4, H2, H3, J1, J3.
+**Wave 1 (parallel; no dependencies):** B (done), C1 (done), D1–D3 (done), E1 (done), F1–F2, G1, G2, H1, J2, J4, L1, L3.
+**Wave 2:** A (A1–A5 done, opt-in priority; default flip open), D4–D5, E2–E3 (done), E4–E6, F3–F4, G3–G4, H2, H3, J1, J3.
 **Wave 3:** C2, I, K, L2, L4.
 
-Within Wave 1, put the human's attention on B and C1, because A can't start meaningfully without them, and let agents take D, E1, G and L in parallel.
+B and C1 are done, so the next human attention goes to C2 (the agent interface) and to flipping `enforce_priority` on by default. Agents can keep taking F, G, H and L in parallel.
 
 ## Explicitly out of scope
 
