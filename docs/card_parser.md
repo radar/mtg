@@ -182,8 +182,13 @@ isn't supported.
   `target`, the target of an earlier effect in the same ability. `EffectList.parse`
   rejects one with no targeted effect before it; in a multi-target spell it uses the
   `targets[i]` of the last targeted effect before it; in a trigger it runs inside that
-  effect's `TargetChoice`. Tap, untap and pumps also take "enchanted creature" /
-  "equipped creature" (`PermanentTarget::ATTACHED`, `Effect::THIS.attached_to`).
+  effect's `TargetChoice`. Tap, untap, pumps and `AddCounters` also take "enchanted
+  creature" / "equipped creature" (`PermanentTarget::ATTACHED`, `Effect::THIS.attached_to`) --
+  `AddCounters` didn't thread `PermanentTarget::REFERENCE` (so didn't support pronoun or
+  attached targets) until it needed "Tap target creature. Put a stun counter on it."
+  `AddCounters` also no longer requires the counter type to be `+1/+1`/`-1/-1` for a
+  target (only `~`/self used to accept other types, e.g. "Put a quest counter on ~.") --
+  any type `Magic::Counters` knows can go on a target too (e.g. a stun counter).
 - An effect refers to its own card/permanent as `Effect::THIS`, which `EffectList`
   expands per context (`self` in a spell, `source` in an activated ability, `card` in a
   mode, `actor` in a trigger or inside a Choice). Never write `self`/`actor`/`source` in
