@@ -173,6 +173,13 @@ module Magic
       players.each do |player|
         7.times { player.draw! }
       end
+      # "beginning" (the state Turn starts in, before its first untap!) is a
+      # NO_PRIORITY_STEP like untap/cleanup, but unlike those it isn't a real rules
+      # concept -- it only exists so specs can build a game and act (an instant, a mana
+      # ability) before bothering to call go_to_main_phase!, same as they always could
+      # pre-enforce_priority. Grant the active player priority immediately so that keeps
+      # working; the very next untap! still revokes it like any other NO_PRIORITY_STEP.
+      grant_priority!(@current_turn.active_player)
     end
 
     def notify!(*events)

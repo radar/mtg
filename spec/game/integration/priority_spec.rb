@@ -7,6 +7,20 @@ RSpec.describe "Priority (Game#pass_priority!)" do
 
   let(:game) { Magic::Game.new(enforce_priority: true) }
 
+  it "gives the active player priority as soon as the game starts, before any untap!" do
+    expect(current_turn.step).to eq("beginning")
+    expect(game.priority_player).to eq(p1)
+  end
+
+  it "lets an instant be cast immediately, without go_to_main_phase! first" do
+    p1.add_mana(red: 1)
+
+    p1.cast(card: Card("Lightning Bolt", owner: p1)) { |a| a.pay_mana(red: 1).targeting(p2) }
+    game.stack.resolve!
+
+    expect(p2.life).to eq(17)
+  end
+
   describe "stack resolution" do
     it "resolves only the top item with resolve_top!" do
       go_to_main_phase!
