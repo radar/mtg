@@ -171,4 +171,27 @@ RSpec.describe Magic::Game, "action legality -- casting spells" do
       expect(game.stack.spells.map(&:card)).to eq([bears])
     end
   end
+
+  context "a land" do
+    let(:forest) { Card("Forest", owner: p1) }
+
+    before { p1.hand.add(forest) }
+
+    it "cannot be cast (lands are played, not cast)" do
+      go_to_main_phase!
+
+      expect { p1.cast(card: forest) }.to raise_error(Magic::IllegalAction, /lands are played, not cast/)
+    end
+
+    it "can still be cast for its adventure side, which is not a land" do
+      lindblum = Card("Lindblum, Industrial Regency", owner: p1)
+      p1.hand.add(lindblum)
+      p1.add_mana(red: 3)
+      go_to_main_phase!
+
+      p1.cast(card: lindblum, adventure: true) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
+
+      expect(game.stack.spells.map(&:card)).to eq([lindblum])
+    end
+  end
 end

@@ -214,6 +214,12 @@ module Magic
       players - [player]
     end
 
+    # Roadmap C2b: every action +player+ could legally attempt right now (plus `nil` for
+    # "pass"), as unpaid/untargeted `Action` candidates -- see `Magic::LegalActions`.
+    def legal_actions(player)
+      LegalActions.new(game: self, player: player).call
+    end
+
     def remaining_players
       players.reject(&:lost?)
     end

@@ -96,6 +96,7 @@ module Magic
 
       def illegal_reason
         unless @by_effect
+          return "#{card.name} is a land, and lands are played, not cast" if card.land? && !@adventure
           return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
 
           if !instant_speed? && (reason = sorcery_speed_reason)
