@@ -260,6 +260,17 @@ module Magic
         self
       end
 
+      # "Blight N or pay {M}" as an additional cost: `payment` is a creature (to blight)
+      # or a mana payment hash (to pay the extra mana instead).
+      def pay_blight_or_mana(payment)
+        cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::BlightOrMana) }
+        raise "Unknown additional blight-or-mana cost" unless cost
+
+        cost.pay(player:, payment: payment)
+        @paid_additional_costs << cost
+        self
+      end
+
       def pay_discard(payment)
         if payment.is_a?(Array)
           cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::DiscardCards) }
