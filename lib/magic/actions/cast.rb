@@ -73,7 +73,20 @@ module Magic
           .of_type(Abilities::Static::ManaCostAdjustment)
           .applies_to(card)
 
-          cost = mana_cost_adjustment_abilities.each_with_object(cost.dup) { |ability, cost| ability.apply(cost) }
+          # `cost` (from `card.cost`, at least) is a `Costs::Mana` that lives as long as the
+          # card does and is shared by every `Cast` action built for it over the card's
+          # life (cast, resolve, bounced back to hand, cast again, ...). `Costs::Mana#dup`
+          # is `Object#dup`'s default shallow copy: it shares @balance/@payments (by
+          # reference) with the original instead of giving each cast its own, so paying
+          # this "fresh" cost mutates the card's cost for every future cast of it too.
+          # Building a new Costs::Mana from the face-value cost hash instead keeps that
+          # hash the only thing carried over, with balance/payments starting clean. Other
+          # alternative-cost objects (Costs::SacrificeAlternativeCost,
+          # Costs::ExileCardAndLifeAlternativeCost, ...) don't have this problem the same
+          # way and don't share `Costs::Mana`'s `#cost`/`#adjusted_by` shape, so they're
+          # just `dup`'d as before.
+          fresh_cost = cost.is_a?(Costs::Mana) ? Costs::Mana.new(cost.cost.dup) : cost.dup
+          cost = mana_cost_adjustment_abilities.each_with_object(fresh_cost) { |ability, cost| ability.apply(cost) }
           cost.x = value_for_x if value_for_x
           cost
         end
@@ -88,6 +101,7 @@ module Magic
       end
 
       def can_perform?
+        return false if already_on_stack?
         return false unless castable_from_current_zone?
         return true if mana_cost.zero?
 
@@ -97,6 +111,7 @@ module Magic
       def illegal_reason
         unless @by_effect
           return "#{card.name} is a land, and lands are played, not cast" if card.land? && !@adventure
+          return "#{card.name} is already on the stack" if already_on_stack?
           return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
 
           if !instant_speed? && (reason = sorcery_speed_reason)
@@ -318,6 +333,20 @@ module Magic
 
       def castable_from_current_zone?
         in_permitted_zone?(card, flashback: @flashback)
+      end
+
+      # Rule 405.2: once a spell is on the stack it isn't in any zone it could be cast
+      # from again. `card.zone` doesn't track "on the stack" as its own state (it's still
+      # whatever zone it was cast from until the spell resolves and moves it elsewhere),
+      # so this is checked against the stack directly instead of folded into
+      # `in_permitted_zone?`. Without this, asking twice whether the same still-unresolved
+      # spell is castable says yes both times -- harmless for a caller that only ever
+      # asks once, but a legality query built to be asked repeatedly (`Game#legal_actions`,
+      # roadmap C2b) would offer it again and a caller that acted on that would re-pay its
+      # cost against the same Costs::Mana object `card.cost`'s already at (a shallow `dup`
+      # away from `Costs::Mana#auto_pay`/`#pay` mutating `@balance` in place), overpaying it.
+      def already_on_stack?
+        game.stack.spells.any? { |spell| spell.card == card }
       end
     end
   end

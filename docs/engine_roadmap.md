@@ -317,11 +317,18 @@ Independent, card-driven features. Pick them up when a card needs one, or batch 
 ## L. Tooling and confidence
 
 - L1. **Card coverage report.** `rake coverage`: compares `data/oracle-cards-*.jsonl` (filtered to the card pool being targeted) with `lib/magic/cards/`. Lists unimplemented cards grouped by the mechanic they need, feeding K and E1. Cheap and useful for prioritising every other workstream.
-- L2. **Self-play fuzzing.** With C2's `FirstLegalAgent` or a random agent and a seeded RNG (H2), play many games between random decks and assert invariants: the stack is empty at end of turn; no negative life without a loss; every permanent belongs to exactly one zone; card count is conserved. Any crash is a bug report.
+- L2 (done, scoped down -- see status). **Self-play fuzzing.** With C2's `FirstLegalAgent` or a random agent and a seeded RNG (H2), play many games between random decks and assert invariants: the stack is empty at end of turn; no negative life without a loss; every permanent belongs to exactly one zone; card count is conserved. Any crash is a bug report.
+
+**Status (2026-09-27): L2 done, scoped to fixed decks (no H2 yet).** `spec/game/integration/self_play_spec.rb` runs `Game#run!` (two `FirstLegalAgent`s) to completion on three fixed decks (all-land; vanilla creatures; creatures + a single-target burn spell across two colors) and asserts, per player: the stack is empty, life is positive unless the player lost, and every card they started with is in exactly one zone/on the battlefield with none duplicated or dropped. No seeded RNG or random decks yet (needs H2), so this is a fixed fuzz set, not a random one -- rerunning it finds the same bugs, not new ones, until more decks are added. Bugs this found and fixed, exactly as intended ("any crash is a bug report"):
+  - `spec_helper.rb`'s own `p2_library` built every card with the `Card()` helper's default `owner: p1` instead of `p2` -- latent since the shared "two player game" context was written, never caught because no existing spec actually played one of its filler lands (they all build their own test-specific cards). A land P2 "played" out of that deck resolved as a permanent P1 controlled.
+  - `LegalActions#declarable_attackers` offered re-declaring an already-attacking creature at the *same* target as a distinct legal action forever (it's legal -- see `DeclareAttacker#illegal_reason` -- but a no-op). A "take the first legal action" agent picked it every time forever instead of ever passing, hanging the whole run.
+  - A mana ability was still being built as the base `Actions::ActivateAbility`, not `Actions::ActivateManaAbility` in one path (see C2b's fix); `Costs::SelfTap` still wasn't excluded (also C2b).
+  - **The one worth its own callout:** `Cast#mana_cost` built its per-cast cost via `Costs::Mana#dup` (`Object#dup`'s default *shallow* copy), which shares `@balance`/`@payments` **by reference** with the original -- `card.cost` is one persistent `Costs::Mana` instance per card, reused by every `Cast` action built for that card over its whole life (cast, resolve, bounced back to hand, cast again; or, more simply, offered again by `legal_actions` while still unresolved on the stack). Paying the "fresh" duplicate mutated the card's own cost permanently, so a second cast against the same card ever again raised `Costs::Mana::Overpayment`. Fixed by building a real fresh `Costs::Mana` from the face-value cost hash (`cost.cost.dup`) instead of duping the stateful wrapper; alternative-cost objects that aren't `Costs::Mana` (`Costs::SacrificeAlternativeCost`, `Costs::ExileCardAndLifeAlternativeCost`) keep the old behaviour, since they don't share this shape or this problem. This was a real, pre-existing engine bug independent of self-play or `enforce_priority` -- any caller that recast the same physical card object twice (a bounce-and-recast, most plausibly) would have hit it. Added `Cast#already_on_stack?` alongside it (rule 405.2: a spell already on the stack isn't in a zone it can be cast from again), which is what `legal_actions` was actually tripping over.
+  Specs: `spec/game/integration/self_play_spec.rb`, two new cases in `spec/game/integration/action_legality/cast_spec.rb` for `already_on_stack?`.
 - L3. **Comprehensive Rules conformance specs.** A `spec/rules/` directory with one file per rules section (e.g. `rule_704_spec.rb`) mapping rule numbers to specs, written as workstreams land. Ties each workstream's "Done when" to something citable.
 - L4. **Game log and replay.** `EventLog` (`game/event_log.rb`) already records events per turn. Serialise it plus RNG seed so a failing game can be replayed.
 
-**Depends on.** L1 none, L3 none, L4 none. L2 needs C2 (done) and H2. **Good for.** Agent (L1, L3), human (L2 design).
+**Depends on.** L1 none, L3 none, L4 none. L2 needed C2 (done); full random-deck fuzzing still wants H2, the scoped-down fixed-deck version done above didn't. **Good for.** Agent (L1, L3), human (L2 design).
 
 ---
 
@@ -329,9 +336,9 @@ Independent, card-driven features. Pick them up when a card needs one, or batch 
 
 **Wave 1 (parallel; no dependencies):** B (done), C1 (done), D1–D3 (done), E1 (done), F1–F2, G1, G2, H1, J2, J4, L1, L3.
 **Wave 2:** A (A1–A5 done, opt-in priority; default flip open), C2 (done), D4–D5, E2–E3 (done), E4–E6, F3–F4, G3–G4, H2, H3, J1, J3.
-**Wave 3:** I, K, L2, L4.
+**Wave 3:** I, K, L4.
 
-B, C1 and C2 are all done, so the next human attention goes to flipping `enforce_priority` on by default (the last piece of A) and to L2 (self-play fuzzing), which C2 unblocks. Agents can keep taking F, G, H and L in parallel.
+B, C1, C2 and L2 are all done, so the next human attention goes to flipping `enforce_priority` on by default (the last piece of A). Agents can keep taking F, G, H and L in parallel.
 
 ## Explicitly out of scope
 

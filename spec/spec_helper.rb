@@ -91,7 +91,7 @@ RSpec.shared_context "two player game" do
   end
 
   def p2_library
-    14.times.map { Card("Mountain") }
+    14.times.map { Card("Mountain", owner: p2) }
   end
 
   def current_turn

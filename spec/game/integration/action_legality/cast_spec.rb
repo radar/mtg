@@ -194,4 +194,26 @@ RSpec.describe Magic::Game, "action legality -- casting spells" do
       expect(game.stack.spells.map(&:card)).to eq([lindblum])
     end
   end
+
+  context "a spell already on the stack, still unresolved" do
+    it "cannot be cast again" do
+      go_to_main_phase!
+      p1.add_mana(red: 2)
+      p1.cast(card: bolt) { |a| a.pay_mana(red: 1).targeting(p2) }
+
+      expect { p1.cast(card: bolt) { |a| a.pay_mana(red: 1).targeting(p2) } }
+        .to raise_error(Magic::IllegalAction, /already on the stack/)
+    end
+
+    it "can be cast again once it resolves" do
+      go_to_main_phase!
+      p1.add_mana(red: 2)
+      p1.cast(card: bolt) { |a| a.pay_mana(red: 1).targeting(p2) }
+      game.stack.resolve!
+      p1.hand.add(bolt)
+      p1.add_mana(red: 1)
+
+      expect { p1.cast(card: bolt) { |a| a.pay_mana(red: 1).targeting(p2) } }.not_to raise_error
+    end
+  end
 end

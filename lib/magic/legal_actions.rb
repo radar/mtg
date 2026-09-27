@@ -82,9 +82,19 @@ module Magic
 
       player.creatures.flat_map do |attacker|
         game.opponents(player).filter_map do |target|
+          # Re-declaring an already-attacking creature at the *same* target is legal (it's
+          # a no-op retarget -- see DeclareAttacker#illegal_reason), but offering it here
+          # would give a "just take the first legal action" agent an action that's always
+          # available and never changes anything to loop on forever.
+          next if already_attacking?(attacker, target)
+
           keep(Actions::DeclareAttacker.new(game: game, player: player, attacker: attacker, target: target))
         end
       end
+    end
+
+    def already_attacking?(attacker, target)
+      game.current_turn.attacks.find { |attack| attack.attacker == attacker }&.target == target
     end
 
     # One candidate per (attacking creature, potential blocker) pair, for whichever player
