@@ -220,6 +220,14 @@ module Magic
       LegalActions.new(game: self, player: player).call
     end
 
+    # Roadmap C2c: play the game to completion using each player's Agent (Player#agent).
+    # See Magic::GameRunner for what it can and can't prepare on an agent's behalf.
+    def run!(max_actions: 10_000)
+      raise "Game#run! needs enforce_priority: true" unless enforce_priority?
+
+      GameRunner.new(game: self, max_actions: max_actions).call
+    end
+
     def remaining_players
       players.reject(&:lost?)
     end

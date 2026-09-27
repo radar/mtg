@@ -71,6 +71,21 @@ RSpec.describe Magic::Game, "#legal_actions (roadmap C2b)" do
 
       expect(actions_of(Magic::Actions::ActivateAbility, p1).map(&:ability)).to include(permanent.activated_abilities.first)
     end
+
+    it "builds a mana ability as ActivateManaAbility, not the priority-using base class" do
+      permanent = ResolvePermanent("Forest", owner: p1)
+      permanent.untap!
+
+      action = actions_of(Magic::Actions::ActivateAbility, p1).find { |a| a.ability == permanent.activated_abilities.first }
+      expect(action).to be_a(Magic::Actions::ActivateManaAbility)
+    end
+
+    it "excludes an already-tapped source's mana ability" do
+      permanent = ResolvePermanent("Forest", owner: p1)
+      permanent.tap!
+
+      expect(actions_of(Magic::Actions::ActivateAbility, p1).map(&:ability)).not_to include(permanent.activated_abilities.first)
+    end
   end
 
   describe "attack declarations" do

@@ -15,7 +15,7 @@ module Magic
   # legal-but-unaffordable ability can still show up here; paying will fail
   # the same way it would for a caller that tried it directly.
   #
-  # `nil` is always included, meaning "pass" (see `Magic::Agent#choose_action`).
+  # `nil` is always included (last), meaning "pass" (see `Magic::Agent#choose_action`).
   class LegalActions
     def initialize(game:, player:)
       @game = game
@@ -23,8 +23,8 @@ module Magic
     end
 
     def call
-      [nil, *castable_spells, *playable_lands, *cyclable_cards, *activatable_abilities, *activatable_loyalty_abilities,
-       *declarable_attackers, *declarable_blockers]
+      [*castable_spells, *playable_lands, *cyclable_cards, *activatable_abilities, *activatable_loyalty_abilities,
+       *declarable_attackers, *declarable_blockers, nil]
     end
 
     private
@@ -63,7 +63,11 @@ module Magic
 
     def activatable_abilities
       player.permanents.flat_map(&:activated_abilities).filter_map do |ability|
-        keep(Actions::ActivateAbility.new(game: game, player: player, ability: ability))
+        # Mana abilities don't use the stack (`Actions::ActivateManaAbility#uses_priority?`
+        # is false) and resolve immediately in `#perform`; `Player#activate_ability` picks
+        # the class the same way.
+        action_class = ability.is_a?(Magic::ManaAbility) ? Actions::ActivateManaAbility : Actions::ActivateAbility
+        keep(action_class.new(game: game, player: player, ability: ability))
       end
     end
 
@@ -100,6 +104,14 @@ module Magic
     def keep(action)
       return nil unless action.legal?
       return nil if action.respond_to?(:can_perform?) && !action.can_perform?
+      # illegal_reason deliberately doesn't check {T}-cost payability (see CLAUDE.md
+      # "Action Legality" -- it's checked at payment time instead), but an enumeration of
+      # what's *currently* activatable has to exclude an already-tapped/summoning-sick
+      # source, or a caller that tries the "legal" action gets an IllegalAction from
+      # ActivateAbility#pay for a reason this method never surfaced.
+      if action.respond_to?(:has_cost?) && action.has_cost?(Costs::SelfTap)
+        return nil if action.costs.find { |cost| cost.is_a?(Costs::SelfTap) }.unpayable_reason
+      end
 
       action
     end

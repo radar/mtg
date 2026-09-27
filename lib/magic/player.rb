@@ -5,6 +5,10 @@ module Magic
 
     attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters, :commander, :attachments
     attr_accessor :ring_bearer, :spell_cast_limit, :spell_cast_limit_turn
+    # Roadmap C2: the Magic::Agent driving this player's decisions for Game#run!. Unset by
+    # default -- nothing outside GameRunner reads it, so every other caller keeps driving
+    # the player directly.
+    attr_accessor :agent
 
     def_delegators :@game, :logger
 
