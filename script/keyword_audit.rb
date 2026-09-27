@@ -36,6 +36,7 @@ IMPLEMENTED = {
   "Flashback" => "card.rb (flashback); actions/cast.rb",
   "Cycling" => "card.rb (cycling); actions/cycle.rb",
   "Buyback" => "card.rb (buyback); actions/cast.rb",
+  "Convoke" => "card.rb (convoke); actions/cast.rb (#convoke, reduces the cost via Costs::Mana#adjusted_by); card_parser/rules/keywords.rb",
   "Rebound" => "card.rb (rebound); actions/cast.rb (by_effect)",
   "Landfall" => "triggered_ability/landfall.rb; events/landfall.rb",
   "Equip" => "cards/equipment.rb",

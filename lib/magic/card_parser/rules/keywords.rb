@@ -13,6 +13,7 @@ module Magic
       #   Kicker {1}{G}                       -> kicker_cost generic: 1, green: 1
       #   Flashback {2}{R}                    -> flashback Costs::Mana.new(generic: 2, red: 1)
       #   Cycling {2}                         -> cycling generic: 2
+      #   Convoke                             -> convoke
       class Keywords < Data.define(:keywords, :extras)
         include Rule
 
@@ -58,6 +59,8 @@ module Magic
             Extra.new("flashback Costs::Mana.new(#{cost_hash($~[:cost])})")
           when /\ACycling (?<cost>#{MANA})\z/i
             Extra.new("cycling #{cost_hash($~[:cost])}")
+          when /\AConvoke\z/i
+            Extra.new("convoke")
           end
         end
 

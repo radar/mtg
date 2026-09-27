@@ -192,6 +192,33 @@ module Magic
         self
       end
 
+      # Rule 702.51: tap an untapped creature you control to pay for {1} (`pay: :generic`)
+      # or one mana of `pay` (one of the creature's own colors) toward this spell's cost.
+      # Reduces the cost itself (`Costs::Mana#adjusted_by`, the same mechanism a static
+      # cost-reduction ability uses) rather than paying from the mana pool, so this must
+      # be called before any real mana payment (`pay_mana`/`auto_pay_mana`) -- paying
+      # first and convoking after would reset the balance those payments already reduced,
+      # since `adjusted_by` rebuilds `balance` from the (now smaller) cost.
+      def convoke(creature, pay: :generic)
+        raise "#{card.name} does not have convoke" unless card.convoke?
+        raise "#{creature.name} is tapped" if creature.tapped?
+        raise "#{player.inspect} does not control #{creature.name}" unless creature.controller == player
+
+        if pay == :generic
+          raise "#{card.name}'s cost has no generic mana left to convoke" unless mana_cost.balance[:generic].to_i.positive?
+
+          mana_cost.adjusted_by(generic: -1)
+        else
+          raise "#{creature.name} is not #{pay}" unless creature.colors.include?(pay)
+          raise "#{card.name}'s cost has no #{pay} mana left to convoke" unless mana_cost.balance[pay].to_i.positive?
+
+          mana_cost.adjusted_by(pay => -1)
+        end
+
+        creature.tap!
+        self
+      end
+
       def pay_kicker(payment)
         kicker_cost.pay(player:, payment:)
       end

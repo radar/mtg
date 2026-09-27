@@ -76,6 +76,14 @@ module Magic
         end
       end
 
+      # "Convoke (Your creatures can help cast this spell. Each creature you tap while
+      # casting this spell pays for {1} or one mana of that creature's color.)"
+      def convoke
+        define_method(:convoke?) do
+          true
+        end
+      end
+
       def kicker_cost(cost)
         const_set(:KICKER_COST, cost)
       end
@@ -376,6 +384,10 @@ module Magic
     end
 
     def buyback?
+      false
+    end
+
+    def convoke?
       false
     end
 
