@@ -293,12 +293,16 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
   end
 
   it "runs the effects after an optional one whether or not it is accepted" do
-    source = parse("When ~ dies, you may draw a card. If you do, discard a card. You gain 1 life.").class_source("DiesTrigger")
-    expect(source).to include("trigger_effect(:draw_cards, number_to_draw: 1)\n      game.add_choice(Magic::Choice::Discard.new(player: controller))\n      finish",
+    source = parse("When ~ dies, you may draw a card. If you do, you lose 1 life. You gain 1 life.").class_source("DiesTrigger")
+    expect(source).to include("trigger_effect(:draw_cards, number_to_draw: 1)\n      trigger_effect(:lose_life",
                               "def decline! = finish", "def finish\n      trigger_effect(:gain_life")
   end
 
   it "rejects effects after an optional effect that makes its own choice" do
     expect { parse("When ~ enters, you may scry 1. Draw a card.").class_source("X") }.to raise_error(Magic::CardParser::UnsupportedCard)
+  end
+
+  it "rejects effects after an optional discard, since discard is itself a choice" do
+    expect { parse("When ~ dies, you may draw a card. If you do, discard a card. You gain 1 life.").class_source("X") }.to raise_error(Magic::CardParser::UnsupportedCard)
   end
 end
