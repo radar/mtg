@@ -318,7 +318,9 @@ Independent, card-driven features. Pick them up when a card needs one, or batch 
 
 ## L. Tooling and confidence
 
-- L1. **Card coverage report.** `rake coverage`: compares `data/oracle-cards-*.jsonl` (filtered to the card pool being targeted) with `lib/magic/cards/`. Lists unimplemented cards grouped by the mechanic they need, feeding K and E1. Cheap and useful for prioritising every other workstream.
+- L1 (done). **Card coverage report.** `rake coverage`: compares `data/oracle-cards-*.jsonl` (filtered to the card pool being targeted) with `lib/magic/cards/`. Lists unimplemented cards grouped by the mechanic they need, feeding K and E1. Cheap and useful for prioritising every other workstream.
+
+**Status (2026-09-27): L1 done.** `rake coverage[<set code>]` (or `bundle exec ruby script/coverage.rb <set code> [--lines] [--cards]`) reports, for one set at a time (the "card pool being targeted" is whichever set you name — currently `ecl`, Lorwyn Eclipsed, the set most other work targets), how many of its cards have no `lib/magic/cards/` file yet, and tags each unimplemented one by the mechanic blocking it (reusing `script/parser_gaps.rb`'s tagging, extracted into shared `script/mechanic_tags.rb` so the two scripts don't keep two copies of the same ~40-regex table) — or "Ready to generate" for one `rake parse_card` alone would produce cleanly, no gap to close first. "Implemented" means `Magic::Cards` defines the constant for the card's name, true whether the file was hand-written or `rake parse_card`-generated; this is a different (and narrower) question than `parser_gaps.rb`'s "can the parser reproduce this Oracle text", so an already-implemented but hand-rolled-around-a-parser-gap card doesn't show up here. First `ecl` run: 262 cards, 55 implemented, 207 not, 36 of those "ready to generate" right now. Known approximation, shared with `parser_gaps.rb`: adventure/split/transform cards are looked up by Scryfall's combined name, so a hand-written file keyed on only the front face's name could misreport as unimplemented (not observed in the current `ecl` data — spot-checked `Lindblum, Industrial Regency`, correctly counted implemented).
 - L2 (done, scoped down -- see status). **Self-play fuzzing.** With C2's `FirstLegalAgent` or a random agent and a seeded RNG (H2), play many games between random decks and assert invariants: the stack is empty at end of turn; no negative life without a loss; every permanent belongs to exactly one zone; card count is conserved. Any crash is a bug report.
 
 **Status (2026-09-27): L2 done, scoped to fixed decks (no H2 yet).** `spec/game/integration/self_play_spec.rb` runs `Game#run!` (two `FirstLegalAgent`s) to completion on three fixed decks (all-land; vanilla creatures; creatures + a single-target burn spell across two colors) and asserts, per player: the stack is empty, life is positive unless the player lost, and every card they started with is in exactly one zone/on the battlefield with none duplicated or dropped. No seeded RNG or random decks yet (needs H2), so this is a fixed fuzz set, not a random one -- rerunning it finds the same bugs, not new ones, until more decks are added. Bugs this found and fixed, exactly as intended ("any crash is a bug report"):
@@ -336,11 +338,11 @@ Independent, card-driven features. Pick them up when a card needs one, or batch 
 
 ## Suggested waves
 
-**Wave 1 (parallel; no dependencies):** B (done), C1 (done), D1–D3 (done), E1 (done), F1–F2, G1, G2, H1, J2, J4, L1, L3.
+**Wave 1 (parallel; no dependencies):** B (done), C1 (done), D1–D3 (done), E1 (done), F1–F2, G1, G2, H1, J2, J4, L1 (done), L3.
 **Wave 2:** A (A1–A5 done, opt-in priority by design), C2 (done), D4–D5, E2–E3 (done), E4–E6, F3–F4, G3–G4, H2, H3, J1, J3.
 **Wave 3:** I, K, L4.
 
-B, C1, C2 and L2 are all done; A stays opt-in by design (not a deferred default flip — see its 2026-09-27 status). Next human attention goes wherever's most useful next: F/G (layers, mana/cost pipeline) are the biggest remaining structural gaps. Agents can keep taking D4–D5, E4–E6, H and L in parallel.
+B, C1, C2, L1 and L2 are all done; A stays opt-in by design (not a deferred default flip — see its 2026-09-27 status). `rake coverage[ecl]` (L1) says where the cheapest card-implementation wins are (36 cards ready to generate outright). Next human attention goes wherever's most useful next: F/G (layers, mana/cost pipeline) are the biggest remaining structural gaps. Agents can keep taking D4–D5, E4–E6, H and L3/L4 in parallel.
 
 ## Explicitly out of scope
 

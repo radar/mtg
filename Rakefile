@@ -34,6 +34,13 @@ task :search_cards, :fragment do |task, args|
   puts names.inspect
 end
 
+desc "Roadmap L1: cards of a set with no lib/magic/cards/ file yet, grouped by blocking mechanic (see script/coverage.rb; run it directly for --lines/--cards)"
+task :coverage, :set_code do |_task, args|
+  set_code = args[:set_code] or abort "usage: rake coverage[<set code>]"
+  ARGV.replace([set_code])
+  load "script/coverage.rb"
+end
+
 desc "Generate lib/magic/cards/<name>.rb from card text on stdin (see Magic::CardParser)"
 task :parse_card do
   result = Magic::CardParser.parse($stdin.read.force_encoding(Encoding::UTF_8))
