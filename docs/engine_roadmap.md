@@ -110,10 +110,12 @@ Two independent halves.
 
 ### C2. Decision-provider interface and game runner
 
+**Status (2026-09-27): C2a done.** `Magic::Agent` (`lib/magic/agent.rb`) documents the contract (`choose_action`, `choose_targets`, `choose_blockers`, `choose_mana_payment`, `resolve_choice`) by raising `NotImplementedError`; `Magic::Agents::ScriptedAgent` answers from a queue passed at construction (raises `OutOfAnswers` once it's empty); `Magic::Agents::FirstLegalAgent` takes the first option offered (including a `nil` "pass"), declines every block, and has no generic answer for `resolve_choice` yet (`Choice` subclasses each expect a different answer shape — see C2b/C2c). Nothing in the engine calls these yet; `Player` has no `agent`/`controller` attribute. Specs: `spec/agent_spec.rb`, `spec/agents/`.
+
 **Problem.** There is no seam for "ask the player what to do". This blocks bots, a UI, network play, and automated testing of whole games.
 
 **Scope.**
-- C2a. Define `Magic::Agent` (or `Player#controller`) with methods like `choose_action(game, legal_actions)`, `choose_targets`, `choose_blockers`, `choose_mana_payment`, `resolve_choice(choice)`. Ship a `ScriptedAgent` (queue of answers, for specs) and a `FirstLegalAgent`.
+- C2a (done). Define `Magic::Agent` (or `Player#controller`) with methods like `choose_action(game, legal_actions)`, `choose_targets`, `choose_blockers`, `choose_mana_payment`, `resolve_choice(choice)`. Ship a `ScriptedAgent` (queue of answers, for specs) and a `FirstLegalAgent`.
 - C2b. `Game#legal_actions(player)`: enumerate castable spells, playable lands, activatable abilities, attack/block declarations. Builds on C1's legality predicate.
 - C2c. `Game#run!` main loop: while game not over, ask the player with priority for an action. Requires A for real semantics; before A lands, it can drive turn-level actions only.
 - Existing `Stack#choices` queue becomes "ask the choice's `controller`'s agent" instead of waiting for specs to call `resolve_choice!`.
@@ -122,7 +124,7 @@ Two independent halves.
 
 **Done when.** A full game between two `FirstLegalAgent`s runs to completion with no exceptions. Existing specs keep working unchanged because default behaviour is "no agent → caller drives".
 
-**Depends on.** C1 (legal actions), A (priority loop). C2a can start earlier. **Size.** Large. **Good for.** Human-led design, agent-implemented pieces.
+**Depends on.** C1 (legal actions), A (priority loop) for C2b/C2c; both are done, so C2b can start now. **Size.** Large. **Good for.** Human-led design, agent-implemented pieces.
 
 ---
 
@@ -323,7 +325,7 @@ Independent, card-driven features. Pick them up when a card needs one, or batch 
 **Wave 2:** A (A1–A5 done, opt-in priority; default flip open), D4–D5, E2–E3 (done), E4–E6, F3–F4, G3–G4, H2, H3, J1, J3.
 **Wave 3:** C2, I, K, L2, L4.
 
-B and C1 are done, so the next human attention goes to C2 (the agent interface) and to flipping `enforce_priority` on by default. Agents can keep taking F, G, H and L in parallel.
+B, C1 and C2a are done, so the next human attention goes to C2b/C2c (`legal_actions`, the game runner) and to flipping `enforce_priority` on by default. Agents can keep taking F, G, H and L in parallel.
 
 ## Explicitly out of scope
 
