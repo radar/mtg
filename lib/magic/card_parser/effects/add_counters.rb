@@ -6,7 +6,7 @@ module Magic
       # "Put a +1/+1 counter on target creature." / "Put two +1/+1 counters on
       # each creature you control." / "Put a +1/+1 counter on ~." / "Put a quest counter
       # on ~." (a counter type Magic::Counters knows; only +1/+1 can go on other permanents).
-      class AddCounters < Data.define(:amount, :counter_type, :who, :targets)
+      class AddCounters < Data.define(:amount, :counter_type, :who, :targets, :optional)
         include Effect
 
         LINE = %r{\APut (?<amount>\d+|\w+) (?<type>[+-]1/[+-]1|[a-z]+) counters? on (?:(?<self>~)|(?<each>each creature you control)|#{PermanentTarget::PATTERN})\.?\z}i
@@ -22,12 +22,13 @@ module Magic
                          elsif m[:each] then [:each, "battlefield.controlled_by(controller).creatures"]
                          else [:target, PermanentTarget.choices(m)]
                          end
-          new(amount: Number.parse(m[:amount]), counter_type: m[:type], who:, targets:)
+          new(amount: Number.parse(m[:amount]), counter_type: m[:type], who:, targets:, optional: who == :target && PermanentTarget.optional?(m))
         rescue RuntimeError => e
           raise unless e.message.start_with?("Unknown counter type")
         end
 
         def target_choices = who == :target ? targets : nil
+        def optional_target? = optional
 
         def resolve_call
           case who

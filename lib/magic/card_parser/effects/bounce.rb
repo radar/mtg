@@ -5,16 +5,17 @@ module Magic
     module Effects
       # "Return target creature to its owner's hand." / "Return target nonland
       # permanent an opponent controls to its owner's hand."
-      class Bounce < Data.define(:targets)
+      class Bounce < Data.define(:targets, :optional)
         include Effect
 
         LINE = /\AReturn #{PermanentTarget::PATTERN} to its owner's hand\.?\z/i
 
         def self.parse(text)
-          new(targets: PermanentTarget.choices($~)) if LINE.match(text)
+          new(targets: PermanentTarget.choices($~), optional: PermanentTarget.optional?($~)) if LINE.match(text)
         end
 
         def target_choices = targets
+        def optional_target? = optional
         def resolve_call = "trigger_effect(:return_to_owners_hand, target: target)"
       end
     end

@@ -243,6 +243,16 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   targeted effect is its own choice, nested in turn (`TargetChoice`, `TargetChoice2`,
   ...). Unless its only target is its first effect, it starts with
   `return if <targets>.none? || ...`: an ability missing a legal target does nothing.
+- Every `Effect` matching `PermanentTarget::PATTERN` needs its own `optional_target?`
+  (usually `PermanentTarget.optional?(match)`, stashed at parse time) to get the
+  `0..1`/skippable treatment above for "up to one target ...": the base `Effect#
+  optional_target?` defaults to `false`, so an effect that builds its targets from the
+  match but forgets to override it silently generates a *mandatory* `choice_amount = 1`
+  instead. `AddCounters` and `Bounce` both had this gap (fixed) — with exactly one legal
+  target, `Stack#add_choice`'s lone-target auto-resolve then picks it for the player
+  instead of leaving "up to one" genuinely optional. Check any other `Effect` that
+  matches `PermanentTarget::PATTERN` (`rg optional_target? lib/magic/card_parser/effects/`
+  to see which ones already have it) before assuming a new one is fine.
 
 ## Testing
 
