@@ -23,7 +23,8 @@ module Magic
     end
 
     def call
-      [nil, *castable_spells, *playable_lands, *cyclable_cards, *activatable_abilities, *activatable_loyalty_abilities, *declarable_attackers]
+      [nil, *castable_spells, *playable_lands, *cyclable_cards, *activatable_abilities, *activatable_loyalty_abilities,
+       *declarable_attackers, *declarable_blockers]
     end
 
     private
@@ -78,6 +79,20 @@ module Magic
       player.creatures.flat_map do |attacker|
         game.opponents(player).filter_map do |target|
           keep(Actions::DeclareAttacker.new(game: game, player: player, attacker: attacker, target: target))
+        end
+      end
+    end
+
+    # One candidate per (attacking creature, potential blocker) pair, for whichever player
+    # is asked -- `Actions::DeclareBlocker#illegal_reason` rejects the ones that aren't
+    # this player's creatures or aren't legal blocks, so this doesn't need to work out the
+    # defending player itself.
+    def declarable_blockers
+      return [] unless game.current_turn.step?(:declare_blockers)
+
+      game.current_turn.attacks.flat_map do |attack|
+        player.creatures.filter_map do |blocker|
+          keep(Actions::DeclareBlocker.new(game: game, player: player, blocker: blocker, attacker: attack.attacker))
         end
       end
     end

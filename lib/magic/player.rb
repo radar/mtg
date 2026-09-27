@@ -126,6 +126,15 @@ module Magic
       action
     end
 
+    # Legality-checked counterpart to `current_turn.declare_blocker(blocker, attacker:)`
+    # (the raw `CombatPhase` delegate): goes through `Turn#take_action`, so an illegal
+    # block raises `Magic::IllegalAction` rather than `CombatPhase::IllegalBlock`.
+    def declare_blocker(blocker:, attacker:, **args)
+      action = prepare_action(Magic::Actions::DeclareBlocker, blocker: blocker, attacker: attacker, **args)
+      game.take_action(action)
+      action
+    end
+
     def skip_choice(choice)
       game.skip_choice!
     end

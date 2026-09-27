@@ -110,6 +110,49 @@ RSpec.describe Magic::Game, "#legal_actions (roadmap C2b)" do
     end
   end
 
+  describe "block declarations" do
+    def declare_bears_attacking
+      attacker = ResolvePermanent("Grizzly Bears", owner: p1)
+      skip_to_combat!
+      current_turn.declare_attackers!
+      p1.declare_attacker(attacker: attacker, target: p2)
+      current_turn.attackers_declared!
+      attacker
+    end
+
+    it "includes an untapped creature the defending player controls, only in the declare blockers step" do
+      attacker = declare_bears_attacking
+      blocker = ResolvePermanent("Grizzly Bears", owner: p2)
+
+      action = actions_of(Magic::Actions::DeclareBlocker, p2).find { |a| a.blocker == blocker }
+      expect(action).not_to be_nil
+      expect(action.attacker).to eq(attacker)
+    end
+
+    it "excludes it outside the declare blockers step" do
+      ResolvePermanent("Grizzly Bears", owner: p1)
+      skip_to_combat!
+      ResolvePermanent("Grizzly Bears", owner: p2)
+
+      expect(actions_of(Magic::Actions::DeclareBlocker, p2)).to be_empty
+    end
+
+    it "excludes a tapped creature" do
+      declare_bears_attacking
+      tapped_blocker = ResolvePermanent("Grizzly Bears", owner: p2)
+      tapped_blocker.tap!
+
+      expect(actions_of(Magic::Actions::DeclareBlocker, p2).map(&:blocker)).not_to include(tapped_blocker)
+    end
+
+    it "excludes it for the attacking player's own creatures" do
+      declare_bears_attacking
+      ResolvePermanent("Grizzly Bears", owner: p1)
+
+      expect(actions_of(Magic::Actions::DeclareBlocker, p1)).to be_empty
+    end
+  end
+
   def actions_of(klass, player)
     game.legal_actions(player).compact.select { |action| action.is_a?(klass) }
   end
