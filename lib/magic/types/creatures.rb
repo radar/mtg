@@ -236,6 +236,7 @@ module Magic
         "Snake",
         "Soldier",
         "Soltari",
+        "Sorcerer",
         "Spawn",
         "Specter",
         "Spellshaper",
