@@ -96,4 +96,56 @@ RSpec.describe Magic::GameRunner, "roadmap C2c" do
       expect(p1.lands.count).to be >= 1
     end
   end
+  describe "a modal \"choose two\" spell" do
+    let(:command) { Card("Brigids Command", owner: p1) }
+    let(:modes) { Magic::Cards::BrigidsCommand }
+
+    def command_candidate
+      game.legal_actions(p1).find { |a| a.is_a?(Magic::Actions::Cast) && a.card == command }
+    end
+
+    before do
+      go_to_main_phase!
+      p1.hand.add(command)
+      p1.add_mana(green: 2, white: 1)
+    end
+
+    it "isn't offered while fewer than two modes have anything to target" do
+      expect(command_candidate).to be_nil
+    end
+
+    context "with a creature to target" do
+      let!(:farmer) { ResolvePermanent("Wary Farmer", owner: p1) }
+
+      it "only offers modes that have something to target" do
+        expect(command_candidate.available_modes).to contain_exactly(modes::CopyKithkin, modes::CreateKithkin, modes::Pump)
+      end
+
+      it "asks the agent for the modes, then each mode's target" do
+        agent = Magic::Agents::ScriptedAgent.new(answers: [command_candidate, [modes::Pump, modes::CopyKithkin], [farmer], [farmer]])
+        p1.agent = agent
+
+        expect { Magic::GameRunner.new(game: game, max_actions: 1).call }.to raise_error(Magic::GameRunner::NotFinished)
+        game.stack.resolve!
+        game.tick!
+
+        expect(farmer.power).to eq(6)
+        expect(p1.creatures.count { _1.name == "Wary Farmer" }).to eq(2)
+      end
+
+it "casts it with a FirstLegalAgent-style agent, taking the first available modes and targets" do
+  caster = Class.new(Magic::Agents::FirstLegalAgent) do
+    def choose_action(_game, legal_actions) = legal_actions.find { _1.is_a?(Magic::Actions::Cast) }
+  end
+  p1.agent = caster.new
+
+  expect { Magic::GameRunner.new(game: game, max_actions: 1).call }.to raise_error(Magic::GameRunner::NotFinished)
+  game.stack.resolve!
+  game.tick!
+
+  expect(p1.creatures.count { _1.name == "Wary Farmer" }).to eq(2) # CopyKithkin
+  expect(p1.creatures.count(&:token?)).to eq(2)                    # the copy, and CreateKithkin's token
+end
+    end
+  end
 end

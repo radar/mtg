@@ -58,7 +58,8 @@ What the rules cover:
 
 - `SpellEffect`: an instant's or sorcery's effect lines, merged into one `EffectList`.
 - `Modal`: "Choose one —" plus "• <effects>" lines → a `ModeN < Mode` class per bullet
-  and `modes Mode1, ...`. How many modes may be chosen ("one or both") isn't enforced.
+  and `modes Mode1, ...` plus `choose_modes N` ("one" 1, "two" 2, "one or both" `1..2`,
+  "one or more" `1..<modes>`), which `Actions::Cast` enforces.
 - `Trigger`: "<trigger>, <effects>" from its `KINDS` table, one `Kind` row per
   trigger (pattern, class name, `TriggeredAbility` base, hook, event,
   `should_perform?` condition, allowed card kinds). "When" and "Whenever" are

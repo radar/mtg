@@ -106,6 +106,7 @@ module Magic
       def can_perform?
         return false if already_on_stack?
         return false unless castable_from_current_zone?
+        return false unless modes_satisfiable?
         return true if mana_cost.zero?
 
         mana_cost.can_pay?(player)
@@ -336,11 +337,37 @@ module Magic
         raise InvalidModes, "#{card.name} needs #{allowed} modes chosen, got #{@modes.size}"
       end
 
+      # The mode classes that currently have something to target (or need no target).
+      def available_modes
+        card.modes.select { |mode_class| mode_targetable?(mode_class) }
+      end
+
+      def min_modes
+        return 0 unless card.respond_to?(:modes_to_choose)
+
+        allowed = card.modes_to_choose
+        allowed.is_a?(Range) ? allowed.min : allowed
+      end
+
+      # Advisory, like #can_perform?: could enough modes be chosen right now?
+      def modes_satisfiable?
+        available_modes.size >= min_modes
+      end
+
       def max_modes
         return unless card.respond_to?(:modes_to_choose)
 
         allowed = card.modes_to_choose
         allowed.is_a?(Range) ? allowed.max : allowed
+      end
+
+      def mode_targetable?(mode_class)
+        mode = mode_class.new(game: game, card: card)
+        return true unless mode.respond_to?(:target_choices)
+
+        pools = mode.target_choices
+        pools = [pools] unless mode.respond_to?(:multi_target?) && mode.multi_target?
+        pools.all? { |pool| pool.any? }
       end
 
       def resolve!

@@ -32,7 +32,16 @@ RSpec.describe Magic::CardParser::Rules::Modal do
       end
 
       modes Mode1, Mode2
+      choose_modes 1
     RUBY
+  end
+
+  it "turns each header into a mode count" do
+    counts = ["one", "two", "one or both", "one or more"].map do |header|
+      modal("Choose #{header} —", "• Draw a card.", "• You gain 2 life.").first.mode_count
+    end
+
+    expect(counts).to eq(["1", "2", "1..2", "1..2"])
   end
 
   it "needs one header and two modes" do

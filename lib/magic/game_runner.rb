@@ -21,7 +21,10 @@ module Magic
   #     agent chose to activate mana abilities first if it needed to, the same as a real
   #     player would),
   #   - a single-target spell/ability (asks `Agent#choose_targets` for one target from
-  #     `target_choices`; modal and multi-target spells are not handled), and
+  #     `target_choices`; multi-target spells are not handled),
+  #   - a modal spell that declares `choose_modes` (asks `Agent#choose_targets` for the
+  #     minimum number of modes among those with something to target, then one target
+  #     per target list of each chosen mode), and
   #   - `Cycle`'s mana cost.
   # Anything else unpaid (a cost needing a chosen target permanent or card, e.g.
   # `Costs::Tap`/`Costs::Sacrifice`/`Costs::Discard`) is left to fail exactly the way it
@@ -110,8 +113,28 @@ module Magic
     end
 
     def prepare_cast!(action, agent)
+      prepare_modes!(action, agent)
       prepare_single_target!(action, agent)
       action.auto_pay_mana unless action.mana_cost.zero?
+    end
+
+    def prepare_modes!(action, agent)
+      return unless action.card.respond_to?(:modes_to_choose)
+
+      agent.choose_targets(game, action.available_modes, count: action.min_modes).each do |mode_class|
+        action.choose_mode(mode_class) { |mode| prepare_mode_targets!(mode, agent) }
+      end
+    end
+
+    def prepare_mode_targets!(mode, agent)
+      return unless mode.mode.respond_to?(:target_choices)
+
+      pools = mode.target_choices
+      if mode.mode.respond_to?(:multi_target?) && mode.mode.multi_target?
+        mode.targeting(*pools.map { |pool| agent.choose_targets(game, pool.to_a, count: 1).first })
+      else
+        mode.targeting(*agent.choose_targets(game, pools.to_a, count: 1))
+      end
     end
 
     def prepare_single_target!(action, agent)
