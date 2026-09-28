@@ -10,8 +10,9 @@ module Magic
         def initialize(source:)
           @source = source
           @adjustment = { generic: -1 }
-          @applies_to = -> (c) { c.artifact? }
         end
+
+        def applies_to?(card) = card.artifact?
       end
 
       def static_abilities = [ReduceManaCost]

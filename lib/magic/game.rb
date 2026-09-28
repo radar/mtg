@@ -1,8 +1,9 @@
 module Magic
   class Game
     extend Forwardable
+    include LoggerlessMarshal
 
-    attr_reader :logger, :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn, :event_listeners, :monarch,
+    attr_reader :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn, :event_listeners, :monarch,
                 :play_permissions
 
     class EmblemList
@@ -47,12 +48,10 @@ module Magic
       queue_triggers: true,
       enforce_priority: false
     )
-      @logger = Logger.new(STDOUT)
       @battlefield = battlefield
       @exile = exile
-      @stack = Stack.new(logger: @logger, game: self)
+      @stack = Stack.new(game: self)
       @effects = effects
-      @logger.level = ENV['LOG_LEVEL'] || "INFO"
       @player_count = 0
       @players = players
       @emblems = EmblemList.new(self)
@@ -69,6 +68,11 @@ module Magic
     end
 
     attr_reader :priority_player, :priority_passes
+
+    # Built lazily, and not marshalled (see LoggerlessMarshal).
+    def logger
+      @logger ||= Logger.new(STDOUT).tap { |logger| logger.level = ENV['LOG_LEVEL'] || "INFO" }
+    end
 
     # When true, Turn#take_action rejects actions from a player who doesn't hold priority.
     # Off by default so specs that drive several players' actions directly keep working.

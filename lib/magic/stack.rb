@@ -4,7 +4,7 @@ module Magic
 
     def_delegators :@stack, :first, :select, :count, :include?, :map, :empty?
 
-    attr_reader :logger, :effects, :choices, :game
+    attr_reader :effects, :choices, :game
 
     class TargetedCast
       class InvalidTarget < StandardError; end
@@ -29,7 +29,14 @@ module Magic
       end
     end
 
-    def initialize(logger: Logger.new($stdout), stack: [], effects: [], choices: [], game: nil)
+    include LoggerlessMarshal
+
+    # Shares the game's logger when there is one; not marshalled (see LoggerlessMarshal).
+    def logger
+      @logger ||= @game&.logger || Logger.new($stdout)
+    end
+
+    def initialize(logger: nil, stack: [], effects: [], choices: [], game: nil)
       @logger = logger
       @game = game
       @stack = stack

@@ -2,15 +2,16 @@ module Magic
   module Abilities
     module Static
       class ManaCostAdjustment < StaticAbility
-        attr_reader :source, :adjustment, :applies_to
-        def initialize(source:, adjustment:, applies_to:)
+        attr_reader :source, :adjustment
+
+        def initialize(source:, adjustment:)
           @source = source
           @adjustment = adjustment
-          @applies_to = applies_to
         end
 
+        # Subclasses override this (a method, not a stored lambda, so the game stays marshallable).
         def applies_to?(card)
-          applies_to.call(card)
+          raise NotImplementedError, "#{self.class} must define applies_to?(card)"
         end
 
         def applies_while_entering_the_battlefield?

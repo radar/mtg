@@ -12,8 +12,9 @@ module Magic
         def initialize(source:)
           @source = source
           @adjustment = { generic: -1 }
-          @applies_to = ->(card) { card.enchantment? }
         end
+
+        def applies_to?(card) = card.enchantment?
       end
 
       class EnchantmentGraveyardTrigger < TriggeredAbility

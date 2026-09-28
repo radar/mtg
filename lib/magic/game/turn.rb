@@ -147,8 +147,6 @@ module Magic
 
       def initialize(number: 1, game: Magic::Game.new, active_player: Magic::Player.new)
         @number = number
-        @logger = Logger.new(STDOUT)
-        @logger.formatter = -> (_, _, _, msg) { "#{msg}\n" }
         @game = game
         @active_player = active_player
         @actions = []

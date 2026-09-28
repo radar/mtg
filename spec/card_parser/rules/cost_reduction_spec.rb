@@ -12,9 +12,9 @@ RSpec.describe Magic::CardParser::Rules::CostReduction do
   it "renders a ManaCostAdjustment for the matching spells" do
     source = described_class.new(%w[instant sorcery], 1).class_source("CostReduction")
     expect(source).to include("class CostReduction < Abilities::Static::ManaCostAdjustment", "adjustment: { generic: -1 }",
-                              '->(card) { card.type?("Instant") || card.type?("Sorcery") }')
+                              'def applies_to?(card) = card.type?("Instant") || card.type?("Sorcery")')
     expect(described_class.new(["noncreature"], 1).class_source("X")).to include('!card.type?("Creature")')
-    expect(described_class.new([], 1).class_source("X")).to include("->(card) { true }")
+    expect(described_class.new([], 1).class_source("X")).to include("def applies_to?(card) = true")
   end
 
   it "ignores other lines" do

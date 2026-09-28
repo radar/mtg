@@ -12,9 +12,13 @@ module Magic
       class ReduceManaCost < Abilities::Static::ManaCostAdjustment
         def initialize(source:)
           @source = source
-          @adjustment = { generic: -> { -source.controller.permanents.enchantments.reject(&:creature?).sum(&:mana_value) } }
-          @applies_to = ->(card) { card == source.card }
         end
+
+        def adjustment
+          { generic: -source.controller.permanents.enchantments.reject(&:creature?).sum(&:mana_value) }
+        end
+
+        def applies_to?(card) = card == source.card
       end
 
       class ActivatedAbility < Magic::ActivatedAbility

@@ -25,8 +25,10 @@ module Magic
           <<~RUBY
             class #{name} < Abilities::Static::ManaCostAdjustment
               def initialize(source:)
-                super(source:, adjustment: { generic: -#{amount} }, applies_to: ->(card) { #{condition} })
+                super(source:, adjustment: { generic: -#{amount} })
               end
+
+              def applies_to?(card) = #{condition}
             end
           RUBY
         end
