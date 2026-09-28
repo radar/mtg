@@ -25,6 +25,25 @@ module Magic
         @permanent = permanent
       end
 
+      # 613.7, layer 7b: the resolved base power/toughness (before 7c modifiers,
+      # counters and attachments) -- exposed publicly so Permanent#base_power/
+      # #base_toughness (e.g. Zinnia, Valley's Voice's "base power 1" count) share
+      # the same timestamp-ordered resolution as #calculate_power/#calculate_toughness,
+      # rather than a second, characteristic-setting-blind implementation.
+      def base_power
+        last_by_timestamp(
+          modifiers_by_type(Modifications::BasePower).map { [_1.timestamp, _1.base_power] } +
+          characteristic_settings.select(&:set_base_power).map { [_1.timestamp, _1.set_base_power] },
+        ) || (copiable_card.base_power if copiable_card.respond_to?(:base_power)) || 0
+      end
+
+      def base_toughness
+        last_by_timestamp(
+          modifiers_by_type(Modifications::BaseToughness).map { [_1.timestamp, _1.base_toughness] } +
+          characteristic_settings.select(&:set_base_toughness).map { [_1.timestamp, _1.set_base_toughness] },
+        ) || (copiable_card.base_toughness if copiable_card.respond_to?(:base_toughness)) || 0
+      end
+
       def apply!
         game.logger.debug "Applying continuous effects for #{permanent}"
 
@@ -88,11 +107,6 @@ module Magic
       end
 
       def calculate_power
-        base_power = last_by_timestamp(
-          modifiers_by_type(Modifications::BasePower).map { [_1.timestamp, _1.base_power] } +
-          characteristic_settings.select(&:set_base_power).map { [_1.timestamp, _1.set_base_power] },
-        ) || copiable_card.base_power
-
         [
           permanent.counters,
           modifiers_by_type(Modifications::Power),
@@ -106,11 +120,6 @@ module Magic
       end
 
       def calculate_toughness
-        base_toughness = last_by_timestamp(
-          modifiers_by_type(Modifications::BaseToughness).map { [_1.timestamp, _1.base_toughness] } +
-          characteristic_settings.select(&:set_base_toughness).map { [_1.timestamp, _1.set_base_toughness] },
-        ) || copiable_card.base_toughness
-
         [
           permanent.counters,
           modifiers_by_type(Modifications::Toughness),

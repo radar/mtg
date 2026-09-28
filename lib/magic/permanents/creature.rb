@@ -25,16 +25,14 @@ module Magic
         @marked_for_death || (toughness.positive? && damage >= toughness)
       end
 
+      # Layer 7b (613): shares ContinuousEffects' timestamp-ordered resolution
+      # rather than a second, characteristic-setting-blind "last modifier wins".
       def base_power
-        base_power = @card.respond_to?(:base_power) ? @card.base_power : 0
-        base_power_modifier = @modifiers.select { |mod| mod.is_a?(Modifications::BasePower) }.last
-        base_power_modifier ? base_power_modifier.base_power : base_power
+        Permanents::ContinuousEffects.new(game: game, permanent: self).base_power
       end
 
       def base_toughness
-        base_toughness = @card.respond_to?(:base_toughness) ? @card.base_toughness : 0
-        base_toughness_modifier = @modifiers.select { |mod| mod.is_a?(Modifications::BaseToughness) }.last
-        base_toughness_modifier ? base_toughness_modifier.base_toughness : base_toughness
+        Permanents::ContinuousEffects.new(game: game, permanent: self).base_toughness
       end
 
       def take_damage(damage)
