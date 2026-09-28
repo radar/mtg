@@ -6,6 +6,9 @@ module Magic
       def initialize(ability:, **args)
         @ability = ability
         @costs = @ability.costs
+        # So restricted mana ("spend only on abilities of Elemental sources") counts wherever
+        # these costs are checked or paid: `legal_actions`, `#pay`, or `GameRunner`.
+        @costs.each { |cost| cost.for_use = @ability.source if cost.is_a?(Costs::Mana) }
         @targets = []
         super(**args)
       end
@@ -125,7 +128,6 @@ module Magic
         if cost.is_a?(Costs::Mana) && (any_color_for_creature_activations? || any_color_for_any_cost?)
           cost.treat_any_color_as_any!
         end
-        cost.for_use = ability.source if cost.is_a?(Costs::Mana)
 
         pay_method = cost.method(:pay)
         args = {}

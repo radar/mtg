@@ -176,8 +176,11 @@ module Magic
       end
 
       def auto_pay_generic_costs(player)
-        available_mana = player.spendable_mana_for(for_use).flat_map do |color, amount|
-          [color] * amount
+        # Mana the colored part of the cost already claimed can't also pay for generic.
+        pool = player.spendable_mana_for(for_use)
+        deduct_from_pool(pool, color_costs)
+        available_mana = pool.flat_map do |color, amount|
+          [color] * [amount, 0].max
         end
 
         pay_generic(available_mana.take(cost[:generic]).tally)
