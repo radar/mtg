@@ -22,9 +22,10 @@ module Magic
         )
       end
 
-      def modify_power(power)
+      def modify_power(power, until_eot: true)
         modifiers << Power.new(
           power_modification: power,
+          until_eot:,
         )
       end
 
@@ -35,9 +36,10 @@ module Magic
         )
       end
 
-      def modify_toughness(toughness)
+      def modify_toughness(toughness, until_eot: true)
         modifiers << Toughness.new(
           toughness_modification: toughness,
+          until_eot:,
         )
       end
 
@@ -75,10 +77,6 @@ module Magic
       def respond_to_missing?(method_name, include_private = false)
         match = method_name.to_s.match(/\Agrant_(\w+)!\z/)
         (match && Cards::Keywords.const_defined?(match[1].upcase)) || super
-      end
-
-      def remove_keyword_grant(grant)
-        @keyword_grants.delete(grant)
       end
     end
   end

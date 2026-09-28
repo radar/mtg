@@ -15,8 +15,8 @@ module Magic
       end
 
       def resolve!
-        target.modify_power(power) if power
-        target.modify_toughness(toughness) if toughness
+        target.modify_power(power, until_eot: @until_eot) if power
+        target.modify_toughness(toughness, until_eot: @until_eot) if toughness
       end
     end
   end

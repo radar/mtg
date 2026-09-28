@@ -541,7 +541,6 @@ module Magic
       @modes_chosen_this_turn = []
       @triggered_once_keys_this_turn = []
       @abilities_activated_this_turn = []
-      remove_until_eot_keyword_grants!
       remove_until_eot_protections!
       remove_until_eot_modifiers!
       expire_control_change_effects!
@@ -710,13 +709,6 @@ module Magic
       Array(card.event_handlers[event.class]).each do |handler_class|
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
         perform_trigger!(handler_class, event)
-      end
-    end
-
-    def remove_until_eot_keyword_grants!
-      until_eot_grants = keyword_grants.select(&:until_eot?)
-      until_eot_grants.each do |grant|
-        remove_keyword_grant(grant)
       end
     end
 

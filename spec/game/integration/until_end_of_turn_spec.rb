@@ -45,7 +45,32 @@ RSpec.describe Magic::Game, "until end of turn effect" do
     end
   end
 
-  context "protections" do
+context "a permanent whose card grants keywords to what it enchants" do
+  it "survives cleanup" do
+    dub = ResolvePermanent("Dub", owner: p1)
+    expect { dub.cleanup! }.not_to raise_error
+  end
+end
+
+context "power/toughness modifiers with until_eot: false" do
+  it "persist through cleanup" do
+    dranas_emissary.modify_power(3, until_eot: false)
+    dranas_emissary.modify_toughness(1, until_eot: false)
+    go_to_cleanup
+
+    expect(dranas_emissary.power).to eq(5)
+    expect(dranas_emissary.toughness).to eq(3)
+  end
+
+  it "carry through Effects::ApplyPowerToughnessModification" do
+    game.add_effect(Magic::Effects::ApplyPowerToughnessModification.new(source: dranas_emissary, target: dranas_emissary, power: 1, toughness: 1, until_eot: false))
+    go_to_cleanup
+
+    expect(dranas_emissary.power).to eq(3)
+  end
+end
+
+context "protections" do
     before do
       dranas_emissary.gains_protection_from_color(:green, until_eot: true)
     end
