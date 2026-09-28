@@ -8,6 +8,17 @@ module Magic
       raise NotImplementedError, "#{self.class} must implement #permits?(use)"
     end
 
+    # "Spend this mana only to cast Elemental spells or activate abilities of Elemental sources."
+    class OfType < ManaRestriction
+      def initialize(type:)
+        @type = type
+      end
+
+      def permits?(use)
+        use.respond_to?(:type?) && use.type?(@type)
+      end
+    end
+
     # "Spend this mana only to cast a spell of the chosen type or activate an ability of a
     # source of the chosen type." `source` is the permanent holding the chosen creature type.
     class ChosenType < ManaRestriction
