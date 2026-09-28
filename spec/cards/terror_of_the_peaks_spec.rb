@@ -24,8 +24,19 @@ RSpec.describe Magic::Cards::TerrorOfThePeaks do
       game.settle!
     end
 
-    it "the opponent loses 3 life" do
+    it "the opponent loses 3 life if they pay the ward cost" do
+      game.resolve_choice!(pay_life: true)
+      game.settle!
+
       expect(p2.life).to eq(17)
+    end
+
+    it "counters the spell if they don't pay" do
+      game.resolve_choice!(pay_life: false)
+      game.settle!
+
+      expect(p2.life).to eq(20)
+      expect(terror.damage).to eq(0)
     end
   end
 

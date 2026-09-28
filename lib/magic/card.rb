@@ -140,11 +140,9 @@ module Magic
       # unless that player pays the ward cost." One trigger for spells, one for abilities.
       def ward(life: nil, generic: nil)
         ward_call = lambda do |trigger, spell: nil, ability: nil|
-          if life
-            trigger.trigger_effect(:lose_life, target: trigger.event.player, life: life)
-          else
-            trigger.game.choices.add(Choice::Ward.new(actor: trigger.actor, payer: trigger.event.player, spell: spell, ability: ability, generic: generic))
-          end
+          trigger.game.choices.add(
+            Choice::Ward.new(actor: trigger.actor, payer: trigger.event.player, spell: spell, ability: ability, generic: generic, life: life)
+          )
         end
 
         spell_trigger = Class.new(TriggeredAbility::SpellCast) do

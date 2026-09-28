@@ -45,13 +45,17 @@ RSpec.describe "CardParser generated keywords with values, in play" do
     end
   end
 
-  it "makes an opponent targeting it lose life for ward—pay life" do
+  it "makes an opponent targeting it pay life or be countered for ward—pay life" do
     load_card("Parsed Weaver {2}{G}\nCreature — Spider\nReach, hexproof from blue\nWard—Pay 3 life.\n2/3\n")
     weaver = ResolvePermanent("Parsed Weaver", owner: p1)
     expect(weaver.hexproof_from?(:blue)).to eq(true)
 
     p2.add_mana(red: 1)
     p2.cast(card: Card("Shock", owner: p2)) { _1.pay_mana(red: 1).targeting(weaver) }
+    game.settle!
+
+    expect(game.choices.last).to be_a(Magic::Choice::Ward)
+    game.resolve_choice!(pay_life: true)
     game.settle!
 
     expect(p2.life).to eq(17)
