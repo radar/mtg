@@ -151,6 +151,7 @@ module Magic
         ]
 
         types = types.uniq
+        types -= Magic::Types::Creatures.values if modifiers_by_type(Modifications::LoseCreatureTypes).any?
         types -= static_abilities_for(permanent).of_type(Abilities::Static::TypeRemoval).flat_map(&:type_removal)
       end
 

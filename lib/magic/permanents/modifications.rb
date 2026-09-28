@@ -57,6 +57,15 @@ module Magic
         modifiers << KeywordGrant.new(keyword_grant: keyword, until_eot: until_eot)
       end
 
+      def lose_creature_types!(until_eot: true)
+        modifiers << LoseCreatureTypes.new(until_eot:)
+        apply_continuous_effects!
+      end
+
+      def lost_creature_types?
+        modifiers.any? { |modifier| modifier.is_a?(LoseCreatureTypes) }
+      end
+
       def prevent_blocking!(until_eot: true)
         modifiers << CannotBlock.new(until_eot: until_eot)
       end

@@ -246,6 +246,8 @@ module Magic
     end
 
     def all_creature_types?
+      return false if lost_creature_types?
+
       copiable_card.all_creature_types? || attachments.any? { _1.card.grants_all_creature_types? }
     end
 
