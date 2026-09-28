@@ -115,6 +115,7 @@ module Magic
           return "#{card.name} is a land, and lands are played, not cast" if card.land? && !@adventure
           return "#{card.name} is already on the stack" if already_on_stack?
           return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
+          return "#{card.name}'s flashback requirements aren't met" if @flashback && card.respond_to?(:flashback_requirements_met?) && !card.flashback_requirements_met?(player)
 
           if !instant_speed? && (reason = sorcery_speed_reason)
             return "#{card.name} can only be cast at sorcery speed, but #{reason}"
