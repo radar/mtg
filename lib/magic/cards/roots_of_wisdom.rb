@@ -26,7 +26,7 @@ module Magic
         if choice.choices.any?
           game.choices.add(choice)
         else
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          trigger_effect(:draw_card)
         end
       end
     end

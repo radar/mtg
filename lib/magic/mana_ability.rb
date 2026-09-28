@@ -27,7 +27,7 @@ module Magic
 
       raise "Invalid choice made for mana ability. Choice: #{choice}, Choices: #{choices}" unless choices.include?(choice)
       mana = mana_produced
-      source.controller.add_mana(**mana)
+      source.controller.add_mana(mana, restriction: mana_restriction)
 
       game.battlefield.static_abilities.each do |ability|
         next unless ability.respond_to?(:additional_mana)
@@ -39,5 +39,8 @@ module Magic
     def mana_produced
       { choice => 1 }
     end
+
+    # A ManaRestriction ("spend this mana only to ...") for the mana this ability adds, or nil.
+    def mana_restriction = nil
   end
 end

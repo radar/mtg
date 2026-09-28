@@ -16,7 +16,7 @@ module Magic
         def requirements_met? = game.can_cast_sorcery?(controller)
 
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          trigger_effect(:draw_card)
         end
       end
 

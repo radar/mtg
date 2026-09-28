@@ -125,6 +125,7 @@ module Magic
         if cost.is_a?(Costs::Mana) && (any_color_for_creature_activations? || any_color_for_any_cost?)
           cost.treat_any_color_as_any!
         end
+        cost.for_use = ability.source if cost.is_a?(Costs::Mana)
 
         pay_method = cost.method(:pay)
         args = {}

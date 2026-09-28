@@ -8,7 +8,7 @@ module Magic
       class ScryChoice < Magic::Choice::Scry
         def resolve!(**args)
           super(**args)
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          trigger_effect(:draw_card)
         end
       end
 

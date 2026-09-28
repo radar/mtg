@@ -10,7 +10,7 @@ module Magic
     class SummitSentinel < Creature
       class DiesTrigger < TriggeredAbility::Death
         def call
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          trigger_effect(:draw_card)
         end
       end
 

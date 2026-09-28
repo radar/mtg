@@ -50,7 +50,7 @@ module Magic
       end
 
       def mana_cost=(cost)
-        @mana_cost = Costs::Mana.new(cost)
+        @mana_cost = Costs::Mana.new(cost).tap { |mana_cost| mana_cost.for_use = card }
       end
 
       def mana_cost
@@ -89,6 +89,7 @@ module Magic
           cost = mana_cost_adjustment_abilities.each_with_object(fresh_cost) { |ability, cost| ability.apply(cost) }
           cost.adjusted_by(card.self_mana_cost_adjustment) if cost.is_a?(Costs::Mana) && card.self_mana_cost_adjustment
           cost.x = value_for_x if value_for_x
+          cost.for_use = card if cost.is_a?(Costs::Mana)
           cost
         end
       end

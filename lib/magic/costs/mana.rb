@@ -20,6 +20,10 @@ module Magic
       end
 
       attr_reader :balance, :cost
+      # What this mana is being spent on (the spell's card, or an ability's source), so
+      # restricted mana ("spend only to cast an Elf spell") that permits it counts too.
+      attr_accessor :for_use
+
       def initialize(cost)
         if cost.is_a?(String)
           @cost = Parsers::Mana.parse(cost)
@@ -92,12 +96,12 @@ module Magic
         raise Overpayment.new(cost, balance) if overpaid?
         raise CannotPay.new(cost, player) unless can_pay?(player)
 
-        player.pay_mana(@payments[:generic]) if @payments[:generic].any?
+        player.pay_mana(@payments[:generic], for_use: for_use) if @payments[:generic].any?
         if @any_color
-          player.pay_mana(@actual_color_payments) if @actual_color_payments.any?
+          player.pay_mana(@actual_color_payments, for_use: for_use) if @actual_color_payments.any?
         else
           fixed_payments = color_costs.merge(@hybrid_actual_payments) { |_key, a, b| a + b }
-          player.pay_mana(fixed_payments) if fixed_payments.values.any?(&:positive?)
+          player.pay_mana(fixed_payments, for_use: for_use) if fixed_payments.values.any?(&:positive?)
         end
       end
 
@@ -135,11 +139,11 @@ module Magic
 
       def any_color_payable?(player)
         total_needed = color_costs.values.sum + (cost[:generic] || 0) + (cost[:x] || 0)
-        player.mana_pool.values.sum >= total_needed
+        player.spendable_mana_for(for_use).values.sum >= total_needed
       end
 
       def fixed_color_payable?(player)
-        pool = player.mana_pool.dup
+        pool = player.spendable_mana_for(for_use)
         deduct_from_pool(pool, color_costs)
 
         hybrid_costs.each do |key, amount|
@@ -172,7 +176,7 @@ module Magic
       end
 
       def auto_pay_generic_costs(player)
-        available_mana = player.mana_pool.flat_map do |color, amount|
+        available_mana = player.spendable_mana_for(for_use).flat_map do |color, amount|
           [color] * amount
         end
 

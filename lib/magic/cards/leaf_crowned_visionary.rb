@@ -16,7 +16,7 @@ module Magic
       class MayPayChoice < Magic::Choice::May
         def resolve!(payment: {})
           controller.pay_mana(payment)
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          trigger_effect(:draw_card)
         end
       end
 

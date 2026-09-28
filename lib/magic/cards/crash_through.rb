@@ -7,7 +7,7 @@ module Magic
     class CrashThrough < Sorcery
       def resolve!
         controller.creatures.each(&:grant_trample!)
-        trigger_effect(:draw_cards, number_to_draw: 1)
+        trigger_effect(:draw_card)
 
         super
       end

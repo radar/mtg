@@ -14,7 +14,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          trigger_effect(:draw_card)
           game.add_choice(Magic::Choice::Discard.new(player: controller))
         end
       end

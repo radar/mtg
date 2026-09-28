@@ -3,7 +3,7 @@ module Magic
     include Targetable
     extend Forwardable
 
-    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :hand, :life, :starting_life, :counters, :commander, :attachments
+    attr_reader :name, :game, :lost, :library, :graveyard, :exile, :mana_pool, :restricted_mana, :hand, :life, :starting_life, :counters, :commander, :attachments
     attr_accessor :ring_bearer, :spell_cast_limit, :spell_cast_limit_turn
     # Roadmap C2: the Magic::Agent driving this player's decisions for Game#run!. Unset by
     # default -- nothing outside GameRunner reads it, so every other caller keeps driving
@@ -32,6 +32,7 @@ module Magic
       @exile = exile
       @mana_pool = mana_pool
       @floating_mana = floating_mana
+      @restricted_mana = []
       @starting_life = life
       @life = life
       @counters = Counters::Collection.new([])
@@ -200,9 +201,29 @@ module Magic
       !protected_from?(source)
     end
 
-    def add_mana(mana)
+    # With a `restriction` ("spend this mana only to ..."), each unit is kept in
+    # `restricted_mana` instead of the plain pool, so only a matching spell/ability can use it.
+    def add_mana(mana, restriction: nil)
       mana.each do |color, count|
-        @mana_pool[color] += count
+        if restriction
+          count.times { @restricted_mana << RestrictedMana.new(color: color, restriction: restriction) }
+        else
+          @mana_pool[color] += count
+        end
+      end
+    end
+
+    RestrictedMana = Data.define(:color, :restriction)
+
+    # The restricted mana `use` may spend, as { color => count }.
+    def restricted_mana_for(use)
+      @restricted_mana.select { |unit| unit.restriction.permits?(use) }.map(&:color).tally
+    end
+
+    # Plain pool plus the restricted mana `use` may spend.
+    def spendable_mana_for(use)
+      restricted_mana_for(use).each_with_object(Hash.new(0).merge(mana_pool)) do |(color, count), pool|
+        pool[color] += count
       end
     end
 
@@ -211,16 +232,32 @@ module Magic
       add_mana(target_mana)
     end
 
-    def pay_mana(mana)
+    # `for_use`: what the mana is spent on. Restricted mana it permits is spent first (it
+    # can't pay for anything else), then the plain pool.
+    def pay_mana(mana, for_use: nil)
       logger.debug "Paying mana: #{mana.inspect}" if game
-      if mana.any? { |color, count| mana_pool[color] - count < 0 }
-        raise UnpayableMana, "Cannot pay mana #{mana.inspect}, there is only #{mana_pool.inspect} available"
+      available = for_use ? spendable_mana_for(for_use) : mana_pool
+      if mana.any? { |color, count| available[color] - count < 0 }
+        raise UnpayableMana, "Cannot pay mana #{mana.inspect}, there is only #{available.inspect} available"
       end
 
       mana.each do |color, count|
+        count -= spend_restricted_mana(color, count, for_use) if for_use
         @mana_pool[color] -= count
       end
     end
+
+    def spend_restricted_mana(color, count, use)
+      spent = 0
+      @restricted_mana.reject! do |unit|
+        next false unless spent < count && unit.color == color && unit.restriction.permits?(use)
+
+        spent += 1
+        true
+      end
+      spent
+    end
+    private :spend_restricted_mana
 
     # Rule 704.5b: drawing from an empty library doesn't lose immediately;
     # the player loses the next time state-based actions are checked.
