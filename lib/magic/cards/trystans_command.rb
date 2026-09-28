@@ -38,6 +38,7 @@ module Magic
       end
 
       modes CopyElf, Return, Destroy, PumpAndUntap
+      choose_modes 2
     end
   end
 end

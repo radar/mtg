@@ -35,6 +35,7 @@ module Magic
       end
 
       modes CopyElemental, Draw, Damage, Treasures
+      choose_modes 2
     end
   end
 end

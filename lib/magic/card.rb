@@ -110,6 +110,11 @@ module Magic
         const_set(:MODES, modes)
       end
 
+      # "Choose two —": how many modes the caster must pick (an Integer, or a Range for "one or more"). Unset = not enforced.
+      def choose_modes(count)
+        define_method(:modes_to_choose) { count }
+      end
+
       def enters_the_battlefield(&block)
         etb = Class.new(TriggeredAbility::EnterTheBattlefield)
         etb.define_method(:call, &block)

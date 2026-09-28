@@ -36,6 +36,7 @@ module Magic
       end
 
       modes CopyMerfolk, Lifelink, Draw, TapAndStun
+      choose_modes 2
     end
   end
 end

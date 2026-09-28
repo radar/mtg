@@ -38,6 +38,7 @@ module Magic
       end
 
       modes CopyGoblin, Buff, Destroy, Mill
+      choose_modes 2
     end
   end
 end

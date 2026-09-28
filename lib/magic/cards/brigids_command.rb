@@ -47,6 +47,7 @@ module Magic
       end
 
       modes CopyKithkin, CreateKithkin, Pump, Fight
+      choose_modes 2
     end
   end
 end

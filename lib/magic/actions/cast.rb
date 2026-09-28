@@ -4,6 +4,7 @@ module Magic
       extend Forwardable
 
       class InvalidTarget < StandardError; end
+      class InvalidModes < StandardError; end
 
       def_delegators :@card, :enchantment?, :artifact?, :multi_target?
       attr_reader :card, :targets, :value_for_x, :controller, :modes, :additional_costs
@@ -291,6 +292,8 @@ module Magic
       end
 
       def perform
+        validate_modes!
+
         missing_costs = additional_costs - @paid_additional_costs
         raise "Additional costs have not been paid" unless missing_costs.empty?
 
@@ -313,9 +316,31 @@ module Magic
       end
 
       def choose_mode(mode_class, &)
+        raise InvalidModes, "#{mode_class} is not a mode of #{card.name}" unless card.modes.include?(mode_class)
+        raise InvalidModes, "#{mode_class} was already chosen" if @modes.any? { |mode| mode.mode.instance_of?(mode_class) }
+        raise InvalidModes, "#{card.name} allows at most #{max_modes} modes" if max_modes && @modes.size >= max_modes
+
         mode = Mode.new(mode_class.new(game: game, card: card), source: card, controller: player)
         yield mode if block_given?
         @modes << mode
+      end
+
+      # Rule 700.2: the number of modes is fixed when the spell is cast. Only cards that declare
+      # `choose_modes` are checked.
+      def validate_modes!
+        return unless card.respond_to?(:modes_to_choose)
+
+        allowed = card.modes_to_choose
+        return if allowed === @modes.size
+
+        raise InvalidModes, "#{card.name} needs #{allowed} modes chosen, got #{@modes.size}"
+      end
+
+      def max_modes
+        return unless card.respond_to?(:modes_to_choose)
+
+        allowed = card.modes_to_choose
+        allowed.is_a?(Range) ? allowed.max : allowed
       end
 
       def resolve!
