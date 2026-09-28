@@ -5,7 +5,9 @@ module Magic
       cost white: 1, generic: 2
       power 2
       toughness 1
+    end
 
+    class VrynWingmare < Creature
       class IncreaseManaCost < Abilities::Static::ManaCostAdjustment
         def initialize(source:)
           @source = source
