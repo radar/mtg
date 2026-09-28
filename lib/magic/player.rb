@@ -313,6 +313,11 @@ module Magic
       game.battlefield.permanents.controlled_by(self)
     end
 
+    # Vivid: the number of colors among permanents this player controls.
+    def colors_among_permanents
+      permanents.flat_map { |permanent| permanent.colors.to_a }.uniq.count
+    end
+
     def lands
       permanents.lands
     end

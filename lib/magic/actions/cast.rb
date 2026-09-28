@@ -87,6 +87,7 @@ module Magic
           # just `dup`'d as before.
           fresh_cost = cost.is_a?(Costs::Mana) ? Costs::Mana.new(cost.cost.dup) : cost.dup
           cost = mana_cost_adjustment_abilities.each_with_object(fresh_cost) { |ability, cost| ability.apply(cost) }
+          cost.adjusted_by(card.self_mana_cost_adjustment) if cost.is_a?(Costs::Mana) && card.self_mana_cost_adjustment
           cost.x = value_for_x if value_for_x
           cost
         end

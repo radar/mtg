@@ -195,6 +195,11 @@ module Magic
       cost.colors
     end
 
+    # "This spell costs {1} less to cast for each ..." -- a change for `Costs::Mana#adjusted_by`
+    # (values may be callables), applied by `Actions::Cast` while this card is being cast.
+    # Static abilities on the battlefield can't do this: the card is in hand.
+    def self_mana_cost_adjustment = nil
+
     def color_identity
       colors.dup
     end

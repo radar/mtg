@@ -5,12 +5,16 @@ module Magic
   class PlayPermissions
     # Lasts through the end of the player's next turn: their next one after this, if
     # it's their turn now.
-    Permission = Data.define(:card, :player, :granted_on_turn) do
+    # `this_turn` permissions ("you may cast the exiled cards this turn") end with the turn
+    # they were granted on instead.
+    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn) do
       def permits?(game, card, player)
         card.equal?(self.card) && player == self.player && card.zone&.exile? && !expired?(game)
       end
 
       def expired?(game)
+        return game.current_turn.number > granted_on_turn if this_turn
+
         game.turns.any? do |turn|
           turn.active_player == player && turn.number > granted_on_turn && turn.number < game.current_turn.number
         end
@@ -23,7 +27,11 @@ module Magic
     end
 
     def grant_until_end_of_next_turn(card:, player:)
-      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false)
+    end
+
+    def grant_until_end_of_turn(card:, player:)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: true)
     end
 
     def permits?(card, player)
