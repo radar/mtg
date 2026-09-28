@@ -27,7 +27,11 @@ module Magic
 
       raise "Invalid choice made for mana ability. Choice: #{choice}, Choices: #{choices}" unless choices.include?(choice)
       mana = mana_produced
-      source.controller.add_mana(mana, restriction: mana_restriction)
+      if mana_restriction
+        source.controller.add_mana(mana, restriction: mana_restriction)
+      else
+        source.controller.add_mana(**mana)
+      end
 
       game.battlefield.static_abilities.each do |ability|
         next unless ability.respond_to?(:additional_mana)

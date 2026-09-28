@@ -203,8 +203,8 @@ module Magic
 
     # With a `restriction` ("spend this mana only to ..."), each unit is kept in
     # `restricted_mana` instead of the plain pool, so only a matching spell/ability can use it.
-    def add_mana(mana, restriction: nil)
-      mana.each do |color, count|
+    def add_mana(mana = {}, restriction: nil, **colors)
+      mana.merge(colors).each do |color, count|
         if restriction
           count.times { @restricted_mana << RestrictedMana.new(color: color, restriction: restriction) }
         else
@@ -234,7 +234,8 @@ module Magic
 
     # `for_use`: what the mana is spent on. Restricted mana it permits is spent first (it
     # can't pay for anything else), then the plain pool.
-    def pay_mana(mana, for_use: nil)
+    def pay_mana(mana = {}, for_use: nil, **colors)
+      mana = mana.merge(colors)
       logger.debug "Paying mana: #{mana.inspect}" if game
       available = for_use ? spendable_mana_for(for_use) : mana_pool
       if mana.any? { |color, count| available[color] - count < 0 }
