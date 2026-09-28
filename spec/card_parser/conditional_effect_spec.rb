@@ -14,7 +14,7 @@ RSpec.describe Magic::CardParser::ConditionalEffect do
 
   it "renders the effects inside an if" do
     call = described_class.parse("If there is a Goblin card in your graveyard, draw a card.").resolve_call
-    expect(call).to eq(%(if controller.graveyard.cards.any? { |card| card.type?("Goblin") }\n  trigger_effect(:draw_cards, number_to_draw: 1)\nend))
+    expect(call).to eq(%(if controller.graveyard.cards.any? { |card| card.type?("Goblin") }\n  trigger_effect(:draw_card)\nend))
   end
 
   it "doesn't parse conditional choices or targeted effects" do

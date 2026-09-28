@@ -27,7 +27,7 @@ RSpec.describe Magic::CardParser::Rules::Modal do
 
       class Mode2 < Mode
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          trigger_effect(:draw_card)
         end
       end
 

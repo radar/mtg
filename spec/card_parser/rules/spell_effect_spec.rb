@@ -47,7 +47,7 @@ RSpec.describe Magic::CardParser::Rules::SpellEffect do
 
   it "runs the effects after a scry once the scry choice resolves" do
     source = spell("Scry 1.", "Draw a card.").body_source
-    expect(source).to include("class ScryChoice < Magic::Choice::Scry", "super(**args)\n    trigger_effect(:draw_cards, number_to_draw: 1)",
+    expect(source).to include("class ScryChoice < Magic::Choice::Scry", "super(**args)\n    trigger_effect(:draw_card)",
                               "def resolve!\n  game.choices.add(ScryChoice.new(actor: self, amount: 1))\nend")
   end
 
@@ -91,7 +91,7 @@ RSpec.describe Magic::CardParser::Rules::SpellEffect do
     expect(source).to eq(<<~RUBY)
       class MayChoice < Magic::Choice::May
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          trigger_effect(:draw_card)
           trigger_effect(:lose_life, target: controller, life: 1)
           finish
         end
@@ -111,7 +111,7 @@ RSpec.describe Magic::CardParser::Rules::SpellEffect do
 
   it "keeps effects before an optional one in resolve!" do
     source = spell("Draw a card, then you may discard a card.").body_source
-    expect(source).to include("def resolve!\n  trigger_effect(:draw_cards, number_to_draw: 1)\n  game.choices.add(MayChoice.new(actor: self))")
+    expect(source).to include("def resolve!\n  trigger_effect(:draw_card)\n  game.choices.add(MayChoice.new(actor: self))")
   end
 end
 
@@ -130,7 +130,7 @@ RSpec.describe Magic::CardParser::Rules::SpellEffect, "if this spell was kicked"
       def resolve!(target:)
         trigger_effect(:deal_damage, target: target, damage: 2)
         if kicker_cost.paid?
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          trigger_effect(:draw_card)
           trigger_effect(:gain_life, target: controller, life: 2)
         end
       end

@@ -29,14 +29,14 @@ RSpec.describe Magic::CardParser::Rules::Chapter do
 
   it "renders a choice effect's choice class inside the chapter" do
     source = described_class.parse("I — Scry 2, then draw a card.").body_source
-    expect(source).to include("class ScryChoice < Magic::Choice::Scry", "trigger_effect(:draw_cards, number_to_draw: 1)",
+    expect(source).to include("class ScryChoice < Magic::Choice::Scry", "trigger_effect(:draw_card)",
                               "def resolve!\n    game.choices.add(ScryChoice.new(actor: actor, amount: 2))")
   end
 
   it "renders chapter abilities, a targeted one as a choice" do
     rule = described_class.merge(["I — Draw a card.", "II — ~ deals 2 damage to any target."].map { described_class.parse(_1) }).first
     source = rule.body_source
-    expect(source).to include("class Chapter1 < Saga::ChapterAbility", "trigger_effect(:draw_cards, number_to_draw: 1)",
+    expect(source).to include("class Chapter1 < Saga::ChapterAbility", "trigger_effect(:draw_card)",
                               "class Chapter2 < Saga::ChapterAbility", "class TargetChoice < Magic::Choice::Targeted",
                               "game.any_target", "game.add_choice(choice) if choice.choices.any?", "[Chapter1, Chapter2]")
   end

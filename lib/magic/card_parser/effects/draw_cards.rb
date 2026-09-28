@@ -13,7 +13,11 @@ module Magic
           new(amount: Number.parse($~[:amount])) if LINE.match(text)
         end
 
-        def resolve_call = "trigger_effect(:draw_cards, number_to_draw: #{amount})"
+        def resolve_call
+          return "trigger_effect(:draw_card)" if amount == 1
+
+          "trigger_effect(:draw_cards, number_to_draw: #{amount})"
+        end
       end
     end
   end
