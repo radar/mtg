@@ -37,6 +37,9 @@ RSpec integration tests. See `spec/spec_helper.rb` for helpers/shared contexts.
 - Use `rg`, not `grep`, for text searches.
 - Avoid `xargs`. Never, ever use it. Find another way.
 - Temporary files: write to a `tmp/` dir within this repo, not `/tmp`.
+- Run commands from the repo root with relative paths. Don't `cd`, and don't pass absolute paths to commands (each one triggers a permission prompt).
+- Don't pipe test output through `rg` with path-like patterns (e.g. `rg -v "^\s*# /Users"`). Use `head`/`tail`, or `rspec --format progress`.
+- Edit files with the Edit/Write tools, not `sed`. The shell has `noclobber` set, so `>` onto an existing file fails: use Write, or `>|`.
 
 ### Code Style
 
