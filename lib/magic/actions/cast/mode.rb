@@ -35,6 +35,22 @@ module Magic
           self
         end
 
+        # Mirrors Actions::Cast#multi_target: a mode with its own multi_target? (one
+        # target list per index, "N damage to any target and M damage to any other
+        # target"-style) never had this -- #targeting called it unconditionally but
+        # nothing defined it, so a multi-target mode always raised NoMethodError.
+        def multi_target(*targets)
+          targets.each_with_index do |target, index|
+            raise InvalidTarget, "Invalid target for #{mode.class}: #{target}" unless can_target?(target, index)
+          end
+          if mode.respond_to?(:distinct_targets?) && mode.distinct_targets? && targets.uniq.size != targets.size
+            raise InvalidTarget, "#{mode.class} needs different targets"
+          end
+
+          @targets = targets
+          self
+        end
+
         def resolve!
           resolve_with_args(mode, target: targets.first, targets: targets)
         end
