@@ -14,6 +14,8 @@ module Magic
       end
 
       def resolve!(targets:)
+        raise ArgumentError, "can search for at most #{upto} cards, got #{targets.size}" if targets.size > upto
+
         case to_zone
         when :battlefield
           targets.map do |target|
