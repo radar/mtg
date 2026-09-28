@@ -2,6 +2,8 @@ module Magic
   module Abilities
     module Static
       class PowerAndToughnessModification < StaticAbility
+        layer 7, sublayer: :c
+
         attr_reader :source, :power, :toughness, :applicable_targets
 
         def self.modify(power:, toughness:)

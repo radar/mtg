@@ -41,6 +41,11 @@ module Magic
         )
       end
 
+      # "~'s power and toughness are switched until end of turn."
+      def switch_power_and_toughness!(until_eot: true)
+        modifiers << SwitchPowerToughness.new(until_eot: until_eot)
+      end
+
       # "~ becomes red until end of turn" / "becomes all colors": replaces its colors.
       def change_colors!(colors, until_eot: true)
         modifiers << Color.new(colors: colors, until_eot: until_eot)

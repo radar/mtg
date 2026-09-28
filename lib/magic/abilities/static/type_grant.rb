@@ -2,6 +2,8 @@ module Magic
   module Abilities
     module Static
       class TypeGrant < StaticAbility
+        layer 4
+
         attr_reader :source, :applicable_targets
 
         def self.type_grants(*keywords)

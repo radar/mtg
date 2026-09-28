@@ -13,6 +13,10 @@ module Magic
       #     sets_base_power_and_toughness 3, 3
       #     loses_all_abilities
       #   end
+      # Spans layers 3 (loses_all_abilities), 4 (sets_types), 5 (sets_colors) and
+      # 7b (sets_base_power_and_toughness) depending which of the DSL macros below
+      # a subclass uses -- left untagged with `layer`/`sublayer` since no single
+      # label fits; ContinuousEffects reads each set_* method directly instead.
       class CharacteristicSetting < StaticAbility
         attr_reader :source
 

@@ -4,6 +4,8 @@ module Magic
   module Abilities
     module Static
       class GrantActivatedAbilities < StaticAbility
+        layer 6
+
         def granted_abilities
           []
         end

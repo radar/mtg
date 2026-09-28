@@ -1,5 +1,18 @@
 module Magic
   module Permanents
+    # Applies rule 613's layers, in order, recomputing every characteristic from
+    # scratch each time (called after any mutation that could change one: entering
+    # the battlefield, gaining/losing a modifier, cleanup, ...). Layers 1 and 2 are
+    # resolved elsewhere (Permanent#copiable_card/#copied_card and
+    # Permanent#controller=/#gain_control_until_eot! respectively -- both already
+    # apply eagerly rather than being recomputed here) and are only labelled below
+    # so the pipeline documents all seven layers rather than silently skipping two.
+    #
+    # 613.8 dependency ordering within a layer/sublayer isn't implemented -- ties
+    # are broken by timestamp only (613.7: a static ability's effect is timestamped
+    # to when its source entered the battlefield; a one-shot modifier, to when it
+    # was created -- see ContinuousEffect.next_timestamp). `last_by_timestamp`
+    # below is the hook a future dependency pass would replace.
     class ContinuousEffects
       extend Forwardable
 
@@ -14,23 +27,37 @@ module Magic
 
       def apply!
         game.logger.debug "Applying continuous effects for #{permanent}"
-        # Layer 4
-        types = calculate_types
 
+        # Layer 1 (copy): Permanent#copiable_card already resolves copy effects
+        # for every characteristic below.
+        # Layer 2 (control): applied eagerly by Permanent#gain_control_until_eot!/
+        # #controller=, not recomputed here.
+
+        # Layer 3 (text-changing, e.g. "loses all abilities")
+        permanent.lost_all_abilities_by_effect = characteristic_settings.any?(&:loses_all_abilities?)
+
+        # Layer 4 (type-changing)
+        types = calculate_types
         permanent.types = types
         game.logger.debug "Types: #{types}"
-        # Layer 5
-        permanent.color_override = characteristic_settings.filter_map(&:set_colors).last
-        # Layer 6
-        permanent.lost_all_abilities_by_effect = characteristic_settings.any?(&:loses_all_abilities?)
+
+        # Layer 5 (colour-changing)
+        permanent.color_override = calculate_color
+
+        # Layer 6 (ability add/remove)
         permanent.activated_abilities = calculate_activated_abililities
         permanent.keywords = calculate_keywords
         game.logger.debug "Keywords: #{permanent.keywords}"
-        # Layer 7
+
+        # Layer 7: power/toughness (7a characteristic-defining, 7b set, 7c modify
+        # incl. counters, 7d switch)
         if creature?(types)
-          permanent.power = calculate_power
+          power = calculate_power
+          toughness = calculate_toughness
+          power, toughness = toughness, power if switch_power_and_toughness?
+          permanent.power = power
           game.logger.debug "Power: #{permanent.power}"
-          permanent.toughness = calculate_toughness
+          permanent.toughness = toughness
           game.logger.debug "Toughness: #{permanent.toughness}"
         end
       end
@@ -53,9 +80,19 @@ module Magic
         types.include?(T::Creature)
       end
 
+      # 613.7: among effects competing to set the same layer-7b value, the one
+      # with the latest timestamp wins. `entries` is a list of `(timestamp, value)`
+      # pairs; nil values (no setter present) are already filtered by the callers.
+      def last_by_timestamp(entries)
+        entries.max_by(&:first)&.last
+      end
+
       def calculate_power
-        base_power = modifiers_by_type(Modifications::BasePower).last&.base_power ||
-                     characteristic_settings.filter_map(&:set_base_power).last || copiable_card.base_power
+        base_power = last_by_timestamp(
+          modifiers_by_type(Modifications::BasePower).map { [_1.timestamp, _1.base_power] } +
+          characteristic_settings.select(&:set_base_power).map { [_1.timestamp, _1.set_base_power] },
+        ) || copiable_card.base_power
+
         [
           permanent.counters,
           modifiers_by_type(Modifications::Power),
@@ -69,8 +106,11 @@ module Magic
       end
 
       def calculate_toughness
-        base_toughness = modifiers_by_type(Modifications::BaseToughness).last&.base_toughness ||
-                         characteristic_settings.filter_map(&:set_base_toughness).last || copiable_card.base_toughness
+        base_toughness = last_by_timestamp(
+          modifiers_by_type(Modifications::BaseToughness).map { [_1.timestamp, _1.base_toughness] } +
+          characteristic_settings.select(&:set_base_toughness).map { [_1.timestamp, _1.set_base_toughness] },
+        ) || copiable_card.base_toughness
+
         [
           permanent.counters,
           modifiers_by_type(Modifications::Toughness),
@@ -83,13 +123,19 @@ module Magic
           end
       end
 
+      def switch_power_and_toughness?
+        # Multiple switches commute -- only parity matters.
+        modifiers_by_type(Modifications::SwitchPowerToughness).count.odd?
+      end
+
       def modifiers_by_type(type)
         permanent.modifiers.select { |modifier| modifier.is_a?(type) }
       end
 
       def calculate_types
+        base_types = last_by_timestamp(characteristic_settings.select(&:set_types).map { [_1.timestamp, _1.set_types] }) || copiable_card.types
         types = [
-          *(characteristic_settings.filter_map(&:set_types).last || copiable_card.types),
+          *base_types,
           *permanent.attachments.flat_map(&:type_grants),
           *static_abilities_for(permanent).of_type(Abilities::Static::TypeGrant).flat_map(&:type_grants),
           *modifiers_by_type(Modifications::AdditionalType).flat_map(&:type_grants),
@@ -97,6 +143,13 @@ module Magic
 
         types = types.uniq
         types -= static_abilities_for(permanent).of_type(Abilities::Static::TypeRemoval).flat_map(&:type_removal)
+      end
+
+      def calculate_color
+        last_by_timestamp(
+          modifiers_by_type(Modifications::Color).map { [_1.timestamp, _1.colors] } +
+          characteristic_settings.select(&:set_colors).map { [_1.timestamp, _1.set_colors] },
+        )
       end
 
       def calculate_keywords

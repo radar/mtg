@@ -1,7 +1,9 @@
 module Magic
   module Permanents
     module Modifications
-      class BaseToughness < Modification
+      class BaseToughness < ContinuousEffect
+        layer 7, sublayer: :b
+
         attr_reader :base_toughness
 
         def initialize(base_toughness: 0, **args)

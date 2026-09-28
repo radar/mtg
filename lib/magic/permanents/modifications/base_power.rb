@@ -1,7 +1,9 @@
 module Magic
   module Permanents
     module Modifications
-      class BasePower < Modification
+      class BasePower < ContinuousEffect
+        layer 7, sublayer: :b
+
         attr_reader :base_power
 
         def initialize(base_power: 0, **args)

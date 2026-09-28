@@ -25,7 +25,8 @@ module Magic
       :activated_abilities,
       :state_triggered_abilities,
       :exiled_cards,
-      :cannot_untap_next_turn
+      :cannot_untap_next_turn,
+      :timestamp
 
     attr_accessor :copied_card, :chosen_creature_type, :exile_cast_permission_turn, :ring_bearer, :prevent_opponent_lifegain_turn, :pending_mana_ability_uses
 
@@ -103,7 +104,7 @@ module Magic
 
     def self.static_abilities(game, type) = game.battlefield.static_abilities.of_type(type)
 
-    def initialize(game:, owner:, card:, controller: owner, token: false, cast: true, kicked: false, copy: false, timestamp: Time.now)
+    def initialize(game:, owner:, card:, controller: owner, token: false, cast: true, kicked: false, copy: false, timestamp: Permanents::ContinuousEffect.next_timestamp)
       @game = game
       @owner = owner
       @controller = controller
@@ -145,12 +146,10 @@ module Magic
     def name = copiable_card.name
     def cmc = copiable_card.cmc
     def mana_value = copiable_card.mana_value
-    # A color set by continuous effects, else the latest color-changing modifier ("becomes that color
-    # until end of turn"), else the card's colors.
+    # A color set by continuous effects (layer 5 -- ContinuousEffects resolves any competing
+    # Modifications::Color/CharacteristicSetting#set_colors by timestamp), else the card's colors.
     def colors
-      color_override ||
-        modifiers.reverse.find { _1.is_a?(Permanents::Modifications::Color) }&.colors ||
-        copiable_card.colors
+      color_override || copiable_card.colors
     end
 
     def colorless? = colors.empty?
@@ -214,10 +213,17 @@ module Magic
     end
 
     # "Gain control of target creature until end of turn": control returns to the
-    # previous controller at cleanup.
+    # previous controller at cleanup. Layer 2 (613): stacked as an ordered list of
+    # ControlChangeEffects rather than a single slot, so two such effects on the
+    # same permanent in one turn revert correctly instead of the second clobbering
+    # the first's memory of who to revert to.
     def gain_control_until_eot!(player)
-      @controller_before_eot ||= controller
+      control_change_effects << Permanents::ControlChangeEffect.new(controller: player, previous_controller: controller, until_eot: true)
       self.controller = player
+    end
+
+    def control_change_effects
+      @control_change_effects ||= []
     end
 
     # Rule 302.6: a creature's {T} abilities and its ability to attack need it to have been under its
@@ -538,7 +544,7 @@ module Magic
       remove_until_eot_keyword_grants!
       remove_until_eot_protections!
       remove_until_eot_modifiers!
-      revert_until_eot_control!
+      expire_control_change_effects!
       apply_continuous_effects!
     end
 
@@ -721,11 +727,14 @@ module Magic
       end
     end
 
-    def revert_until_eot_control!
-      return unless @controller_before_eot
+    def expire_control_change_effects!
+      return if control_change_effects.empty?
 
-      self.controller = @controller_before_eot
-      @controller_before_eot = nil
+      expiring, remaining = control_change_effects.partition(&:until_eot?)
+      @control_change_effects = remaining
+      return if expiring.empty?
+
+      self.controller = remaining.max_by(&:timestamp)&.controller || expiring.min_by(&:timestamp).previous_controller
     end
 
     def remove_until_eot_modifiers!

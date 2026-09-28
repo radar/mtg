@@ -6,6 +6,22 @@ module Magic
       define_method(:applicable_targets, block)
     end
 
+    def self.layer(number, sublayer: nil)
+      define_method(:layer) { number }
+      define_method(:sublayer) { sublayer }
+    end
+
+    def layer = nil
+    def sublayer = nil
+
+    # 613.7: a static ability's effect has the timestamp of when its source
+    # entered the battlefield. A graveyard-sourced static ability (e.g. Anger)
+    # comes from a Card, which has no timestamp of its own -- falls back to 0
+    # ("oldest"), a simplification since only one card in the repo uses that path.
+    def timestamp
+      source.respond_to?(:timestamp) ? source.timestamp : 0
+    end
+
     def self.conditions(&block)
       define_method(:conditions_met?, &block)
     end

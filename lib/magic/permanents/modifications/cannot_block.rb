@@ -1,16 +1,8 @@
 module Magic
   module Permanents
     module Modifications
-      class CannotBlock
-        attr_reader :until_eot
-
-        def initialize(until_eot: true)
-          @until_eot = until_eot
-        end
-
-        def until_eot?
-          @until_eot
-        end
+      # A combat restriction, not a 613 characteristic layer -- left untagged.
+      class CannotBlock < ContinuousEffect
       end
     end
   end

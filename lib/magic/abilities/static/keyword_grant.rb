@@ -2,6 +2,8 @@ module Magic
   module Abilities
     module Static
       class KeywordGrant < StaticAbility
+        layer 6
+
         attr_reader :source, :applicable_targets
 
         def self.keyword_grants(*keywords)
