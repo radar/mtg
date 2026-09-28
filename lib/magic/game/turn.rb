@@ -33,7 +33,7 @@ module Magic
 
         after_transition to: :draw do |turn|
           turn.notify!(
-            Events::DrawStep.new
+            Events::DrawStep.new(player: turn.active_player)
           )
           turn.active_player.draw!
           turn.checkpoint!

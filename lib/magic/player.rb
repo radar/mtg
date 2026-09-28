@@ -159,7 +159,19 @@ module Magic
       game.unsubscribe(self)
     end
 
+    # A static ability of a permanent can define `prevents_life_gain?(player)` (Mornsong Aria).
+    def can_gain_life?
+      game.battlefield.static_abilities.none? { |ability| ability.respond_to?(:prevents_life_gain?) && ability.prevents_life_gain?(self) }
+    end
+
+    # Likewise `prevents_drawing?(player)`.
+    def can_draw?
+      game.battlefield.static_abilities.none? { |ability| ability.respond_to?(:prevents_drawing?) && ability.prevents_drawing?(self) }
+    end
+
     def gain_life(gain)
+      return unless can_gain_life?
+
       game.notify!(
         Events::LifeGain.new(
           player: self,
@@ -267,6 +279,8 @@ module Magic
     end
 
     def draw!
+      return unless can_draw?
+
       if library.none?
         @drew_from_empty_library = true
         return
