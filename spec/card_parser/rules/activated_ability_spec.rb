@@ -67,6 +67,6 @@ RSpec.describe Magic::CardParser::Rules::ActivatedAbility do
 
   it "renders a sorcery-speed requirement" do
     source = described_class.parse("{2}{U}: Scry 1, then draw a card. Activate only as a sorcery.").class_source("ActivatedAbility")
-    expect(source).to include("def requirements_met? = game.can_cast_sorcery?(controller)", "class ScryChoice < Magic::Choice::Scry")
+    expect(source).to include("activate_only_as_sorcery", "class ScryChoice < Magic::Choice::Scry")
   end
 end

@@ -16,6 +16,7 @@ module Magic
 
       class ActivatedAbility < Magic::ActivatedAbility
         costs "{4}{G}{G}, Sacrifice {this}"
+        activate_only_as_sorcery
 
         ElfToken = Token.create "Elf" do
           creature_type "Elf"
@@ -23,8 +24,6 @@ module Magic
           toughness 2
           colors :black, :green
         end
-
-        def requirements_met? = game.can_cast_sorcery?(controller)
 
         def resolve!
           elves = controller.graveyard.cards.count { |card| card.type?("Elf") }

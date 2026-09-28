@@ -11,6 +11,11 @@ module Magic
       define_method(:once_each_turn?) { true }
     end
 
+    # "Activate only as a sorcery."
+    def self.activate_only_as_sorcery
+      define_method(:requirements_met?) { game.can_cast_sorcery?(controller) }
+    end
+
     def name
       self.class.name
     end

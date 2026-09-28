@@ -13,7 +13,7 @@ module Magic
       class ActivatedAbility < Magic::ActivatedAbility
         costs "{1}{W}, Remove 1 -1/-1 counters from {this}"
 
-        def requirements_met? = game.can_cast_sorcery?(controller)
+        activate_only_as_sorcery
 
         def target_choices
           battlefield.creatures

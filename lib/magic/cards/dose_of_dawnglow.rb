@@ -5,7 +5,7 @@ module Magic
       cost generic: 4, black: 1
 
       def target_choices
-        controller.graveyard.cards.select { _1.type?("Creature") }
+        controller.graveyard.cards.creatures
       end
 
       # "Then if it isn't your main phase, blight 2."

@@ -11,7 +11,7 @@ module Magic
       class ActivatedAbility < Magic::ActivatedAbility
         costs "{T}"
 
-        def requirements_met? = game.can_cast_sorcery?(controller)
+        activate_only_as_sorcery
 
         def target_choices
           battlefield.controlled_by(controller).creatures

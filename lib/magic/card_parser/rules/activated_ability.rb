@@ -42,7 +42,7 @@ module Magic
         def class_source(name)
           body = ["costs #{costs.inspect}\n"]
           body << "once_each_turn\n" if once_each_turn
-          body << "def requirements_met? = game.can_cast_sorcery?(controller)\n" if sorcery_speed
+          body << "activate_only_as_sorcery\n" if sorcery_speed
           body << effect_list.spell_source(this: "source")
           "class #{name} < Magic::ActivatedAbility\n#{body.join("\n").gsub(/^(?=.)/, '  ')}end\n"
         end

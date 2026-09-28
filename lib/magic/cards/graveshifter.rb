@@ -13,7 +13,7 @@ module Magic
         class MayChoice < Magic::Choice::May
           class TargetChoice < Magic::Choice::Targeted
             def choices
-              controller.graveyard.cards.select { _1.type?("Creature") }
+              controller.graveyard.cards.creatures
             end
 
             def choice_amount = 1
@@ -30,7 +30,7 @@ module Magic
         end
 
         def call
-          return if (controller.graveyard.cards.select { _1.type?("Creature") }).none?
+          return if (controller.graveyard.cards.creatures).none?
           game.choices.add(MayChoice.new(actor: actor))
         end
       end
