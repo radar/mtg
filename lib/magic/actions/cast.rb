@@ -226,6 +226,7 @@ module Magic
 
       def pay_kicker(payment)
         kicker_cost.pay(player:, payment:)
+        self
       end
 
       # Offspring costs: the card's own, then any a static ability grants as it's cast

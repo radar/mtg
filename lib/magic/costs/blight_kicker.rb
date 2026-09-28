@@ -1,0 +1,24 @@
+module Magic
+  module Costs
+    # "As an additional cost to cast this spell, you may blight N." Optional, so it goes
+    # through the kicker plumbing (`Cast#pay_kicker`, `card.kicker_cost.paid?`) rather
+    # than `additional_costs`, which must all be paid.
+    class BlightKicker
+      def initialize(amount: 1)
+        @amount = amount
+        @paid = false
+      end
+
+      def pay(player:, payment:)
+        raise "#{payment.name} isn't a creature #{player.inspect} controls" unless payment.creature? && payment.controller == player
+
+        payment.add_counter(Counters::Minus1Minus1, amount: @amount)
+        @paid = true
+      end
+
+      def paid?
+        @paid
+      end
+    end
+  end
+end
