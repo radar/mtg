@@ -90,3 +90,42 @@ RSpec.describe "CardParser generated modal enters trigger in play" do
     expect(bears).not_to be_tapped
   end
 end
+
+RSpec.describe "CardParser generated \"target player\" modes in play" do
+  include CardParserHelpers
+  include_context "two player game"
+  before { go_to_main_phase! }
+
+  let(:charm) { Card("Parsed Gift", owner: p1) }
+
+  before do
+    load_card("Parsed Gift {1}{G}\nInstant\nChoose one —\n• Target player draws two cards.\n" \
+              "• Target player creates two Treasure tokens.\n• Target player creates a 1/1 green and white Kithkin creature token.\n")
+  end
+
+  def cast_mode(index, target)
+    p1.hand.add(charm)
+    p1.add_mana(green: 2)
+    p1.cast(card: charm) do |action|
+      action.choose_mode(charm.modes[index]) { |mode| mode.targeting(target) }
+      action.pay_mana(generic: { green: 1 }, green: 1)
+    end
+    game.stack.resolve!
+  end
+
+  it "makes the targeted player draw" do
+    expect { cast_mode(0, p2) }.to change { p2.hand.count }.by(2)
+  end
+
+  it "gives the targeted player Treasures" do
+    cast_mode(1, p2)
+
+    expect(p2.permanents.count { _1.name == "Treasure" }).to eq(2)
+  end
+
+  it "gives the targeted player a Kithkin token" do
+    cast_mode(2, p2)
+
+    expect(p2.creatures.map(&:name)).to eq(["Kithkin"])
+  end
+end
