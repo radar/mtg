@@ -13,9 +13,9 @@
 # itself still can't reproduce doesn't show up here; that's script/parser_gaps.rb's question
 # (the two scripts share their card-to-mechanic tagging, see mechanic_tags.rb).
 #
-# Adventure/split/transform cards are looked up by Scryfall's combined "Front // Back" name;
-# if a hand-written file only used the front face's name, this can misreport it as
-# unimplemented -- a planning aid, not a parser, same caveat as parser_gaps.rb.
+# Adventure/split/transform cards are looked up by either face's name (Scryfall's combined
+# "Front // Back" name is split), so a double-faced card counts once its front (or back) face
+# class exists. A planning aid, not a parser, same caveat as parser_gaps.rb.
 
 require "bundler/setup"
 require_relative "../lib/magic"
@@ -27,7 +27,7 @@ show_cards = ARGV.include?("--cards")
 
 by_card = card_faces_for(set_code).group_by { _1[:card] }
 
-implemented, unimplemented = by_card.keys.partition { |name| Magic::Cards.const_defined?(Magic::CardGenerator.const_name(name)) }
+implemented, unimplemented = by_card.keys.partition { |name| name.split(" // ").any? { |face| Magic::Cards.const_defined?(Magic::CardGenerator.const_name(face)) } }
 
 puts "#{set_code}: #{by_card.size} cards; #{implemented.size} implemented, #{unimplemented.size} are not"
 puts
