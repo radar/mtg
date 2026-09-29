@@ -423,6 +423,19 @@ RSpec.describe Magic::CardParser::Effect do
     expect(copy.resolve_call).to include("token: true, copy: true", "target.copiable_card")
   end
 
+  it "affects the creatures of a target player" do
+    pump = described_class.parse("Creatures target player controls get +1/+1 and gain haste until end of turn.")
+    expect(pump.target_choices).to eq("game.players")
+    expect(pump.resolve_call).to include("target.creatures.each do |creature|", "modify_power_toughness", 'keyword: :haste')
+
+    expect(described_class.parse("Untap them.").resolve_call).to eq("target.creatures.each(&:untap!)")
+    expect(described_class.parse("Untap them.")).to be_earlier_target
+
+    damage = described_class.parse("~ deals 2 damage to each creature target player controls.")
+    expect(damage.target_choices).to eq("game.players")
+    expect(damage.resolve_call).to eq("target.creatures.each { trigger_effect(:deal_damage, target: _1, damage: 2) }")
+  end
+
   it "parses untapping" do
     expect(described_class.parse("Untap target Merfolk you control.").target_choices)
       .to eq('battlefield.controlled_by(controller).creatures.by_any_type("Merfolk")')

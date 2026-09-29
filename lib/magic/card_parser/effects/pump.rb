@@ -7,11 +7,11 @@ module Magic
       # trample", "[Other] creatures you control gain flying and haste", "It gains
       # haste" (an earlier target), "Target creature gets +1/+1 for each Elf you
       # control" (the count, `per`, may also follow "until end of turn"; it's
-      # taken once, as the effect resolves).
+      # taken once, as the effect resolves), "Creatures target player controls get +1/+1".
       class Pump < Data.define(:who, :reference, :power, :toughness, :per, :keywords)
         include Effect
 
-        WHO = /(?:(?<self>~)|(?<each>(?:other )?creatures you control)|#{PermanentTarget::REFERENCE})/i
+        WHO = /(?:(?<self>~)|(?<each>(?:other )?creatures you control)|(?<player_creatures>creatures target player controls)|#{PermanentTarget::REFERENCE})/i
         KEYWORDS = /[\w ,]+?/
         PER = /[^.]+?/
         LINE = %r{\A#{WHO} (?:gets? (?<power>[+-]\d+)/(?<toughness>[+-]\d+)(?: for each (?<per>#{PER}))?(?: and gains? (?<with>#{KEYWORDS}))?|gains? (?<only>#{KEYWORDS})) until end of turn(?: for each (?<per_after>#{PER}))?\.?\z}i
@@ -27,19 +27,20 @@ module Magic
           if (phrase = m[:per] || m[:per_after])
             return unless m[:power] && (per = Count.parse(phrase, this: THIS))
           end
-          who = m[:self] ? :self : m[:each]&.downcase || :target
+          who = m[:self] ? :self : m[:each]&.downcase || (:player_creatures if m[:player_creatures]) || :target
           reference = PermanentTarget.reference(m) if who == :target
           new(who:, reference:, power: m[:power]&.to_i, toughness: m[:toughness]&.to_i, per:,
               keywords:)
         end
 
-        def target_choices = reference&.choices
+        def target_choices = who == :player_creatures ? "game.players" : reference&.choices
         def earlier_target? = !!reference&.earlier_target?
 
         def resolve_call
           case who
           when :self then calls(THIS)
           when :target then calls(reference.object)
+          when :player_creatures then each("target.creatures")
           when "creatures you control" then each("battlefield.controlled_by(controller).creatures")
           else each("(battlefield.controlled_by(controller).creatures - [#{THIS}])")
           end

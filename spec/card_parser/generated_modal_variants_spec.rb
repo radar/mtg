@@ -152,3 +152,46 @@ RSpec.describe "CardParser generated token copy mode in play" do
     expect(copies.count(&:token?)).to eq(1)
   end
 end
+
+RSpec.describe "CardParser generated modes that affect a player's creatures in play" do
+  include CardParserHelpers
+  include_context "two player game"
+  before { go_to_main_phase! }
+
+  let(:charm) { Card("Parsed Rally", owner: p1) }
+
+  before do
+    load_card("Parsed Rally {2}{R}\nInstant\nChoose one —\n• Creatures target player controls get +3/+3 until end of turn. Untap them.\n" \
+              "• ~ deals 2 damage to each creature target player controls.\n")
+  end
+
+  def cast_mode(index, target)
+    p1.hand.add(charm)
+    p1.add_mana(red: 3)
+    p1.cast(card: charm) do |action|
+      action.choose_mode(charm.modes[index]) { |mode| mode.targeting(target) }
+      action.pay_mana(generic: { red: 2 }, red: 1)
+    end
+    game.stack.resolve!
+  end
+
+  it "pumps and untaps that player's creatures only" do
+    mine = ResolvePermanent("Grizzly Bears", owner: p1)
+    mine.tap!
+    theirs = ResolvePermanent("Grizzly Bears", owner: p2)
+    cast_mode(0, p1)
+    game.tick!
+
+    expect([mine.power, mine.tapped?]).to eq([5, false])
+    expect(theirs.power).to eq(2)
+  end
+
+  it "damages each creature that player controls" do
+    tough = ResolvePermanent("Courser Of Kruphix", owner: p2)
+    mine = ResolvePermanent("Courser Of Kruphix", owner: p1)
+    cast_mode(1, p2)
+
+    expect(tough.damage).to eq(2)
+    expect(mine.damage).to eq(0)
+  end
+end
