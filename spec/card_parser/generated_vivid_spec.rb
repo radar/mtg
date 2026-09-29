@@ -95,4 +95,33 @@ RSpec.describe "CardParser generated Vivid effects in play" do
 
     expect([bears.power, bears.toughness]).to eq([4, 4])
   end
+
+  context "with a generated Prismatic Undercurrents" do
+    before do
+      load_card("Parsed Currents {3}{G}\nEnchantment\nVivid — When ~ enters, search your library for up to X basic land cards, where X is the number of colors among permanents you control. Reveal those cards, put them into your hand, then shuffle.\nYou may play an additional land on each of your turns.\n")
+      go_to_main_phase!
+      4.times { p1.library.add(Card("Forest")) }
+    end
+
+    it "lets you play an additional land each turn" do
+      ResolvePermanent("Parsed Currents", owner: p1)
+
+      expect(p1.max_lands_per_turn).to eq(2)
+    end
+
+    it "searches for up to X basic lands, X being the colors among your permanents" do
+      ResolvePermanent("Alaborn Trooper", owner: p1)
+      currents = Card("Parsed Currents", owner: p1)
+      p1.hand.add(currents)
+      p1.add_mana(green: 4)
+      p1.cast(card: currents) { _1.pay_mana(generic: { green: 3 }, green: 1) }
+      game.stack.resolve!
+      choice = game.choices.first
+      lands = p1.library.basic_lands.first(2)
+      choice.resolve!(targets: lands)
+
+      expect(choice.upto).to eq(2)
+      expect(p1.hand.cards).to include(*lands)
+    end
+  end
 end
