@@ -3,46 +3,69 @@ require "spec_helper"
 RSpec.describe Magic::Cards::Clone do
   include_context "two player game"
 
+  let!(:grizzly_bears) { ResolvePermanent("Grizzly Bears", owner: p2) }
+
   subject(:clone) { ResolvePermanent("Clone", owner: p1) }
 
   context "when entering the battlefield" do
     it "presents a may choice to copy a creature" do
       clone
+
       expect(game.choices.last).to be_a(Magic::Cards::Clone::MayCopyChoice)
     end
 
-    context "when accepting the copy" do
-      let!(:grizzly_bears) { ResolvePermanent("Grizzly Bears", owner: p1) }
+    it "survives as a 0/0 while it is still choosing (state-based actions wait for the choice)" do
+      clone
+      game.settle!
 
-      before { clone }
+      expect(clone.zone).to be_battlefield
+    end
+
+    context "when accepting the copy" do
+      before do
+        clone
+        game.resolve_choice! # yes
+        game.resolve_choice!(target: grizzly_bears)
+        game.tick!
+      end
 
       it "becomes a copy of the chosen creature" do
-        # The ETB may-choice flow lets a still-0/0 Clone die to state-based actions
-        # (704.5f) before its own trigger resolves and creates the choice -- a real
-        # rules interaction this card's trigger-based (rather than a genuine
-        # replacement-based "choose as it enters") implementation doesn't protect
-        # against; fixing that needs replacement-effect infrastructure this engine
-        # doesn't have yet. Exercise the copy mechanism directly instead.
-        clone.copied_card = grizzly_bears.card
-        clone.apply_continuous_effects!
-
         expect(clone.name).to eq("Grizzly Bears")
         expect(clone.power).to eq(2)
         expect(clone.toughness).to eq(2)
         expect(clone.token?).to be(false)
+        expect(clone.zone).to be_battlefield
       end
     end
 
     context "when declining the copy" do
-      it "stays a 0/0 Shapeshifter" do
+      it "stays a 0/0 Shapeshifter and then dies to state-based actions" do
         clone
         game.skip_choice!
         game.settle!
 
-        expect(clone.name).to eq("Clone")
-        expect(clone.power).to eq(0)
-        expect(clone.toughness).to eq(0)
+        expect(game.battlefield.permanents).not_to include(clone)
+        expect(clone.card.zone).to be_graveyard
       end
+    end
+
+    it "can't copy itself" do
+      clone
+      game.resolve_choice!
+
+      expect(game.choices.last.choices).to contain_exactly(grizzly_bears)
+    end
+  end
+
+  context "with no other creature to copy" do
+    it "dies as a 0/0 without asking" do
+      grizzly_bears.destroy!
+      game.settle!
+      clone
+      game.settle!
+
+      expect(game.choices).to be_empty
+      expect(clone.card.zone).to be_graveyard
     end
   end
 end

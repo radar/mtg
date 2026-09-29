@@ -47,7 +47,7 @@ module Magic
 
       # Rule 704.5f: toughness 0 or less. Indestructible does not help here.
       def put_zero_toughness_creatures_into_graveyard
-        creatures = game.battlefield.creatures.select { |creature| creature.toughness <= 0 }
+        creatures = game.battlefield.creatures.select { |creature| creature.toughness <= 0 && !creature.copy_choice_pending? }
         creatures.each(&:put_into_graveyard!)
         creatures.any?
       end

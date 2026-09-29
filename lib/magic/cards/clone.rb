@@ -8,9 +8,11 @@ module Magic
     end
 
     class Clone < Creature
+      enters_as_copy
+
       class CopyChoice < Magic::Choice::Targeted
         def choices
-          game.battlefield.creatures
+          game.battlefield.creatures.except(actor)
         end
 
         def choice_amount
@@ -19,6 +21,7 @@ module Magic
 
         def resolve!(target:)
           actor.copied_card = target.card
+          actor.copy_choice_pending = false
         end
       end
 
@@ -26,11 +29,19 @@ module Magic
         def resolve!
           game.choices.add(Clone::CopyChoice.new(actor: actor))
         end
+
+        def decline!
+          actor.copy_choice_pending = false
+        end
       end
 
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
-          game.choices.add(Clone::MayCopyChoice.new(actor: actor))
+          if game.battlefield.creatures.except(actor).any?
+            game.choices.add(Clone::MayCopyChoice.new(actor: actor))
+          else
+            actor.copy_choice_pending = false
+          end
         end
       end
 

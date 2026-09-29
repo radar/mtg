@@ -50,6 +50,9 @@ module Magic
     # it was cast for its evoke cost (sacrificed when it enters).
     attr_writer :mana_spent
     attr_accessor :evoked
+    # "You may have this enter as a copy of ...": a not-yet-copied 0/0 mustn't die to state-based
+    # actions while its enters trigger is still asking (cleared once that's answered).
+    attr_writer :copy_choice_pending
     # The zone the card was in when it entered the battlefield (nil for tokens and copies).
     # A spell cast from a graveyard keeps its graveyard zone until it resolves.
     attr_accessor :entered_from_zone
@@ -71,6 +74,7 @@ module Magic
         copy: copy,
       )
       permanent.mana_spent = mana_spent
+      permanent.copy_choice_pending = card.enters_as_copy?
       permanent.evoked = evoked
 
       permanent.entered_from_zone = card_zone
@@ -158,6 +162,7 @@ module Magic
 
     def mana_spent = @mana_spent || {}
     def evoked? = !!@evoked
+    def copy_choice_pending? = !!@copy_choice_pending
 
     # "If {W}{W} was spent to cast it": at least `amount` mana of `color` went into casting this.
     def mana_spent?(color, amount = 1) = mana_spent.fetch(color, 0) >= amount

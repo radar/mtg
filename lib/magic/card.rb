@@ -75,6 +75,12 @@ module Magic
         const_set(:EVOKE_COST, cost)
       end
 
+      # "You may have this enter as a copy of a creature": Permanent.resolve then holds off state-based
+      # actions until the card's enters trigger clears `copy_choice_pending`.
+      def enters_as_copy
+        define_method(:enters_as_copy?) { true }
+      end
+
       def offspring(cost)
         const_set(:OFFSPRING_COST, cost)
       end
@@ -421,6 +427,8 @@ module Magic
     def rebound?
       false
     end
+
+    def enters_as_copy? = false
 
     def evoke_cost
       self.class.const_defined?(:EVOKE_COST, false) ? Costs::Mana.new(self.class::EVOKE_COST.dup) : nil
