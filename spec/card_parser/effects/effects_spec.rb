@@ -402,22 +402,28 @@ RSpec.describe Magic::CardParser::Effect do
       .to eq("battlefield.creatures.select(&:tapped?)")
   end
 
-it "lets another player draw or create tokens" do
-  draw = described_class.parse("Target player draws two cards.")
-  expect([draw.target_choices, draw.resolve_call]).to eq(["game.players", "trigger_effect(:draw_cards, player: target, number_to_draw: 2)"])
-  expect(described_class.parse("Target player draws a card.").resolve_call).to eq("trigger_effect(:draw_cards, player: target)")
-  expect(described_class.parse("Draw a card.").target_choices).to be_nil
+  it "lets another player draw or create tokens" do
+    draw = described_class.parse("Target player draws two cards.")
+    expect([draw.target_choices, draw.resolve_call]).to eq(["game.players", "trigger_effect(:draw_cards, player: target, number_to_draw: 2)"])
+    expect(described_class.parse("Target player draws a card.").resolve_call).to eq("trigger_effect(:draw_cards, player: target)")
+    expect(described_class.parse("Draw a card.").target_choices).to be_nil
 
-  treasure = described_class.parse("Target player creates two Treasure tokens.")
-  expect([treasure.target_choices, treasure.resolve_call])
-    .to eq(["game.players", "trigger_effect(:create_token, token_class: Tokens::Treasure, amount: 2, controller: target)"])
+    treasure = described_class.parse("Target player creates two Treasure tokens.")
+    expect([treasure.target_choices, treasure.resolve_call])
+      .to eq(["game.players", "trigger_effect(:create_token, token_class: Tokens::Treasure, amount: 2, controller: target)"])
 
-  kithkin = described_class.parse("Target player creates a 1/1 green and white Kithkin creature token.")
-  expect(kithkin.target_choices).to eq("game.players")
-  expect(kithkin.resolve_call).to eq("trigger_effect(:create_token, token_class: KithkinToken, controller: target)")
-end
+    kithkin = described_class.parse("Target player creates a 1/1 green and white Kithkin creature token.")
+    expect(kithkin.target_choices).to eq("game.players")
+    expect(kithkin.resolve_call).to eq("trigger_effect(:create_token, token_class: KithkinToken, controller: target)")
+  end
 
-it "parses untapping" do
+  it "copies a target permanent as a token" do
+    copy = described_class.parse("Create a token that's a copy of target Kithkin you control.")
+    expect(copy.target_choices).to eq('battlefield.controlled_by(controller).creatures.by_any_type("Kithkin")')
+    expect(copy.resolve_call).to include("token: true, copy: true", "target.copiable_card")
+  end
+
+  it "parses untapping" do
     expect(described_class.parse("Untap target Merfolk you control.").target_choices)
       .to eq('battlefield.controlled_by(controller).creatures.by_any_type("Merfolk")')
     expect(described_class.parse("Untap target creature.").resolve_call).to eq("target.untap!")

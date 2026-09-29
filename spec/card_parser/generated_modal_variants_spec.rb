@@ -129,3 +129,26 @@ RSpec.describe "CardParser generated \"target player\" modes in play" do
     expect(p2.creatures.map(&:name)).to eq(["Kithkin"])
   end
 end
+
+RSpec.describe "CardParser generated token copy mode in play" do
+  include CardParserHelpers
+  include_context "two player game"
+  before { go_to_main_phase! }
+
+  it "creates a token copy of a Kithkin you control" do
+    load_card("Parsed Echo {1}{W}\nInstant\nChoose one —\n• Create a token that's a copy of target Kithkin you control.\n• You gain 3 life.\n")
+    nomad = ResolvePermanent("Goldmeadow Nomad", owner: p1)
+    card = Card("Parsed Echo", owner: p1)
+    p1.hand.add(card)
+    p1.add_mana(white: 2)
+    p1.cast(card:) do |action|
+      action.choose_mode(card.modes[0]) { |mode| mode.targeting(nomad) }
+      action.pay_mana(generic: { white: 1 }, white: 1)
+    end
+    game.stack.resolve!
+
+    copies = p1.creatures.select { _1.name == "Goldmeadow Nomad" }
+    expect(copies.size).to eq(2)
+    expect(copies.count(&:token?)).to eq(1)
+  end
+end
