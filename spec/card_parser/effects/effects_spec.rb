@@ -441,6 +441,19 @@ RSpec.describe Magic::CardParser::Effect do
     expect(damage.resolve_call).to eq("target.creatures.each { trigger_effect(:deal_damage, target: _1, damage: 2) }")
   end
 
+  it "makes \"up to one target\" destroy and exile effects optional" do
+    expect(described_class.parse("Destroy up to one target artifact or enchantment.")).to be_optional_target
+    expect(described_class.parse("Destroy target artifact or enchantment.")).not_to be_optional_target
+    expect(described_class.parse("Exile up to one target creature.")).to be_optional_target
+  end
+
+  it "returns a permanent card (not just any card with a type) from your graveyard" do
+    expect(described_class.parse("Return target permanent card from your graveyard to your hand.").target_choices)
+      .to eq("controller.graveyard.cards.select(&:permanent?)")
+    expect(described_class.parse("Return target creature card from your graveyard to your hand.").target_choices)
+      .to eq('controller.graveyard.cards.select { _1.type?("Creature") }')
+  end
+
   it "parses untapping" do
     expect(described_class.parse("Untap target Merfolk you control.").target_choices)
       .to eq('battlefield.controlled_by(controller).creatures.by_any_type("Merfolk")')

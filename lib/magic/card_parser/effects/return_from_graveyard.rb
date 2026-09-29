@@ -16,7 +16,10 @@ module Magic
 
         def target_choices
           cards = "controller.graveyard.cards"
-          card_type ? "#{cards}.select { _1.type?(#{card_type.inspect}) }" : "#{cards}.to_a"
+          return "#{cards}.to_a" unless card_type
+          return "#{cards}.select(&:permanent?)" if card_type == "Permanent"
+
+          "#{cards}.select { _1.type?(#{card_type.inspect}) }"
         end
 
         def resolve_call = "target.move_to_hand!"
