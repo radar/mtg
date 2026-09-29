@@ -19,6 +19,12 @@ module Magic
       def paid?
         @paid
       end
+
+      # `card.kicker_cost` lives as long as the card does: a card whose effects don't run through
+      # `resolve!` (a modal spell) calls this once it has read `paid?`.
+      def reset!
+        @paid = false
+      end
     end
   end
 end
