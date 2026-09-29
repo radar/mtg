@@ -11,6 +11,11 @@ module Magic
       @actor = actor
     end
 
+    # A copy of this triggered ability (Kirol): the same trigger, resolving again for the same event.
+    def copy_and_call!
+      self.class.new(event:, actor:).call
+    end
+
     def you?
       controller == event.player
     end

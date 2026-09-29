@@ -160,6 +160,9 @@ module Magic
 
     def transformed? = @transformed || false
 
+    # Free-form per-permanent state for cards that level up or remember something (Figure of Fable).
+    def state = (@state ||= {})
+
     def mana_spent = @mana_spent || {}
     def evoked? = !!@evoked
     def copy_choice_pending? = !!@copy_choice_pending
