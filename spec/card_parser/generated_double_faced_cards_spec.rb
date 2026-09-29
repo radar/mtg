@@ -230,4 +230,160 @@ RSpec.describe "CardParser generated double-faced cards in play" do
       expect(eirdu).not_to be_persist
     end
   end
+
+  describe "Sygg" do
+    let(:text) do
+      <<~TEXT
+        Parsed Sygg, Wanderwine Wisdom {1}{U}
+        Legendary Creature — Merfolk Wizard
+        Parsed Sygg can't be blocked.
+        Whenever this creature enters or transforms into Parsed Sygg, Wanderwine Wisdom, target creature gains "Whenever this creature deals combat damage to a player or planeswalker, draw a card" until end of turn.
+        At the beginning of your first main phase, you may pay {W}. If you do, transform Parsed Sygg.
+        2/2
+        ----
+        Parsed Sygg, Wanderbrine Shield
+        Color Indicator: White
+        Legendary Creature — Merfolk Rogue
+        Parsed Sygg can't be blocked.
+        Whenever this creature transforms into Parsed Sygg, Wanderbrine Shield, target creature you control gains protection from each color until your next turn.
+        At the beginning of your first main phase, you may pay {U}. If you do, transform Parsed Sygg.
+        2/2
+      TEXT
+    end
+
+    before { load_card(text) }
+
+    it "can't be blocked" do
+      sygg = ResolvePermanent("Parsed Sygg, Wanderwine Wisdom", owner: p1)
+      game.skip_choice! if game.choices.any?
+      blocker = ResolvePermanent("Grizzly Bears", owner: p2)
+      skip_to_combat!
+      current_turn.declare_attackers!
+      current_turn.declare_attacker(sygg, target: p2)
+      current_turn.attackers_declared!
+
+      expect { current_turn.declare_blocker(blocker, attacker: sygg) }.to raise_error(Magic::Game::CombatPhase::IllegalBlock)
+    end
+
+    it "lets the target creature draw a card for combat damage to a player this turn" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      ResolvePermanent("Parsed Sygg, Wanderwine Wisdom", owner: p1)
+      game.resolve_choice!(target: bears)
+      hand = p1.hand.count
+      skip_to_combat!
+      current_turn.declare_attackers!
+      current_turn.declare_attacker(bears, target: p2)
+      current_turn.attackers_declared!
+      current_turn.combat_damage!
+      game.settle!
+
+      expect(p2.life).to eq(18)
+      expect(p1.hand.count).to eq(hand + 1)
+    end
+
+    it "the back face gives a creature you control protection from each color until your next turn" do
+      sygg = ResolvePermanent("Parsed Sygg, Wanderwine Wisdom", owner: p1)
+      game.skip_choice! if game.choices.any?
+      sygg.transform!
+      game.settle!
+      game.resolve_choice!(target: sygg) if game.choices.any?
+
+      expect(sygg.protected_from?(Card("Lightning Bolt", owner: p2))).to be(true)
+    end
+  end
+
+  describe "Oko" do
+    let(:text) do
+      <<~TEXT
+        Parsed Oko, Lorwyn Liege {2}{U}
+        Legendary Planeswalker — Oko
+        At the beginning of your first main phase, you may pay {G}. If you do, transform Parsed Oko.
+        +2: Up to one target creature gains all creature types.
+        +1: Target creature gets -2/-0 until your next turn.
+        Loyalty: 3
+        ----
+        Parsed Oko, Shadowmoor Scion
+        Color Indicator: Green
+        Legendary Planeswalker — Oko
+        At the beginning of your first main phase, you may pay {U}. If you do, transform Parsed Oko.
+        −1: Mill three cards. You may put a permanent card from among them into your hand.
+        −3: Create two 3/3 green Elk creature tokens.
+        −6: Choose a creature type. You get an emblem with "Creatures you control of the chosen type get +3/+3 and have vigilance and hexproof."
+        Loyalty: 3
+      TEXT
+    end
+
+    before { load_card(text) }
+
+    let(:oko) { ResolvePermanent("Parsed Oko, Lorwyn Liege", owner: p1) }
+
+    def activate(index, target: nil)
+      p1.activate_loyalty_ability(ability: oko.loyalty_abilities[index]) { |action| action.targeting(target) if target }
+      game.stack.resolve!
+      game.settle!
+    end
+
+    it "+2: gives up to one creature all creature types" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      activate(0, target: bears)
+
+      expect(oko.loyalty).to eq(5)
+      expect(bears.type?("Goblin")).to be(true)
+    end
+
+    it "+2 may have no target" do
+      activate(0)
+
+      expect(oko.loyalty).to eq(5)
+    end
+
+    it "+1: -2/-0 until your next turn" do
+      courser = ResolvePermanent("Courser Of Kruphix", owner: p2)
+      activate(1, target: courser)
+      game.tick!
+
+      expect(courser.power).to eq(0)
+      game.next_turn
+      game.next_turn
+      go_to_main_phase!
+      game.tick!
+      expect(courser.power).to eq(2)
+    end
+
+    describe "transformed" do
+      before do
+        oko.transform!
+        game.settle!
+      end
+
+      it "-1: mills three, may put a permanent card into hand" do
+        3.times { p1.library.add(Card("Forest", owner: p1)) }
+        activate(0)
+        forest = p1.graveyard.cards.find { _1.name == "Forest" }
+        game.resolve_choice!(target: forest)
+
+        expect(forest.zone).to be_hand
+      end
+
+      it "-3: two 3/3 green Elk tokens" do
+        oko.change_loyalty!(3)
+        activate(1)
+
+        expect(p1.creatures.count { _1.name == "Elk" }).to eq(2)
+      end
+
+      it "-6: an emblem for a chosen creature type" do
+        oko.change_loyalty!(6)
+        elf = ResolvePermanent("Skyway Sniper", owner: p1)
+        base = elf.power
+        activate(2)
+        game.resolve_choice!(creature_type: "Elf")
+        game.tick!
+
+        expect(elf.power).to eq(base + 3)
+        expect(elf).to be_vigilant
+        expect(elf).to be_hexproof
+      end
+    end
+  end
 end

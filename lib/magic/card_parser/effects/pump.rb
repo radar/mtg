@@ -8,16 +8,22 @@ module Magic
       # haste" (an earlier target), "Target creature gets +1/+1 for each Elf you
       # control" (the count, `per`, may also follow "until end of turn"; it's
       # taken once, as the effect resolves), "Creatures target player controls get +1/+1".
-      class Pump < Data.define(:who, :reference, :power, :toughness, :per, :keywords)
+      class Pump < Data.define(:who, :reference, :power, :toughness, :per, :keywords, :until_next_turn)
         include Effect
 
         WHO = /(?:(?<self>~)|(?<each>(?:other )?creatures you control)|(?<player_creatures>creatures target player controls)|#{PermanentTarget::REFERENCE})/i
         KEYWORDS = /[\w ,]+?/
         PER = /[^.]+?/
-        LINE = %r{\A#{WHO} (?:gets? (?<power>[+-](?:\d+|X))/(?<toughness>[+-](?:\d+|X))(?: for each (?<per>#{PER}))?(?: and gains? (?<with>#{KEYWORDS}))?|gains? (?<only>#{KEYWORDS})) until end of turn(?: for each (?<per_after>#{PER}))?\.?\z}i
+        LINE = %r{\A#{WHO} (?:gets? (?<power>[+-](?:\d+|X))/(?<toughness>[+-](?:\d+|X))(?: for each (?<per>#{PER}))?(?: and gains? (?<with>#{KEYWORDS}))?|gains? (?<only>#{KEYWORDS})) (?<duration>until end of turn|until your next turn)(?: for each (?<per_after>#{PER}))?\.?\z}i
+
+        def initialize(who:, reference:, power:, toughness:, per:, keywords:, until_next_turn: false) = super
 
         def self.parse(text)
           return unless (m = LINE.match(text))
+
+          until_next_turn = m[:duration].downcase == "until your next turn"
+          # "Until your next turn" is only supported for a plain power/toughness change.
+          return if until_next_turn && (m[:with] || m[:only] || m[:per] || m[:per_after] || !m[:power])
           return if m[:kind] && !PermanentTarget.creature?(m)
           return if [m[:power], m[:toughness]].any? { _1&.end_with?("X") } && !Number.x_bound?
 
@@ -31,7 +37,7 @@ module Magic
           who = m[:self] ? :self : m[:each]&.downcase || (:player_creatures if m[:player_creatures]) || :target
           reference = PermanentTarget.reference(m) if who == :target
           new(who:, reference:, power: stat(m[:power]), toughness: stat(m[:toughness]), per:,
-              keywords:)
+              keywords:, until_next_turn:)
         end
 
         # "+2" -> 2, "+X" -> the Ruby for X, "-X" -> its negation.
@@ -73,7 +79,11 @@ module Magic
 
         def calls(target)
           lines = []
-          lines << "trigger_effect(:modify_power_toughness, target: #{target}, power: #{amount(power)}, toughness: #{amount(toughness)})" if power
+          if power && until_next_turn
+            lines << "#{target}.modify_power_toughness_until_turn_of!(controller, #{power}, #{toughness})"
+          elsif power
+            lines << "trigger_effect(:modify_power_toughness, target: #{target}, power: #{amount(power)}, toughness: #{amount(toughness)})"
+          end
           keywords.each { lines << "trigger_effect(:grant_keyword, target: #{target}, keyword: #{_1.inspect})" }
           lines.join("\n")
         end

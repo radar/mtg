@@ -376,6 +376,14 @@ module Magic
       modifiers.last.until_turn_of = player
     end
 
+    # "Target creature gets -2/-0 until your next turn" (either or both of power and toughness).
+    def modify_power_toughness_until_turn_of!(player, power, toughness)
+      modify_power(power, until_eot: false)
+      modifiers.last.until_turn_of = player
+      modify_toughness(toughness, until_eot: false)
+      modifiers.last.until_turn_of = player
+    end
+
     # "Gains all creature types. (This effect doesn't end.)"
     def gain_all_creature_types!
       @gained_all_creature_types = true

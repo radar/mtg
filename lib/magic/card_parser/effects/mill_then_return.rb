@@ -9,7 +9,7 @@ module Magic
       class MillThenReturn < Data.define(:amount, :card_type)
         include Effect
 
-        LINE = /\AMill (?<amount>\d+|\w+) cards?, then you may return an? (?<type>permanent|[a-z-]+) card from among them to your hand\.?\z/i
+        LINE = /\AMill (?<amount>\d+|\w+) cards?(?:, then you may return|\. You may put) an? (?<type>permanent|[a-z-]+) card from among them (?:to|into) your hand\.?\z/i
 
         def self.parse(text)
           new(amount: Number.parse($~[:amount]), card_type: $~[:type].downcase) if LINE.match(text)

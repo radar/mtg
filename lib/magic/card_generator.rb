@@ -82,35 +82,46 @@ module Magic
       "module Magic\n  module Cards\n#{source.gsub(/^(?=.)/, '    ')}  end\nend\n"
     end
 
-# A double-faced card: the back face's class first (it has no cost and takes its colours from a
-# colour indicator), then the front face, which names it with `back_face`. Both live in the
-# front face's file.
-def double_faced_source
-  raise CardParser::UnsupportedCard, "only creature double-faced cards are supported" unless kind == :creature
+    # A double-faced card: the back face's class first (it has no cost and takes its colours from a
+    # colour indicator), then the front face, which names it with `back_face`. Both live in the
+    # front face's file.
+    def double_faced_source
+      unless %i[creature planeswalker].include?(kind)
+        raise CardParser::UnsupportedCard, "only creature and planeswalker double-faced cards are supported"
+      end
 
-  back = self.class.new(@result.back_face)
-  raise CardParser::UnsupportedCard, "the back face must be a creature" unless back.send(:kind) == :creature
+      back = self.class.new(@result.back_face)
+      raise CardParser::UnsupportedCard, "the back face must be a #{kind}" unless back.send(:kind) == kind
 
-  wrap([back.builder_body, builder_body].join("\n"))
-end
+      wrap([back.body_source, body_source].join("\n"))
+    end
 
-# Instant("Name") do ... end plus an optional class reopening for nested classes.
-def builder_source
-  wrap(builder_body)
-end
+    # Instant("Name") do ... end plus an optional class reopening for nested classes.
+    def builder_source
+      wrap(builder_body)
+    end
 
-protected
+    # Planeswalkers are written as a Planeswalker subclass, not a DSL block:
+    # card_name / planeswalker / cost / loyalty, then the loyalty ability classes.
+    def planeswalker_source
+      wrap(planeswalker_body)
+    end
 
-def builder_body
+    protected
+
+    # This face's class(es), unwrapped.
+    def body_source = kind == :planeswalker ? planeswalker_body : builder_body
+
+    def builder_body
       kind = self.kind
       require_rule(kind)
       check_rule_kinds(kind)
       lines = []
       lines << "cost #{cost_args}" if @result.mana_cost.any?
-lines.concat(type_lines(kind))
-lines << "color_indicator #{@result.color_indicator.map(&:inspect).join(', ')}" if @result.color_indicator
-lines << "back_face #{self.class.const_name(@result.back_face.name)}" if @result.back_face
-lines.concat(@result.rules.flat_map(&:dsl_lines))
+      lines.concat(type_lines(kind))
+      lines << "color_indicator #{@result.color_indicator.map(&:inspect).join(', ')}" if @result.color_indicator
+      lines << "back_face #{self.class.const_name(@result.back_face.name)}" if @result.back_face
+      lines.concat(@result.rules.flat_map(&:dsl_lines))
       if kind == :creature
         lines << "power #{@result.power}"
         lines << "toughness #{@result.toughness}"
@@ -120,21 +131,11 @@ lines.concat(@result.rules.flat_map(&:dsl_lines))
       lines.each { |l| source << "  #{l}\n" }
       source << "end\n"
       sections = class_sections
-  source << "\nclass #{const} < #{base}\n#{sections.map { indent(_1) }.join("\n\n")}\nend\n" if sections.any?
-  source
-end
-
-private
-
-    def land_source
-      sections = class_sections
-      body = ["NAME = #{@result.name.inspect}", *sections].join("\n\n")
-      wrap("class #{const} < Land\n#{indent(body)}\nend\n")
+      source << "\nclass #{const} < #{base}\n#{sections.map { indent(_1) }.join("\n\n")}\nend\n" if sections.any?
+      source
     end
 
-    # Planeswalkers are written as a Planeswalker subclass, not a DSL block:
-    # card_name / planeswalker / cost / loyalty, then the loyalty ability classes.
-    def planeswalker_source
+    def planeswalker_body
       require_rule(:planeswalker)
       check_rule_kinds(:planeswalker)
       raise CardParser::UnsupportedCard, "non-legendary planeswalkers not supported" unless @result.legendary?
@@ -142,9 +143,19 @@ private
 
       header = ["card_name #{@result.name.inspect}", "planeswalker #{@result.subtypes.join(' ').inspect}"]
       header << "cost #{cost_args}" if @result.mana_cost.any?
+      header << "color_indicator #{@result.color_indicator.map(&:inspect).join(', ')}" if @result.color_indicator
+      header << "back_face #{self.class.const_name(@result.back_face.name)}" if @result.back_face
       header << "loyalty #{@result.loyalty}"
       body = [header.join("\n"), *class_sections].join("\n\n")
-      wrap("class #{const} < Planeswalker\n#{indent(body)}\nend\n")
+      "class #{const} < Planeswalker\n#{indent(body)}\nend\n"
+    end
+
+    private
+
+    def land_source
+      sections = class_sections
+      body = ["NAME = #{@result.name.inspect}", *sections].join("\n\n")
+      wrap("class #{const} < Land\n#{indent(body)}\nend\n")
     end
 
     def basic_land_source

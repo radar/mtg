@@ -137,7 +137,11 @@ module Magic
       # are chosen on casting, so they must come before any choice point.
       def spell_source(this: "self")
         raise UnsupportedCard, "\"if this spell was kicked\" only works on instants and sorceries" if this == "source" && kicked?
-        raise UnsupportedCard, "\"up to one target\" is only supported in triggered abilities" if leaves(effects).any?(&:optional_target?)
+        optional = leaves(effects).select(&:optional_target?)
+        # Abilities (a planeswalker's, an activated one's) may leave "up to one target" unchosen; a spell can't.
+        raise UnsupportedCard, "\"up to one target\" is only supported in triggered and activated abilities" if optional.any? && this != "source"
+        raise UnsupportedCard, "\"up to one target\" needs to be the only target" if optional.any? && leaves(effects).count(&:target_choices) > 1
+
         targeted = leaves(effects).select(&:target_choices)
         # One effect that itself takes several targets ("N damage to any target and M damage to any other target").
         single_multi = targeted.one? && targeted.first.respond_to?(:multi_target?) && targeted.first.multi_target?
@@ -156,7 +160,11 @@ module Magic
           sections << method("resolve!(targets:)", statements)
         else
           sections << "def target_choices\n  #{expand(targeted.first.target_choices, this)}\nend\n" if targeted.any?
-          sections << method("resolve!#{'(target:)' if targeted.any?}", statements)
+          if optional.any?
+            sections << method("resolve!(target: nil)", ["return unless target", *statements])
+          else
+            sections << method("resolve!#{'(target:)' if targeted.any?}", statements)
+          end
         end
         sections.join("\n")
       end
