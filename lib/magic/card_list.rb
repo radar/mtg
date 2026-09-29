@@ -100,6 +100,10 @@ module Magic
       select(&:tapped?)
     end
 
+    def untapped
+      select(&:untapped?)
+    end
+
     def with_keyword(keyword)
       select { |c| c.has_keyword?(keyword) }
     end

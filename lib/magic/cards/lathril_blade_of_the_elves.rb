@@ -17,7 +17,7 @@ module Magic
       end
 
       class ActivatedAbility < Magic::ActivatedAbility
-        def costs = [Costs::SelfTap.new(source), Costs::MultiTap.new(source, 10, type: "Elf")]
+        def costs = [Costs::SelfTap.new(source), Costs::MultiTap.new(10) { controller.creatures.by_type("Elf").untapped }]
 
         def resolve!
           opponents = game.opponents(source.controller)

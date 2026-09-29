@@ -25,7 +25,7 @@ module Magic
       def etb_triggers = [ETB]
 
       class TapThreeAbility < Magic::ActivatedAbility
-        def costs = [Costs::MultiTap.new(source, 3)]
+        def costs = [Costs::MultiTap.new(3) { controller.creatures.untapped }]
 
         def resolve!
           source.modify_power(3)

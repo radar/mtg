@@ -9,7 +9,7 @@ RSpec.describe Magic::Costs::MultiTap do
   let(:bears) { 2.times.map { ResolvePermanent("Grizzly Bears", owner: p1) } }
 
   it "can be paid only when enough untapped creatures are available" do
-    cost = described_class.new(source, 3)
+    cost = described_class.new(3) { p1.creatures.untapped }
     source
     expect(cost.can_pay?(p1)).to be(false)
 
@@ -18,24 +18,24 @@ RSpec.describe Magic::Costs::MultiTap do
   end
 
   it "taps exactly the named creatures" do
-    cost = described_class.new(source, 3)
+    cost = described_class.new(3) { p1.creatures.untapped }
     cost.pay(player: p1, payment: [source, *bears])
 
     expect([source, *bears]).to all(be_tapped)
   end
 
   it "rejects the wrong number, tapped, duplicate or opponent's creatures" do
-    cost = described_class.new(source, 3)
+    cost = described_class.new(3) { p1.creatures.untapped }
     bears.first.tap!
 
-    expect { cost.pay(player: p1, payment: [source, bears.last]) }.to raise_error(/exactly 3/)
-    expect { cost.pay(player: p1, payment: [source, *bears]) }.to raise_error(/exactly 3/)
-    expect { cost.pay(player: p1, payment: [source, bears.last, ResolvePermanent("Grizzly Bears", owner: p2)]) }.to raise_error(/exactly 3/)
-    expect { cost.pay(player: p1, payment: [source, bears.last, bears.last]) }.to raise_error(/exactly 3/)
+    expect { cost.pay(player: p1, payment: [source, bears.last]) }.to raise_error(/Tap exactly 3/)
+    expect { cost.pay(player: p1, payment: [source, *bears]) }.to raise_error(/Tap exactly 3/)
+    expect { cost.pay(player: p1, payment: [source, bears.last, ResolvePermanent("Grizzly Bears", owner: p2)]) }.to raise_error(/Tap exactly 3/)
+    expect { cost.pay(player: p1, payment: [source, bears.last, bears.last]) }.to raise_error(/Tap exactly 3/)
   end
 
   it "only counts creatures of the named type" do
-    cost = described_class.new(source, 2, type: "Elf")
+    cost = described_class.new(2) { p1.creatures.by_type("Elf").untapped }
     source
     bears
 

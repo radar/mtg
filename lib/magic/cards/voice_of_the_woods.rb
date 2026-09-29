@@ -17,7 +17,7 @@ module Magic
       end
 
       class TapFiveElvesAbility < Magic::ActivatedAbility
-        def costs = [Costs::MultiTap.new(source, 5, type: "Elf")]
+        def costs = [Costs::MultiTap.new(5) { controller.creatures.by_type("Elf").untapped }]
 
         def resolve!
           trigger_effect(:create_token, token_class: ElementalToken)

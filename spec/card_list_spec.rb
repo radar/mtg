@@ -9,6 +9,15 @@ RSpec.describe Magic::CardList do
 
   subject { Magic::CardList.new([card_1, card_2]) }
 
+  context "untapped" do
+    it "returns only untapped cards" do
+      tapped = double(Magic::Card, untapped?: false)
+      untapped = double(Magic::Card, untapped?: true)
+
+      expect(Magic::CardList.new([tapped, untapped]).untapped).to eq([untapped])
+    end
+  end
+
   context "controlled_by" do
     it "returns cards controlled by p1" do
       p1_cards = subject.controlled_by(p1)

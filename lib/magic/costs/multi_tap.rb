@@ -1,26 +1,24 @@
 module Magic
   module Costs
-    # "Tap three untapped creatures you control" / "Tap five untapped Elves you control".
-    # The payer names the permanents (`pay_multi_tap([...])`); the source may be one of them.
-    # Summoning sickness doesn't matter: this isn't the {T} symbol.
+    # "Tap three untapped creatures you control": `MultiTap.new(3) { controller.creatures.untapped }`.
+    # The block returns the permanents that may be tapped (evaluated when checked or paid, in
+    # the ability's context); the payer names `count` of them (`pay_multi_tap([...])`). The
+    # source may be among them. Summoning sickness doesn't matter: this isn't the {T} symbol.
     class MultiTap
-      attr_reader :source, :count, :type
+      attr_reader :count
 
-      def initialize(source, count, type: nil)
-        @source = source
+      def initialize(count, &candidates)
         @count = count
-        @type = type
+        @candidates = candidates
       end
 
-      def candidates
-        source.controller.creatures.select { |creature| creature.untapped? && (type.nil? || creature.type?(type)) }
-      end
+      def candidates = @candidates.call
 
       def can_pay?(_player = nil) = candidates.size >= count
 
       def pay(player:, payment:)
         unless payment.uniq.size == count && payment.all? { candidates.include?(_1) }
-          raise "Tap exactly #{count} untapped #{type || 'creature'}s you control"
+          raise "Tap exactly #{count} of: #{candidates.map(&:name).join(', ')}"
         end
 
         payment.each(&:tap!)
