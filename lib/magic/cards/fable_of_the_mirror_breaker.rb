@@ -11,8 +11,24 @@ module Magic
         end
       end
 
+      # "You may discard up to two cards. If you do, draw that many cards."
+      class DiscardUpToTwo < Magic::Choice::May
+        def choices = hand.cards.to_a
+
+        def resolve!(cards:)
+          cards = Array(cards)
+          unless cards.size <= 2 && cards.all? { choices.include?(_1) }
+            raise ArgumentError, "#{cards.map(&:name).join(', ')} is not a legal discard"
+          end
+
+          cards.each(&:move_to_graveyard!)
+          cards.size.times { trigger_effect(:draw_card) }
+        end
+      end
+
       class Chapter2 < Saga::ChapterAbility
         def resolve!
+          actor.game.choices.add(DiscardUpToTwo.new(actor: actor))
         end
       end
 
@@ -27,6 +43,22 @@ module Magic
         power 2
         toughness 2
         colors :red
+
+        def event_handlers
+          { Events::CreatureAttacked => GoblinShamanToken::AttacksTrigger }
+        end
+      end
+
+      class GoblinShamanToken
+        class AttacksTrigger < TriggeredAbility
+          def should_perform?
+            this?
+          end
+
+          def call
+            trigger_effect(:create_token, token_class: Tokens::Treasure)
+          end
+        end
       end
 
       def chapters

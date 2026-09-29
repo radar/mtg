@@ -216,6 +216,7 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 - Lands with "enters tapped" need `permanent.untap!` before you activate their mana ability, and a mana source needs `untap!` between two activations.
 - A loyalty ability that costs more than the planeswalker has needs `planeswalker.change_loyalty!(n)` first. Two copies of a legendary planeswalker trigger a pending legend-rule choice that blocks all stack resolution.
 - **DSL-block leak**: a `class Foo` written inside a `Creature("Name") do ... end` block lands in `Magic::Cards::Foo`, and a bare `ActivatedAbility` in *any* other card then resolves to whichever leaked `Magic::Cards::ActivatedAbility` loaded last. It showed up as a spec that passed alone and failed in the full suite (`Speaker of the Heavens`, fixed). Put nested classes in a class reopening.
+- **Token triggers**: a `Token.create` block can define `event_handlers` (tokens dispatch them like cards), but constants in that block resolve in the *enclosing card's* scope, not the token's. Define the trigger in a `class GoblinShamanToken` reopening and reference it as `GoblinShamanToken::AttacksTrigger` (bare `AttacksTrigger` raises `NameError`). Example: `FableOfTheMirrorBreaker`.
 
 ## Card Parser
 
