@@ -1,0 +1,44 @@
+# frozen_string_literal: true
+
+require "spec_helper"
+
+RSpec.describe Magic::Costs::MultiTap do
+  include_context "two player game"
+
+  let(:source) { ResolvePermanent("Grizzly Bears", owner: p1) }
+  let(:bears) { 2.times.map { ResolvePermanent("Grizzly Bears", owner: p1) } }
+
+  it "can be paid only when enough untapped creatures are available" do
+    cost = described_class.new(source, 3)
+    source
+    expect(cost.can_pay?(p1)).to be(false)
+
+    bears
+    expect(cost.can_pay?(p1)).to be(true)
+  end
+
+  it "taps exactly the named creatures" do
+    cost = described_class.new(source, 3)
+    cost.pay(player: p1, payment: [source, *bears])
+
+    expect([source, *bears]).to all(be_tapped)
+  end
+
+  it "rejects the wrong number, tapped, duplicate or opponent's creatures" do
+    cost = described_class.new(source, 3)
+    bears.first.tap!
+
+    expect { cost.pay(player: p1, payment: [source, bears.last]) }.to raise_error(/exactly 3/)
+    expect { cost.pay(player: p1, payment: [source, *bears]) }.to raise_error(/exactly 3/)
+    expect { cost.pay(player: p1, payment: [source, bears.last, ResolvePermanent("Grizzly Bears", owner: p2)]) }.to raise_error(/exactly 3/)
+    expect { cost.pay(player: p1, payment: [source, bears.last, bears.last]) }.to raise_error(/exactly 3/)
+  end
+
+  it "only counts creatures of the named type" do
+    cost = described_class.new(source, 2, type: "Elf")
+    source
+    bears
+
+    expect(cost.can_pay?(p1)).to be(false)
+  end
+end
