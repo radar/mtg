@@ -19,6 +19,10 @@ module Magic
       IF_YOU_DO = /\A(?:If|When) you do, /i
       IF_YOU_DONT = /\AIf you don't, /i
       KICKED = /\AIf (?:this spell|~) was kicked, /i
+      # What follows "If this spell was kicked, ": "<effects> instead." or "instead <effects>."
+      INSTEAD = /\A(?:instead,? (?<before>.+?)|(?<after>.+?),? instead)\.?\z/i
+      # "it deals 4 damage instead": the same recipients as the damage it replaces.
+      SAME_RECIPIENTS = /\A(?:~|it) deals (?<amount>\d+|\w+) damage\z/i
 
       # Where effects are rendered: `this` is Ruby for the card or permanent the
       # effects belong to (and the actor of any Choice they add); a spell has its
@@ -54,8 +58,14 @@ module Magic
         end
         clauses.each do |sentence|
           if KICKED.match?(sentence)
-            effect = kicked(sentence.sub(KICKED, "")) or return
-            effects << effect
+            rest = sentence.sub(KICKED, "")
+            if (instead = INSTEAD.match(rest))
+              effect = kicked_instead(instead[:before] || instead[:after], effects.last) or return
+              effects[-1] = effect
+            else
+              effect = kicked(rest) or return
+              effects << effect
+            end
           elsif IF_YOU_DONT.match?(sentence)
             return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DONT, "")))
 
@@ -89,6 +99,25 @@ module Magic
         raise UnsupportedCard, "targeted effects after \"if this spell was kicked\" are not supported" if list.targeted?
 
         KickedEffect.new(effects: list.effects)
+      end
+
+      # "If this spell was kicked, <effects> instead": the effect just before `replaced` runs
+      # only when the spell wasn't kicked. Like kicked effects, the replacement can't target,
+      # but "it"/"that creature" refers to the replaced effect's target, and a bare "it deals
+      # N damage" has that effect's recipients.
+      def self.kicked_instead(text, replaced)
+        return unless replaced && !replaced.is_a?(KickedEffect) && !replaced.is_a?(OptionalEffect)
+
+        if (m = SAME_RECIPIENTS.match(text)) && replaced.is_a?(Effects::DealDamage)
+          return KickedEffect.new(effects: [replaced.with(amount: Number.parse(m[:amount]))], otherwise: [replaced])
+        end
+
+        effects = text.split(SENTENCE).flat_map { |sentence| sentence.split(CLAUSE) }.map { parse_sentence(_1) or return }
+        if effects.any? { _1.target_choices || _1.is_a?(OptionalEffect) || _1.choice_base }
+          raise UnsupportedCard, "targeted effects after \"if this spell was kicked\" are not supported"
+        end
+
+        KickedEffect.new(effects:, otherwise: [replaced])
       end
 
       # One sentence, capitalised; after "you may", also with its implied "You"
@@ -158,7 +187,7 @@ module Magic
         list.flat_map do |effect|
           case effect
           when OptionalEffect then effect.all_effects
-          when KickedEffect then leaves(effect.effects)
+          when KickedEffect then leaves(effect.otherwise) + leaves(effect.effects).reject { effect.otherwise.any? && _1.target_choices }
           else [effect]
           end
         end
@@ -197,7 +226,7 @@ module Magic
           next lines.concat(calls([effect], context)) unless effect.is_a?(KickedEffect)
 
           # Anything after a choice would run before that choice resolved.
-          if leaves(effect.effects).any? { choice_point?(_1, context) } && index < list.size - 1
+          if leaves(effect.effects + effect.otherwise).any? { choice_point?(_1, context) } && index < list.size - 1
             raise UnsupportedCard, "effects after a choice in \"if this spell was kicked\" are not supported"
           end
 
@@ -205,7 +234,16 @@ module Magic
 
           classes.concat(inner_classes)
           kicker = context.this == "self" ? "kicker_cost" : "#{context.this}.kicker_cost"
-          lines << "if #{kicker}.paid?\n#{inner.join("\n").lines.map { "  #{_1.chomp}\n" }.join}end"
+          body = ->(statements) { statements.join("\n").lines.map { "  #{_1.chomp}\n" }.join }
+          if effect.otherwise.empty?
+            lines << "if #{kicker}.paid?\n#{body.(inner)}end"
+          else
+            other_classes, other = render(effect.otherwise, context)
+            raise UnsupportedCard, "choices in both branches of \"if this spell was kicked, ... instead\" are not supported" if inner_classes.any? && other_classes.any?
+
+            classes.concat(other_classes)
+            lines << "if #{kicker}.paid?\n#{body.(inner)}else\n#{body.(other)}end"
+          end
         end
       end
 

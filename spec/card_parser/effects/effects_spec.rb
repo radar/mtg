@@ -171,6 +171,11 @@ RSpec.describe Magic::CardParser::Effect do
     expect(exile.resolve_call).to include("target.register_turn_replacement", "ExileInsteadOfDying")
   end
 
+  it "parses exiling a creature or planeswalker instead if it would die this turn" do
+    exile = described_class.parse("If that creature or planeswalker would die this turn, exile it instead.")
+    expect(exile).to be_a(e.const_get(:ExileInsteadIfDies))
+  end
+
   it "parses countering a spell, optionally by type or mana value" do
     expect(described_class.parse("Counter target spell.").target_choices).to eq("game.stack.spells")
     expect(described_class.parse("Counter target spell with mana value 2.").target_choices)
