@@ -23,7 +23,7 @@ module Magic
       GRAVEYARD_CARDS = { "creature" => "creatures", "land" => "lands", "enchantment" => "enchantments" }.freeze
 
       # Vivid: "the number of colors among permanents you control".
-      COLORS_AMONG = /\A(?:the number of colors|each color) among permanents you control\z/
+      COLORS_AMONG = /\A(?:the number of colors|each color|color) among permanents you control\z/
 
       def self.parse(text, this: "source")
         if COLORS_AMONG.match?(text)

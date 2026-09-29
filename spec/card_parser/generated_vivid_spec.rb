@@ -51,4 +51,37 @@ RSpec.describe "CardParser generated Vivid effects in play" do
 
     expect(p1.creatures.count { _1.name == "Kithkin" }).to eq(2)
   end
+
+  context "cost reductions" do
+    before { go_to_main_phase! }
+
+    it "costs {1} less for each color among permanents you control" do
+      load_card("Parsed Giant {6}{G}\nCreature — Giant\nVivid — ~ costs {1} less to cast for each color among permanents you control.\n6/5\n")
+      ResolvePermanent("Grizzly Bears", owner: p1)
+      giant = Card("Parsed Giant", owner: p1)
+      p1.hand.add(giant)
+      p1.add_mana(green: 6)
+
+      p1.cast(card: giant) { _1.pay_mana(generic: { green: 5 }, green: 1) }
+      game.stack.resolve!
+
+      expect(p1.creatures.map(&:name)).to include("Parsed Giant")
+      expect(p1.mana_pool[:green]).to eq(0)
+    end
+
+    it "costs {1} less if you control a Kithkin" do
+      load_card("Parsed Sage {4}{G}\nCreature — Kithkin\n~ costs {1} less to cast if you control a Kithkin.\n4/3\n")
+      sage = Card("Parsed Sage", owner: p1)
+      p1.hand.add(sage)
+      p1.add_mana(green: 5)
+
+      expect { p1.cast(card: sage) { _1.pay_mana(generic: { green: 3 }, green: 1) } }.to raise_error(StandardError)
+
+      ResolvePermanent("Goldmeadow Nomad", owner: p1)
+      p1.cast(card: sage) { _1.pay_mana(generic: { green: 3 }, green: 1) }
+      game.stack.resolve!
+
+      expect(p1.creatures.map(&:name)).to include("Parsed Sage")
+    end
+  end
 end
