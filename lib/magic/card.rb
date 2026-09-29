@@ -269,7 +269,17 @@ module Magic
       move_zone!(to: target_controller.graveyard)
     end
 
+    # Keywords a spell has only while it's on the stack ("those spells gain wither").
+    def gain_keyword_as_spell!(keyword)
+      (@spell_keywords ||= []) << keyword
+    end
+
+    def keywords
+      @spell_keywords ? [*@keywords, *@spell_keywords] : @keywords
+    end
+
     def zone=(zone)
+      @spell_keywords = nil
       @on_adventure = false unless zone&.exile?
       @dream_counter = false unless zone&.exile?
       @exile_with_dream_counter = false

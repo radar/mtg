@@ -37,7 +37,7 @@ module Magic
       end
 
       def deal_combat_damage!
-        target.take_damage(damage)
+        deal_damage_to_target!(target, damage)
 
         game.notify!(
           Events::DamageDealt.new(

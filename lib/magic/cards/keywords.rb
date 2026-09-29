@@ -37,6 +37,7 @@ module Magic
       SKULK = Class.new(Keyword)
       TRAMPLE = Class.new(Keyword)
       VIGILANCE = Class.new(Keyword)
+      WITHER = Class.new(Keyword)
 
       # Landwalk of a land subtype, e.g. Landwalk.new("Swamp") for swampwalk.
       class Landwalk < Keyword
@@ -134,6 +135,10 @@ module Magic
 
       def flash?
         has_keyword?(Keywords::FLASH)
+      end
+
+      def wither?
+        has_keyword?(Keywords::WITHER)
       end
 
       def persist?

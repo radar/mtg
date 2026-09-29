@@ -230,6 +230,26 @@ module Magic
         self
       end
 
+      # Rule 702.78 (conspire): as you cast it, tap two untapped creatures you control that share a
+      # color with it; when you do, copy it. A card has conspire itself or is granted it by a
+      # static ability that defines `grants_conspire?(card, player)` (Raiding Schemes).
+      def conspire(first, second)
+        unless card.respond_to?(:conspire?) && card.conspire? || static_ability_allows?(:grants_conspire?)
+          raise "#{card.name} does not have conspire"
+        end
+        raise "conspire needs two different creatures" if first.equal?(second)
+
+        [first, second].each do |creature|
+          raise "#{creature.name} is tapped" if creature.tapped?
+          raise "#{player.inspect} does not control #{creature.name}" unless creature.controller == player
+          raise "#{creature.name} doesn't share a color with #{card.name}" if (creature.colors & card.colors).empty?
+        end
+
+        [first, second].each(&:tap!)
+        @conspired = true
+        self
+      end
+
       def pay_kicker(payment)
         kicker_cost.pay(player:, payment:)
         self
@@ -352,6 +372,8 @@ module Magic
           flashback: @flashback,
           targets: targets,
         ))
+
+        copy_for_conspire if @conspired
       end
 
       def choose_mode(mode_class, &)
@@ -455,6 +477,16 @@ module Magic
           else
             card.move_to_graveyard!(card.owner)
           end
+        end
+      end
+
+      # \"When you do, copy it\": a copy of a permanent spell becomes a token; any other copy may
+      # choose new targets.
+      def copy_for_conspire
+        if card.permanent?
+          Permanent.resolve(game:, owner: player, card:, token: true, copy: true, cast: false, from_zone: nil)
+        else
+          Magic::CopyEffect.resolve_with_choice!(actor: card, receiver: card, targets:, copies: 1)
         end
       end
 
