@@ -13,7 +13,7 @@ module Magic
 
     class Shacklegeist < Creature
       class ActivatedAbility < Magic::ActivatedAbility
-        def costs = [Costs::MultiTap.new(-> (c) { c.type?("Spirit") }, 2)]
+        def costs = [Costs::MultiTap.new(source, 2, type: "Spirit")]
 
         def target_choices
           game.battlefield.not_controlled_by(controller).creatures

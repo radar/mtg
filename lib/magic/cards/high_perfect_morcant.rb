@@ -24,7 +24,7 @@ module Magic
 
       # Tap three untapped Elves you control: Proliferate. Activate only as a sorcery.
       class ProliferateAbility < Magic::ActivatedAbility
-        def costs = [Costs::MultiTap.new(-> (c) { c.type?("Elf") && c.controller == controller && c.untapped? }, 3)]
+        def costs = [Costs::MultiTap.new(source, 3, type: "Elf")]
 
         def requirements_met?
           game.can_cast_sorcery?(controller)
