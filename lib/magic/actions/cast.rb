@@ -297,6 +297,17 @@ module Magic
         self
       end
 
+      # "Behold a <type> [and exile it] [or pay {M}]" as an additional cost: `payment` is the
+      # permanent or card to behold, or a mana payment hash for the "or pay" alternative.
+      def pay_behold(payment)
+        cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::Behold) }
+        raise "Unknown additional behold cost" unless cost
+
+        cost.pay(player:, payment:)
+        @paid_additional_costs << cost
+        self
+      end
+
       def pay_discard(payment)
         if payment.is_a?(Array)
           cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::DiscardCards) }
@@ -409,6 +420,10 @@ module Magic
           resolved.grant_haste!
           resolved.register_turn_trigger(Events::CreatureDied, Blitz::DeathDrawTrigger)
           resolved.register_turn_trigger(Events::BeginningOfEndStep, Blitz::EndStepSacrificeTrigger)
+        end
+
+        if resolved.is_a?(Permanent)
+          @paid_additional_costs.each { |cost| cost.resolved!(resolved) if cost.respond_to?(:resolved!) }
         end
 
         queue_offspring_triggers(resolved) if paid_offspring_costs.any?
