@@ -22,7 +22,7 @@ module Magic
     module Rule
       HOOKS = %i[static_abilities activated_abilities etb_triggers ltb_triggers death_triggers event_handlers].freeze
       # Kinds of card that become permanents, for rules only permanents can have.
-      PERMANENT_KINDS = %i[creature enchantment artifact equipment aura saga land].freeze
+      PERMANENT_KINDS = %i[creature enchantment artifact equipment aura saga land planeswalker].freeze
 
       def self.all
         CardParser.load_all("rules", Rules)

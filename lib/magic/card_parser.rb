@@ -15,7 +15,7 @@ module Magic
     class ParseError < StandardError; end
     class UnsupportedCard < ParseError; end
 
-    Result = Struct.new(:name, :mana_cost, :supertypes, :types, :subtypes, :rules, :power, :toughness, keyword_init: true) do
+    Result = Struct.new(:name, :mana_cost, :supertypes, :types, :subtypes, :rules, :power, :toughness, :loyalty, keyword_init: true) do
       def creature?
         types.include?("Creature")
       end
@@ -39,6 +39,7 @@ module Magic
     # Current card text says "this creature" where older text used the card's name.
     THIS_OBJECT = /\b[Tt]his (?:creature|artifact|enchantment|land|permanent|Equipment|Aura|Saga|spell|card)\b/
     PT = %r{\A(?<power>-?\d+|\*)/(?<toughness>-?\d+)\z}
+    LOYALTY = /\ALoyalty: (?<loyalty>\d+)\z/i
 
     # Every class in lib/magic/card_parser/<dir>/, so a new file needs no registration.
     def self.load_all(dir, namespace)
@@ -61,6 +62,7 @@ module Magic
 
       header, type_line, *rest = @lines
       pt_line = rest.pop if rest.last&.match?(PT)
+      loyalty = LOYALTY.match(rest.pop)[:loyalty].to_i if rest.last&.match?(LOYALTY)
       rules = parse_rules(rest.map { |line| line.gsub(@name, "~").gsub(THIS_OBJECT, "~") })
 
       header_match = NAME_AND_COST.match(header) or raise ParseError, "bad name line: #{header}"
@@ -68,13 +70,15 @@ module Magic
       pt = PT.match(pt_line) if pt_line
       raise ParseError, "creature needs power/toughness" if types.include?("Creature") && pt.nil?
       raise UnsupportedCard, "a * power needs a rule defining it" if pt && pt[:power] == "*" && rules.none?(Rules::CharacteristicPower)
+      raise ParseError, "planeswalker needs a \"Loyalty: N\" line" if types.include?("Planeswalker") && loyalty.nil?
 
       Result.new(
         name: header_match[:name],
         mana_cost: ManaCost.parse(header_match[:cost]),
         supertypes:, types:, subtypes:, rules:,
         power: pt && pt[:power].to_i, # "*" is 0 here; Rules::CharacteristicPower supplies the value
-        toughness: pt && pt[:toughness].to_i
+        toughness: pt && pt[:toughness].to_i,
+        loyalty:
       )
     end
 
