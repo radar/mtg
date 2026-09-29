@@ -161,6 +161,9 @@ module Magic
         if card.respond_to?(:distinct_targets?) && card.distinct_targets? && targets.uniq.size != targets.size
           raise InvalidTarget, "#{card.name} needs different targets"
         end
+        if card.respond_to?(:targets_legal?) && !card.targets_legal?(targets)
+          raise InvalidTarget, "Invalid targets for #{card.name}: #{targets.map(&:name).join(', ')}"
+        end
 
         @targets = targets
         self

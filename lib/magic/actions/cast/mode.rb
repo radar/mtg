@@ -46,6 +46,9 @@ module Magic
           if mode.respond_to?(:distinct_targets?) && mode.distinct_targets? && targets.uniq.size != targets.size
             raise InvalidTarget, "#{mode.class} needs different targets"
           end
+          if mode.respond_to?(:targets_legal?) && !mode.targets_legal?(targets)
+            raise InvalidTarget, "Invalid targets for #{mode.class}: #{targets.map(&:name).join(', ')}"
+          end
 
           @targets = targets
           self
