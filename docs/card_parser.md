@@ -226,7 +226,7 @@ An "If this spell was kicked, <effects>." sentence (`~` too, since "this spell" 
 triggered or activated ability raises `UnsupportedCard`. Kicked effects can't target
 (targets are chosen on casting), and a kicked effect that makes a choice (scry, "you
 may") must come last, or the effects after it would run before the choice resolved.
-"… instead" sentences ("it deals 4 damage instead") aren't supported.
+"If this spell was kicked, <effects> instead" / "…, instead <effects>" replaces the effect before it: `EffectList.kicked_instead` builds a `KickedEffect` whose `otherwise` is the replaced effect, rendered as `if kicker_cost.paid? ... else ... end`. The replacement can't have its own target, but "that creature" / "it" refers to the replaced effect's, and a bare "it deals N damage instead" reuses its recipients (`SAME_RECIPIENTS`). Choices in both branches, or a replacement with a target of its own ("instead destroy target creature"), raise `UnsupportedCard`. Other "… instead" conditions (bargained, gift promised, cast from a graveyard, "if it's a Human", threshold, "choose both instead") aren't supported.
 
 Rendering (`render`) walks the effects to the first *choice point* (an
 `OptionalEffect`, a choice effect with `choice_base`/`choice_class_name`/`choice_args`

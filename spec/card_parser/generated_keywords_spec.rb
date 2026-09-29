@@ -146,6 +146,82 @@ RSpec.describe "CardParser generated keywords with values, in play" do
     end
   end
 
+  context "if this spell was kicked, ... instead" do
+    def cast_kicked(card, kicked:, &block)
+      p1.hand.add(card)
+      p1.add_mana(red: 5, green: 5)
+      p1.cast(card:) do |action|
+        block.(action)
+        action.pay_mana(generic: { red: 1 }, red: 1)
+        action.pay_kicker(generic: { red: 2 }) if kicked
+      end
+      game.stack.resolve!
+    end
+
+    it "deals the replacement damage to the same target" do
+      load_card("Parsed Bolt {1}{R}\nInstant\nKicker {2}\n" \
+                "Parsed Bolt deals 2 damage to any target. If this spell was kicked, it deals 4 damage instead.\n")
+
+      cast_kicked(Card("Parsed Bolt", owner: p1), kicked: true) { _1.targeting(p2) }
+      expect(p2.life).to eq(16)
+    end
+
+    it "deals the base damage when not kicked" do
+      load_card("Parsed Bolt {1}{R}\nInstant\nKicker {2}\n" \
+                "Parsed Bolt deals 2 damage to any target. If this spell was kicked, it deals 4 damage instead.\n")
+
+      cast_kicked(Card("Parsed Bolt", owner: p1), kicked: false) { _1.targeting(p2) }
+      expect(p2.life).to eq(18)
+    end
+
+    it "reads the leading form and a pronoun target" do
+      load_card("Parsed Shrink {B}\nInstant\nKicker {2}\nTarget creature gets -2/-2 until end of turn. " \
+                "If this spell was kicked, that creature gets -5/-5 until end of turn instead.\n")
+      shrink = Card("Parsed Shrink", owner: p1)
+      bear = ResolvePermanent("Grizzly Bears", owner: p2)
+      bear_toughness = bear.toughness
+
+      p1.hand.add(shrink)
+      p1.add_mana(black: 1, red: 2)
+      p1.cast(card: shrink) do |action|
+        action.pay_mana(black: 1).targeting(bear)
+        action.pay_kicker(generic: { red: 2 })
+      end
+      game.stack.resolve!
+
+      expect(bear.toughness).to eq(bear_toughness - 5)
+    end
+
+    it "runs untargeted replacement effects" do
+      load_card("Parsed Growth {1}{R}\nSorcery\nKicker {2}\nYou gain 3 life. " \
+                "If this spell was kicked, instead you gain 8 life.\n")
+      go_to_main_phase!
+
+      cast_kicked(Card("Parsed Growth", owner: p1), kicked: true) { _1 }
+      expect(p1.life).to eq(28)
+    end
+
+    it "gains only the base life when not kicked" do
+      load_card("Parsed Growth {1}{R}\nSorcery\nKicker {2}\nYou gain 3 life. " \
+                "If this spell was kicked, instead you gain 8 life.\n")
+      go_to_main_phase!
+
+      cast_kicked(Card("Parsed Growth", owner: p1), kicked: false) { _1 }
+      expect(p1.life).to eq(23)
+    end
+
+    it "rejects a replacement with its own target" do
+      expect { generate("Parsed Snare {1}{W}\nInstant\nKicker {2}\nDestroy target creature with mana value 3 or less. " \
+                        "If this spell was kicked, instead destroy target creature.\n") }
+        .to raise_error(Magic::CardParser::UnsupportedCard, /targeted effects after/)
+    end
+
+    it "isn't parsed when nothing precedes it" do
+      expect { generate("Parsed Snare {1}{W}\nInstant\nKicker {2}\nIf this spell was kicked, instead you gain 8 life.\n") }
+        .to raise_error(Magic::CardParser::UnsupportedCard)
+    end
+  end
+
   it "cycles for its cycling cost" do
     load_card("Parsed Cycler {3}{U}\nCreature — Bird\nFlying\nCycling {1}{U}\n2/2\n")
     card = Card("Parsed Cycler", owner: p1)
