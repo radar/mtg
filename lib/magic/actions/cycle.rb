@@ -28,7 +28,11 @@ module Magic
       def perform
         mana_cost.finalize!(player)
         card.discard!
-        card.trigger_effect(:draw_cards, number_to_draw: 1)
+        if card.cycling_search
+          game.add_choice(Magic::Choice::SearchLibrary.new(actor: card, to_zone: :hand, upto: 1, reveal: true, filter: Filter[card.cycling_search]))
+        else
+          card.trigger_effect(:draw_cards, number_to_draw: 1)
+        end
       end
     end
   end

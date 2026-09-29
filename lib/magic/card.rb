@@ -81,6 +81,13 @@ module Magic
         const_set(:CYCLING_COST, cost)
       end
 
+      # "Basic landcycling {1}{R}": cycling that searches for a basic land card instead of drawing.
+      # `filter` names a `Filter[...]` (`:basic_lands`).
+      def landcycling(cost, filter: :basic_lands)
+        cycling(cost)
+        const_set(:CYCLING_SEARCH, filter)
+      end
+
       # "This spell can't be countered."
       def cant_be_countered
         define_method(:can_be_countered?) { false }
@@ -412,6 +419,11 @@ module Magic
 
     def cycling_cost
       self.class.const_defined?(:CYCLING_COST, false) ? Costs::Mana.new(self.class::CYCLING_COST.dup) : nil
+    end
+
+    # The `Filter[...]` name a landcycling card searches for, or nil for plain cycling.
+    def cycling_search
+      self.class.const_defined?(:CYCLING_SEARCH, false) ? self.class::CYCLING_SEARCH : nil
     end
 
     def cycling?

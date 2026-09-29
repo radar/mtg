@@ -192,7 +192,7 @@ module Magic
       end
 
       def free_from_exile?
-        card.zone&.exile? && static_ability_allows?(:free_cast_from_exile?)
+        card.zone&.exile? && (static_ability_allows?(:free_cast_from_exile?) || game.play_permissions.free_cast?(card, player))
       end
 
       def auto_pay_mana

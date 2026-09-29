@@ -7,7 +7,7 @@ module Magic
     # it's their turn now.
     # `this_turn` permissions ("you may cast the exiled cards this turn") end with the turn
     # they were granted on instead.
-    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn) do
+    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free) do
       def permits?(game, card, player)
         card.equal?(self.card) && player == self.player && card.zone&.exile? && !expired?(game)
       end
@@ -27,11 +27,28 @@ module Magic
     end
 
     def grant_until_end_of_next_turn(card:, player:)
-      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false)
     end
 
-    def grant_until_end_of_turn(card:, player:)
-      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: true)
+    # `free: true`: "you may cast it without paying its mana cost" (Dream Harvest).
+    def grant_until_end_of_turn(card:, player:, free: false)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: true, free:)
+    end
+
+    # "Until your next end step, you may play those cards": through this turn when it's your turn
+    # now, else through your next turn.
+    def grant_until_next_end_step(card:, player:)
+      if @game.current_turn.active_player == player
+        grant_until_end_of_turn(card:, player:)
+      else
+        grant_until_end_of_next_turn(card:, player:)
+      end
+    end
+
+    # Whether a permission lets `player` cast `card` without paying its mana cost.
+    def free_cast?(card, player)
+      @permissions.reject! { _1.expired?(@game) }
+      @permissions.any? { _1.free && _1.permits?(@game, card, player) }
     end
 
     def permits?(card, player)
