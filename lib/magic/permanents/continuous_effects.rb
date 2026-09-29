@@ -84,7 +84,11 @@ module Magic
       private
 
       def static_abilities
-        StaticAbilities.new(game.battlefield.static_abilities.to_a + graveyard_static_abilities)
+        StaticAbilities.new(game.battlefield.static_abilities.to_a + graveyard_static_abilities + emblem_static_abilities)
+      end
+
+      def emblem_static_abilities
+        game.emblems.flat_map { |emblem| emblem.static_abilities.map { |ability| ability.new(source: emblem) } }
       end
 
       def graveyard_static_abilities

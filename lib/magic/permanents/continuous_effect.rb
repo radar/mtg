@@ -8,6 +8,8 @@ module Magic
     # `Permanent#modify_power`-style call site.
     class ContinuousEffect
       attr_reader :timestamp, :source
+      # A player: the effect lasts until that player's next turn begins ("until your next turn").
+      attr_accessor :until_turn_of
 
       # Single process-wide counter (not per-game): only relative order within a
       # game is ever compared, so this is safe and avoids threading `game` into

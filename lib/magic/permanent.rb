@@ -273,7 +273,7 @@ module Magic
     def all_creature_types?
       return false if lost_creature_types?
 
-      copiable_card.all_creature_types? || attachments.any? { _1.card.grants_all_creature_types? }
+      @gained_all_creature_types || copiable_card.all_creature_types? || attachments.any? { _1.card.grants_all_creature_types? }
     end
 
     def ring_bearer?
@@ -348,6 +348,17 @@ module Magic
 
     def protected_from?(card)
       @protections.any? { |protection| protection.protected_from?(card) }
+    end
+
+    # "Target creature gets -2/-0 until your next turn."
+    def modify_power_until_turn_of!(player, power)
+      modify_power(power, until_eot: false)
+      modifiers.last.until_turn_of = player
+    end
+
+    # "Gains all creature types. (This effect doesn't end.)"
+    def gain_all_creature_types!
+      @gained_all_creature_types = true
     end
 
     def gains_protection_from_color(color, until_eot: false, until_turn_of: nil)
@@ -747,6 +758,7 @@ module Magic
 
     def expire_protections_until_turn_of(player)
       protections.reject! { |protection| protection.until_turn_of == player }
+      modifiers.reject! { |modifier| modifier.until_turn_of == player }
     end
 
     def remove_until_eot_protections!

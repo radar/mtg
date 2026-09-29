@@ -18,7 +18,7 @@ module Magic
       end
 
       def loyalty_abilities
-        card.loyalty_abilities.map { |ability| ability.new(source: self) }
+        face.loyalty_abilities.map { |ability| ability.new(source: self) }
       end
     end
   end
