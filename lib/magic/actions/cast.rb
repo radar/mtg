@@ -21,7 +21,7 @@ module Magic
         @card = card
         @targets = []
         @modes = []
-        @additional_costs = card.respond_to?(:additional_costs) ? card.additional_costs : []
+        @additional_costs = (card.respond_to?(:additional_costs) ? card.additional_costs : []) + granted_additional_costs
         @paid_additional_costs = []
         @flashback = flashback
         @blitz = blitz
@@ -255,6 +255,26 @@ module Magic
 
       def paid_offspring_costs
         @paid_offspring_costs ||= []
+      end
+
+      # Additional costs a static ability attaches to casting this card (Dawnhand Dissident:
+      # "...by removing three counters from among creatures you control in addition to paying
+      # their other costs"). The ability answers `additional_cost_for(card, player)`.
+      def granted_additional_costs
+        game.battlefield.static_abilities
+          .select { |ability| ability.respond_to?(:additional_cost_for) }
+          .filter_map { |ability| ability.additional_cost_for(card, player) }
+      end
+
+      # "Remove N counters from among creatures you control" additional cost: `payment` is
+      # an Array of `[creature, counter_class]` pairs.
+      def pay_remove_counters(payment)
+        cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::RemoveCountersFromCreatures) }
+        raise "Unknown additional remove-counters cost" unless cost
+
+        cost.pay(player:, payment:)
+        @paid_additional_costs << cost
+        self
       end
 
       def pay_sacrifice(target)
