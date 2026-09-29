@@ -38,7 +38,7 @@ module Magic
     NAME_AND_COST = /\A(?<name>.+?)(?:\s+(?<cost>(?:\{[^}]+\})+))?\z/
     # Current card text says "this creature" where older text used the card's name.
     THIS_OBJECT = /\b[Tt]his (?:creature|artifact|enchantment|land|permanent|Equipment|Aura|Saga|spell|card)\b/
-    PT = %r{\A(?<power>-?\d+)/(?<toughness>-?\d+)\z}
+    PT = %r{\A(?<power>-?\d+|\*)/(?<toughness>-?\d+)\z}
 
     # Every class in lib/magic/card_parser/<dir>/, so a new file needs no registration.
     def self.load_all(dir, namespace)
@@ -67,12 +67,13 @@ module Magic
       supertypes, types, subtypes = parse_type_line(type_line)
       pt = PT.match(pt_line) if pt_line
       raise ParseError, "creature needs power/toughness" if types.include?("Creature") && pt.nil?
+      raise UnsupportedCard, "a * power needs a rule defining it" if pt && pt[:power] == "*" && rules.none?(Rules::CharacteristicPower)
 
       Result.new(
         name: header_match[:name],
         mana_cost: ManaCost.parse(header_match[:cost]),
         supertypes:, types:, subtypes:, rules:,
-        power: pt && pt[:power].to_i,
+        power: pt && pt[:power].to_i, # "*" is 0 here; Rules::CharacteristicPower supplies the value
         toughness: pt && pt[:toughness].to_i
       )
     end
