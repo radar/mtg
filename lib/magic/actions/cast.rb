@@ -208,7 +208,7 @@ module Magic
       # first and convoking after would reset the balance those payments already reduced,
       # since `adjusted_by` rebuilds `balance` from the (now smaller) cost.
       def convoke(creature, pay: :generic)
-        raise "#{card.name} does not have convoke" unless card.convoke?
+        raise "#{card.name} does not have convoke" unless card.convoke? || static_ability_allows?(:grants_convoke?)
         raise "#{creature.name} is tapped" if creature.tapped?
         raise "#{player.inspect} does not control #{creature.name}" unless creature.controller == player
 

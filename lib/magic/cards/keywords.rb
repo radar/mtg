@@ -29,6 +29,7 @@ module Magic
       INTIMIDATE = Class.new(Keyword)
       LIFELINK = Class.new(Keyword)
       MENACE = Class.new(Keyword)
+      PERSIST = Class.new(Keyword)
       PROWESS = Class.new(Keyword)
       REACH = Class.new(Keyword)
       SHADOW = Class.new(Keyword)
@@ -133,6 +134,10 @@ module Magic
 
       def flash?
         has_keyword?(Keywords::FLASH)
+      end
+
+      def persist?
+        has_keyword?(Keywords::PERSIST)
       end
 
       def prowess?
