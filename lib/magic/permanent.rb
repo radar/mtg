@@ -591,6 +591,14 @@ module Magic
       lost_all_abilities? || face.can_be_blocked?(blocker)
     end
 
+    def maximum_blockers
+      lost_all_abilities? ? nil : face.maximum_blockers
+    end
+
+    def must_be_blocked?
+      !lost_all_abilities? && face.must_be_blocked?
+    end
+
     def maximum_attackers_blocked
       lost_all_abilities? ? 1 : face.maximum_attackers_blocked
     end

@@ -72,7 +72,7 @@ RSpec.describe Magic::Cards::GrubStoriedMatriarch do
       skip_to_combat!
       current_turn.declare_attackers!
       current_turn.declare_attacker(creature, target: p2)
-      game.notify!(Magic::Events::CreatureAttacked.new(attacker: creature, target: p2))
+      current_turn.attackers_declared!
       game.settle!
     end
 

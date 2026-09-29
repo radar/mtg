@@ -212,6 +212,9 @@ module Magic
         blocked = attacks_blocked_by(blocker)
         return "#{blocker.name} is already blocking #{attacker.name}" if blocked.include?(attack)
         return "#{blocker.name} is already blocking" if blocked.count >= blocker.maximum_attackers_blocked
+        if attacker.maximum_blockers && attack.blockers.count >= attacker.maximum_blockers
+          return "#{attacker.name} can't be blocked by more than #{attacker.maximum_blockers} creature#{'s' unless attacker.maximum_blockers == 1}"
+        end
         return "#{attacker.name} has protection from #{blocker.name}" if attacker.protected_from?(blocker)
         return "#{blocker.name} can't block #{attacker.name}" unless blocker.can_block?(attacker)
         return "#{attacker.name} can't be blocked by #{blocker.name}" unless attacker.can_be_blocked?(blocker)
@@ -267,6 +270,9 @@ module Magic
       # Rule 509.1c: checked once all blockers are declared.
       def validate_blocks!
         @attacks.each do |attack|
+          if attack.attacker.must_be_blocked? && attack.blockers.empty? && any_possible_blocker?(attack)
+            raise IllegalBlock, "#{attack.attacker.name} must be blocked if able"
+          end
           if attack.attacker.menace? && attack.blockers.count == 1
             raise IllegalBlock, "#{attack.attacker.name} has menace and can't be blocked except by two or more creatures"
           end
@@ -294,6 +300,13 @@ module Magic
       end
 
       private
+
+      # Whether some creature could block this attack as things stand (rule 509.1c).
+      def any_possible_blocker?(attack)
+        defender = attack.defending_player or return false
+
+        game.battlefield.creatures.controlled_by(defender).any? { |creature| can_block?(attacker: attack.attacker, blocker: creature) }
+      end
 
       def combatants
         @attacks.flat_map { |attack| [attack.attacker, *attack.blockers] }.uniq
