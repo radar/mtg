@@ -301,3 +301,5 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   its own choice classes and expects a lone target to be offered rather than chosen
   automatically (`game.add_choice`). Generate from the card's exact text (cost, P/T):
   a mismatch there fails the card's spec for reasons unrelated to the parser.
+
+**Modal enters trigger**: "When ~ enters, choose one —" plus "• ..." bullets is the `Modal` rule with `trigger: true` (a creature/permanent, hook `:etb_triggers`). Each bullet becomes a `TriggeredAbility::EnterTheBattlefield` subclass built from `EffectList#trigger_source` (so a mode may itself target), and the `EntersTrigger` queues a `ModeChoice` (`game.resolve_choice!(mode: index)`) that runs the chosen one. Only "choose one" is supported there.

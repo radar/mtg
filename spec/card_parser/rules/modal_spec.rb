@@ -36,7 +36,21 @@ RSpec.describe Magic::CardParser::Rules::Modal do
     RUBY
   end
 
-  it "turns each header into a mode count" do
+it "parses a modal enters trigger and renders a ModeChoice for it" do
+  rule = modal("When ~ enters, choose one —", "• Draw a card.", "• You gain 2 life.").first
+
+  expect(rule.trigger).to be(true)
+  expect([rule.hook, rule.class_base_name, rule.body_source]).to eq([:etb_triggers, "EntersTrigger", nil])
+  expect(rule.class_source("EntersTrigger")).to include("MODES = [Mode1, Mode2].freeze", "class ModeChoice < Magic::Choice")
+  expect(rule.kinds).to include(:creature)
+end
+
+it "only supports \"choose one\" for an enters trigger" do
+  expect { modal("When ~ enters, choose two —", "• Draw a card.", "• You gain 2 life.") }
+    .to raise_error(Magic::CardParser::UnsupportedCard)
+end
+
+it "turns each header into a mode count" do
     counts = ["one", "two", "one or both", "one or more"].map do |header|
       modal("Choose #{header} —", "• Draw a card.", "• You gain 2 life.").first.mode_count
     end

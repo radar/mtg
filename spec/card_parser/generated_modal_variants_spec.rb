@@ -58,3 +58,35 @@ RSpec.describe "CardParser generated modal spells with qualified targets in play
     expect(stone.card.zone).to be_graveyard
   end
 end
+
+RSpec.describe "CardParser generated modal enters trigger in play" do
+  include CardParserHelpers
+  include_context "two player game"
+
+  before do
+    load_card("Parsed Mite {2}{U}\nCreature — Faerie Rogue\nFlash\nFlying\nWhen ~ enters, choose one —\n" \
+              "• Tap target creature.\n• Untap target creature.\n2/2\n")
+  end
+
+  it "asks which mode, then for the target of that mode" do
+    bears = ResolvePermanent("Grizzly Bears", owner: p2)
+    ResolvePermanent("Parsed Mite", owner: p1)
+
+    expect(game.choices.last.choices).to eq([0, 1])
+    game.resolve_choice!(mode: 0)
+    game.resolve_choice!(target: bears)
+
+    expect(bears).to be_tapped
+  end
+
+  it "runs the other mode when it is chosen" do
+    bears = ResolvePermanent("Grizzly Bears", owner: p2)
+    bears.tap!
+    ResolvePermanent("Parsed Mite", owner: p1)
+
+    game.resolve_choice!(mode: 1)
+    game.resolve_choice!(target: bears)
+
+    expect(bears).not_to be_tapped
+  end
+end
