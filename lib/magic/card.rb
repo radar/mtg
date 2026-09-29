@@ -17,6 +17,9 @@ module Magic
     attr_reader :zone
     # True while this card sits in exile as an adventure, from where its owner may cast it later.
     attr_accessor :on_adventure
+    # A dream counter (Goliath Daydreamer) on a card in exile; lost when it leaves exile.
+    # `exile_with_dream_counter` marks a spell that will go to exile with one as it resolves.
+    attr_accessor :dream_counter, :exile_with_dream_counter
 
     COST = {}
     KICKER_COST = {}
@@ -233,6 +236,8 @@ module Magic
 
     def zone=(zone)
       @on_adventure = false unless zone&.exile?
+      @dream_counter = false unless zone&.exile?
+      @exile_with_dream_counter = false
       # Only a spell (or a permanent's card) can be controlled by someone other than its owner.
       @controller = owner unless zone&.battlefield?
       @zone = zone

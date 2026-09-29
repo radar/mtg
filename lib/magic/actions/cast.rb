@@ -421,6 +421,10 @@ module Magic
             card.exile!
           elsif card.zone&.graveyard? && game.emblems.any? { |emblem| emblem.owner == player && emblem.respond_to?(:exiles_after_graveyard_cast?) && emblem.exiles_after_graveyard_cast?(card) }
             card.exile!
+          elsif card.exile_with_dream_counter
+            card.exile_with_dream_counter = false
+            card.exile!
+            card.dream_counter = true
           elsif card.rebound? && card.zone.hand?
             card.exile!
           elsif card.buyback? && kicker_cost.paid?
