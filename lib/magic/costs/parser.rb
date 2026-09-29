@@ -28,6 +28,8 @@ module Magic
             RemoveCounter.new(source, Counters[$~[:type].downcase], amount: $~[:amount].to_i)
           when /\ABlight (?<amount>\d+)\z/
             Blight.new(source, amount: $~[:amount].to_i)
+          when /\APay (?<amount>\d+) life\z/i
+            PayLife.new(source, amount: $~[:amount].to_i)
           when /Sacrifice {this}/
             SelfSacrifice.new(source)
           when /Exile {this}/

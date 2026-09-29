@@ -21,6 +21,12 @@ RSpec.describe Magic::Costs::Parser do
     expect(cost).to be_a(Magic::Costs::SelfTap)
   end
 
+  it "parses Pay N life into a life cost" do
+    cost = Magic::Costs::Parser.parse(source:, costs: "Pay 2 life").first
+    expect(cost).to be_a(Magic::Costs::PayLife)
+    expect(cost.amount).to eq(2)
+  end
+
   context "combined costs" do
     before do
       allow(controller).to receive(:creatures).and_return([])
