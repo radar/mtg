@@ -17,6 +17,8 @@ module Magic
         WORDS.index(text) or raise UnsupportedCard, "unknown number: #{text}"
       end
 
+      def self.x_bound? = !@x.nil?
+
       # Parses with "X" standing for the Ruby expression `expression`.
       def self.with_x(expression)
         previous = @x

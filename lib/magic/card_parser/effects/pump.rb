@@ -14,11 +14,12 @@ module Magic
         WHO = /(?:(?<self>~)|(?<each>(?:other )?creatures you control)|(?<player_creatures>creatures target player controls)|#{PermanentTarget::REFERENCE})/i
         KEYWORDS = /[\w ,]+?/
         PER = /[^.]+?/
-        LINE = %r{\A#{WHO} (?:gets? (?<power>[+-]\d+)/(?<toughness>[+-]\d+)(?: for each (?<per>#{PER}))?(?: and gains? (?<with>#{KEYWORDS}))?|gains? (?<only>#{KEYWORDS})) until end of turn(?: for each (?<per_after>#{PER}))?\.?\z}i
+        LINE = %r{\A#{WHO} (?:gets? (?<power>[+-](?:\d+|X))/(?<toughness>[+-](?:\d+|X))(?: for each (?<per>#{PER}))?(?: and gains? (?<with>#{KEYWORDS}))?|gains? (?<only>#{KEYWORDS})) until end of turn(?: for each (?<per_after>#{PER}))?\.?\z}i
 
         def self.parse(text)
           return unless (m = LINE.match(text))
           return if m[:kind] && !PermanentTarget.creature?(m)
+          return if [m[:power], m[:toughness]].any? { _1&.end_with?("X") } && !Number.x_bound?
 
           keywords = []
           if (phrase = m[:with] || m[:only])
@@ -29,8 +30,15 @@ module Magic
           end
           who = m[:self] ? :self : m[:each]&.downcase || (:player_creatures if m[:player_creatures]) || :target
           reference = PermanentTarget.reference(m) if who == :target
-          new(who:, reference:, power: m[:power]&.to_i, toughness: m[:toughness]&.to_i, per:,
+          new(who:, reference:, power: stat(m[:power]), toughness: stat(m[:toughness]), per:,
               keywords:)
+        end
+
+        # "+2" -> 2, "+X" -> the Ruby for X, "-X" -> its negation.
+        def self.stat(text)
+          return text&.to_i unless text&.end_with?("X")
+
+          text.start_with?("-") ? "-(#{Number.parse('X')})" : Number.parse("X")
         end
 
         def target_choices = who == :player_creatures ? "game.players" : reference&.choices
@@ -58,7 +66,7 @@ module Magic
         # A fixed amount, or so many for each of `per`.
         def amount(value)
           return value unless per
-          return 0 if value.zero?
+          return 0 if value.respond_to?(:zero?) && value.zero?
 
           value == 1 ? per : "#{value} * #{per}"
         end

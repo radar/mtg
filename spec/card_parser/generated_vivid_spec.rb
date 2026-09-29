@@ -84,4 +84,15 @@ RSpec.describe "CardParser generated Vivid effects in play" do
       expect(p1.creatures.map(&:name)).to include("Parsed Sage")
     end
   end
+
+  it "pumps another creature by X at the beginning of combat" do
+    load_card("Parsed Bairn {3}{U}\nCreature — Faerie\nVivid — At the beginning of combat on your turn, another target creature you control gets +X/+X until end of turn, where X is the number of colors among permanents you control.\n2/2\n")
+    go_to_main_phase!
+    bears = ResolvePermanent("Grizzly Bears", owner: p1)
+    ResolvePermanent("Parsed Bairn", owner: p1)
+    current_turn.beginning_of_combat!
+    game.settle!
+
+    expect([bears.power, bears.toughness]).to eq([4, 4])
+  end
 end
