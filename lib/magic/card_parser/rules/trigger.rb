@@ -45,12 +45,17 @@ module Magic
         ENTERS_OR_ATTACKS = "EntersOrAttacksTrigger"
         # "When ~ enters or dies" (see merge).
         ENTERS_OR_DIES = "EntersOrDiesTrigger"
+        # "Whenever ~ enters or transforms into ~" (a double-faced card; see merge).
+        ENTERS_OR_TRANSFORMS = "EntersOrTransformsTrigger"
 
         KINDS = [
           Kind.new(/#{WHEN} ~ enters(?: the battlefield)?/, "EntersTrigger", "TriggeredAbility::EnterTheBattlefield",
                    :etb_triggers, nil, nil, PERMANENT_KINDS),
           Kind.new(/#{WHEN} ~ enters(?: the battlefield)? or attacks/, ENTERS_OR_ATTACKS, nil, nil, nil, nil, %i[creature]),
           Kind.new(/#{WHEN} ~ enters(?: the battlefield)? or dies/, ENTERS_OR_DIES, nil, nil, nil, nil, %i[creature]),
+          Kind.new(/#{WHEN} ~ enters(?: the battlefield)? or transforms into ~/, ENTERS_OR_TRANSFORMS, nil, nil, nil, nil, %i[creature planeswalker]),
+          Kind.new(/#{WHEN} ~ transforms into ~/, "TransformedTrigger", "TriggeredAbility", :event_handlers,
+                   "Events::PermanentTransformed", "event.permanent == actor", %i[creature planeswalker]),
           Kind.new(/#{WHEN} ~ dies/, "DiesTrigger", "TriggeredAbility::Death", :death_triggers, nil, nil, %i[creature]),
           Kind.new(/#{WHEN} ~ leaves the battlefield/, "LeavesTrigger", "TriggeredAbility::LeaveTheBattlefield",
                    :ltb_triggers, nil, nil, PERMANENT_KINDS),
@@ -178,7 +183,7 @@ module Magic
         end
 
         # "When ~ enters or attacks" / "enters or dies" are two triggers with the same effects.
-        SPLIT_KINDS = { ENTERS_OR_ATTACKS => "AttacksTrigger", ENTERS_OR_DIES => "DiesTrigger" }.freeze
+        SPLIT_KINDS = { ENTERS_OR_ATTACKS => "AttacksTrigger", ENTERS_OR_DIES => "DiesTrigger", ENTERS_OR_TRANSFORMS => "TransformedTrigger" }.freeze
 
         def self.merge(rules)
           rules.flat_map do |rule|

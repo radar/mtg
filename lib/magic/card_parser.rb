@@ -15,7 +15,7 @@ module Magic
     class ParseError < StandardError; end
     class UnsupportedCard < ParseError; end
 
-    Result = Struct.new(:name, :mana_cost, :supertypes, :types, :subtypes, :rules, :power, :toughness, :loyalty, keyword_init: true) do
+    Result = Struct.new(:name, :mana_cost, :supertypes, :types, :subtypes, :rules, :power, :toughness, :loyalty, :color_indicator, :back_face, keyword_init: true) do
       def creature?
         types.include?("Creature")
       end
@@ -48,22 +48,34 @@ module Magic
       end
     end
 
-    def self.parse(text)
-      new(text).parse
-    end
+FACE_SEPARATOR = /^----\s*$/
+COLOR_INDICATOR = /\AColor Indicator: (?<colors>.+)\z/i
 
-    def initialize(text)
-      @name = text.strip.lines.first.to_s[/\A[^{\n]+/].to_s.strip
+# A double-faced card is its two faces' texts joined by a "----" line: the front face, then the
+# back (whose header has no mana cost and may be followed by a "Color Indicator: Black" line).
+def self.parse(text)
+  front, back = text.split(FACE_SEPARATOR, 2)
+  return new(text).parse unless back
+
+  new(front, double_faced: true).parse.tap { |result| result.back_face = new(back, double_faced: true).parse }
+end
+
+def initialize(text, double_faced: false)
+  @name = text.strip.lines.first.to_s[/\A[^{\n]+/].to_s.strip
+  # A legendary face's rules text may call it by its first name ("transform Trystan").
+  @short_name = (@name.split(",").first if double_faced && @name.include?(","))
       @lines = text.strip.lines.map { |line| line.gsub(/\s*\([^)]*\)/, "").strip }.reject(&:empty?)
     end
 
     def parse
       raise ParseError, "expected name, type line and power/toughness" if @lines.size < 2
 
-      header, type_line, *rest = @lines
+      header, *rest = @lines
+      color_indicator = parse_color_indicator(rest.shift) if rest.first&.match?(COLOR_INDICATOR)
+      type_line, *rest = rest
       pt_line = rest.pop if rest.last&.match?(PT)
       loyalty = LOYALTY.match(rest.pop)[:loyalty].to_i if rest.last&.match?(LOYALTY)
-      rules = parse_rules(rest.map { |line| line.gsub(@name, "~").gsub(THIS_OBJECT, "~") })
+      rules = parse_rules(rest.map { |line| own_name_to_tilde(line) })
 
       header_match = NAME_AND_COST.match(header) or raise ParseError, "bad name line: #{header}"
       supertypes, types, subtypes = parse_type_line(type_line)
@@ -78,11 +90,27 @@ module Magic
         supertypes:, types:, subtypes:, rules:,
         power: pt && pt[:power].to_i, # "*" is 0 here; Rules::CharacteristicPower supplies the value
         toughness: pt && pt[:toughness].to_i,
-        loyalty:
+        loyalty:,
+        color_indicator:
       )
     end
 
-    private
+private
+
+def own_name_to_tilde(line)
+  line = line.gsub(@name, "~")
+  line = line.gsub(/\b#{Regexp.escape(@short_name)}\b/, "~") if @short_name
+  line.gsub(THIS_OBJECT, "~")
+end
+
+# "Color Indicator: Black" / "Blue and Red" -> [:black] / [:blue, :red]
+def parse_color_indicator(line)
+  names = COLOR_INDICATOR.match(line)[:colors].downcase.split(/,\s*|\s+and\s+/)
+  names.map do |name|
+    color = %w[white blue black red green].find { _1 == name } or raise UnsupportedCard, "unknown colour: #{name}"
+    color.to_sym
+  end
+end
 
     def parse_type_line(line)
       left, right = line.split(/\s+[—-]\s+/, 2)

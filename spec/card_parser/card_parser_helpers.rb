@@ -10,7 +10,10 @@ module CardParserHelpers
   def load_card(text)
     result = Magic::CardParser.parse(text)
     const = Magic::CardGenerator.const_name(result.name)
-    Magic::Cards.send(:remove_const, const) if Magic::Cards.const_defined?(const, false)
+    [result, result.back_face].compact.each do |face|
+      name = Magic::CardGenerator.const_name(face.name)
+      Magic::Cards.send(:remove_const, name) if Magic::Cards.const_defined?(name, false)
+    end
     TOPLEVEL_BINDING.eval(Magic::CardGenerator.generate(result))
     Magic::Cards.const_get(const)
   end
