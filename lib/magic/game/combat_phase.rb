@@ -56,7 +56,7 @@ module Magic
 
         # The division the attacking player chose, if it is still legal in this damage step.
         def chosen_damage_assignments(pending)
-          return unless blocked? && damage_assignment && attacker.power.positive?
+          return unless blocked? && damage_assignment && attacker.combat_damage_amount.positive?
           return if assignment_illegal_reason(damage_assignment, pending)
 
           damage_assignment.reject { |_, amount| amount.zero? }
@@ -66,7 +66,7 @@ module Magic
         # goes to the player or permanent under attack if the attacker has trample, or to the last
         # blocker if not.
         def default_damage_assignments(pending)
-          power = attacker.power
+          power = attacker.combat_damage_amount
           return {} unless power.positive?
           return { target => power } unless blocked?
 
@@ -74,7 +74,7 @@ module Magic
         end
 
         def assignment_illegal_reason(assignment, pending)
-          power = attacker.power
+          power = attacker.combat_damage_amount
           remaining = remaining_blockers
           recipients = assignment.keys
           return "#{attacker.name} isn't blocked" unless blocked?
@@ -333,11 +333,11 @@ module Magic
 
         blockers_dealing_damage = @attacks.flat_map(&:remaining_blockers).uniq.select(&deals_damage)
         blockers_dealing_damage.each do |blocker|
-          next unless blocker.power.positive?
+          next unless blocker.combat_damage_amount.positive?
 
           # Rule 510.1d: a creature blocking several attackers divides its damage between them.
           attackers = attacks_blocked_by(blocker).map(&:attacker).select { |attacker| self.class.in_combat?(attacker) }
-          division = self.class.divide_damage(blocker, blocker.power, attackers, pending)
+          division = self.class.divide_damage(blocker, blocker.combat_damage_amount, attackers, pending)
           pending.add_all(blocker, division)
           division.each { |recipient, amount| assignments << [blocker, recipient, amount] }
         end

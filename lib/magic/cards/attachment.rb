@@ -22,6 +22,11 @@ module Magic
         false
       end
 
+      # Bark of Doran: "it assigns combat damage equal to its toughness rather than its power".
+      def assigns_toughness_damage?(_creature)
+        false
+      end
+
       def power_modification
         0
       end

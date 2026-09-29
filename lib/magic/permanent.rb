@@ -569,6 +569,12 @@ module Magic
         attachments.all? { |attachment| attachment.can_block?(permanent) }
     end
 
+    # What a creature's combat damage is based on: normally its power, but its toughness while
+    # something says so (Bark of Doran).
+    def combat_damage_amount
+      attachments.any? { _1.card.assigns_toughness_damage?(self) } ? toughness : power
+    end
+
     def can_be_blocked?(blocker)
       lost_all_abilities? || face.can_be_blocked?(blocker)
     end
