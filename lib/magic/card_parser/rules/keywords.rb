@@ -18,7 +18,7 @@ module Magic
         include Rule
 
         KNOWN = %w[changeling deathtouch defender double_strike first_strike flash flying haste hexproof indestructible
-                   infect lifelink menace prowess reach shroud skulk trample vigilance].freeze
+                   infect lifelink menace persist prowess reach shroud skulk trample vigilance wither].freeze
         COLORS = %w[white blue black red green].freeze
         CARD_TYPES = { "artifacts" => "Artifact", "creatures" => "Creature", "enchantments" => "Enchantment",
                        "instants" => "Instant", "sorceries" => "Sorcery", "planeswalkers" => "Planeswalker",

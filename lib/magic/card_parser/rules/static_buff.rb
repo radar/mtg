@@ -19,6 +19,8 @@ module Magic
           "creatures you control" => ["CreaturesYouControl", "applicable_targets { source.controller.creatures }", PERMANENT_KINDS],
           "other creatures you control" => ["CreaturesYouControl", "applicable_targets { source.controller.creatures - [source] }",
                                             PERMANENT_KINDS],
+          "each other nontoken creature you control" => ["NontokenCreaturesYouControl", "applicable_targets { source.controller.creatures.reject(&:token?) - [source] }",
+                                                         PERMANENT_KINDS],
           "equipped creature" => ["EquippedCreature", "applies_to_target", %i[equipment]],
           "enchanted creature" => ["EnchantedCreature", "applies_to_target", %i[aura]],
           "~" => ["Self", "applicable_targets { [source] }", %i[creature]]

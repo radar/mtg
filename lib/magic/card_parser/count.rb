@@ -29,7 +29,7 @@ module Magic
         if COLORS_AMONG.match?(text)
           "controller.colors_among_permanents"
         elsif (m = PERMANENTS.match(text))
-          permanents = collection("controller", YOUR_PERMANENTS, m[:type], all: "controller.permanents")
+          permanents = collection("controller", YOUR_PERMANENTS, Condition.singular(m[:type]), all: "controller.permanents")
           "#{permanents}#{".except(#{this})" if m[:other]}.count"
         elsif text == "card in your hand"
           "controller.hand.count"

@@ -48,22 +48,29 @@ module Magic
       end
     end
 
-FACE_SEPARATOR = /^----\s*$/
-COLOR_INDICATOR = /\AColor Indicator: (?<colors>.+)\z/i
+    FACE_SEPARATOR = /^----\s*$/
+    COLOR_INDICATOR = /\AColor Indicator: (?<colors>.+)\z/i
 
-# A double-faced card is its two faces' texts joined by a "----" line: the front face, then the
-# back (whose header has no mana cost and may be followed by a "Color Indicator: Black" line).
-def self.parse(text)
-  front, back = text.split(FACE_SEPARATOR, 2)
-  return new(text).parse unless back
+    # A double-faced card is its two faces' texts joined by a "----" line: the front face, then the
+    # back (whose header has no mana cost and may be followed by a "Color Indicator: Black" line).
+    def self.parse(text)
+      front, back = text.split(FACE_SEPARATOR, 2)
+      return new(text).parse unless back
 
-  new(front, double_faced: true).parse.tap { |result| result.back_face = new(back, double_faced: true).parse }
-end
+      short_names = [front, back].filter_map { |face| first_name_of(face) }
+      new(front, short_names:).parse.tap { |result| result.back_face = new(back, short_names:).parse }
+    end
 
-def initialize(text, double_faced: false)
-  @name = text.strip.lines.first.to_s[/\A[^{\n]+/].to_s.strip
-  # A legendary face's rules text may call it by its first name ("transform Trystan").
-  @short_name = (@name.split(",").first if double_faced && @name.include?(","))
+    # "Trystan" from "Trystan, Callous Cultivator".
+    def self.first_name_of(face_text)
+      name = face_text.strip.lines.first.to_s[/\A[^{\n]+/].to_s.strip
+      name.split(",").first if name.include?(",")
+    end
+
+    def initialize(text, short_names: [])
+      @name = text.strip.lines.first.to_s[/\A[^{\n]+/].to_s.strip
+      # A double-faced card's rules text may call either face by its first name ("transform Eirdu").
+      @short_names = short_names
       @lines = text.strip.lines.map { |line| line.gsub(/\s*\([^)]*\)/, "").strip }.reject(&:empty?)
     end
 
@@ -95,22 +102,22 @@ def initialize(text, double_faced: false)
       )
     end
 
-private
+    private
 
-def own_name_to_tilde(line)
-  line = line.gsub(@name, "~")
-  line = line.gsub(/\b#{Regexp.escape(@short_name)}\b/, "~") if @short_name
-  line.gsub(THIS_OBJECT, "~")
-end
+    def own_name_to_tilde(line)
+      line = line.gsub(@name, "~")
+      @short_names.each { |short| line = line.gsub(/\b#{Regexp.escape(short)}\b/, "~") }
+      line.gsub(THIS_OBJECT, "~")
+    end
 
-# "Color Indicator: Black" / "Blue and Red" -> [:black] / [:blue, :red]
-def parse_color_indicator(line)
-  names = COLOR_INDICATOR.match(line)[:colors].downcase.split(/,\s*|\s+and\s+/)
-  names.map do |name|
-    color = %w[white blue black red green].find { _1 == name } or raise UnsupportedCard, "unknown colour: #{name}"
-    color.to_sym
-  end
-end
+    # "Color Indicator: Black" / "Blue and Red" -> [:black] / [:blue, :red]
+    def parse_color_indicator(line)
+      names = COLOR_INDICATOR.match(line)[:colors].downcase.split(/,\s*|\s+and\s+/)
+      names.map do |name|
+        color = %w[white blue black red green].find { _1 == name } or raise UnsupportedCard, "unknown colour: #{name}"
+        color.to_sym
+      end
+    end
 
     def parse_type_line(line)
       left, right = line.split(/\s+[—-]\s+/, 2)
