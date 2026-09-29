@@ -12,6 +12,7 @@ module Magic
 
       # Protection: damage from a source the target is protected from is prevented.
       def damage_prevented?
+        return true if target.respond_to?(:prevents_damage?) && target.prevents_damage?
         return false unless target.respond_to?(:protected_from?)
 
         origin = source.respond_to?(:colors) ? source : (source.source if source.respond_to?(:source))

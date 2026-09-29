@@ -429,6 +429,10 @@ module Magic
     end
 
     def enters_as_copy? = false
+    # "Exile ~" as the last instruction of a spell (Morningtide's Light): it isn't put into the graveyard.
+    def exile_as_it_resolves? = false
+    # X paid for a "blight X" additional cost (Costs::BlightX).
+    attr_accessor :x_blighted
 
     def evoke_cost
       self.class.const_defined?(:EVOKE_COST, false) ? Costs::Mana.new(self.class::EVOKE_COST.dup) : nil

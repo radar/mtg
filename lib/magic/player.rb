@@ -207,6 +207,17 @@ module Magic
       lands_played < max_lands_per_turn
     end
 
+    # "Until your next turn, prevent all damage that would be dealt to you."
+    def prevent_all_damage_until_next_turn!
+      @damage_prevented_since_turn = game.current_turn.number
+    end
+
+    def prevents_damage?
+      return false unless @damage_prevented_since_turn
+
+      game.turns.none? { |turn| turn.active_player == self && turn.number > @damage_prevented_since_turn && turn.number <= game.current_turn.number }
+    end
+
     def can_be_targeted_by?(source, controller: source&.controller)
       return true if source.nil?
 

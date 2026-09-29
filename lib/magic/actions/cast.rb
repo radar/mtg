@@ -334,6 +334,17 @@ module Magic
         self
       end
 
+      # "Blight X" as an additional cost: put X -1/-1 counters on `creature` (X up to the greatest
+      # toughness among your creatures).
+      def pay_blight_x(creature, x)
+        cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::BlightX) }
+        raise "Unknown additional blight-X cost" unless cost
+
+        cost.pay(player:, payment: [creature, x])
+        @paid_additional_costs << cost
+        self
+      end
+
       def pay_discard(payment)
         if payment.is_a?(Array)
           cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::DiscardCards) }
@@ -471,6 +482,8 @@ module Magic
             card.exile!
             card.dream_counter = true
           elsif card.rebound? && card.zone.hand?
+            card.exile!
+          elsif card.exile_as_it_resolves?
             card.exile!
           elsif card.buyback? && kicker_cost.paid?
             card.move_to_hand!(card.owner)
