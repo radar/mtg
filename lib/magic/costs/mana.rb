@@ -91,6 +91,15 @@ module Magic
         auto_pay_generic_costs(player) if cost[:generic]
       end
 
+      # The mana this cost was paid with, as { color => amount } (generic and X payments included, by the
+      # colour actually spent): what "if {W}{W} was spent to cast it" reads.
+      def mana_spent
+        colored = @any_color ? @actual_color_payments : color_costs.merge(@hybrid_actual_payments) { |_key, a, b| a + b }
+        [colored, @payments[:generic], @payments[:x]].each_with_object(Hash.new(0)) do |payment, spent|
+          payment.each { |color, amount| spent[color] += amount if Magic::Mana::COLORS.include?(color) }
+        end
+      end
+
       def finalize!(player)
         raise OutstandingBalance.new(cost, balance) if outstanding_balance?
         raise Overpayment.new(cost, balance) if overpaid?

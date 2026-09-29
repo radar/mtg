@@ -16,7 +16,7 @@ module Magic
       # @param adventure [Boolean] When true, pays the card's adventure cost, resolves via
       #   #adventure_resolve! instead of #resolve!, and exiles the card afterward
       # @param alternative [Boolean] When true, pays the card's alternative_cost instead of its mana cost
-      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, adventure: false, alternative: false, by_effect: false, **args)
+      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, evoked: false, adventure: false, alternative: false, by_effect: false, **args)
         super(**args)
         @card = card
         @targets = []
@@ -25,6 +25,7 @@ module Magic
         @paid_additional_costs = []
         @flashback = flashback
         @blitz = blitz
+        @evoked = evoked
         @adventure = adventure
         @alternative = alternative
         @by_effect = by_effect
@@ -60,6 +61,8 @@ module Magic
             cost = card.flashback_cost
           elsif @blitz
             cost = card.blitz_cost
+          elsif @evoked
+            cost = card.evoke_cost
           elsif @adventure
             cost = card.adventure_cost
           elsif @alternative
@@ -414,6 +417,8 @@ module Magic
             target: targets.first,
             targets: targets,
             kicked: kicker_cost.paid?,
+            mana_spent: mana_cost.is_a?(Costs::Mana) ? mana_cost.mana_spent : {},
+            evoked: @evoked,
             value_for_x: mana_cost.x,
             controller: player,
           )

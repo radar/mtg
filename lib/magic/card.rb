@@ -69,6 +69,12 @@ module Magic
         const_set(:BLITZ_COST, cost)
       end
 
+      # "Evoke {cost}": an alternative cost; the permanent is sacrificed when it enters (cast with
+      # `evoked: true`, see `Permanent#evoked?`).
+      def evoke(cost)
+        const_set(:EVOKE_COST, cost)
+      end
+
       def offspring(cost)
         const_set(:OFFSPRING_COST, cost)
       end
@@ -291,7 +297,7 @@ module Magic
       controller.hand
     end
 
-    def resolve!(enters_tapped: enters_tapped?, kicked: false, attach_to: nil, controller: owner)
+    def resolve!(enters_tapped: enters_tapped?, kicked: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false)
       if permanent?
         permanent = Magic::Permanent.resolve(
           game: game,
@@ -302,6 +308,8 @@ module Magic
           enters_tapped: enters_tapped,
           kicked: kicked,
           attach_to: attach_to,
+          mana_spent: mana_spent,
+          evoked: evoked,
         )
         # A card resolving from the stack has no zone, so Permanent.resolve can't move it.
         move_zone!(to: battlefield) unless zone&.battlefield?
@@ -402,6 +410,10 @@ module Magic
 
     def rebound?
       false
+    end
+
+    def evoke_cost
+      self.class.const_defined?(:EVOKE_COST, false) ? Costs::Mana.new(self.class::EVOKE_COST.dup) : nil
     end
 
     def blitz_cost

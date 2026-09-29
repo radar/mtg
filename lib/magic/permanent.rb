@@ -46,13 +46,17 @@ module Magic
     end
 
     attr_accessor :zone
+    # The mana it was cast with, as { color => amount } ("if {W}{W} was spent to cast it"), and whether
+    # it was cast for its evoke cost (sacrificed when it enters).
+    attr_writer :mana_spent
+    attr_accessor :evoked
     # The zone the card was in when it entered the battlefield (nil for tokens and copies).
     # A spell cast from a graveyard keeps its graveyard zone until it resolves.
     attr_accessor :entered_from_zone
     # The number of the turn during which the current controller gained control of this permanent.
     attr_accessor :controlled_since_turn
 
-    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner)
+    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false)
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:)
       card_zone = card.zone unless token || copy
 
@@ -66,6 +70,8 @@ module Magic
         token: token,
         copy: copy,
       )
+      permanent.mana_spent = mana_spent
+      permanent.evoked = evoked
 
       permanent.entered_from_zone = card_zone
       permanent.tap! if enters_tapped
@@ -149,6 +155,12 @@ module Magic
     end
 
     def transformed? = @transformed || false
+
+    def mana_spent = @mana_spent || {}
+    def evoked? = !!@evoked
+
+    # "If {W}{W} was spent to cast it": at least `amount` mana of `color` went into casting this.
+    def mana_spent?(color, amount = 1) = mana_spent.fetch(color, 0) >= amount
 
     def copiable_card
       copied_card || face
@@ -746,7 +758,7 @@ module Magic
 
     def lifecycle_triggers_for(event)
       case event
-      when Events::EnteredTheBattlefield then face.etb_triggers
+      when Events::EnteredTheBattlefield then face.etb_triggers + (evoked? ? [TriggeredAbility::EvokeSacrifice] : [])
       when Events::LeftTheBattlefield     then face.ltb_triggers
       when Events::CreatureDied           then face.death_triggers + (has_keyword?(Keywords::PERSIST) ? [TriggeredAbility::Persist] : [])
       else []
