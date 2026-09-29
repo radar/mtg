@@ -1,9 +1,10 @@
 module Magic
   module Permanents
     module Modifications
-      def add_types(*types)
+      def add_types(*types, until_eot: true)
         modifiers << AdditionalType.new(
           types: types,
+          until_eot:,
         )
       end
 
