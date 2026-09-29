@@ -30,6 +30,7 @@ module Magic
       case kind
       when :basic_land then basic_land_source
       when :land then land_source
+      when :planeswalker then planeswalker_source
       else builder_source
       end
     end
@@ -45,6 +46,7 @@ module Magic
 
       case types.first
       when "Land" then land_kind
+      when "Planeswalker" then :planeswalker
       when "Enchantment" then subtypes == ["Aura"] ? :aura : subtypes == ["Saga"] ? :saga : plain(:enchantment)
       when "Artifact" then subtypes == ["Equipment"] ? :equipment : plain(:artifact)
       when "Instant" then plain(:instant)
@@ -106,6 +108,21 @@ module Magic
       wrap("class #{const} < Land\n#{indent(body)}\nend\n")
     end
 
+    # Planeswalkers are written as a Planeswalker subclass, not a DSL block:
+    # card_name / planeswalker / cost / loyalty, then the loyalty ability classes.
+    def planeswalker_source
+      require_rule(:planeswalker)
+      check_rule_kinds(:planeswalker)
+      raise CardParser::UnsupportedCard, "non-legendary planeswalkers not supported" unless @result.legendary?
+      raise CardParser::UnsupportedCard, "planeswalker needs a subtype" if @result.subtypes.empty?
+
+      header = ["card_name #{@result.name.inspect}", "planeswalker #{@result.subtypes.join(' ').inspect}"]
+      header << "cost #{cost_args}" if @result.mana_cost.any?
+      header << "loyalty #{@result.loyalty}"
+      body = [header.join("\n"), *class_sections].join("\n\n")
+      wrap("class #{const} < Planeswalker\n#{indent(body)}\nend\n")
+    end
+
     def basic_land_source
       subtype = @result.subtypes.first
       wrap("class #{const} < BasicLand\n  type Types::Lands::#{subtype}\nend\n")
@@ -164,7 +181,7 @@ module Magic
 
     # Kinds whose Oracle text always includes a particular line.
     REQUIRED_RULE = {
-      equipment: %w[Equip], aura: %w[Enchant], instant: %w[SpellEffect Modal], sorcery: %w[SpellEffect Modal], saga: %w[Chapter]
+      equipment: %w[Equip], aura: %w[Enchant], instant: %w[SpellEffect Modal], sorcery: %w[SpellEffect Modal], saga: %w[Chapter], planeswalker: %w[LoyaltyAbility]
     }.freeze
 
     def require_rule(kind)

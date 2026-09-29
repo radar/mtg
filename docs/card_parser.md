@@ -14,10 +14,11 @@ writes `lib/magic/cards/<name>.rb` from plain card text (`Magic::CardParser` →
 chapters parses under a C locale. Unrecognised rules text raises `UnsupportedCard`.
 
 Supported card kinds: creature (also Artifact/Enchantment Creature), instant,
-sorcery, enchantment, artifact (incl. legendary), Kindred artifact/enchantment/instant/
+sorcery, enchantment, artifact (incl. legendary), legendary Planeswalker (see below), Kindred artifact/enchantment/instant/
 sorcery (`type T::Kindred, T::Artifact, T::Creatures[...]`), Equipment (needs an `Equip` line),
 Aura (needs an `Enchant` line), Saga (needs chapter lines), land and basic land.
-Instants and sorceries need effect lines or a modal block. Other type lines/subtypes
+Instants and sorceries need effect lines or a modal block.
+A planeswalker is written with a final `Loyalty: N` line where a creature has its P/T, needs a `Legendary Planeswalker — <Subtype>` type line and at least one loyalty ability, and generates a `class X < Planeswalker` (`card_name`, `planeswalker`, `cost`, `loyalty`) like the hand-written ones, not a DSL block. `Rule::PERMANENT_KINDS` includes `:planeswalker`, so static abilities, triggers and activated abilities are accepted too (only the static-ability case is spec'd). Other type lines/subtypes
 raise `UnsupportedCard`.
 
 Mana costs may use hybrid symbols: `{G/U}` → `blue_or_green: 1`, the key
@@ -147,6 +148,7 @@ What the rules cover:
 - Counter types: `Magic::Counters[]` knows a fixed set (+1/+1, -1/-1, lore, ...), and makes a class (`Counters::Spore`) for any other single lowercase word on first use (`Counters.const_missing` too, so generated code naming `Counters::Spore` loads in a fresh process). A `+N/+N` shape it doesn't know still raises `Unknown counter type`, which the parser reads as "not supported".
 - `UnlessPay` effect: "Sacrifice ~ / Tap ~ unless you pay {W}{W} / pay N life / discard a card / sacrifice a <type>." → `Choice::UnlessPay` (a `Choice::May`): resolve it with `game.resolve_choice!` (mana paid automatically, or `payment:` as for `Costs::Mana#pay`; a card or permanent for discard/sacrifice), decline with `game.skip_choice!`; declining or being unable to pay applies the penalty.
 - Also: `Equip`, `Enchant`.
+- `LoyaltyAbility`: a planeswalker's "+1: ...", "−3: ...", "0: ..." lines (also `-` and `–` for the minus) → one `LoyaltyAbilityN < LoyaltyAbility` per line with `def loyalty_change = N`, plus `def loyalty_abilities`. Effects render like an activated ability's (`spell_source(this: "source")`, so targets are chosen on activation). `−X` abilities aren't supported.
 
 ## Effects
 
