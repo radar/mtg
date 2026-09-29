@@ -327,6 +327,7 @@ module Magic
     end
 
     def receive_event(event)
+      expire_protections_until_turn_of(event.player) if event.is_a?(Events::BeginningOfUpkeep)
       dispatch_lifecycle_triggers(event)
       dispatch_event_handlers(event)
       dispatch_turn_triggers(event)
@@ -349,8 +350,13 @@ module Magic
       @protections.any? { |protection| protection.protected_from?(card) }
     end
 
-    def gains_protection_from_color(color, until_eot:)
-      @protections << Protection.from_color(color, until_eot: until_eot)
+    def gains_protection_from_color(color, until_eot: false, until_turn_of: nil)
+      @protections << Protection.from_color(color, until_eot: until_eot, until_turn_of: until_turn_of)
+    end
+
+    # "Gains protection from each color until your next turn" (`player`'s next turn begins).
+    def gains_protection_from_each_color_until_turn_of!(player)
+      %i[white blue black red green].each { gains_protection_from_color(_1, until_turn_of: player) }
     end
 
     def permanent?
@@ -548,16 +554,16 @@ module Magic
     end
 
     def can_block?(permanent)
-      !prevented_from_blocking? && (lost_all_abilities? || card.can_block?(permanent)) &&
+      !prevented_from_blocking? && (lost_all_abilities? || face.can_block?(permanent)) &&
         attachments.all? { |attachment| attachment.can_block?(permanent) }
     end
 
     def can_be_blocked?(blocker)
-      lost_all_abilities? || card.can_be_blocked?(blocker)
+      lost_all_abilities? || face.can_be_blocked?(blocker)
     end
 
     def maximum_attackers_blocked
-      lost_all_abilities? ? 1 : card.maximum_attackers_blocked
+      lost_all_abilities? ? 1 : face.maximum_attackers_blocked
     end
 
 
@@ -737,6 +743,10 @@ module Magic
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
         perform_trigger!(handler_class, event)
       end
+    end
+
+    def expire_protections_until_turn_of(player)
+      protections.reject! { |protection| protection.until_turn_of == player }
     end
 
     def remove_until_eot_protections!
