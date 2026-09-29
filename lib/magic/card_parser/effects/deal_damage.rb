@@ -24,12 +24,21 @@ module Magic
         }.freeze
 
         def self.parse(text)
-          return unless (m = LINE.match(text)) && (TARGETS.key?(m[:targets]) || UNTARGETED.key?(m[:targets]))
+          return unless (m = LINE.match(text)) && (TARGETS.key?(m[:targets]) || UNTARGETED.key?(m[:targets]) || creature_target(m[:targets]))
 
           new(amount: Number.parse(m[:amount]), targets: m[:targets])
         end
 
-        def target_choices = TARGETS[targets]
+        # "target tapped creature", "target creature with flying": a creature qualified the
+        # way PermanentTarget knows.
+        def self.creature_target(text)
+          match = /\A#{PermanentTarget::PATTERN}\z/.match(text)
+          match if match && PermanentTarget.creature?(match) && !match[:up_to]
+        end
+
+        def target_choices
+          TARGETS[targets] || ((match = self.class.creature_target(targets)) && PermanentTarget.choices(match))
+        end
 
         def resolve_call
           return "#{UNTARGETED[targets]}.each { trigger_effect(:deal_damage, target: _1, damage: #{amount}) }" if UNTARGETED.key?(targets)

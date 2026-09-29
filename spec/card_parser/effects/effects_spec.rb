@@ -385,6 +385,23 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Target Widget you control gets +2/+2 until end of turn.")).to be_nil
   end
 
+  it "qualifies targets: tapped, with flying, with mana value N or greater/less, and artifact-or-creature unions" do
+    expect(described_class.parse("Destroy target tapped creature.").target_choices)
+      .to eq("battlefield.creatures.select(&:tapped?)")
+    expect(described_class.parse("Destroy target creature with flying.").target_choices)
+      .to eq("battlefield.creatures.select { _1.has_keyword?(Keywords::FLYING) }")
+    expect(described_class.parse("Destroy target creature with mana value 3 or greater.").target_choices)
+      .to eq("battlefield.creatures.select { _1.mana_value >= 3 }")
+    expect(described_class.parse("Destroy target creature with mana value 2 or less an opponent controls.").target_choices)
+      .to eq("battlefield.not_controlled_by(controller).creatures.select { _1.mana_value <= 2 }")
+    expect(described_class.parse("Destroy target artifact or enchantment.").target_choices)
+      .to eq("(battlefield.artifacts + battlefield.enchantments)")
+    expect(described_class.parse("Destroy target artifact or creature.").target_choices)
+      .to eq("(battlefield.artifacts + battlefield.creatures)")
+    expect(described_class.parse("~ deals 4 damage to target tapped creature.").target_choices)
+      .to eq("battlefield.creatures.select(&:tapped?)")
+  end
+
   it "parses untapping" do
     expect(described_class.parse("Untap target Merfolk you control.").target_choices)
       .to eq('battlefield.controlled_by(controller).creatures.by_any_type("Merfolk")')

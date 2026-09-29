@@ -156,7 +156,10 @@ returns Ruby for a constant the call needs, e.g. `CreateToken`'s `Token.create`
 class). Current effects: damage to a target or each opponent, draw, gain/lose life,
 destroy/exile/tap/untap/bounce target (`PermanentTarget`: [another] target
 creature/artifact/enchantment/land/[nonland] permanent [you control / an opponent
-controls]; "another" leaves out `Effect::THIS`), counter target [<type>/non<type>] spell
+controls]; "another" leaves out `Effect::THIS`; also "tapped" / "attacking", "artifact or
+enchantment" / "artifact or creature" / "creature or enchantment" (`PermanentTarget::UNIONS`),
+and "with flying" / "with mana value N or greater|less" (`PermanentTarget::WITH`, rendered
+as a `.select { ... }`), which `~ deals N damage to target tapped creature` uses too), counter target [<type>/non<type>] spell
 (targets `game.stack.spells`), mill, search your library for a basic land/land/creature
 card (onto the battlefield [tapped] or into your hand; a `Choice::SearchLibrary` choice
 point), flicker ("exile <target>, then return that card to the

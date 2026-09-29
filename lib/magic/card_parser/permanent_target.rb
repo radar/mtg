@@ -16,14 +16,19 @@ module Magic
         "an opponent controls" => "battlefield.not_controlled_by(controller)",
         "you don't control" => "battlefield.not_controlled_by(controller)"
       }.freeze
+      # "artifact or creature" etc.: a target that may be any of several kinds.
+      UNIONS = { "artifact or enchantment" => %w[artifacts enchantments], "artifact or creature" => %w[artifacts creatures],
+                 "creature or enchantment" => %w[creatures enchantments] }.freeze
+      # "with flying", "with mana value 3 or greater": a filter on the candidates.
+      WITH = /(?<qualifier>flying|mana value \d+ or (?:greater|less))/i
       # Every creature type the engine knows, longest first so "Elemental" beats "Elf".
       CREATURE_TYPES = Magic::Types::Creatures.values.sort_by { -_1.size }.join("|").freeze
-      PATTERN = /(?<up_to>up to one )?(?<another>another |other )?target (?<attacking>attacking )?(?<kind>#{KINDS.keys.join('|')}|(?-i:(?:#{CREATURE_TYPES})\b))(?: (?<controller>#{CONTROLLERS.keys.compact.join('|')}))?/i
+      PATTERN = /(?<up_to>up to one )?(?<another>another |other )?target (?<attacking>attacking )?(?<tapped>tapped )?(?<kind>#{UNIONS.keys.join('|')}|#{KINDS.keys.join('|')}|(?-i:(?:#{CREATURE_TYPES})\b))(?: with #{WITH})?(?: (?<controller>#{CONTROLLERS.keys.compact.join('|')}))?/i
 
       # Whether the match names creatures ("target creature", "target Elf"), not another card type.
       def self.creature?(match) = match[:kind].downcase == "creature" || creature_type?(match)
 
-      def self.creature_type?(match) = !KINDS.key?(match[:kind].downcase)
+      def self.creature_type?(match) = !KINDS.key?(match[:kind].downcase) && !UNIONS.key?(match[:kind].downcase)
 
       # "it" / "that creature": whatever an earlier effect of the same ability targeted.
       PRONOUN = /(?<pronoun>it|that creature|that permanent)/i
@@ -54,14 +59,27 @@ module Magic
       # "up to one target ...": the target may be left unchosen.
       def self.optional?(match) = !match[:up_to].nil?
 
+      # "with flying" / "with mana value N or greater|less" -> a `.select` over the candidates.
+      def self.with_filter(with)
+        if (m = /mana value (\d+) or (greater|less)/i.match(with))
+          ".select { _1.mana_value #{m[2].downcase == 'greater' ? '>=' : '<='} #{m[1]} }"
+        else
+          ".select { _1.has_keyword?(Keywords::#{with.upcase}) }"
+        end
+      end
+
       def self.choices(match)
         base = CONTROLLERS.fetch(match[:controller]&.downcase)
-        permanents = if creature_type?(match)
+        permanents = if UNIONS.key?(match[:kind].downcase)
+                       "(#{UNIONS.fetch(match[:kind].downcase).map { "#{base}.#{_1}" }.join(' + ')})"
+                     elsif creature_type?(match)
                        "#{base}.creatures.by_any_type(#{match[:kind].inspect})"
                      else
                        "#{base}.#{KINDS.fetch(match[:kind].downcase)}"
                      end
         permanents += ".attacking" if match[:attacking]
+        permanents += ".select(&:tapped?)" if match[:tapped]
+        permanents += with_filter(match[:qualifier]) if match[:qualifier]
         match[:another] ? "(#{permanents} - [#{Effect::THIS}])" : permanents
       end
     end
