@@ -142,8 +142,16 @@ module Magic
       @kicked
     end
 
+    # The face of a double-faced card that's currently up (the card itself when it isn't
+    # double-faced or hasn't transformed). Its characteristics and abilities are the permanent's.
+    def face
+      @transformed ? card.back_face : card
+    end
+
+    def transformed? = @transformed || false
+
     def copiable_card
-      copied_card || card
+      copied_card || face
     end
 
     def name = copiable_card.name
@@ -182,7 +190,21 @@ module Magic
       @activated_abilities = abilities
     end
 
-    def transform!(card:)
+    # With no `card:`, turns a double-faced card over (rule 701.28): the other face's
+    # characteristics and abilities take over, the physical card stays the same (so it still
+    # goes to the graveyard as the front face) and `Events::PermanentTransformed` fires.
+    # With `card:`, swaps in another card object outright (Fable of the Mirror-Breaker).
+    def transform!(card: nil)
+      unless card
+        raise "#{name} is not a double-faced card" unless self.card.back_face
+
+        @transformed = !@transformed
+        @keyword_grants = face.keyword_grants
+        apply_continuous_effects!
+        game.notify!(Events::PermanentTransformed.new(permanent: self))
+        return self
+      end
+
       @card = card
       @base_types = card.types
       @types = card.types
@@ -444,7 +466,7 @@ module Magic
     def static_abilities
       return [] if lost_all_abilities?
 
-      card.static_abilities.map { |ability| ability.new(source: self) }
+      face.static_abilities.map { |ability| ability.new(source: self) }
     end
 
     # "It loses all abilities": its own keywords, activated, triggered, static and
@@ -701,9 +723,9 @@ module Magic
 
     def lifecycle_triggers_for(event)
       case event
-      when Events::EnteredTheBattlefield then card.etb_triggers
-      when Events::LeftTheBattlefield     then card.ltb_triggers
-      when Events::CreatureDied           then card.death_triggers
+      when Events::EnteredTheBattlefield then face.etb_triggers
+      when Events::LeftTheBattlefield     then face.ltb_triggers
+      when Events::CreatureDied           then face.death_triggers
       else []
       end
     end
@@ -711,7 +733,7 @@ module Magic
     def dispatch_event_handlers(event)
       return if lost_all_abilities?
 
-      Array(card.event_handlers[event.class]).each do |handler_class|
+      Array(face.event_handlers[event.class]).each do |handler_class|
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
         perform_trigger!(handler_class, event)
       end

@@ -12,6 +12,8 @@ module Magic
     include Cards::Shared::Types
     attr_reader :game, :controller, :owner, :name, :cost, :kicker_cost, :types, :countered, :keyword_grants, :keywords, :protections, :delayed_responses, :modes
     attr_accessor :chosen_color
+    # The other face of a double-faced card / the front face a back-face card belongs to.
+    attr_accessor :front_face
     attr_accessor :tapped
 
     attr_reader :zone
@@ -23,6 +25,7 @@ module Magic
 
     COST = {}
     KICKER_COST = {}
+    BACK_FACE = nil
     KEYWORDS = []
     PROTECTIONS = []
     MODES = []
@@ -30,6 +33,16 @@ module Magic
     class << self
       def card_name(name)
         const_set(:NAME, name)
+      end
+
+      # A double-faced card: `back_face SomeBackFaceCard` on the front face's class.
+      def back_face(card_class)
+        const_set(:BACK_FACE, card_class)
+      end
+
+      # A back face has no mana cost, so its colours come from a colour indicator.
+      def color_indicator(*colors)
+        define_method(:colors) { colors }
       end
 
       def type(*types)
@@ -191,8 +204,9 @@ module Magic
       name
     end
 
+    # A back face has the mana value of its front face (rule 711.4c).
     def mana_value
-      cost.mana_value
+      front_face ? front_face.mana_value : cost.mana_value
     end
     alias_method :cmc, :mana_value
     alias_method :converted_mana_cost, :mana_value
@@ -200,6 +214,14 @@ module Magic
     def colors
       cost.colors
     end
+
+    def back_face
+      return unless (face_class = self.class::BACK_FACE)
+
+      @back_face ||= face_class.new(game:, owner:).tap { _1.front_face = self }
+    end
+
+    def double_faced? = !self.class::BACK_FACE.nil?
 
     # "This spell costs {1} less to cast for each ..." -- a change for `Costs::Mana#adjusted_by`
     # (values may be callables), applied by `Actions::Cast` while this card is being cast.
