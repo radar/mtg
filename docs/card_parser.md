@@ -303,3 +303,5 @@ inside it, so choices nest (`MayChoice` > `TargetChoice`, `ScryChoice` >
   a mismatch there fails the card's spec for reasons unrelated to the parser.
 
 **Modal enters trigger**: "When ~ enters, choose one —" plus "• ..." bullets is the `Modal` rule with `trigger: true` (a creature/permanent, hook `:etb_triggers`). Each bullet becomes a `TriggeredAbility::EnterTheBattlefield` subclass built from `EffectList#trigger_source` (so a mode may itself target), and the `EntersTrigger` queues a `ModeChoice` (`game.resolve_choice!(mode: index)`) that runs the chosen one. Only "choose one" is supported there.
+
+**Vivid / "X" amounts**: `EffectList.parse` rewrites "..., where X is <count>" and "draw cards / gain life equal to <count>" (`WHERE_X`, `EQUAL_TO`) by parsing the sentence with `Number.with_x(<Ruby for the count>)`, so an amount of "X" in any effect (`Number.parse("X")`) becomes that Ruby expression (e.g. `controller.colors_among_permanents` for "the number of colors among permanents you control", `Count::COLORS_AMONG`). Works for draw, gain/lose life, damage and token amounts; an effect whose amount is a regex `[+-]\d+` (pump) doesn't take X yet.

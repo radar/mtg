@@ -10,6 +10,7 @@ module Magic
     #   "other Elf you control"           -> controller.permanents.by_type("Elf").except(source).count
     #   "card in your hand"               -> controller.hand.count
     #   "creature card in your graveyard" -> controller.graveyard.creatures.count
+    #   "the number of colors among permanents you control" -> controller.colors_among_permanents
     module Count
       TYPE = /[A-Za-z][\w-]*/
       PERMANENTS = /\A(?<other>other )?(?<type>#{TYPE}) you control\z/
@@ -21,8 +22,13 @@ module Magic
       # ... and on a zone's cards.
       GRAVEYARD_CARDS = { "creature" => "creatures", "land" => "lands", "enchantment" => "enchantments" }.freeze
 
+      # Vivid: "the number of colors among permanents you control".
+      COLORS_AMONG = /\A(?:the number of colors|each color) among permanents you control\z/
+
       def self.parse(text, this: "source")
-        if (m = PERMANENTS.match(text))
+        if COLORS_AMONG.match?(text)
+          "controller.colors_among_permanents"
+        elsif (m = PERMANENTS.match(text))
           permanents = collection("controller", YOUR_PERMANENTS, m[:type], all: "controller.permanents")
           "#{permanents}#{".except(#{this})" if m[:other]}.count"
         elsif text == "card in your hand"

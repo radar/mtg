@@ -26,9 +26,20 @@ module Magic
       Context = Data.define(:this, :targets_in_scope)
       INSIDE_CHOICE = Context.new(this: "actor", targets_in_scope: false)
 
+      # ", where X is <count>" after an amount of X, or "draw cards / gain life equal to <count>".
+      WHERE_X = /,? where X is (?<what>[^.]+)(?=\.|\z)/
+      EQUAL_TO = /\b(?<verb>draw|gain) (?<noun>cards|life) equal to (?<what>[^.]+?)(?=\.|,|\z)/i
+
       # `text` as one effect (some span two sentences), else every sentence (or,
       # failing that, every clause of it) as an effect; nil unless all of them parse.
       def self.parse(text)
+        if (m = WHERE_X.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))
+          return Number.with_x(count) { parse(text.sub(WHERE_X, "")) }
+        elsif (m = EQUAL_TO.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))
+          rewritten = text.sub(EQUAL_TO) { m[:noun] == "cards" ? "#{m[:verb]} X cards" : "#{m[:verb]} X life" }
+          return Number.with_x(count) { parse(rewritten) }
+        end
+
         effect = Effect.parse(text) and return (new(effects: [effect]) unless effect.earlier_target?)
 
         effects = []
