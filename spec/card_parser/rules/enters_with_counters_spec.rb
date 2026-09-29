@@ -9,8 +9,9 @@ RSpec.describe Magic::CardParser::Rules::EntersWithCounters do
     expect(described_class.parse("~ enters with three time counters on it.")).to eq(described_class.new(3, "time"))
   end
 
-  it "ignores unknown counters" do
-    expect(described_class.parse("~ enters with three charge counters on it.")).to be_nil
+  it "takes any named counter, but ignores a +N/+N counter it doesn't know" do
+    expect(described_class.parse("~ enters with three charge counters on it.")).to eq(described_class.new(3, "charge"))
+    expect(described_class.parse("~ enters with three +2/+2 counters on it.")).to be_nil
   end
 
   it "renders the enters_with_counters macro, +1/+1 counters on creatures only" do

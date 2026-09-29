@@ -18,7 +18,17 @@ RSpec.describe Magic::CardParser::Effect do
   end
 
   it "does not parse damage to unsupported targets" do
-    expect(described_class.parse("~ deals 3 damage to each creature.")).to be_nil
+    expect(described_class.parse("~ deals 3 damage to each land.")).to be_nil
+  end
+
+  it "parses untargeted damage to you and to each creature or player" do
+    expect(described_class.parse("~ deals 1 damage to you.").resolve_call)
+      .to eq("[controller].each { trigger_effect(:deal_damage, target: _1, damage: 1) }")
+    expect(described_class.parse("~ deals 3 damage to each creature.").resolve_call)
+      .to eq("battlefield.creatures.each { trigger_effect(:deal_damage, target: _1, damage: 3) }")
+    expect(described_class.parse("~ deals 1 damage to each creature and each player.").resolve_call)
+      .to eq("(battlefield.creatures + game.players).each { trigger_effect(:deal_damage, target: _1, damage: 1) }")
+    expect(described_class.parse("~ deals 1 damage to each creature.").target_choices).to be_nil
   end
 
   it "parses drawing and life gain" do
@@ -293,7 +303,7 @@ RSpec.describe Magic::CardParser::Effect do
       "trigger_effect(:remove_counter, counter_type: Counters::Time, target: #{this}, amount: 1) " \
       "if #{this}.counters.of_type(Counters::Time).count >= 1"
     )
-    expect(described_class.parse("Remove a widget counter from ~.")).to be_nil
+    expect(described_class.parse("Remove a +2/+2 counter from ~.")).to be_nil
     expect(described_class.parse("Sacrifice ~.").resolve_call).to eq("trigger_effect(:sacrifice, target: #{this})")
     expect(described_class.parse("sacrifice it.".capitalize)).to eq(e.const_get(:SacrificeSelf).new)
   end

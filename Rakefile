@@ -41,6 +41,12 @@ task :coverage, :set_code do |_task, args|
   load "script/coverage.rb"
 end
 
+desc "Roadmap L1b: whole-corpus parser coverage; rake parser_coverage[upkeep] splits one phase's \"At the beginning of\" gaps into effect families (script/parser_coverage.rb; --lines for examples)"
+task :parser_coverage, :phase do |_task, args|
+  ARGV.replace([args[:phase]].compact)
+  load "script/parser_coverage.rb"
+end
+
 desc "Generate lib/magic/cards/<name>.rb from card text on stdin (see Magic::CardParser)"
 task :parse_card do
   result = Magic::CardParser.parse($stdin.read.force_encoding(Encoding::UTF_8))

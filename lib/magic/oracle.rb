@@ -23,6 +23,9 @@ module Magic
       @oracle_data.select { |card| card["set"] == code.downcase }
     end
 
+    # Every card in the Oracle data, as raw hashes including card_faces.
+    def all_cards = @oracle_data
+
     def search_cards(fragment)
       @oracle_data
         .select { |card| card["name"].downcase.include?(fragment.downcase) }

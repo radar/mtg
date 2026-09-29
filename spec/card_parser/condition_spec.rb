@@ -29,6 +29,12 @@ RSpec.describe Magic::CardParser::Condition do
     expect(described_class.parse("~ is equipped")).to eq('source.attachments.any? { _1.type?("Equipment") }')
   end
 
+  it "checks typed cards in the graveyard and counters on the permanent" do
+    expect(described_class.parse("there are three or more creature cards in your graveyard")).to eq("controller.graveyard.creatures.count >= 3")
+    expect(described_class.parse("~ has three or more spore counters on it")).to eq("source.counters.of_type(Counters::Spore).count >= 3")
+    expect(described_class.parse("~ has three or more +2/+2 counters on it")).to be_nil
+  end
+
   it "doesn't parse other conditions" do
     expect(described_class.parse("you have 30 or more poison counters")).to be_nil
   end

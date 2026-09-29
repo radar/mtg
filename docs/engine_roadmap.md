@@ -345,7 +345,24 @@ Independent, card-driven features. Pick them up when a card needs one, or batch 
   4. **Phase coverage gaps in `trigger.rb` itself:** "each upkeep" (98 lines), "each player's upkeep" (82), "each opponent's upkeep" (36), "the end step" / "the next end step" delayed triggers (50), "each combat" (28), "each player's end step" (22), "your draw step"/"each player's draw step", "your second main phase". These are new `Kind`s, one line each, mostly reusing the existing event classes with a different `active_player` check (`Events::BeginningOfUpkeep`/`BeginningOfEndStep`/`BeginningOfCombat` already exist; check whether there are draw-step/second-main events before adding kinds for them).
   5. **Not worth chasing yet:** multi-sentence "other" bodies (dice, explore, dungeon, "perpetually", conjure, Horde/Archenemy) are a long tail with no shared shape.
 
-  Re-measure after each step by rerunning the method above (about a minute); a `rake parser_coverage` task that prints the table is the obvious follow-up if this is going to be repeated. **Good for.** Agent, one PR per numbered step.
+  Re-measure with `rake parser_coverage` (overall numbers plus the phase table; about a minute) and `rake "parser_coverage[upkeep]"` (one phase split into effect families, `-- --lines` for examples; phases: upkeep, draw, first_main, second_main, combat, end_step), both in `script/parser_coverage.rb`. **Good for.** Agent, one PR per numbered step.
+
+  **Progress (2026-09-29), upkeep.** Upkeep splits into these families (first table below, before), of which the following were built (second, after; unparsed lines / lines now parsed): "sacrifice/tap ~ unless you pay {cost} / pay N life / discard a card / sacrifice a <type>" (76 → 17 unparsed; new `Effects::UnlessPay`, `Choice::UnlessPay`), named counters on ~ (94 → 37; `Magic::Counters[]` now makes a class for any single-word counter name on first use, and `Counters.const_missing` does the same so generated files loading `Counters::Spore` in a fresh process work), untargeted "~ deals N damage to you / each creature / each player / each creature and each player" (22 → 9), and an intervening "if" on any trigger using `Condition` (only 194 → 189 upkeep lines: the conditions left are a one-off long tail, each shape 1–7 lines). Upkeep parsed lines: 97 → 234 of 1,104; overall 33.4% → 34.3% of lines, 15.4% → 15.8% of faces.
+
+  | Upkeep family | Before | After |
+  |---|---|---|
+  | Other (multi-sentence, one-offs) | 275 | 275 |
+  | Intervening if / unless | 194 | 189 |
+  | Counters on other permanents (target, each creature, "on it") | 115 | 112 |
+  | Put/remove a counter on ~ | 94 | 37 |
+  | Sacrifice/tap ~ unless you … | 76 | 17 |
+  | Exile/look at/reveal top of a library | 46 | 46 |
+  | Each opponent / target opponent / each player | 32 | 32 |
+  | Create a token | 32 | 32 |
+  | Sacrifice a creature/permanent | 26 | 26 |
+  | ~ deals damage to you / each … | 22 | 9 |
+
+  Known simplifications: the intervening-if is checked when the trigger fires, not again on resolution (rule 603.4); "sacrifice ~ unless you pay {X} for each …" and "unless you pay" with a non-mana/life/discard/sacrifice cost aren't parsed; "each"/"each player's"/"each opponent's" upkeep kinds weren't added because their bodies address "that player", which the effects can't express yet. Next by size: counters on other permanents ("put a … counter on target creature / each creature you control / it"), "exile/look at/reveal the top card", the "Other" long tail is not worth chasing.
 - L2 (done, scoped down -- see status). **Self-play fuzzing.** With C2's `FirstLegalAgent` or a random agent and a seeded RNG (H2), play many games between random decks and assert invariants: the stack is empty at end of turn; no negative life without a loss; every permanent belongs to exactly one zone; card count is conserved. Any crash is a bug report.
 
 **Status (2026-09-27): L2 done, scoped to fixed decks (no H2 yet).** `spec/game/integration/self_play_spec.rb` runs `Game#run!` (two `FirstLegalAgent`s) to completion on three fixed decks (all-land; vanilla creatures; creatures + a single-target burn spell across two colors) and asserts, per player: the stack is empty, life is positive unless the player lost, and every card they started with is in exactly one zone/on the battlefield with none duplicated or dropped. No seeded RNG or random decks yet (needs H2), so this is a fixed fuzz set, not a random one -- rerunning it finds the same bugs, not new ones, until more decks are added. Bugs this found and fixed, exactly as intended ("any crash is a bug report"):

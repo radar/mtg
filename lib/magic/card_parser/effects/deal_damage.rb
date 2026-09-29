@@ -14,10 +14,17 @@ module Magic
           "target player" => "game.players",
           "target creature or planeswalker" => "battlefield.creatures + battlefield.planeswalkers"
         }.freeze
-        EACH_OPPONENT = "each opponent"
+        # Not targeted: who is dealt damage -> Ruby for the recipients.
+        UNTARGETED = {
+          "each opponent" => "game.opponents(controller)",
+          "you" => "[controller]",
+          "each player" => "game.players",
+          "each creature" => "battlefield.creatures",
+          "each creature and each player" => "(battlefield.creatures + game.players)"
+        }.freeze
 
         def self.parse(text)
-          return unless (m = LINE.match(text)) && (TARGETS.key?(m[:targets]) || m[:targets] == EACH_OPPONENT)
+          return unless (m = LINE.match(text)) && (TARGETS.key?(m[:targets]) || UNTARGETED.key?(m[:targets]))
 
           new(amount: Number.parse(m[:amount]), targets: m[:targets])
         end
@@ -25,7 +32,7 @@ module Magic
         def target_choices = TARGETS[targets]
 
         def resolve_call
-          return "game.opponents(controller).each { trigger_effect(:deal_damage, target: _1, damage: #{amount}) }" if targets == EACH_OPPONENT
+          return "#{UNTARGETED[targets]}.each { trigger_effect(:deal_damage, target: _1, damage: #{amount}) }" if UNTARGETED.key?(targets)
 
           "trigger_effect(:deal_damage, target: target, damage: #{amount})"
         end

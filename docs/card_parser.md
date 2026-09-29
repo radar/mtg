@@ -143,6 +143,9 @@ What the rules cover:
   check that the keyword is there.
 - `StaticBuff` also reads "Equipped/Enchanted creature gets +N/+N and is all creature
   types." (`merge` splits off `def grants_all_creature_types? = true` as a body).
+- `Trigger` also takes an intervening "if" ("At the beginning of your upkeep, if you have 5 or less life, you gain 3 life."): `INTERVENING_IF` splits it off and `Condition.parse` renders it into `should_perform?` (`source` becomes `actor`, and a kind with no condition of its own gets `super && (...)` so the base class's check, e.g. "your upkeep", stays). It is checked when the trigger fires only, not again on resolution (rule 603.4). A condition `Condition` doesn't know leaves the line unparsed. `Condition` also reads "there are N or more <creature/land/enchantment> cards in your graveyard" and "~ has N or more <counter> counters on it".
+- Counter types: `Magic::Counters[]` knows a fixed set (+1/+1, -1/-1, lore, ...), and makes a class (`Counters::Spore`) for any other single lowercase word on first use (`Counters.const_missing` too, so generated code naming `Counters::Spore` loads in a fresh process). A `+N/+N` shape it doesn't know still raises `Unknown counter type`, which the parser reads as "not supported".
+- `UnlessPay` effect: "Sacrifice ~ / Tap ~ unless you pay {W}{W} / pay N life / discard a card / sacrifice a <type>." → `Choice::UnlessPay` (a `Choice::May`): resolve it with `game.resolve_choice!` (mana paid automatically, or `payment:` as for `Costs::Mana#pay`; a card or permanent for discard/sacrifice), decline with `game.skip_choice!`; declining or being unable to pay applies the penalty.
 - Also: `Equip`, `Enchant`.
 
 ## Effects
@@ -178,6 +181,7 @@ create Treasure/Food/Clue tokens (`Magic::Tokens::Treasure`/`Food`/`Clue`), surv
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 
+- `DealDamage` also has untargeted recipients (`UNTARGETED`): each opponent, you, each player, each creature, each creature and each player.
 - "It" / "that creature" ("Untap it.", "It gains haste until end of turn.") is
   `PermanentTarget::PRONOUN`: the effect's `earlier_target?` is true and it acts on
   `target`, the target of an earlier effect in the same ability. `EffectList.parse`

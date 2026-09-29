@@ -17,7 +17,8 @@ module Magic
       MANY = /\Ayou control (?<amount>\d+|\w+) or more (?<types>#{Count::TYPE})\z/
       NONE = /\Ayou control no (?<other>other )?(?<types>#{Count::TYPE})\z/
       LIFE = /\A(?<who>you have|an opponent has) (?<amount>\d+|\w+) or (?<cmp>more|less) life\z/
-      GRAVEYARD = /\Athere are (?<amount>\d+|\w+) or more cards in your graveyard\z/
+      GRAVEYARD = /\Athere are (?<amount>\d+|\w+) or more (?:(?<type>creature|land|enchantment) )?cards in your graveyard\z/
+      COUNTERS = %r{\A~ has (?<amount>\d+|\w+) or more (?<counter>[\w+/-]+) counters on it\z}
       SELF = {
         "~ is tapped" => "source.tapped?",
         "~ is untapped" => "source.untapped?",
@@ -35,7 +36,10 @@ module Magic
         elsif (m = LIFE.match(text))
           life(m)
         elsif (m = GRAVEYARD.match(text))
-          "controller.graveyard.cards.count >= #{Number.parse(m[:amount])}"
+          cards = m[:type] ? Count.collection("controller.graveyard", Count::GRAVEYARD_CARDS, m[:type]) : "controller.graveyard.cards"
+          "#{cards}.count >= #{Number.parse(m[:amount])}"
+        elsif (m = COUNTERS.match(text))
+          counters(m)
         elsif (m = /\Ait's (?<not>not )?your turn\z/.match(text))
           "game.current_turn.active_player #{m[:not] ? '!=' : '=='} controller"
         elsif text.match?(/\Ayou have no cards in hand\z/)
@@ -43,6 +47,14 @@ module Magic
         else
           SELF[text]
         end
+      end
+
+      # nil for a counter type Magic::Counters doesn't know.
+      def self.counters(match)
+        counter = Magic::Counters[match[:counter].downcase].name.split("::").last
+        "source.counters.of_type(Counters::#{counter}).count >= #{Number.parse(match[:amount])}"
+      rescue RuntimeError => e
+        raise unless e.message.start_with?("Unknown counter type")
       end
 
       def self.life(match)

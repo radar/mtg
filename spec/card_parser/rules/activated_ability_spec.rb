@@ -37,7 +37,7 @@ RSpec.describe Magic::CardParser::Rules::ActivatedAbility do
   it "ignores mana abilities, unknown costs and unknown effects" do
     expect(described_class.parse("{T}: Add {G}.")).to be_nil
     expect(described_class.parse("{X}{R}: ~ deals X damage to any target.")).to be_nil
-    expect(described_class.parse("Remove a widget counter from ~: Draw a card.")).to be_nil
+    expect(described_class.parse("Remove a +2/+2 counter from ~: Draw a card.")).to be_nil
     expect(described_class.parse("Pay 2 life: Draw a card.")).to be_nil
     expect(described_class.parse("{1}: ~ gains protection from red until end of turn.")).to be_nil
   end

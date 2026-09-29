@@ -59,7 +59,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
       rule = parse(line)
       expect([rule.class_base_name, rule.handled_event, rule.condition]).to eq([name, event, condition]), line
     end
-    expect(parse("When the last widget counter is removed from ~, draw a card.")).to be_nil
+    expect(parse("When the last +2/+2 counter is removed from ~, draw a card.")).to be_nil
   end
 
   it "parses creatures being exiled from the battlefield" do

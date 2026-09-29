@@ -147,6 +147,7 @@ module Magic
         # An italic ability word ("Landfall — ") is flavour; the rest is the trigger.
         ABILITY_WORD = /\A[A-Z][a-z]+(?: [a-z]+)* — /
         KICKED = /\Aif (?:it|~) was kicked, /
+        INTERVENING_IF = /\Aif (?<condition>[^,]+), (?<rest>.+)\z/
 
         def self.parse(line)
           text = line.sub(ABILITY_WORD, "")
@@ -159,6 +160,13 @@ module Magic
             if kind.name == "EntersTrigger" && (kicked = KICKED.match(effects))
               effects = kicked.post_match
               condition = [condition, "actor.kicked?"].compact.join(" && ")
+            end
+
+            # "At the beginning of your upkeep, if you have 5 or less life, ..." (rule 603.4,
+            # checked when it triggers only; it should also be rechecked on resolution).
+            if (intervening = INTERVENING_IF.match(effects)) && (ruby = Condition.parse(intervening[:condition]))
+              effects = intervening[:rest]
+              condition = [condition || "super", "(#{ruby.gsub(/\bsource\b/, 'actor')})"].join(" && ")
             end
 
             effect_list = EffectList.parse(effects) or return
