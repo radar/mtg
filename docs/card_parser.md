@@ -181,6 +181,7 @@ create Treasure/Food/Clue tokens (`Magic::Tokens::Treasure`/`Food`/`Clue`), surv
 last-counter "sacrifice it" generate vanishing-style creatures; suspend (cards in exile)
 isn't supported.
 
+- `AddCounters` also reads "each [other] [<Type>] creature [you control / an opponent controls / each opponent controls]" (`EACH`, shared with `DoubleCounters`), "... for each <Count>" (amount `N * <count>`), and a named (not +1/+1 or -1/-1) counter on any target permanent, artifact, land, ...; `RemoveCounters` reads "Remove all <type> counters from ~"; `DoubleCounters` reads "Double the number of <type> counters on ~ / enchanted creature / each [other] creature you control."
 - `DealDamage` also has untargeted recipients (`UNTARGETED`): each opponent, you, each player, each creature, each creature and each player.
 - "It" / "that creature" ("Untap it.", "It gains haste until end of turn.") is
   `PermanentTarget::PRONOUN`: the effect's `earlier_target?` is true and it acts on
