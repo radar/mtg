@@ -40,6 +40,10 @@ RSpec integration tests. See `spec/spec_helper.rb` for helpers/shared contexts.
 - Run commands from the repo root with relative paths. Don't `cd`, and don't pass absolute paths to commands (each one triggers a permission prompt).
 - Don't pipe test output through `rg` with path-like patterns (e.g. `rg -v "^\s*# /Users"`). Use `head`/`tail`, or `rspec --format progress`.
 - Edit files with the Edit/Write tools, not `sed`. The shell has `noclobber` set, so `>` onto an existing file fails: use Write, or `>|`.
+- Don't write throwaway Ruby (or perl/python) scripts to edit source or spec files -- no `tmp/*.rb` full of `sub!` calls, no `ruby -e` patches. Use the Edit tool (Read the file first). Scripted edits mangled indentation (a `<<~` heredoc strips the common indent from what it inserts) and broke on `#{}` interpolation inside double-quoted patterns, and they hide the change from review.
+- For read-only questions about data (transcripts, JSON, logs), use `jq`, `rg` or `fd`, not a Ruby script. Ruby scripts in `tmp/` are for exercising this codebase (e.g. generating a card to look at its output), not for editing or for counting things `jq`/`rg` can count.
+- `rm`, `cp` and `mv` are aliased to prompt interactively in this shell, and a prompt hangs the command: use `rm -f` / `cp -f` / `mv -f` (or `command cp -f`). `c` is also an alias, so don't name a shell function `c`.
+- A test spec that changes state of the shared game (`game.tick!`, `game.settle!`, `current_turn.end!; current_turn.cleanup!`) needs those calls to see the effect; see the Testing Patterns and Trigger Queue sections before guessing.
 
 ### Code Style
 
