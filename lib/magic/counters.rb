@@ -15,6 +15,9 @@ module Magic
       when "hatchling" then Hatchling
       when "time" then Time
       when "quest" then Quest
+      when "flying" then Flying
+      when "first strike" then FirstStrike
+      when "lifelink" then Lifelink
       else
         named(counter_type)
       end
