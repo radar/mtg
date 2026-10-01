@@ -124,6 +124,11 @@ module Magic
                    "Events::PermanentTapped", "event.permanent == actor", PERMANENT_KINDS),
           Kind.new(/#{WHEN} ~ attacks/, "AttacksTrigger", "TriggeredAbility", :event_handlers,
                    "Events::FinalAttackersDeclared", "event.attacks.any? { _1.attacker == actor }", %i[creature]),
+          # "Mobilize N" is rewritten to this by `parse`; it fires like an attack trigger.
+          Kind.new(/#{WHEN} ~ mobilizes/, "MobilizeTrigger", "TriggeredAbility", :event_handlers,
+                   "Events::FinalAttackersDeclared", "event.attacks.any? { _1.attacker == actor }", %i[creature]),
+          Kind.new(/#{WHEN} you cast your second spell each turn/, "FlurryTrigger", "TriggeredAbility::SpellCast",
+                   :event_handlers, "Events::SpellCast", "you? && second_spell_this_turn?", PERMANENT_KINDS),
           Kind.new(/#{WHEN} you attack/, "YouAttackTrigger", "TriggeredAbility", :event_handlers,
                    "Events::FinalAttackersDeclared", "event.active_player == controller && event.attacks.any?", PERMANENT_KINDS),
           Kind.new(/#{WHEN} ~ deals combat damage to (?:a player|an opponent)/, "CombatDamageTrigger", "TriggeredAbility",
@@ -154,8 +159,15 @@ module Magic
         KICKED = /\Aif (?:it|~) was kicked, /
         INTERVENING_IF = /\Aif (?<condition>[^,]+), (?<rest>.+)\z/
 
+        # "Mobilize N" / "Mobilize X, where X is <count>" is a keyword for this attack trigger.
+        MOBILIZE = /\AMobilize (?<amount>\w+)(?<where>, where X is [^.]+)?\.?\z/
+
         def self.parse(line)
           text = line.sub(ABILITY_WORD, "")
+          if (m = MOBILIZE.match(text))
+            text = "Whenever ~ mobilizes, create #{m[:amount]} tapped and attacking 1/1 red Warrior creature tokens#{m[:where]}. " \
+                   "Sacrifice them at the beginning of the next end step."
+          end
           KINDS.each do |kind|
             next unless (m = /\A#{kind.pattern}, (?<effects>.+)\z/.match(text))
 

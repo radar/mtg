@@ -298,6 +298,24 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
                               "def decline! = finish", "def finish\n      trigger_effect(:gain_life")
   end
 
+  it "reads Mobilize N as an attack trigger that makes tapped and attacking Warriors" do
+    rule = parse("Mobilize 2")
+    expect([rule.class_base_name, rule.hook, rule.handled_event]).to eq(["MobilizeTrigger", :event_handlers, "Events::FinalAttackersDeclared"])
+    expect(rule.condition).to eq("event.attacks.any? { _1.attacker == actor }")
+    expect(rule.effect_list.effects).to eq([Magic::CardParser::Effects::MobilizeTokens.new(amount: 2)])
+    expect(rule.class_source("MobilizeTrigger")).to include("amount: 2, enters_tapped: true, attacking: true", "SacrificeTokenTrigger")
+  end
+
+  it "reads Mobilize X, where X is a count" do
+    rule = parse("Mobilize X, where X is the number of creature cards in your graveyard.")
+    expect(rule.class_source("MobilizeTrigger")).to include("amount: controller.graveyard.creatures.count")
+  end
+
+  it "reads Flurry as a SpellCast trigger on the controller's second spell each turn" do
+    rule = parse("Flurry — Whenever you cast your second spell each turn, draw a card.")
+    expect([rule.class_base_name, rule.handled_event, rule.condition]).to eq(["FlurryTrigger", "Events::SpellCast", "you? && second_spell_this_turn?"])
+  end
+
   it "rejects effects after an optional effect that makes its own choice" do
     expect { parse("When ~ enters, you may scry 1. Draw a card.").class_source("X") }.to raise_error(Magic::CardParser::UnsupportedCard)
   end

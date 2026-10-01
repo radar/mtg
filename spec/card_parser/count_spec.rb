@@ -25,6 +25,11 @@ RSpec.describe Magic::CardParser::Count do
     expect(described_class.parse("Elf card in your graveyard")).to eq('controller.graveyard.by_type("Elf").count')
   end
 
+  it "reads \"the number of\" and plural cards" do
+    expect(described_class.parse("the number of creature cards in your graveyard")).to eq("controller.graveyard.creatures.count")
+    expect(described_class.parse("the number of creatures you control")).to eq("controller.creatures.count")
+  end
+
   it "doesn't count what it doesn't know" do
     expect(described_class.parse("opponent you have")).to be_nil
     expect(described_class.parse("card in target player's graveyard")).to be_nil

@@ -14,7 +14,7 @@ module Magic
     module Count
       TYPE = /[A-Za-z][\w-]*/
       PERMANENTS = /\A(?<other>other )?(?<type>#{TYPE}) you control\z/
-      GRAVEYARD = /\A(?:(?<type>#{TYPE}) )?card in your graveyard\z/
+      GRAVEYARD = /\A(?:(?<type>#{TYPE}) )?cards? in your graveyard\z/
 
       # Card types with a named collection on Player (and so on its permanents).
       YOUR_PERMANENTS = { "creature" => "creatures", "land" => "lands", "artifact" => "artifacts", "enchantment" => "enchantments",
@@ -26,9 +26,10 @@ module Magic
       COLORS_AMONG = /\A(?:the number of colors|each color|color) among permanents you control\z/
 
       def self.parse(text, this: "source")
-        if COLORS_AMONG.match?(text)
-          "controller.colors_among_permanents"
-        elsif (m = PERMANENTS.match(text))
+        return "controller.colors_among_permanents" if COLORS_AMONG.match?(text)
+
+        text = text.delete_prefix("the number of ")
+        if (m = PERMANENTS.match(text))
           permanents = collection("controller", YOUR_PERMANENTS, Condition.singular(m[:type]), all: "controller.permanents")
           "#{permanents}#{".except(#{this})" if m[:other]}.count"
         elsif text == "card in your hand"
