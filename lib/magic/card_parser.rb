@@ -71,6 +71,8 @@ module Magic
       @name = text.strip.lines.first.to_s[/\A[^{\n]+/].to_s.strip
       # A double-faced card's rules text may call either face by its first name ("transform Eirdu").
       @short_names = short_names
+      # A legendary "Name, Title" card calls itself by its first name ("Anafenza endures 2").
+      @short_names += [@name.split(",").first] if @name.include?(",") && !@short_names.include?(@name.split(",").first)
       @lines = text.strip.lines.map { |line| line.gsub(/\s*\([^)]*\)/, "").strip }.reject(&:empty?)
     end
 

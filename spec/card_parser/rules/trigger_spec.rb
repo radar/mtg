@@ -32,6 +32,11 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
       "At the beginning of your upkeep, draw a card." => ["UpkeepTrigger", :event_handlers, "Events::BeginningOfUpkeep", nil],
       "At the beginning of your end step, draw a card." => ["EndStepTrigger", :event_handlers, "Events::BeginningOfEndStep", "controllers_end_step?"],
       "Whenever ~ attacks, draw a card." => ["AttacksTrigger", :event_handlers, "Events::FinalAttackersDeclared", "event.attacks.any? { _1.attacker == actor }"],
+      "Whenever another nontoken creature you control dies, draw a card." =>
+        ["CreatureDiesTrigger", :event_handlers, "Events::CreatureDied", "you? && event.permanent != actor && !event.permanent.token?"],
+      "Whenever another nontoken creature you control enters, draw a card." =>
+        ["NontokenCreatureEntersTrigger", :event_handlers, "Events::EnteredTheBattlefield",
+         "another_creature? && under_your_control? && !event.permanent.token?"],
       "Whenever another creature you control enters, draw a card." =>
         ["CreatureEntersTrigger", :event_handlers, "Events::EnteredTheBattlefield", "another_creature? && under_your_control?"]
     }

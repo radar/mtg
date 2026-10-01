@@ -14,7 +14,7 @@ module Magic
       SENTENCE = /(?<=\.)\s+/
       # Clauses of one sentence, when the sentence isn't one effect as a whole
       # ("exile it, then return it" is one effect; "draw a card, then discard a card" two).
-      CLAUSE = /,? then |,? and (?=you |lose |gain |put )/i
+      CLAUSE = /,? then |,? and (?=you |lose |gain |put |~ endures )/i
       MAY = /\Ayou may /i
       IF_YOU_DO = /\A(?:If|When) you do, /i
       IF_YOU_DONT = /\AIf you don't, /i
@@ -70,13 +70,16 @@ module Magic
             return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DONT, "")))
 
             effects[-1] = effects.last.with(if_you_dont: effects.last.if_you_dont + [effect])
+          elsif IF_YOU_DO.match?(sentence) && effects.last.is_a?(Effects::PayMana)
+            # "you may pay {M}. If you do, ...": the pay choice is the "may"; what follows runs once it's paid.
+            effects << (parse_sentence(sentence.sub(IF_YOU_DO, "")) or return)
           elsif IF_YOU_DO.match?(sentence)
             return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DO, "")))
 
             effects[-1] = effects.last.with(if_you_do: effects.last.if_you_do + [effect])
           elsif MAY.match?(sentence)
             effect = parse_sentence(sentence.sub(MAY, "")) or return
-            effects << OptionalEffect.new(effect:, if_you_do: [])
+            effects << (effect.is_a?(Effects::PayMana) ? effect : OptionalEffect.new(effect:, if_you_do: []))
           else
             effect = parse_sentence(sentence) or return
             effects << effect
@@ -281,9 +284,9 @@ module Magic
 
       # A scry: its own Choice class, subclassed when effects follow it.
       def effect_choice(point, rest, context)
-        args = ["actor: #{context.this}", *point.choice_args].join(", ")
+        args = expand(["actor: #{context.this}", *point.choice_args].join(", "), context.this)
         # An effect whose choice can be impossible (blight with no creature) has a choice_guard.
-        guard = point.respond_to?(:choice_guard) ? " if #{point.choice_guard}" : ""
+        guard = point.respond_to?(:choice_guard) ? " if #{expand(point.choice_guard, context.this)}" : ""
         return [nil, ["game.choices.add(#{point.choice_base}.new(#{args}))#{guard}"]] if rest.empty?
 
         classes, after = render(rest, INSIDE_CHOICE)

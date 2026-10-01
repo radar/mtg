@@ -23,6 +23,7 @@ module Magic
         # Whose creature dying triggers "Whenever <who> dies" -> should_perform?
         CREATURE_DIES = {
           "another creature you control" => "you? && event.permanent != actor",
+          "another nontoken creature you control" => "you? && event.permanent != actor && !event.permanent.token?",
           "a creature you control" => "you?",
           "a creature an opponent controls" => "opponent?",
           "another creature" => "event.permanent != actor",
@@ -81,6 +82,9 @@ module Magic
           Kind.new(/#{WHEN} another creature #{ENTERS_UNDER_YOUR_CONTROL}/, "CreatureEntersTrigger",
                    "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
                    "another_creature? && under_your_control?", PERMANENT_KINDS),
+          Kind.new(/#{WHEN} another nontoken creature #{ENTERS_UNDER_YOUR_CONTROL}/, "NontokenCreatureEntersTrigger",
+                   "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
+                   "another_creature? && under_your_control? && !event.permanent.token?", PERMANENT_KINDS),
           Kind.new(/#{WHEN} a land #{ENTERS_UNDER_YOUR_CONTROL}/, "LandfallTrigger", "TriggeredAbility::Landfall",
                    :event_handlers, "Events::Landfall", "you?", PERMANENT_KINDS),
           Kind.new(/#{WHEN} (?<who>you|an opponent|a player) gains? life/, "LifeGainTrigger", "TriggeredAbility",
@@ -172,7 +176,9 @@ module Magic
             next unless (m = /\A#{kind.pattern}, (?<effects>.+)\z/.match(text))
 
             effects = m[:effects]
-            condition = kind.condition.respond_to?(:call) ? kind.condition.call(m) : kind.condition
+            # "Whenever another nontoken creature you control enters, it endures X": "it" is the creature that entered.
+            effects = effects.gsub(/\bit endures\b/, "that creature endures") if kind.name == "NontokenCreatureEntersTrigger"
+            condition =kind.condition.respond_to?(:call) ? kind.condition.call(m) : kind.condition
             # "When ~ enters, if it was kicked, ..." (kicker).
             if kind.name == "EntersTrigger" && (kicked = KICKED.match(effects))
               effects = kicked.post_match

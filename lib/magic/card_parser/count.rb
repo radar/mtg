@@ -25,6 +25,9 @@ module Magic
       # Vivid: "the number of colors among permanents you control".
       COLORS_AMONG = /\A(?:the number of colors|each color|color) among permanents you control\z/
 
+      # "the number of counters on ~" (Warden of the Grove).
+      COUNTERS_ON_THIS = /\A(?:the number of )?counters on ~\z/
+
       def self.parse(text, this: "source")
         return "controller.colors_among_permanents" if COLORS_AMONG.match?(text)
 
@@ -32,6 +35,8 @@ module Magic
         if (m = PERMANENTS.match(text))
           permanents = collection("controller", YOUR_PERMANENTS, Condition.singular(m[:type]), all: "controller.permanents")
           "#{permanents}#{".except(#{this})" if m[:other]}.count"
+        elsif text.match?(COUNTERS_ON_THIS)
+          "#{this}.counters.count"
         elsif text == "card in your hand"
           "controller.hand.count"
         elsif (m = GRAVEYARD.match(text))
