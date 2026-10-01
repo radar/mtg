@@ -20,7 +20,7 @@ module Magic
     # Include this module in a `Data.define(...)` class and it is picked up
     # automatically — no registration needed.
     module Rule
-      HOOKS = %i[static_abilities activated_abilities etb_triggers ltb_triggers death_triggers event_handlers].freeze
+      HOOKS = %i[static_abilities activated_abilities graveyard_abilities etb_triggers ltb_triggers death_triggers event_handlers].freeze
       # Kinds of card that become permanents, for rules only permanents can have.
       PERMANENT_KINDS = %i[creature enchantment artifact equipment aura saga land planeswalker].freeze
 

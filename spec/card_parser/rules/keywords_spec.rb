@@ -55,6 +55,11 @@ RSpec.describe Magic::CardParser::Rules::Keywords, "keywords with values" do
     expect(dsl("Cycling {2}")).to eq(["cycling generic: 2"])
   end
 
+  it "reads a harmonize cost, X included" do
+    expect(dsl("Harmonize {4}{R}")).to eq(["harmonize Costs::Mana.new(generic: 4, red: 1)"])
+    expect(dsl("Harmonize {X}{G}{G}{G}{G}")).to eq(["harmonize Costs::Mana.new(x: 1, green: 4)"])
+  end
+
   it "rejects values it can't represent" do
     expect(described_class.parse("Ward—Discard a card.")).to be_nil
     expect(described_class.parse("Protection from everything")).to be_nil

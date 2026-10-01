@@ -16,7 +16,9 @@ module Magic
       # @param adventure [Boolean] When true, pays the card's adventure cost, resolves via
       #   #adventure_resolve! instead of #resolve!, and exiles the card afterward
       # @param alternative [Boolean] When true, pays the card's alternative_cost instead of its mana cost
-      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, evoked: false, adventure: false, alternative: false, by_effect: false, **args)
+      # @param harmonize [Boolean] When true, casts from the graveyard for the card's harmonize cost
+      #   (see #harmonize_tap) and exiles the spell after it resolves
+      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, evoked: false, adventure: false, alternative: false, by_effect: false, harmonize: false, **args)
         super(**args)
         @card = card
         @targets = []
@@ -24,6 +26,7 @@ module Magic
         @additional_costs = (card.respond_to?(:additional_costs) ? card.additional_costs : []) + granted_additional_costs
         @paid_additional_costs = []
         @flashback = flashback
+        @harmonize = harmonize
         @blitz = blitz
         @evoked = evoked
         @adventure = adventure
@@ -40,7 +43,7 @@ module Magic
 
       def countered!
         game.notify!(Events::SpellCountered.new(spell: card, player: player))
-        card.move_to_graveyard!(card.owner)
+        @harmonize ? card.exile! : card.move_to_graveyard!(card.owner)
       end
 
       def return_to_hand!
@@ -59,6 +62,8 @@ module Magic
         @mana_cost ||= begin
           if @flashback && card.zone.graveyard?
             cost = card.flashback_cost
+          elsif @harmonize && card.zone.graveyard? && card.harmonize_cost
+            cost = card.harmonize_cost
           elsif @blitz
             cost = card.blitz_cost
           elsif @evoked
@@ -120,6 +125,7 @@ module Magic
           return "#{card.name} is a land, and lands are played, not cast" if card.land? && !@adventure
           return "#{card.name} is already on the stack" if already_on_stack?
           return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
+          return "#{card.name} has no harmonize cost" if @harmonize && !card.harmonize_cost
           return "#{card.name}'s flashback requirements aren't met" if @flashback && card.respond_to?(:flashback_requirements_met?) && !card.flashback_requirements_met?(player)
 
           if !instant_speed? && (reason = sorcery_speed_reason)
@@ -226,6 +232,20 @@ module Magic
           mana_cost.adjusted_by(pay => -1)
         end
 
+        creature.tap!
+        self
+      end
+
+      # Rule 702.180 (harmonize): tap an untapped creature you control to reduce the harmonize cost
+      # by an amount of generic mana equal to its power (no more than the generic mana left).
+      # Like #convoke it reduces the cost itself, so call it before any mana payment.
+      def harmonize_tap(creature)
+        raise "#{card.name} is not being cast with harmonize" unless @harmonize
+        raise "#{creature.name} is tapped" if creature.tapped?
+        raise "#{player.inspect} does not control #{creature.name}" unless creature.controller == player
+
+        reduction = [creature.power, mana_cost.balance[:generic].to_i].min
+        mana_cost.adjusted_by(generic: -reduction) if reduction.positive?
         creature.tap!
         self
       end
@@ -473,7 +493,7 @@ module Magic
           card.exile!
           card.on_adventure = true
         elsif card.sorcery? || card.instant?
-          if @flashback
+          if @flashback || @harmonize
             card.exile!
           elsif card.zone&.graveyard? && game.emblems.any? { |emblem| emblem.owner == player && emblem.respond_to?(:exiles_after_graveyard_cast?) && emblem.exiles_after_graveyard_cast?(card) }
             card.exile!
@@ -518,7 +538,7 @@ module Magic
       end
 
       def castable_from_current_zone?
-        in_permitted_zone?(card, flashback: @flashback)
+        in_permitted_zone?(card, flashback: @flashback || @harmonize)
       end
 
       # Rule 405.2: once a spell is on the stack it isn't in any zone it could be cast

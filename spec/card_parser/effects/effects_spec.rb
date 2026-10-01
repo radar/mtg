@@ -165,6 +165,13 @@ RSpec.describe Magic::CardParser::Effect do
     expect(discard.choice_args).to eq(["amount: 2", 'card_type: "Creature"'])
   end
 
+  it "parses granting harmonize to an instant or sorcery card in your graveyard" do
+    grant = described_class.parse("target instant or sorcery card in your graveyard gains harmonize until end of turn. Its harmonize cost is equal to its mana cost.")
+    expect(grant).to eq(e.const_get(:GrantHarmonize).new(%w[instant sorcery]))
+    expect(grant.target_choices).to eq("controller.graveyard.cards.select { _1.instant? || _1.sorcery? }")
+    expect(grant.resolve_call).to eq("target.grant_harmonize_until_end_of_turn!")
+  end
+
   it "parses exiling a creature instead if it would die this turn" do
     exile = described_class.parse("If that creature would die this turn, exile it instead.")
     expect(exile).to be_a(e.const_get(:ExileInsteadIfDies))

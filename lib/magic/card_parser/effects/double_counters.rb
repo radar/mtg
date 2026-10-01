@@ -8,13 +8,14 @@ module Magic
       class DoubleCounters < Data.define(:counter_type, :who, :targets)
         include Effect
 
-        LINE = %r{\ADouble the number of (?<type>[+-]1/[+-]1|[a-z]+) counters on (?:(?<self>~)|(?<attached>enchanted|equipped) creature|(?<each>#{AddCounters::EACH}))\.?\z}i
+        LINE = %r{\ADouble the number of (?<type>[+-]1/[+-]1|[a-z]+) counters on (?:(?<self>~)|(?<attached>enchanted|equipped) creature|(?<that>that creature|it)|(?<each>#{AddCounters::EACH}))\.?\z}i
 
         def self.parse(text)
           return unless (m = LINE.match(text))
 
           Magic::Counters[m[:type].downcase] # raises for an unknown counter type
           who, targets = if m[:self] then [:self, THIS]
+                         elsif m[:that] then [:self, "target"] # the target of an earlier effect ("Put a +1/+1 counter on target creature, then double ... on that creature")
                          elsif m[:attached] then [:self, "#{THIS}.attached_to"]
                          else [:each, AddCounters.each_targets(m)]
                          end
@@ -22,6 +23,8 @@ module Magic
         rescue RuntimeError => e
           raise unless e.message.start_with?("Unknown counter type")
         end
+
+        def earlier_target? = targets == "target"
 
         def resolve_call
           type = "Counters[#{counter_type.inspect}]"

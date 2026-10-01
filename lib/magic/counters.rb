@@ -18,6 +18,9 @@ module Magic
       when "flying" then Flying
       when "first strike" then FirstStrike
       when "lifelink" then Lifelink
+      when "reach" then Reach
+      when "trample" then Trample
+      when "deathtouch" then Deathtouch
       else
         named(counter_type)
       end

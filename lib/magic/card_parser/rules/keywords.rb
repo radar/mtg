@@ -12,7 +12,8 @@ module Magic
       #   Protection from red and from blue   -> protections [Protection.from_color(:red), ...]
       #   Kicker {1}{G}                       -> kicker_cost generic: 1, green: 1
       #   Flashback {2}{R}                    -> flashback Costs::Mana.new(generic: 2, red: 1)
-      #   Cycling {2}                         -> cycling generic: 2
+      #   Harmonize {4}{R}                    -> harmonize Costs::Mana.new(generic: 4, red: 1)
+      #   Cycling {2}                       -> cycling generic: 2
       #   Convoke                             -> convoke
       class Keywords < Data.define(:keywords, :extras)
         include Rule
@@ -57,6 +58,8 @@ module Magic
             Extra.new("kicker_cost #{cost_hash($~[:cost])}")
           when /\AFlashback (?<cost>#{MANA})\z/i
             Extra.new("flashback Costs::Mana.new(#{cost_hash($~[:cost])})")
+          when /\AHarmonize (?<cost>#{MANA})\z/i
+            Extra.new("harmonize Costs::Mana.new(#{cost_hash($~[:cost])})")
           when /\ACycling (?<cost>#{MANA})\z/i
             Extra.new("cycling #{cost_hash($~[:cost])}")
           when /\AConvoke\z/i
@@ -92,7 +95,7 @@ module Magic
           return [] if rules.empty?
 
           extras = rules.flat_map(&:extras)
-          %w[ward protections kicker_cost flashback cycling].each do |call|
+          %w[ward protections kicker_cost flashback harmonize cycling].each do |call|
             raise UnsupportedCard, "more than one #{call}" if extras.count { _1.dsl_line.start_with?("#{call} ") } > 1
           end
           [new(keywords: rules.flat_map(&:keywords), extras:)]

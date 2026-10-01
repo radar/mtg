@@ -16,6 +16,15 @@ module Magic
       define_method(:requirements_met?) { game.can_cast_sorcery?(controller) }
     end
 
+    # An ability a *card* has in its owner's graveyard ("Renew -- {2}{G}, Exile this card from
+    # your graveyard: ... Activate only as a sorcery."; see Card#graveyard_abilities). Its
+    # "Exile {this}" cost is paid before legality is checked, so the card may already be in exile.
+    def self.activate_from_graveyard_as_sorcery
+      define_method(:requirements_met?) do
+        (source.zone&.graveyard? || source.zone&.exile?) && source.owner == controller && game.can_cast_sorcery?(controller)
+      end
+    end
+
     def name
       self.class.name
     end

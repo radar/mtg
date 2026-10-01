@@ -251,4 +251,51 @@ RSpec.describe "CardParser generated keywords with values, in play" do
     expect(p2.life).to eq(18)
     expect(lesson.zone).to be_exile
   end
+
+  describe "harmonize" do
+    let(:chant) do
+      load_card("Parsed Chant {R}\nSorcery\nParsed Chant deals 2 damage to any target.\nHarmonize {4}{R}\n")
+      Card("Parsed Chant", owner: p1).tap { _1.move_to_graveyard!(p1) }
+    end
+
+    before { go_to_main_phase! }
+
+    it "casts from the graveyard for its harmonize cost, then exiles the spell" do
+      p1.add_mana(red: 5)
+      p1.cast(card: chant, harmonize: true) { |a| a.pay_mana(generic: { red: 4 }, red: 1).targeting(p2) }
+      game.stack.resolve!
+
+      expect(p2.life).to eq(18)
+      expect(chant.zone).to be_exile
+    end
+
+    it "taps an untapped creature to reduce the cost by its power" do
+      bear = ResolvePermanent("Grizzly Bears", owner: p1) # 2/2
+      p1.add_mana(red: 3)
+      p1.cast(card: chant, harmonize: true) do |a|
+        a.harmonize_tap(bear)
+        expect(a.mana_cost.cost).to eq(generic: 2, red: 1)
+        a.pay_mana(generic: { red: 2 }, red: 1).targeting(p2)
+      end
+      game.stack.resolve!
+
+      expect(bear).to be_tapped
+      expect(p2.life).to eq(18)
+      expect(chant.zone).to be_exile
+    end
+
+    it "can't reduce the cost below its colored mana, and can't tap a tapped creature" do
+      giant = ResolvePermanent("Shinestriker", owner: p1) # 3/3
+      action = Magic::Actions::Cast.new(game: game, player: p1, card: chant, harmonize: true)
+      action.harmonize_tap(giant)
+      expect(action.mana_cost.cost).to eq(generic: 1, red: 1)
+      expect { action.harmonize_tap(giant) }.to raise_error(/is tapped/)
+    end
+
+    it "is only castable from the graveyard when harmonized, and is offered by legal_actions" do
+      expect(game.legal_actions(p1).grep(Magic::Actions::Cast).map(&:card)).not_to include(chant)
+      p1.add_mana(red: 5)
+      expect(game.legal_actions(p1).grep(Magic::Actions::Cast).map(&:card)).to include(chant)
+    end
+  end
 end

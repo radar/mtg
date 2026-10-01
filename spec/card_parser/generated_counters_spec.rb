@@ -45,6 +45,13 @@ RSpec.describe "CardParser generated counter effects in play" do
       expect(effect.parse("Put a +1/+1 counter on target artifact.")).to be_nil
     end
 
+    it "reads several counter kinds in one sentence, keyword counters included" do
+      call = effect.parse("Put a flying counter, a deathtouch counter, and a lifelink counter on target creature.").resolve_call
+      expect(call.scan("trigger_effect(:add_counter").size).to eq(3)
+      expect(call).to include('counter_type: "deathtouch"')
+      expect(effect.parse("Put two +1/+1 counters and a reach counter on target creature.").resolve_call).to include("amount: 2", 'counter_type: "reach"')
+    end
+
     it "reads doubling counters" do
       expect(effect.parse("Double the number of +1/+1 counters on ~.").resolve_call).to include("amount: __this__.counters.of_type(Counters[\"+1/+1\"]).count")
       expect(effect.parse("Double the number of +1/+1 counters on each creature you control.").resolve_call)

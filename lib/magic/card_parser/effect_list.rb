@@ -14,7 +14,7 @@ module Magic
       SENTENCE = /(?<=\.)\s+/
       # Clauses of one sentence, when the sentence isn't one effect as a whole
       # ("exile it, then return it" is one effect; "draw a card, then discard a card" two).
-      CLAUSE = /,? then |,? and (?=you |lose |gain )/i
+      CLAUSE = /,? then |,? and (?=you |lose |gain |put )/i
       MAY = /\Ayou may /i
       IF_YOU_DO = /\A(?:If|When) you do, /i
       IF_YOU_DONT = /\AIf you don't, /i
@@ -32,7 +32,7 @@ module Magic
 
       # ", where X is <count>" after an amount of X, or "draw cards / gain life equal to <count>".
       WHERE_X = /,? where X is (?<what>[^.]+)(?=\.|\z)/
-      EQUAL_TO = /\b(?<verb>draw|gain) (?<noun>cards|life) equal to (?<what>[^.]+?)(?=\.|,|\z)/i
+      EQUAL_TO = /\b(?<verb>draw|gain|mill) (?<noun>cards|life) equal to (?<what>[^.]+?)(?=\.|,|\z)/i
 
       # `text` as one effect (some span two sentences), else every sentence (or,
       # failing that, every clause of it) as an effect; nil unless all of them parse.

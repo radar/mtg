@@ -59,6 +59,14 @@ module Magic
         end
       end
 
+      # "Harmonize {cost}": castable from the graveyard for this cost (a Costs::Mana), exiled after.
+      # `Actions::Cast.new(card:, harmonize: true)`; `Cast#harmonize_tap` taps a creature to reduce it.
+      def harmonize(cost)
+        define_method(:harmonize_cost) do
+          cost
+        end
+      end
+
       def rebound
         define_method(:rebound?) do
           true
@@ -372,6 +380,23 @@ module Magic
     end
 
     def activated_abilities
+      []
+    end
+
+    # Harmonize granted by an effect until end of turn, its cost being the card's mana cost
+    # (Songcrafter Mage). A card with its own `harmonize` macro overrides `harmonize_cost`.
+    def grant_harmonize_until_end_of_turn!
+      @harmonize_granted_turn = game.current_turn.number
+    end
+
+    # The cost to cast this card from the graveyard with harmonize, or nil when it has none now.
+    def harmonize_cost
+      cost if @harmonize_granted_turn && @harmonize_granted_turn == game.current_turn.number
+    end
+
+    # Abilities a card activates from its owner's graveyard (Renew, "Exile this card from your
+    # graveyard: ..."), as instances: `[GraveyardAbility.new(source: self)]`.
+    def graveyard_abilities
       []
     end
 

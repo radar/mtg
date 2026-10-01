@@ -35,6 +35,7 @@ module Magic
       cast_candidate_cards.flat_map do |card|
         candidates = [keep(Actions::Cast.new(game: game, player: player, card: card))]
         candidates << keep(Actions::Cast.new(game: game, player: player, card: card, flashback: true)) if card.zone&.graveyard? && card.respond_to?(:flashback_cost)
+        candidates << keep(Actions::Cast.new(game: game, player: player, card: card, harmonize: true)) if card.zone&.graveyard? && card.harmonize_cost
         candidates
       end.compact
     end
@@ -62,7 +63,8 @@ module Magic
     end
 
     def activatable_abilities
-      player.permanents.flat_map(&:activated_abilities).filter_map do |ability|
+      graveyard_abilities = player.graveyard.cards.flat_map(&:graveyard_abilities)
+      [*player.permanents.flat_map(&:activated_abilities), *graveyard_abilities].filter_map do |ability|
         # Mana abilities don't use the stack (`Actions::ActivateManaAbility#uses_priority?`
         # is false) and resolve immediately in `#perform`; `Player#activate_ability` picks
         # the class the same way.

@@ -253,6 +253,8 @@ module Magic
     # Abilities and lifecycle triggers are lists; event handlers map event =>
     # ability, or => [abilities] when several handle one event.
     def hook_definition(hook, named)
+      # Graveyard abilities are instances on the card (Card#graveyard_abilities), not classes.
+      return "def #{hook} = [#{named.map { "#{_1.last}.new(source: self)" }.join(', ')}]\n" if hook == :graveyard_abilities
       return "def #{hook} = [#{named.map(&:last).join(', ')}]\n" unless hook == :event_handlers
 
       pairs = named.group_by { |rule, _| rule.handled_event }.map do |event, handlers|
