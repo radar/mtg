@@ -183,6 +183,8 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 **Testing a `SpellCast`-triggered ability (e.g. "whenever you cast a creature spell")**: Use `player.cast(card:) { |a| a.pay_mana(...) }` (calls `game.take_action`), not the `cast_and_resolve` spec helper — `cast_and_resolve` does a raw `game.stack.add(action)` and skips `Actions::Cast#perform`, which is where `Events::SpellCast` actually gets notified. A spec built on `cast_and_resolve` for a spell-cast trigger will silently see the trigger never fire.
 
+**Targeted trigger with exactly one legal target**: `Stack` auto-resolves a `Choice::Targeted` whose `target_choices` has a single entry (`stack.rb`, `single_choice?`), so `game.choices` is empty and `game.resolve_choice!(target:)` fails with `undefined method 'resolve!' for nil` — assert the effect directly, or put two legal targets on the battlefield before the trigger fires to test the choice itself. Exiled cards live in `game.exile`, not `player.exile`.
+
 **Putting a specific card on top of the library in a spec**: Use `player.library.add(card)` (default `placement: 0`, so it lands on top), not `player.library.unshift(card)`. `Zone#add` sets `card.zone = self`; `unshift` is a raw delegated Array method that skips it. A card with an unset `zone` silently fails to be removed from its zone when later moved (`move_to_hand!`/`resolve!` no-op on `from.remove` because `from` is nil), so it ends up duplicated instead of moved.
 
 ## Action Legality
