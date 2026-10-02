@@ -85,10 +85,9 @@ other FDN cards care about Gates.
   fixed and the cards regenerated: `CostReduction` ("spells you cast cost {1} less") also
   discounted the opponent's spells (Archmage of Runes, Mocking Sprite), and `CounterSpell`
   read "red or green" in "counter target red or green spell" as card types instead of colours
-  (Flashfreeze). Full suite: 4012 examples, 0 failures. Cards the parser generated correctly
-  but whose Oracle text needs checking by hand are not flagged: the specs assert the printed
-  text, but a rules line the parser silently dropped would not show up in a spec written from
-  the generated code, so each spec was written from the Oracle text instead.
+  (Flashfreeze). Full suite: 4012 examples, 0 failures. Caveat: the specs were written from
+  each card's Oracle text where it was checked and otherwise from the generated code, so a
+  rules line the parser silently dropped on an unchecked card would not fail its spec.
 
 ## Cards by bucket
 
