@@ -74,6 +74,12 @@ other FDN cards care about Gates.
   Felling Blow still fails: a counter and a bite share one target ("that creature deals…"),
   which `Bite`'s two-target shape doesn't model.
 
+- **2026-10-02 (later)**: generated all 136 "Ready to generate" cards in one pass (`rake
+  parse_card` logic over `tmp/ready.txt`). Implemented 28 → 164 of 427. No per-card specs yet;
+  they load and the existing suite passes, but nothing exercises their behaviour.
+  `Zeitwerk::Loader.eager_load_all` fails on the pre-existing `Aftermath Analyst` (creature
+  type `Detective` is not in `creature_types`), unrelated to these cards.
+
 ## Cards by bucket
 
 Cards listed under every bucket they appear in.
