@@ -53,6 +53,19 @@ RSpec.describe Magic::CardParser::Effects::Bite do
 
     expect(effect.target_choices).not_to include("planeswalkers")
   end
+
+  it "parses a victim the caster doesn't control" do
+    effect = described_class.parse("Target creature you control deals damage equal to its power to target creature or planeswalker you don't control.")
+
+    expect(effect.target_choices).to include("battlefield.not_controlled_by(controller).creatures")
+      .and include("battlefield.not_controlled_by(controller).planeswalkers")
+  end
+
+  it "parses \"creature an opponent controls\"" do
+    effect = described_class.parse("Target creature you control deals damage equal to its power to target creature an opponent controls.")
+
+    expect(effect.target_choices).to end_with("battlefield.not_controlled_by(controller).creatures]")
+  end
 end
 
 RSpec.describe Magic::CardParser::EffectList do

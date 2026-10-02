@@ -14,7 +14,7 @@ module Magic
       SENTENCE = /(?<=\.)\s+/
       # Clauses of one sentence, when the sentence isn't one effect as a whole
       # ("exile it, then return it" is one effect; "draw a card, then discard a card" two).
-      CLAUSE = /,? then |,? and (?=you |lose |gain |put |~ endures )/i
+      CLAUSE = /,? then |,? and (?=you |lose |gain |draw |put |~ endures )/i
       MAY = /\Ayou may /i
       IF_YOU_DO = /\A(?:If|When) you do, /i
       IF_YOU_DONT = /\AIf you don't, /i

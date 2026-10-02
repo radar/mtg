@@ -49,6 +49,24 @@ RSpec.describe "CardParser generated activated abilities in play" do
     expect(elves.card.zone).to be_graveyard
   end
 
+  it "sacrifices a creature to gain life and draw a card (\"You gain 1 life and draw a card\")" do
+    load_card("Parsed Rites {B}\nEnchantment\n{1}{B}, Sacrifice a creature: You gain 1 life and draw a card.\n")
+    rites = ResolvePermanent("Parsed Rites", owner: p1)
+    elves = ResolvePermanent("Wood Elves", owner: p1)
+    hand_size = p1.hand.count
+
+    p1.add_mana(black: 2)
+    p1.activate_ability(ability: ability_of(rites)) do
+      _1.pay_mana(generic: { black: 1 }, black: 1)
+      _1.pay_sacrifice(elves)
+    end
+    game.stack.resolve!
+
+    expect(p1.life).to eq(21)
+    expect(p1.hand.count).to eq(hand_size + 1)
+    expect(elves.card.zone).to be_graveyard
+  end
+
   it "pumps itself" do
     load_card("Parsed Brute {1}{R}\nCreature — Ogre\n{R}: Parsed Brute gets +1/+0 until end of turn.\n2/2\n")
     brute = ResolvePermanent("Parsed Brute", owner: p1)

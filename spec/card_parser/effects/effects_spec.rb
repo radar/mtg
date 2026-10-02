@@ -31,6 +31,13 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("~ deals 1 damage to each creature.").target_choices).to be_nil
   end
 
+  it "parses damage to each creature with or without flying" do
+    expect(described_class.parse("~ deals 2 damage to each creature without flying.").resolve_call)
+      .to eq("battlefield.creatures.reject(&:flying?).each { trigger_effect(:deal_damage, target: _1, damage: 2) }")
+    expect(described_class.parse("~ deals 2 damage to each creature with flying.").resolve_call)
+      .to eq("battlefield.creatures.select(&:flying?).each { trigger_effect(:deal_damage, target: _1, damage: 2) }")
+  end
+
   it "parses drawing and life gain" do
     expect(described_class.parse("Draw three cards.")).to eq(e.const_get(:DrawCards).new(3))
     expect(described_class.parse("You draw a card.")).to eq(e.const_get(:DrawCards).new(1))

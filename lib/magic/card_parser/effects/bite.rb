@@ -11,7 +11,12 @@ module Magic
       class Bite < Data.define(:victims)
         include Effect
 
-        VICTIMS = { "creature" => "battlefield.creatures", "creature or planeswalker" => "(battlefield.creatures + battlefield.planeswalkers)" }.freeze
+        VICTIMS = {
+          "creature" => "battlefield.creatures",
+          "creature or planeswalker" => "(battlefield.creatures + battlefield.planeswalkers)",
+          "creature or planeswalker you don't control" => "(battlefield.not_controlled_by(controller).creatures + battlefield.not_controlled_by(controller).planeswalkers)",
+          "creature an opponent controls" => "battlefield.not_controlled_by(controller).creatures"
+        }.freeze
         LINE = /\ATarget creature you control deals damage equal to its power to target (?<kind>#{VICTIMS.keys.join('|')})\.?\z/i
 
         def self.parse(text)

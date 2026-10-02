@@ -22,6 +22,8 @@ module Magic
           "you" => "[controller]",
           "each player" => "game.players",
           "each creature" => "battlefield.creatures",
+          "each creature without flying" => "battlefield.creatures.reject(&:flying?)",
+          "each creature with flying" => "battlefield.creatures.select(&:flying?)",
           "each creature and each player" => "(battlefield.creatures + game.players)"
         }.freeze
 
