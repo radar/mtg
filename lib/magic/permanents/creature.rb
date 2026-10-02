@@ -51,6 +51,15 @@ module Magic
         other.trigger_effect(:deal_damage, source: other, target: self, damage: their_power) if their_power.positive?
       end
 
+      # "Target creature you control deals damage equal to its power to target creature or planeswalker."
+      # One-way: `other` deals nothing back. Does nothing if either has left the battlefield.
+      def bite!(other)
+        return unless creature? && zone&.battlefield? && other&.zone&.battlefield?
+
+        apply_continuous_effects!
+        trigger_effect(:deal_damage, source: self, target: other, damage: power) if power.positive?
+      end
+
       # One-way combat damage (CombatPhase uses it); see #fights! for the keyword action.
       def fight(target, assigned_damage = power)
         trigger_effect(:deal_combat_damage, source: self, target: target, damage: assigned_damage)

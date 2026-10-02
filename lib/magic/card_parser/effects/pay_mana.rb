@@ -15,6 +15,7 @@ module Magic
           new(mana: ManaCost.parse(LINE.match(text)[:mana]).to_h) if LINE.match?(text)
         end
 
+        def may_choice? = true
         def choice_base = "Magic::Choice::PayMana"
         def choice_class_name = "PayManaChoice"
         def choice_args = "mana: #{mana.inspect}"

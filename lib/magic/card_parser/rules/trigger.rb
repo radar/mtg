@@ -77,6 +77,9 @@ module Magic
                      m[:itself] ? "under_your_control? && (event.permanent == actor || #{TYPE_CHECK.(m)})" : "under_your_control? && event.permanent != actor && #{TYPE_CHECK.(m)}"
                    },
                    PERMANENT_KINDS),
+          Kind.new(/#{WHEN} an? #{TYPES} you control enters/, "TribalEntersTrigger",
+                   "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
+                   ->(m) { "under_your_control? && #{TYPE_CHECK.(m)}" }, PERMANENT_KINDS),
           Kind.new(/#{WHEN} ~ becomes tapped/, "BecomesTappedTrigger", "TriggeredAbility", :event_handlers,
                    "Events::PermanentTapped", "event.permanent == actor", PERMANENT_KINDS),
           Kind.new(/#{WHEN} another creature #{ENTERS_UNDER_YOUR_CONTROL}/, "CreatureEntersTrigger",

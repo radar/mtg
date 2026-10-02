@@ -230,6 +230,8 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 
 Specs that count tokens: use `def tokens = p1.creatures.select { ... }`, not a memoized `let` -- a `let` snapshots the list the first time it's read, so a later "is it gone?" check sees stale permanents. A permanent with an ETB `Choice` (surveil, scry) leaves it pending after `ResolvePermanent`, which blocks `settle!`/trigger resolution until `game.skip_choice!`. Mobilize/Flurry parsing: see `docs/card_parser.md`.
 
+Endure and Behold (TDM): endure is a `Choice::Endure` (`resolve_choice!` = counters, `skip_choice!` = Spirit token); an optional "you may behold" additional cost is the card's `kicker_cost` (`Costs::OptionalBehold`, `pay_kicker`), and "if a Dragon was beheld" is `kicker_cost.paid?`; a destroyed permanent's `zone` is nil, so check `p2.graveyard.cards.map(&:name)` in specs. Details: `docs/card_parser.md`.
+
 `printf 'Name {cost}\nType — Sub\nrules\nP/T\n' | bundle exec rake parse_card` writes `lib/magic/cards/<name>.rb` from plain card text. How it works, what it supports, and how to add a rule or effect: `docs/card_parser.md`. Read it before changing `lib/magic/card_parser/`, `card_parser.rb` or `card_generator.rb`.
 
 ## Trigger Queue (rule 603.3b; default since 2026-09-24)

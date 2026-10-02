@@ -18,7 +18,8 @@ module Magic
       MAY = /\Ayou may /i
       IF_YOU_DO = /\A(?:If|When) you do, /i
       IF_YOU_DONT = /\AIf you don't, /i
-      KICKED = /\AIf (?:this spell|~) was kicked, /i
+      # "If a Dragon was beheld, ..." is the same check: Rules::BeholdCost's optional cost is the card's kicker_cost.
+      KICKED = /\AIf (?:(?:this spell|~) was kicked|an? [A-Z][\w-]* was beheld), /i
       # What follows "If this spell was kicked, ": "<effects> instead." or "instead <effects>."
       INSTEAD = /\A(?:instead,? (?<before>.+?)|(?<after>.+?),? instead)\.?\z/i
       # "it deals 4 damage instead": the same recipients as the damage it replaces.
@@ -70,7 +71,7 @@ module Magic
             return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DONT, "")))
 
             effects[-1] = effects.last.with(if_you_dont: effects.last.if_you_dont + [effect])
-          elsif IF_YOU_DO.match?(sentence) && effects.last.is_a?(Effects::PayMana)
+          elsif IF_YOU_DO.match?(sentence) && effects.last.respond_to?(:may_choice?) && effects.last.may_choice?
             # "you may pay {M}. If you do, ...": the pay choice is the "may"; what follows runs once it's paid.
             effects << (parse_sentence(sentence.sub(IF_YOU_DO, "")) or return)
           elsif IF_YOU_DO.match?(sentence)
@@ -79,7 +80,7 @@ module Magic
             effects[-1] = effects.last.with(if_you_do: effects.last.if_you_do + [effect])
           elsif MAY.match?(sentence)
             effect = parse_sentence(sentence.sub(MAY, "")) or return
-            effects << (effect.is_a?(Effects::PayMana) ? effect : OptionalEffect.new(effect:, if_you_do: []))
+            effects << (effect.respond_to?(:may_choice?) && effect.may_choice? ? effect : OptionalEffect.new(effect:, if_you_do: []))
           else
             effect = parse_sentence(sentence) or return
             effects << effect

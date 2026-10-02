@@ -23,7 +23,7 @@ module Magic
       WITH = /(?<qualifier>flying|mana value \d+ or (?:greater|less))/i
       # Every creature type the engine knows, longest first so "Elemental" beats "Elf".
       CREATURE_TYPES = Magic::Types::Creatures.values.sort_by { -_1.size }.join("|").freeze
-      PATTERN = /(?<up_to>up to one )?(?<another>another |other )?target (?<attacking>attacking )?(?<tapped>tapped )?(?<kind>#{UNIONS.keys.join('|')}|#{KINDS.keys.join('|')}|(?-i:(?:#{CREATURE_TYPES})\b))(?: with #{WITH})?(?: (?<controller>#{CONTROLLERS.keys.compact.join('|')}))?/i
+      PATTERN = /(?<up_to>up to one )?(?<another>another |other )?target (?<attacking>attacking (?<or_blocking>or blocking )?)?(?<tapped>tapped )?(?<kind>#{UNIONS.keys.join('|')}|#{KINDS.keys.join('|')}|(?-i:(?:#{CREATURE_TYPES})\b))(?: with #{WITH})?(?: (?<controller>#{CONTROLLERS.keys.compact.join('|')}))?/i
 
       # Whether the match names creatures ("target creature", "target Elf"), not another card type.
       def self.creature?(match) = match[:kind].downcase == "creature" || creature_type?(match)
@@ -77,7 +77,9 @@ module Magic
                      else
                        "#{base}.#{KINDS.fetch(match[:kind].downcase)}"
                      end
-        permanents += ".attacking" if match[:attacking]
+        if match[:attacking]
+          permanents += match[:or_blocking] ? ".select { game.current_turn.attacking?(_1) || game.current_turn.blocking?(_1) }" : ".attacking"
+        end
         permanents += ".select(&:tapped?)" if match[:tapped]
         permanents += with_filter(match[:qualifier]) if match[:qualifier]
         match[:another] ? "(#{permanents} - [#{Effect::THIS}])" : permanents

@@ -42,6 +42,7 @@ module Magic
       alias_method :name, :inspect
 
       def countered!
+        kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold)
         game.notify!(Events::SpellCountered.new(spell: card, player: player))
         @harmonize ? card.exile! : card.move_to_graveyard!(card.owner)
       end
@@ -138,7 +139,7 @@ module Magic
 
       # Instants and spells with flash can be cast any time the player has priority.
       def instant_speed?
-        card.instant? || card.flash?
+        card.instant? || card.flash? || (kicker_cost.respond_to?(:grants_flash?) && kicker_cost.grants_flash?)
       end
 
       def target_choices
@@ -482,6 +483,9 @@ module Magic
           resolved.register_turn_trigger(Events::CreatureDied, Blitz::DeathDrawTrigger)
           resolved.register_turn_trigger(Events::BeginningOfEndStep, Blitz::EndStepSacrificeTrigger)
         end
+
+        # The card's own optional behold cost outlives this cast: forget it was paid.
+        kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold)
 
         if resolved.is_a?(Permanent)
           @paid_additional_costs.each { |cost| cost.resolved!(resolved) if cost.respond_to?(:resolved!) }

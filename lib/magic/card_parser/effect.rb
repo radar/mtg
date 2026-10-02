@@ -35,6 +35,9 @@ module Magic
       # True for "up to one target ...": the ability still resolves without a target.
       def optional_target? = false
       def choice_base = nil
+      # True when "you may <this>. If you do, <effects>" is the choice itself (PayMana, Behold): the
+      # "If you do" effects run after the choice is accepted, in the choice's subclass.
+      def may_choice? = false
       def choice_args = nil
       def definitions = nil
     end
