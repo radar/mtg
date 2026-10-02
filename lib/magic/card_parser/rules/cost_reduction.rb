@@ -28,7 +28,9 @@ module Magic
                 super(source:, adjustment: { generic: -#{amount} })
               end
 
-              def applies_to?(card) = #{condition}
+              def applies_to?(card)
+                (card.controller || card.owner) == source.controller && (#{condition})
+              end
             end
           RUBY
         end

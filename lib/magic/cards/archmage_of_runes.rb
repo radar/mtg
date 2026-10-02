@@ -13,7 +13,9 @@ module Magic
           super(source:, adjustment: { generic: -1 })
         end
 
-        def applies_to?(card) = card.type?("Instant") || card.type?("Sorcery")
+        def applies_to?(card)
+          (card.controller || card.owner) == source.controller && (card.type?("Instant") || card.type?("Sorcery"))
+        end
       end
 
       def static_abilities = [CostReduction]
