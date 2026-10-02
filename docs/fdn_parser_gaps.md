@@ -80,6 +80,16 @@ other FDN cards care about Gates.
   `Zeitwerk::Loader.eager_load_all` fails on the pre-existing `Aftermath Analyst` (creature
   type `Detective` is not in `creature_types`), unrelated to these cards.
 
+- **2026-10-02 (specs)**: every one of the 136 generated cards now has a spec in
+  `spec/cards/` (one `Add spec for …` commit each). Writing them found two parser bugs, both
+  fixed and the cards regenerated: `CostReduction` ("spells you cast cost {1} less") also
+  discounted the opponent's spells (Archmage of Runes, Mocking Sprite), and `CounterSpell`
+  read "red or green" in "counter target red or green spell" as card types instead of colours
+  (Flashfreeze). Full suite: 4012 examples, 0 failures. Cards the parser generated correctly
+  but whose Oracle text needs checking by hand are not flagged: the specs assert the printed
+  text, but a rules line the parser silently dropped would not show up in a spec written from
+  the generated code, so each spec was written from the Oracle text instead.
+
 ## Cards by bucket
 
 Cards listed under every bucket they appear in.
