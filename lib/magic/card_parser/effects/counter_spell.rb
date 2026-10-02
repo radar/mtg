@@ -9,6 +9,8 @@ module Magic
       class CounterSpell < Data.define(:types, :mana_value)
         include Effect
 
+        # "red spell" is a colour check, not a card type.
+        COLORS = %w[white blue black red green].freeze
         LINE = /\ACounter target (?:(?<types>[\w-]+(?: or [\w-]+)?) )?spell(?: with mana value (?<mana_value>\d+))?\.?\z/i
 
         def self.parse(text)
@@ -21,7 +23,9 @@ module Magic
           filters = []
           unless types.empty?
             checks = types.map do |type|
-              type.start_with?("non") ? "!_1.card.type?(#{capitalize(type.delete_prefix('non')).inspect})" : "_1.card.type?(#{capitalize(type).inspect})"
+              word = type.delete_prefix("non")
+              check = COLORS.include?(word) ? "_1.card.colors.include?(:#{word})" : "_1.card.type?(#{capitalize(word).inspect})"
+              type.start_with?("non") ? "!#{check}" : check
             end
             filters << checks.join(" || ")
           end

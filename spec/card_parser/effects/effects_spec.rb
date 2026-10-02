@@ -199,6 +199,13 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Counter target creature spell.").resolve_call).to eq("trigger_effect(:counter_spell, target: target)")
   end
 
+  it "reads a colour in \"counter target red or green spell\" as a colour check, not a card type" do
+    expect(described_class.parse("Counter target red or green spell.").target_choices)
+      .to eq("game.stack.spells.select { _1.card.colors.include?(:red) || _1.card.colors.include?(:green) }")
+    expect(described_class.parse("Counter target nonblue spell.").target_choices)
+      .to eq("game.stack.spells.select { !_1.card.colors.include?(:blue) }")
+  end
+
   it "parses an up-to-one target getting base power and toughness and all creature types until end of turn" do
     base = described_class.parse("Choose up to one other target creature. Until end of turn, that creature has base power and toughness 4/4 and gains all creature types.")
     expect(base).to eq(e.const_get(:BaseStatsUntilEndOfTurn).new(true, 4, 4, true))

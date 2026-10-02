@@ -6,7 +6,7 @@ module Magic
 
     class Flashfreeze < Instant
       def target_choices
-        game.stack.spells.select { _1.card.type?("Red") || _1.card.type?("Green") }
+        game.stack.spells.select { _1.card.colors.include?(:red) || _1.card.colors.include?(:green) }
       end
 
       def resolve!(target:)
