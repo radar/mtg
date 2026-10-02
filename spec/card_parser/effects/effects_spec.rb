@@ -385,6 +385,19 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Each opponent sacrifices an artifact.").permanent_types).to eq(%w[Artifact])
   end
 
+  it "parses a target player sacrificing a permanent of a type" do
+    sacrifice = described_class.parse("Target player sacrifices a creature of their choice.")
+    expect(sacrifice).to eq(e.const_get(:TargetPlayerSacrifices).new("player", %w[Creature]))
+    expect(sacrifice.target_choices).to eq("game.players")
+    expect(sacrifice.resolve_call).to include("player: target")
+    expect(described_class.parse("Target opponent sacrifices an artifact or creature.").target_choices).to eq("game.opponents(controller)")
+  end
+
+  it "parses damage to a target player or planeswalker, from a lowercase \"it\"" do
+    damage = described_class.parse("it deals 2 damage to target player or planeswalker.")
+    expect(damage.target_choices).to eq("game.players + battlefield.planeswalkers")
+  end
+
   it "parses blight, for you, each opponent or a target opponent" do
     mine = described_class.parse("Blight 2.")
     expect(mine).to eq(e.const_get(:Blight).new("you", 2))
