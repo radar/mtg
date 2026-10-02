@@ -68,7 +68,7 @@ module Magic
 
     def land_kind
       raise CardParser::UnsupportedCard, "legendary lands not supported" if @result.legendary?
-      return :land if @result.supertypes.empty? && @result.subtypes.empty?
+      return :land if @result.supertypes.empty? && (@result.subtypes.empty? || @result.subtypes == [Types::Lands::Gate])
       return :basic_land if @result.supertypes == ["Basic"] && @result.subtypes.size == 1
 
       raise CardParser::UnsupportedCard, "unsupported land: #{@result.supertypes.join(' ')} #{@result.subtypes.join(' ')}"
@@ -154,7 +154,9 @@ module Magic
 
     def land_source
       sections = class_sections
-      body = ["NAME = #{@result.name.inspect}", *sections].join("\n\n")
+      header = ["NAME = #{@result.name.inspect}"]
+      header << "type T::Land, T::Lands::Gate" if @result.subtypes == [Types::Lands::Gate]
+      body = [header.join("\n"), *sections].join("\n\n")
       wrap("class #{const} < Land\n#{indent(body)}\nend\n")
     end
 
