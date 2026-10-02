@@ -22,6 +22,9 @@ module Magic
       SELF = {
         "~ is tapped" => "source.tapped?",
         "~ is untapped" => "source.untapped?",
+        # Raid: the log has a FinalAttackersDeclared with attacks for the controller's turn.
+        "you attacked this turn" => "game.current_turn.events.any? { |e| e.is_a?(Events::FinalAttackersDeclared) && e.active_player == controller && e.attacks.any? }",
+        "an opponent lost life this turn" => "game.current_turn.events.any? { |e| e.is_a?(Events::LifeLoss) && e.player != controller }",
         "~ is equipped" => 'source.attachments.any? { _1.type?("Equipment") }',
         "~ is enchanted" => 'source.attachments.any? { _1.type?("Aura") }'
       }.freeze
