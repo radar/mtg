@@ -165,4 +165,26 @@ RSpec.describe Magic::CardParser::Condition do
   it "reads 'you attacked this turn'" do
     expect(described_class.parse("you attacked this turn")).to include("Events::CreatureAttacked")
   end
+
+  it "reads 'it/~ has a <type> counter on it' as one or more" do
+    expect(described_class.parse("it has a divinity counter on it")).to eq("source.counters.of_type(Counters::Divinity).count >= 1")
+    expect(described_class.parse("~ has three or more time counters on it")).to eq("source.counters.of_type(Counters::Time).count >= 3")
+  end
+end
+
+RSpec.describe Magic::CardParser::Rules::EntersWithCounters, "if cast from your hand" do
+  it "marks the counter as conditional on being cast from the hand" do
+    rule = described_class.parse("~ enters with a divinity counter on it if you cast it from your hand.")
+    expect(rule.body_source).to eq("enters_with_counters \"divinity\", 1, if_cast_from_hand: true\n")
+    expect(described_class.parse("~ enters with a divinity counter on it.").body_source).to eq("enters_with_counters \"divinity\", 1\n")
+  end
+end
+
+RSpec.describe Magic::CardParser::Effect, "(discard hand)" do
+  it "parses discarding a whole hand" do
+    expect(described_class.parse("Each opponent discards their hand.").resolve_call)
+      .to eq("game.opponents(controller).each { |player| [*player.hand.cards].each(&:discard!) }")
+    expect(described_class.parse("Target opponent discards their hand.").target_choices).to eq("game.opponents(controller)")
+    expect(described_class.parse("You discard your hand.").resolve_call).to start_with("[controller].each")
+  end
 end

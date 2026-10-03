@@ -18,7 +18,8 @@ module Magic
       NONE = /\Ayou control no (?<other>other )?(?<types>#{Count::TYPE})\z/
       LIFE = /\A(?<who>you have|an opponent has) (?<amount>\d+|\w+) or (?<cmp>more|less) life\z/
       GRAVEYARD = /\Athere are (?<amount>\d+|\w+) or more (?:(?<type>creature|land|enchantment) )?cards in your graveyard\z/
-      COUNTERS = %r{\A~ has (?<amount>\d+|\w+) or more (?<counter>[\w+/-]+) counters on it\z}
+      # "~ has three or more time counters on it" / "~ has a divinity counter on it" (one or more).
+      COUNTERS = %r{\A(?:~|it) has (?:(?<amount>\d+|\w+) or more|an?) (?<counter>[\w+/-]+) counters? on it\z}
       SELF = {
         "~ is tapped" => "source.tapped?",
         "~ is untapped" => "source.untapped?",
@@ -57,7 +58,7 @@ module Magic
       # nil for a counter type Magic::Counters doesn't know.
       def self.counters(match)
         counter = Magic::Counters[match[:counter].downcase].name.split("::").last
-        "source.counters.of_type(Counters::#{counter}).count >= #{Number.parse(match[:amount])}"
+        "source.counters.of_type(Counters::#{counter}).count >= #{Number.parse(match[:amount] || 'a')}"
       rescue RuntimeError => e
         raise unless e.message.start_with?("Unknown counter type")
       end

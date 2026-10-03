@@ -81,6 +81,9 @@ module Magic
       permanent.tap! if enters_tapped
       permanent.attach_to!(attach_to) if attach_to
       card.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
+      if cast && card_zone&.hand?
+        card.entering_counters_if_cast_from_hand.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
+      end
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       add_additional_counters_for_entering(game:, permanent:) if card.creature?
       move_card_to_battlefield(game:, card:, permanent:, from: card_zone)
