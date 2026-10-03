@@ -107,9 +107,12 @@ module Magic
     private
 
     def own_name_to_tilde(line)
+      # A token's own name ("tokens named Koma's Coil") stays as written.
+      token_names = []
+      line = line.gsub(/(?<=tokens named |token named )[^.]+/) { token_names << $&; "\u0000" }
       line = line.gsub(@name, "~")
       @short_names.each { |short| line = line.gsub(/\b#{Regexp.escape(short)}\b/, "~") }
-      line.gsub(THIS_OBJECT, "~")
+      line.gsub(THIS_OBJECT, "~").gsub("\u0000") { token_names.shift }
     end
 
     # "Color Indicator: Black" / "Blue and Red" -> [:black] / [:blue, :red]

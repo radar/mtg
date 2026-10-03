@@ -19,6 +19,8 @@ module Magic
         def initialize(who:, reference:, power:, toughness:, per:, keywords:, until_next_turn: false) = super
 
         def self.parse(text)
+          # "Until end of turn, creatures you control get +1/+1 and gain haste." (duration first)
+          text = "#{$~[:rest]} until end of turn" if /\AUntil end of turn, (?<rest>.+?)\.?\z/i.match(text)
           return unless (m = LINE.match(text))
 
           until_next_turn = m[:duration].downcase == "until your next turn"
