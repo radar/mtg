@@ -542,6 +542,8 @@ module Magic
 
     def receive_event(event)
       handler_class = event_handlers[event.class]
+      return if zone&.graveyard? && !handler_class.respond_to?(:works_from_graveyard?)
+
       if handler_class
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
         handler = handler_class.new(actor: self, event: event)

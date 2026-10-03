@@ -25,6 +25,10 @@ module Magic
       # Vivid: "the number of colors among permanents you control".
       COLORS_AMONG = /\A(?:the number of colors|each color|color) among permanents you control\z/
 
+      # "the greatest power among other creatures you control" (Prime Speaker Zegana), and "its power".
+      GREATEST_POWER = /\Athe greatest power among (?<other>other )?creatures you control\z/
+      ITS_POWER = /\A(?:its|~'s) power\z/
+
       # "the number of counters on ~" (Warden of the Grove).
       COUNTERS_ON_THIS = /\A(?:the number of )?counters on ~\z/
 
@@ -37,6 +41,9 @@ module Magic
         return "controller.colors_among_permanents" if COLORS_AMONG.match?(text)
         return "controller.permanents.reject(&:land?).map(&:mana_value).uniq.count" if DIFFERENT_MANA_VALUES.match?(text)
         return "event.attacks.count { _1.attacker.controller == controller }" if ATTACKING_CREATURES.match?(text)
+
+        return "(controller.creatures#{".except(#{this})" if $~[:other]}.map(&:power).max || 0)" if GREATEST_POWER.match(text)
+        return "#{this}.power" if ITS_POWER.match?(text)
 
         text = text.delete_prefix("the number of ")
         if (m = PERMANENTS.match(text))

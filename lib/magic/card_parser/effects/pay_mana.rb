@@ -12,6 +12,8 @@ module Magic
         LINE = /\APay (?<mana>(?:\{[^}]+\})+)\.?\z/i
 
         def self.parse(text)
+          return if text.include?("{X}") # PayX's
+
           new(mana: ManaCost.parse(LINE.match(text)[:mana]).to_h) if LINE.match?(text)
         end
 

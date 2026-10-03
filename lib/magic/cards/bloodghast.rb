@@ -29,6 +29,8 @@ module Magic
       end
 
       class LandfallTrigger < TriggeredAbility::Landfall
+        def self.works_from_graveyard? = true
+
         def should_perform?
           actor.zone.graveyard?
         end

@@ -3,7 +3,9 @@
 module Magic
   class CardParser
     module Effects
-      # "Target player loses 2 life." / "Each opponent loses 1 life." / "You lose 1 life."
+      # "Target player loses 2 life." / "Each opponent loses 1 life." / "You lose 1 life." /
+      # "That player loses 2 life." (the controller of the creature in a "Whenever a creature
+      # an opponent controls dies" trigger: `event.permanent.controller`).
       class LoseLife < Data.define(:who, :amount)
         include Effect
 

@@ -106,6 +106,31 @@ other FDN cards care about Gates.
   The changes also moved six cards to "Ready to generate" (raid and opponent-cast triggers):
   Gorehorn Raider, Mischievous Mystic, Mold Adder, Searslicer Goblin, Skyship Buccaneer, Storm
   Fleet Spy; not generated here (they belong to the ETB/dies bucket).
+- **2026-10-03 (ETB/dies bucket)**: 21 cards implemented, each with a spec: Gorehorn Raider, Storm
+  Fleet Spy, Skyship Buccaneer (raid), Bloodtithe Collector, Viashino Pyromancer, Gatekeeper of
+  Malakir, Fierce Empath, Micromancer, Rune-Scarred Demon, Campus Guide, Archway Angel,
+  Good-Fortune Unicorn, Felidar Savior, Affectionate Indrik, Massacre Wurm, Prime Speaker Zegana,
+  Arbiter of Woe, Thrill of Possibility (unlocked by the sacrifice/discard additional-cost rule),
+  Pirate's Cutlass, Wildborn Preserver, Authority of the Consuls. New parser support: raid /
+  "an opponent lost life this turn" intervening-ifs, "target player or planeswalker" damage, "target
+  player sacrifices", library searches for any card / type unions / mana value / "then shuffle and put
+  that card on top", "N life for each <count>" (Gate counts), "put a counter on that creature" for an
+  entering creature, counters on "each of up to two target creatures", "have it fight", pumps on
+  "creatures your opponents control", "that player loses N life", "enters with X counters, where X is
+  the greatest power among other creatures you control", "draw cards equal to its power", additional
+  sacrifice/discard casting costs, "discards a card and loses N life", "attach it to target Pirate",
+  "you may pay {X}. When you do", "another non-<Type> creature you control enters", "creatures your
+  opponents control enter tapped", "a creature an opponent controls enters". Bucket 28 -> 8 cards;
+  FDN implemented 164 -> 194 of 427 (which includes the other agent's work from the merged base).
+  Bug found: a card with `event_handlers` kept triggering from the graveyard after it died (fixed;
+  handlers that really work from there declare `self.works_from_graveyard?`). Not done, and why:
+  Venom Connoisseur (per-turn resolution count), Infernal Vessel (dies, returns as a Demon "in
+  addition to its other types"), Garna ("if it was attacking" on a death), Nine-Lives Familiar
+  (revival counters if cast + delayed return), Kiora (named legendary token, threshold),
+  Undying Malice (grants a dies trigger until end of turn), Predator Ooze (needs "dealt damage by ~
+  this turn" tracking), Hoarding Dragon (exile the searched card, return it when ~ dies). Six more cards
+  now generate cleanly ("Ready to generate": Celestial Armor, Halana and Alena, Heroes' Bane, Searslicer
+  Goblin, Seeker's Folly, Stromkirk Bloodthief) but were not generated or spec'd here.
 
 ## Cards by bucket
 

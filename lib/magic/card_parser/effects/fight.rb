@@ -8,9 +8,10 @@ module Magic
       class Fight < Data.define(:fighter, :reference)
         include Effect
 
-        FIGHTERS = { "~" => Effect::THIS, "enchanted creature" => "#{Effect::THIS}.attached_to",
+        # "you may have it fight target creature" (Affectionate Indrik): "it" is the creature itself.
+        FIGHTERS = { "~" => Effect::THIS, "it" => Effect::THIS, "enchanted creature" => "#{Effect::THIS}.attached_to",
                      "equipped creature" => "#{Effect::THIS}.attached_to" }.freeze
-        LINE = /\A(?<fighter>~|enchanted creature|equipped creature) fights #{PermanentTarget::PATTERN}\.?\z/i
+        LINE = /\A(?:(?<fighter>~|enchanted creature|equipped creature) fights|have (?<fighter>it) fight) #{PermanentTarget::PATTERN}\.?\z/i
 
         def self.parse(text)
           return unless (m = LINE.match(text)) && m[:kind].downcase == "creature"

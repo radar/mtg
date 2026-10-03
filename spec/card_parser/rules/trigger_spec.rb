@@ -14,6 +14,27 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     expect(parse("When ~ enters, draw a card.").hook).to eq(:etb_triggers)
   end
 
+  it "puts counters on the creature that entered, and scales life gain by a count" do
+    counters = parse("Whenever another creature you control enters, put a +1/+1 counter on that creature.")
+    expect(counters.effect_list.effects.first.resolve_call).to include("target: event.permanent")
+    life = parse("When ~ enters, you gain 2 life for each Gate you control.")
+    expect(life.effect_list.effects.first.resolve_call).to eq('trigger_effect(:gain_life, target: controller, life: 2 * controller.permanents.by_type("Gate").count)')
+  end
+
+  it "parses another non-<Type> creature you control entering" do
+    trigger = parse("Whenever another non-Human creature you control enters, draw a card.")
+
+    expect(trigger.kind.name).to eq("NonTribalCreatureEntersTrigger")
+    expect(trigger.condition).to eq('another_creature? && under_your_control? && !event.permanent.type?("Human")')
+  end
+
+  it "parses a creature an opponent controls entering" do
+    trigger = parse("Whenever a creature an opponent controls enters, you gain 1 life.")
+
+    expect(trigger.kind.name).to eq("OpponentCreatureEntersTrigger")
+    expect(trigger.condition).to eq("creature? && event.permanent.controller != controller")
+  end
+
   it "parses several effects" do
     effects = parse("When ~ enters, scry 2, then draw a card.").effect_list.effects
     expect(effects).to eq([e.const_get(:Scry).new(2), e.const_get(:DrawCards).new(1)])

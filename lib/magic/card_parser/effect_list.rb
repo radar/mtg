@@ -38,6 +38,15 @@ module Magic
       # "draw a card for each <count>" / "you gain 1 life for each <count>": N times the count.
       FOR_EACH = /\b(?<verb>draw|gain) (?<n>an?|\d+|\w+) (?<noun>cards?|life) for each (?<what>[^.]+?)(?=\.|,|\z)/i
 
+      # "gain 2 life for each Gate you control" (also lose): the amount is N times the count.
+      LIFE_FOR_EACH = /\b(?<verb>gain|lose|gains|loses) (?<amount>\d+|\w+) life for each (?<what>[^.]+?)(?=\.|,|\z)/i
+
+      # "Each opponent discards a card and loses 2 life": the second verb has the first's subject, so it becomes
+      # a sentence of its own with that subject spelled out.
+      DISCARD_AND_LOSE = /(?<who>Each opponent|Target opponent|Target player) (?<discard>discards? (?:a|\w+) cards?) and (?<lose>loses? \w+ life)/i
+
+      PAY_X = /\byou may pay \{X\}\./i
+
       # `text` as one effect (some span two sentences), else every sentence (or,
       # failing that, every clause of it) as an effect; nil unless all of them parse.
       def self.parse(text)
@@ -47,11 +56,18 @@ module Magic
           return Number.with_x(times == 1 ? count : "#{times} * #{count}") { parse(rewritten) }
         end
 
+        text = text.gsub(DISCARD_AND_LOSE) { "#{$~[:who]} #{$~[:discard]}. #{$~[:who]} #{$~[:lose]}" }
+        # "you may pay {X}. When you do, put X counters ...": the X is what the Choice::PayX remembers as `x`.
+        return Number.with_x("x") { parse(text) } if PAY_X.match?(text) && !Number.x_bound?
+
         if (m = WHERE_X.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))
           return Number.with_x(count) { parse(text.sub(WHERE_X, "")) }
         elsif (m = EQUAL_TO.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))
           rewritten = text.sub(EQUAL_TO) { m[:noun] == "cards" ? "#{m[:verb]} X cards" : "#{m[:verb]} X life" }
           return Number.with_x(count) { parse(rewritten) }
+        elsif (m = LIFE_FOR_EACH.match(text)) && !Number.x_bound? && (count = Count.parse(m[:what], this: Effect::THIS))
+          rewritten = text.sub(LIFE_FOR_EACH) { "#{m[:verb]} X life" }
+          return Number.with_x("#{Number.parse(m[:amount])} * #{count}") { parse(rewritten) }
         end
 
         effect = Effect.parse(text) and return (new(effects: [effect]) unless effect.earlier_target?)
@@ -322,12 +338,15 @@ module Magic
       # "up to one target": choosing none (skip_choice! -> decline!), or having
       # nothing to choose, still runs the effects after it.
       def optional_target_choice(name, point, classes, after, context)
-        body = [method("choices", [expand(point.target_choices, "actor")]), "def choice_amount = 0..1\n", *classes]
+        # "each of up to two target creatures": several targets, resolved with `targets:`.
+        maximum = point.respond_to?(:max_targets) ? point.max_targets : 1
+        resolve = maximum > 1 ? "resolve!(targets:)" : "resolve!(target:)"
+        body = [method("choices", [expand(point.target_choices, "actor")]), "def choice_amount = 0..#{maximum}\n", *classes]
         if after.empty?
-          body << method("resolve!(target:)", [expand(point.resolve_call, "actor")])
+          body << method(resolve, [expand(point.resolve_call, "actor")])
           adds = ["choice = #{name}.new(actor: #{context.this})", "game.add_choice(choice) if choice.choices.any?"]
         else
-          body << method("resolve!(target:)", [expand(point.resolve_call, "actor"), "finish"])
+          body << method(resolve, [expand(point.resolve_call, "actor"), "finish"])
           body << "def decline! = finish\n"
           body << method("finish", after)
           adds = ["choice = #{name}.new(actor: #{context.this})", "choice.choices.any? ? game.add_choice(choice) : choice.finish"]

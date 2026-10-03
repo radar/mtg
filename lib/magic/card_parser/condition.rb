@@ -23,6 +23,7 @@ module Magic
       SELF = {
         "~ is tapped" => "source.tapped?",
         "~ is untapped" => "source.untapped?",
+        "an opponent lost life this turn" => "game.current_turn.events.any? { |e| e.is_a?(Events::LifeLoss) && e.player != controller }",
         "~ is equipped" => 'source.attachments.any? { _1.type?("Equipment") }',
         "~ is enchanted" => 'source.attachments.any? { _1.type?("Aura") }'
       }.freeze
@@ -76,6 +77,7 @@ module Magic
 
         plural = word.downcase.delete_suffix("s")
         return plural if Count::YOUR_PERMANENTS.key?(plural)
+        return Magic::Types::Lands::Gate if plural.capitalize == Magic::Types::Lands::Gate
 
         CreatureType.singular(word)
       end

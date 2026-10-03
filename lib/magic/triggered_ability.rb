@@ -25,9 +25,13 @@ module Magic
     end
 
     # "that player" in a trigger's effect: the player the event is about (who cast, drew or
-    # started a step), or the player who was dealt damage.
+    # started a step), the player who was dealt damage, or the controller of the creature that
+    # entered ("Whenever a creature an opponent controls enters, that player loses 1 life").
     def that_player
-      event.respond_to?(:player) ? event.player : event.target
+      if event.respond_to?(:player) then event.player
+      elsif event.respond_to?(:target) then event.target
+      else event.permanent.controller
+      end
     end
 
     def life_gained_by(controller)

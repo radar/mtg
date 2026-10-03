@@ -385,6 +385,62 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Each opponent sacrifices an artifact.").permanent_types).to eq(%w[Artifact])
   end
 
+  it "parses \"have it fight\" and counters on up to N targets" do
+    fight = described_class.parse("Have it fight target creature you don't control.")
+    expect(fight.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.fights!(target)")
+    expect(fight.target_choices).to eq("battlefield.not_controlled_by(controller).creatures")
+
+    counters = described_class.parse("Put a +1/+1 counter on each of up to two other target creatures you control.")
+    expect(counters.max_targets).to eq(2)
+    expect(counters.optional_target?).to be(true)
+    expect(counters.target_choices).to eq("(battlefield.controlled_by(controller).creatures - [#{Magic::CardParser::Effect::THIS}])")
+    expect(counters.resolve_call).to include("targets.each", '"+1/+1"')
+  end
+
+  it "parses a pump on creatures your opponents control, and \"that player loses N life\"" do
+    pump = described_class.parse("Creatures your opponents control get -2/-2 until end of turn.")
+    expect(pump.resolve_call).to start_with("battlefield.not_controlled_by(controller).creatures.each")
+    expect(pump.resolve_call).to include("power: -2, toughness: -2")
+    expect(described_class.parse("That player loses 2 life.").resolve_call).to eq("trigger_effect(:lose_life, target: that_player, life: 2)")
+  end
+
+  it "gives the second verb of \"each opponent discards a card and loses 2 life\" the same subject" do
+    list = Magic::CardParser::EffectList.parse("each opponent discards a card and loses 2 life. You draw a card and gain 2 life.")
+
+    expect(list.effects).to eq([e.const_get(:Discard).new("each opponent", 1), e.const_get(:LoseLife).new("each opponent", 2),
+                                e.const_get(:DrawCards).new(1), e.const_get(:GainLife).new(2)])
+  end
+
+  it "parses attaching itself to a target creature" do
+    attach = described_class.parse("Attach it to target Pirate you control.")
+
+    expect(attach.target_choices).to eq('battlefield.controlled_by(controller).creatures.by_any_type("Pirate")')
+    expect(attach.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.attach_to!(target)")
+    expect(described_class.parse("Attach it to target land you control.")).to be_nil
+  end
+
+  it "reads pay {X} as its own choice, with X in the following effects as the choice's x" do
+    expect(described_class.parse("Pay {X}.").choice_base).to eq("Magic::Choice::PayX")
+    expect(described_class.parse("Pay {1}{W}.").choice_base).to eq("Magic::Choice::PayMana")
+
+    list = Magic::CardParser::EffectList.parse("You may pay {X}. When you do, put X +1/+1 counters on ~.")
+    expect(list.effects.first).to be_a(e.const_get(:PayX))
+    expect(list.effects.last.resolve_call).to include("amount: x")
+  end
+
+  it "parses a target player sacrificing a permanent of a type" do
+    sacrifice = described_class.parse("Target player sacrifices a creature of their choice.")
+    expect(sacrifice).to eq(e.const_get(:TargetPlayerSacrifices).new("player", %w[Creature]))
+    expect(sacrifice.target_choices).to eq("game.players")
+    expect(sacrifice.resolve_call).to include("player: target")
+    expect(described_class.parse("Target opponent sacrifices an artifact or creature.").target_choices).to eq("game.opponents(controller)")
+  end
+
+  it "parses damage to a target player or planeswalker, from a lowercase \"it\"" do
+    damage = described_class.parse("it deals 2 damage to target player or planeswalker.")
+    expect(damage.target_choices).to eq("game.players + battlefield.planeswalkers")
+  end
+
   it "parses blight, for you, each opponent or a target opponent" do
     mine = described_class.parse("Blight 2.")
     expect(mine).to eq(e.const_get(:Blight).new("you", 2))
@@ -516,7 +572,20 @@ RSpec.describe Magic::CardParser::Effect do
     expect(ramp.choice_args).to eq(["to_zone: :battlefield", "enters_tapped: true", "upto: 1", "filter: Filter[:basic_lands]"])
     tutor = described_class.parse("Search your library for a creature card, reveal it, put it into your hand, then shuffle.")
     expect(tutor.choice_args).to eq(["to_zone: :hand", "enters_tapped: false", "upto: 1", "filter: Filter[:creatures]", "reveal: true"])
-    expect(described_class.parse("Search your library for an artifact card, put it into your hand, then shuffle.")).to be_nil
+    expect(described_class.parse("Search your library for an artifact card, put it into your hand, then shuffle.").choice_args)
+      .to include('filter: ->(card) { card.any_type?("Artifact") }')
+    expect(described_class.parse("Search your library for a card with the same name as that card, put it into your hand, then shuffle.")).to be_nil
+  end
+
+  it "parses searches for any card, a type union, a mana value, or onto the top of the library" do
+    any = described_class.parse("Search your library for a card, put it into your hand, then shuffle.")
+    expect(any.choice_args).to include("filter: ->(card) { true }")
+    union = described_class.parse("Search your library for an instant or sorcery card with mana value 1, reveal it, put it into your hand, then shuffle.")
+    expect(union.choice_args).to include('filter: ->(card) { card.any_type?("Instant", "Sorcery") && card.mana_value == 1 }', "reveal: true")
+    big = described_class.parse("Search your library for a creature card with mana value 6 or greater, put it into your hand, then shuffle.")
+    expect(big.choice_args).to include("filter: ->(card) { card.any_type?(\"Creature\") && card.mana_value >= 6 }")
+    top = described_class.parse("Search your library for a basic land card, reveal it, then shuffle and put that card on top.")
+    expect(top.choice_args).to include("to_zone: :top", "filter: Filter[:basic_lands]", "reveal: true")
   end
 
   it "parses Treasure, Food and Clue tokens" do

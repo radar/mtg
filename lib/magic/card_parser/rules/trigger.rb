@@ -99,6 +99,12 @@ module Magic
           Kind.new(/#{WHEN} another nontoken creature #{ENTERS_UNDER_YOUR_CONTROL}/, "NontokenCreatureEntersTrigger",
                    "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
                    "another_creature? && under_your_control? && !event.permanent.token?", PERMANENT_KINDS),
+          Kind.new(/#{WHEN} another non-(?<type>#{PermanentTarget::CREATURE_TYPES}) creature #{ENTERS_UNDER_YOUR_CONTROL}/, "NonTribalCreatureEntersTrigger",
+                   "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
+                   ->(m) { "another_creature? && under_your_control? && !event.permanent.type?(#{m[:type].inspect})" }, PERMANENT_KINDS),
+          Kind.new(/#{WHEN} a creature an opponent controls enters/, "OpponentCreatureEntersTrigger",
+                   "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
+                   "creature? && event.permanent.controller != controller", PERMANENT_KINDS),
           Kind.new(/#{WHEN} a land #{ENTERS_UNDER_YOUR_CONTROL}/, "LandfallTrigger", "TriggeredAbility::Landfall",
                    :event_handlers, "Events::Landfall", "you?", PERMANENT_KINDS),
           Kind.new(/#{WHEN} (?<who>you|an opponent|a player) gains? life/, "LifeGainTrigger", "TriggeredAbility",
@@ -235,6 +241,8 @@ module Magic
             effects = effects.gsub(/\bon it\b/, "on ~") if kind.name == "CombatDamageTrigger" && !effects.include?("target")
             # "... target artifact or enchantment that player controls": the player damaged is the opponent (two-player games only).
             effects = effects.gsub("that player controls", "an opponent controls") if kind.name == "CombatDamageTrigger"
+            # "... put a +1/+1 counter on that creature": the creature that entered (`event.permanent`).
+            effects = effects.gsub(/\bon that creature\b/, "on the entering creature") if %w[CreatureEntersTrigger NontokenCreatureEntersTrigger].include?(kind.name)
             condition =kind.condition.respond_to?(:call) ? kind.condition.call(m) : kind.condition
             # "When ~ enters, if it was kicked, ..." (kicker).
             if kind.name == "EntersTrigger" && (kicked = KICKED.match(effects))

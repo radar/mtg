@@ -14,6 +14,15 @@ RSpec.describe Magic::CardParser::Rules::EntersWithCounters do
     expect(described_class.parse("~ enters with three +2/+2 counters on it.")).to be_nil
   end
 
+  it "takes X from a count, rendered as an entering_counters method" do
+    rule = described_class.parse("~ enters with X +1/+1 counters on it, where X is the greatest power among other creatures you control.")
+
+    expect(rule.counter_type).to eq("+1/+1")
+    expect(rule.body_source).to include("def entering_counters", "controller.creatures.except(self).map(&:power).max || 0")
+    expect(described_class.parse("~ enters with X +1/+1 counters on it, where X is the number of lands you control.").body_source)
+      .to include('controller.lands.count')
+  end
+
   it "renders the enters_with_counters macro, +1/+1 counters on creatures only" do
     expect(described_class.new(2, "+1/+1").body_source).to eq("enters_with_counters \"+1/+1\", 2\n")
     expect(described_class.new(2, "+1/+1").kinds).to eq(%i[creature])
