@@ -43,7 +43,11 @@ module Magic
       # "the amount of life you gained this turn" (Midnight Snack), from the turn's event log.
       LIFE_GAINED_THIS_TURN = /\A(?:the )?amount of life you gained this turn\z/
 
+      # "the mana value of that spell" (a spell-cast trigger, where `event.spell` is the spell).
+      MANA_VALUE_OF_SPELL = /\Athe mana value of that spell\z/
+
       def self.parse(text, this: "source")
+        return "event.spell.mana_value" if MANA_VALUE_OF_SPELL.match?(text)
         return "game.current_turn.events.select { |e| e.is_a?(Events::LifeGain) && e.player == controller }.sum(&:life)" if LIFE_GAINED_THIS_TURN.match?(text)
         return "controller.creatures.count { _1 != #{this} && _1.name == #{this}.name }" if OTHER_NAMED_THIS.match?(text)
         return "controller.colors_among_permanents" if COLORS_AMONG.match?(text)

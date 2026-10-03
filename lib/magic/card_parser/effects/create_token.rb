@@ -10,13 +10,14 @@ module Magic
       # "Create a number of 1/1 white Rabbit creature tokens equal to the number of other creatures you control named ~."
       # "Create four 3/3 blue Serpent creature tokens named Koma's Coil."
       # "Create Scion of the Deep, a legendary 8/8 blue Octopus creature token."
-      class CreateToken < Data.define(:amount, :power, :toughness, :colors, :subtypes, :artifact, :keywords, :changeling, :who, :tapped, :legendary, :token_name)
+      # "Create X 1/1 red Goblin creature tokens. They gain haste until end of turn."
+      class CreateToken < Data.define(:amount, :power, :toughness, :colors, :subtypes, :artifact, :keywords, :changeling, :who, :tapped, :legendary, :token_name, :haste_until_eot)
         include Effect
 
-        def initialize(changeling: false, who: nil, tapped: false, legendary: false, token_name: nil, **fields) = super
+        def initialize(changeling: false, who: nil, tapped: false, legendary: false, token_name: nil, haste_until_eot: false, **fields) = super
 
         COLORS = %w[white blue black red green].freeze
-        LINE = %r{\A(?:(?<who>Target player|Target opponent) creates|Create) (?:(?<given_name>[A-Z][\w' ]*?), an?|(?<amount>a number of|\w+)) (?<tapped>tapped )?(?<legendary>legendary )?(?<power>\d+)/(?<toughness>\d+) (?<colors>colorless|[a-z]+(?: and [a-z]+)?) (?<subtypes>(?:[A-Z][\w-]* )+)(?<artifact>artifact )?creature tokens?(?: named (?<name>[^.]+?))?(?: with (?<keywords>[\w ,]+?))?(?<tail> for each [^.]+| equal to [^.]+)?\.?\z}
+        LINE = %r{\A(?:(?<who>Target player|Target opponent) creates|[Cc]reate) (?:(?<given_name>[A-Z][\w' ]*?), an?|(?<amount>a number of|\w+)) (?<tapped>tapped )?(?<legendary>legendary )?(?<power>\d+)/(?<toughness>\d+) (?<colors>colorless|[a-z]+(?: and [a-z]+)?) (?<subtypes>(?:[A-Z][\w-]* )+)(?<artifact>artifact )?creature tokens?(?: named (?<name>[^.]+?))?(?: with (?<keywords>[\w ,]+?))?(?<tail> for each [^.]+| equal to [^.]+)?(?<haste>\. They gain haste until end of turn)?\.?\z}
 
         def self.parse(text)
           return unless (m = LINE.match(text))
@@ -33,7 +34,8 @@ module Magic
           new(amount:, power: m[:power].to_i, toughness: m[:toughness].to_i,
               colors: colors.map(&:to_sym), subtypes: m[:subtypes].strip, artifact: !m[:artifact].nil?,
               keywords: keywords.keywords, changeling: changeling, who: m[:who]&.downcase,
-              tapped: !m[:tapped].nil?, legendary: !m[:legendary].nil?, token_name: m[:given_name] || m[:name])
+              tapped: !m[:tapped].nil?, legendary: !m[:legendary].nil?, token_name: m[:given_name] || m[:name],
+              haste_until_eot: !m[:haste].nil?)
         end
 
         # "two" / "X" / "a number of ... equal to <count>" / "a ... for each <count>" -> an Integer or Ruby.
@@ -59,7 +61,10 @@ module Magic
           args << "amount: #{amount}" unless amount == 1
           args << "controller: target" if who
           args << "enters_tapped: true" if tapped
-          "trigger_effect(:create_token, #{args.join(', ')})"
+          call = "trigger_effect(:create_token, #{args.join(', ')})"
+          return call unless haste_until_eot
+
+          "Array(#{call}).each { |token| trigger_effect(:grant_keyword, target: token, keyword: :haste) }"
         end
 
         def definitions

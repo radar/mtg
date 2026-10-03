@@ -188,6 +188,15 @@ RSpec.describe "CardParser effects from the FDN token bucket (sacrifice choice, 
     expect(tokens(p1, "Goblin").size).to eq(2)
   end
 
+  it "reads a ward cost of mana and life, and tokens with haste sized by the spell's mana value" do
+    code = generate("Parsed Goliath {5}\nCreature — Nightmare\nFlying\nWard—{3}, Pay 3 life.\n" \
+                    "Whenever you cast a noncreature spell, create X 1/1 red Goblin creature tokens, where X is the mana value of that spell. They gain haste until end of turn.\n6/6\n")
+
+    expect(code).to include("ward generic: 3, life: 3")
+    expect(code).to include("amount: event.spell.mana_value")
+    expect(code).to include("keyword: :haste")
+  end
+
   it "reads nontoken Cat enters triggers for ~ or another" do
     load_card("Parsed Leader {1}\nCreature — Cat\nWhenever ~ or another nontoken Cat you control enters, create a 1/1 white Cat creature token.\n2/2\n")
     ResolvePermanent("Parsed Leader", owner: p1)
