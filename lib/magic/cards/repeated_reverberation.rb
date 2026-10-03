@@ -25,6 +25,9 @@ module Magic
       end
 
       class SpellTrigger < TriggeredAbility::SpellCast
+        # The spell has resolved and is in the graveyard while its delayed trigger waits.
+        def self.works_from_graveyard? = true
+
         def should_perform?
           you? && actor.pending? && (spell.instant? || spell.sorcery?)
         end
@@ -36,6 +39,8 @@ module Magic
       end
 
       class LoyaltyTrigger < TriggeredAbility
+        def self.works_from_graveyard? = true
+
         def should_perform?
           you? && actor.pending? && event.ability.is_a?(Magic::LoyaltyAbility)
         end
