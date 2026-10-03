@@ -38,9 +38,14 @@ module Magic
       # "gain 2 life for each Gate you control" (also lose): the amount is N times the count.
       LIFE_FOR_EACH = /\b(?<verb>gain|lose|gains|loses) (?<amount>\d+|\w+) life for each (?<what>[^.]+?)(?=\.|,|\z)/i
 
+      # "Each opponent discards a card and loses 2 life": the second verb has the first's subject, so it becomes
+      # a sentence of its own with that subject spelled out.
+      DISCARD_AND_LOSE = /(?<who>Each opponent|Target opponent|Target player) (?<discard>discards? (?:a|\w+) cards?) and (?<lose>loses? \w+ life)/i
+
       # `text` as one effect (some span two sentences), else every sentence (or,
       # failing that, every clause of it) as an effect; nil unless all of them parse.
       def self.parse(text)
+        text = text.gsub(DISCARD_AND_LOSE) { "#{$~[:who]} #{$~[:discard]}. #{$~[:who]} #{$~[:lose]}" }
         if (m = WHERE_X.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))
           return Number.with_x(count) { parse(text.sub(WHERE_X, "")) }
         elsif (m = EQUAL_TO.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))

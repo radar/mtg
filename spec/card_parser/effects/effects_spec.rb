@@ -404,6 +404,13 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("That player loses 2 life.").resolve_call).to eq("trigger_effect(:lose_life, target: event.permanent.controller, life: 2)")
   end
 
+  it "gives the second verb of \"each opponent discards a card and loses 2 life\" the same subject" do
+    list = Magic::CardParser::EffectList.parse("each opponent discards a card and loses 2 life. You draw a card and gain 2 life.")
+
+    expect(list.effects).to eq([e.const_get(:Discard).new("each opponent", 1), e.const_get(:LoseLife).new("each opponent", 2),
+                                e.const_get(:DrawCards).new(1), e.const_get(:GainLife).new(2)])
+  end
+
   it "parses a target player sacrificing a permanent of a type" do
     sacrifice = described_class.parse("Target player sacrifices a creature of their choice.")
     expect(sacrifice).to eq(e.const_get(:TargetPlayerSacrifices).new("player", %w[Creature]))
