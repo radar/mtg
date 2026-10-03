@@ -7,21 +7,27 @@ module Magic
       # card. Activate only as a sorcery." / "... Activate only once each turn."
       # Costs are any Costs::Parser understands; the effects are anything EffectList
       # parses, rendered like a spell's.
-      class ActivatedAbility < Data.define(:costs, :effect_list, :sorcery_speed, :once_each_turn)
+      #
+      # "Activate only if <condition>." (a `Condition`, e.g. "you control five or more lands") becomes
+      # `requirements_met?`.
+      class ActivatedAbility < Data.define(:costs, :effect_list, :sorcery_speed, :once_each_turn, :only_if)
         include Rule
 
         # "Remove a counter from ~" (no type named) means -1/-1: the only cards that
         # phrase it this way ("enters with N -1/-1 counters on it", then this ability)
         # have no other counter type to be ambiguous with.
         COST = /(?:\{(?:\d+|[WUBRGC]|[WUBRG]\/[WUBRG]|\d+\/[WUBRG])\})+|\{T\}|Sacrifice ~|Sacrifice a creature|Exile ~|Discard a card|Blight \d+|Remove (?:\d+|\w+) (?:[\w+\/-]+ )?counters? from ~(?: and sacrifice it)?/
-        LINE = /\A(?<costs>#{COST}(?:, #{COST})*): (?<effects>.+?)(?<sorcery> Activate only as a sorcery\.)?(?<once> Activate only once each turn\.)?\z/
+        LINE = /\A(?<costs>#{COST}(?:, #{COST})*): (?<effects>.+?)(?<sorcery> Activate only as a sorcery\.)?(?<once> Activate only once each turn\.)?(?: Activate only if (?<only_if>[^.]+)\.)?\z/
 
         def self.parse(line)
           return unless (m = LINE.match(line))
 
+          only_if = Condition.parse(m[:only_if]) if m[:only_if]
+          return if m[:only_if] && !only_if
+
           effect_list = EffectList.parse(m[:effects]) or return
           m[:costs].scan(/Remove \w+ (?:([\w+\/-]+) )?counters? from/) { Magic::Counters[($1 || "-1/-1").downcase] } # raises for an unknown counter type
-          new(costs: costs(m[:costs]), effect_list:, sorcery_speed: !m[:sorcery].nil?, once_each_turn: !m[:once].nil?)
+          new(costs: costs(m[:costs]), effect_list:, sorcery_speed: !m[:sorcery].nil?, once_each_turn: !m[:once].nil?, only_if:)
         rescue RuntimeError => e
           raise unless e.message.start_with?("Unknown counter type")
         end
@@ -33,7 +39,7 @@ module Magic
               .gsub("~", "{this}")
         end
 
-        def initialize(costs:, effect_list:, sorcery_speed:, once_each_turn: false) = super
+        def initialize(costs:, effect_list:, sorcery_speed:, once_each_turn: false, only_if: nil) = super
 
         def kinds = PERMANENT_KINDS
         def hook = :activated_abilities
@@ -43,6 +49,7 @@ module Magic
           body = ["costs #{costs.inspect}\n"]
           body << "once_each_turn\n" if once_each_turn
           body << "activate_only_as_sorcery\n" if sorcery_speed
+          body << "def requirements_met?\n  #{only_if}\nend\n" if only_if
           body << effect_list.spell_source(this: "source")
           "class #{name} < Magic::ActivatedAbility\n#{body.join("\n").gsub(/^(?=.)/, '  ')}end\n"
         end

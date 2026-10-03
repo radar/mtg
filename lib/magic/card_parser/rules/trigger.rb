@@ -148,11 +148,16 @@ module Magic
                      "event.permanent == actor && Counters[event.counter_type] == #{counter} && (event.source.nil? || event.source.controller == controller)"
                    },
                    PERMANENT_KINDS),
+          Kind.new(/#{WHEN} a source you control deals noncombat damage to an opponent/, "NoncombatDamageToOpponentTrigger",
+                   "TriggeredAbility", :event_handlers, "Events::DamageDealt",
+                   "!event.combat? && event.target.is_a?(Magic::Player) && event.target != controller && " \
+                   "event.source.respond_to?(:controller) && event.source.controller == controller",
+                   PERMANENT_KINDS),
           Kind.new(/#{WHEN} a creature you control with (?<keyword>deathtouch|lifelink|flying|trample) deals combat damage to a player/,
                    "KeywordCreatureCombatDamageTrigger", "TriggeredAbility", :event_handlers, "Events::CombatDamageDealt",
                    lambda { |m|
                      "event.source.is_a?(Magic::Permanent) && event.source.creature? && event.source.controller == controller && " \
-                       "event.source.has_keyword?(Magic::Cards::Keywords::#{m[:keyword].upcase}) && event.target.is_a?(Magic::Player)"
+                       "event.source.#{m[:keyword]}? && event.target.is_a?(Magic::Player)"
                    },
                    PERMANENT_KINDS),
           Kind.new(/#{WHEN} (?<who>you sacrifice|a player sacrifices) (?:an?|(?<another>another)) (?<type>[\w-]+)/, "SacrificeTrigger",
@@ -204,7 +209,9 @@ module Magic
 
         # An italic ability word ("Landfall — ") is flavour; the rest is the trigger.
         ABILITY_WORD = /\A[A-Z][a-z]+(?: [a-z]+)* — /
-        PERMANENT_EVENTS = %w[Events::CounterAddedToPermanent Events::CreatureDied Events::EnteredTheBattlefield].freeze
+        # Triggers whose event has `damage`, for "that many".
+        DAMAGE_KINDS = %w[CombatDamageTrigger KeywordCreatureCombatDamageTrigger NoncombatDamageToOpponentTrigger].freeze
+        PERMANENT_EVENTS =%w[Events::CounterAddedToPermanent Events::CreatureDied Events::EnteredTheBattlefield].freeze
         ONCE_EACH_TURN =/ This ability triggers only once each turn\.?\z/
         KICKED = /\Aif (?:it|~) was kicked, /
         INTERVENING_IF = /\Aif (?<condition>[^,]+), (?<rest>.+)\z/
@@ -224,6 +231,8 @@ module Magic
             effects = m[:effects]
             # "Whenever another nontoken creature you control enters, it endures X": "it" is the creature that entered.
             effects = effects.gsub(/\bit endures\b/, "that creature endures") if kind.name == "NontokenCreatureEntersTrigger"
+            # "Whenever ~ deals combat damage to a player, put a +1/+1 counter on it": "it" is ~ (no target).
+            effects = effects.gsub(/\bon it\b/, "on ~") if kind.name == "CombatDamageTrigger" && !effects.include?("target")
             condition =kind.condition.respond_to?(:call) ? kind.condition.call(m) : kind.condition
             # "When ~ enters, if it was kicked, ..." (kicker).
             if kind.name == "EntersTrigger" && (kicked = KICKED.match(effects))
@@ -244,6 +253,12 @@ module Magic
               return unless kind.base == "TriggeredAbility" && PERMANENT_EVENTS.include?(kind.event)
 
               kind = kind.with(base: "TriggeredAbility::OncePerTurn")
+            end
+
+            # "put that many incubation counters on it" / "you draw that many cards": the damage dealt.
+            if DAMAGE_KINDS.include?(kind.name) && effects.match?(/\bthat many\b/)
+              effect_list = Number.with_x("event.damage") { EffectList.parse(effects.gsub(/\bthat many\b/, "X")) } or return
+              return new(kind:, condition:, effect_list:)
             end
 
             effect_list = EffectList.parse(effects) or return

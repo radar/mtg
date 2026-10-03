@@ -32,6 +32,95 @@ RSpec.describe Magic::CardParser::Effect do
   end
 end
 
+RSpec.describe Magic::CardParser::Effect, "(batch 3)" do
+  let(:e) { Magic::CardParser::Effects }
+
+  it "parses discard-unless-a-condition" do
+    effect = described_class.parse("Then discard a card unless you attacked this turn.")
+    expect(effect).to be_a(e.const_get(:DiscardUnlessCondition))
+    expect(effect.resolve_call).to start_with("unless game.current_turn.events.any?")
+    expect(described_class.parse("Discard a card unless you have no cards in hand.")).to be_a(e.const_get(:DiscardUnlessCondition))
+    expect(described_class.parse("Discard a card unless you flip a coin.")).to be_nil
+  end
+
+  it "parses damage if a player has exactly N life" do
+    effect = described_class.parse("If target player has exactly 10 life, ~ deals 10 damage to that player.")
+    expect(effect.target_choices).to eq("game.players")
+    expect(effect.resolve_call).to eq("trigger_effect(:deal_damage, target: target, damage: 10) if target.life == 10")
+  end
+
+  it "parses a +1/+1 counter before a bite as one two-target effect" do
+    bite = described_class.parse("Put a +1/+1 counter on target creature you control. Then that creature deals damage equal to its power to target creature an opponent controls.")
+    expect(bite.counter).to be(true)
+    expect(bite.resolve_call.lines.map(&:strip)).to eq(["biter, victim = targets", 'trigger_effect(:add_counter, counter_type: "+1/+1", target: biter, amount: 1)', "biter.bite!(victim)"])
+    expect(described_class.parse("Target creature you control deals damage equal to its power to target creature.").counter).to be(false)
+  end
+
+  it "parses 'it deals damage equal to its power'" do
+    effect = described_class.parse("It deals damage equal to its power to target creature or planeswalker.")
+    expect(effect.target_choices).to eq("battlefield.creatures + battlefield.planeswalkers")
+    expect(effect.resolve_call).to include("damage: #{Magic::CardParser::Effect::THIS}.power")
+  end
+
+  it "parses a wheel" do
+    expect(described_class.parse("Each player discards their hand, then draws seven cards.").resolve_call)
+      .to include("number_to_draw: 7").and include("discard!")
+  end
+
+  it "parses poison counters" do
+    expect(described_class.parse("That player gets two poison counters.").resolve_call).to include("[that_player].each").and include("amount: 2")
+    expect(described_class.parse("Target player gets a poison counter.").target_choices).to eq("game.players")
+    expect(described_class.parse("You get a poison counter.").resolve_call).to include("[controller].each")
+  end
+
+  it "parses lose life unless they discard / sacrifice" do
+    quandary = described_class.parse("That player loses 5 life unless they discard a card.")
+    expect(quandary).to eq(e.const_get(:LoseLifeUnless).new("that player", 5, true, false))
+    artist = described_class.parse("Each opponent loses 3 life unless that player sacrifices a nonland permanent of their choice or discards a card.")
+    expect(artist).to eq(e.const_get(:LoseLifeUnless).new("each opponent", 3, true, true))
+    expect(artist.resolve_call).to include("game.opponents(controller).each").and include("sacrifice: true")
+  end
+end
+
+RSpec.describe Magic::CardParser::Rules::BlockingRestriction, "can't be blocked by a type" do
+  it "parses it, with the blocker passed in" do
+    expect(described_class.parse("~ can't be blocked by Humans.").body_source).to eq("def can_be_blocked?(blocker) = !blocker.type?(\"Human\")\n")
+    expect(described_class.parse("~ can't be blocked by Elves.").body_source).to include('"Elf"')
+    expect(described_class.parse("~ can't be blocked by Blorbs.")).to be_nil
+  end
+end
+
+RSpec.describe Magic::CardParser::Rules::NoMaximumHandSize do
+  it "parses it as a marker" do
+    expect(described_class.parse("You have no maximum hand size.").body_source).to eq("def no_maximum_hand_size? = true\n")
+  end
+end
+
+RSpec.describe Magic::CardParser::Rules::ActivatedAbility, "activation condition" do
+  it "reads 'Activate only if <condition>.' into requirements_met?" do
+    rule = described_class.parse("{1}, {T}, Sacrifice ~: Draw a card. Activate only if you control five or more lands.")
+    expect(rule.only_if).to eq("controller.lands.count >= 5")
+    expect(rule.class_source("Ability")).to include("def requirements_met?\n    controller.lands.count >= 5\n  end")
+    expect(described_class.parse("{T}: Draw a card. Activate only if the moon is full.")).to be_nil
+  end
+end
+
+RSpec.describe Magic::CardParser::Rules::Trigger, "(batch 3)" do
+  def parse(line) = described_class.parse(line)
+
+  it "reads 'that many' as the damage dealt, for damage triggers only" do
+    expect(parse("Whenever ~ deals combat damage to a player, put that many incubation counters on it.").effect_list.effects.first.counters)
+      .to eq([["event.damage", "incubation"]])
+    expect(parse("Whenever a source you control deals noncombat damage to an opponent, you draw that many cards.").kind.name)
+      .to eq("NoncombatDamageToOpponentTrigger")
+    expect(parse("Whenever you attack, put that many +1/+1 counters on ~.")).to be_nil
+  end
+
+  it "reads 'it' as ~ in a combat damage trigger" do
+    expect(parse("Whenever ~ deals combat damage to a player, put a +1/+1 counter on it.").effect_list.effects.first.who).to eq(:self)
+  end
+end
+
 RSpec.describe Magic::CardParser::Rules::Trigger do
   def parse(line) = described_class.parse(line)
 
@@ -63,7 +152,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
 
   it "reads a keyword creature's combat damage to a player" do
     expect(parse("Whenever a creature you control with deathtouch deals combat damage to a player, you gain 1 life.").condition)
-      .to include("Keywords::DEATHTOUCH")
+      .to include("event.source.deathtouch?")
   end
 end
 
