@@ -138,6 +138,20 @@ other FDN cards care about Gates.
   cleanup transition, which queues one `Choice::Discard` per excess card. Six older specs that end
   a turn holding 8+ cards now call the new `resolve_cleanup_discards!` spec helper.
 
+- **2026-10-03 (tokens bucket)**: 20 of the bucket's cards implemented, each with a spec: Arahbo,
+  Cat Collector, Dread Summons, Electroduplicate, Faebloom Trick, Hare Apparent, Heroic
+  Reinforcements, High-Society Hunter, Homunculus Horde, Kiora the Rising Tide, Koma, Midnight Reaper,
+  Midnight Snack, Revenge of the Rats, Spinner of Souls, Valkyrie's Call, Goblin Negotiation, Ovika,
+  Abyssal Harvester, Redcap Gutter-Dweller. New parser pieces are in `docs/card_parser.md` ("Token
+  shapes batch"). Left: Fishing Pole (an Equipment that grants the equipped creature an ability whose
+  cost taps the Equipment, plus an untap trigger; needs granted activated abilities). Approximations: the
+  Faebloom Trick tap is a real reflexive choice, but Goblin Negotiation measures "excess damage" from
+  toughness and marked damage (so deathtouch / damage prevented by something other than marked damage
+  isn't modelled), Abyssal Harvester's "put there this turn" reads the turn's zone-change log, and
+  "SacrificePermanent" reads a bare "Sacrifice another creature." as optional, so it must only follow a
+  "you may". Engine changes: `Choice::SacrificePermanent`, `Choice::Ward` now takes mana and life together.
+  Tokens bucket 22 -> 1; FDN 251 of 427 implemented (176 not), including other agents' merged work.
+
 ## Cards by bucket
 
 Cards listed under every bucket they appear in.
