@@ -28,7 +28,14 @@ module Magic
 
         def initialize(keywords:, extras: []) = super
 
+        # "Ward—{3}, Pay 3 life." has a comma inside the one keyword.
+        WARD_MANA_AND_LIFE = /\AWard[—-](?<cost>\{\d+\}), Pay (?<life>\d+) life\.?\z/i
+
         def self.parse(line)
+          if (m = WARD_MANA_AND_LIFE.match(line))
+            return new(keywords: [], extras: [Extra.new("ward generic: #{ManaCost.parse(m[:cost])[:generic]}, life: #{m[:life]}")])
+          end
+
           parsed = line.split(",").map { keyword(_1.strip) }
           return if parsed.any?(&:nil?)
 
