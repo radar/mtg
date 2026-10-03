@@ -43,6 +43,7 @@ RSpec.describe Magic::Cards::EruditeWizard do
     draw!(p1, 2)
     current_turn.end!
     current_turn.cleanup!
+    resolve_cleanup_discards!
     game.next_turn
     game.next_turn
     draw!(p1, 2)

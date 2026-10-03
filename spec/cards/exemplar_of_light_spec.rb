@@ -34,6 +34,7 @@ RSpec.describe Magic::Cards::ExemplarOfLight do
     game.settle!
     current_turn.end!
     current_turn.cleanup!
+    resolve_cleanup_discards!
     hand = p1.hand.count
     p1.gain_life(1)
     game.settle!

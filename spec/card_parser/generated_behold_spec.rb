@@ -71,6 +71,7 @@ RSpec.describe "CardParser generated behold in play" do
     def attack_with_bears!
       current_turn.end!
       current_turn.cleanup!
+      resolve_cleanup_discards!
       game.next_turn
       skip_to_combat!
       current_turn.declare_attackers!

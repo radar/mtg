@@ -85,6 +85,7 @@ module Magic
         end
 
         after_transition to: :cleanup do |turn|
+          turn.active_player.discard_down_to_maximum_hand_size!
           turn.battlefield.cleanup
         end
 

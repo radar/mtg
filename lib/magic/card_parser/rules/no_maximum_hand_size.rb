@@ -3,8 +3,8 @@
 module Magic
   class CardParser
     module Rules
-      # "You have no maximum hand size." The engine has no cleanup-step discard to hand size, so this only marks
-      # the card (`no_maximum_hand_size?`) for when it does.
+      # "You have no maximum hand size." Marks the card (`no_maximum_hand_size?`); `Player#maximum_hand_size`
+      # returns nil while its controller has such a permanent, so the cleanup step's discard skips them.
       class NoMaximumHandSize < Data.define
         include Rule
 

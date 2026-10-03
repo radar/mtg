@@ -113,6 +113,14 @@ RSpec.shared_context "two player game" do
     go_to_main_phase!
   end
 
+  # The cleanup step makes a player holding more than seven cards discard (rule 514.1); a spec that
+  # ends a turn with a big hand answers those pending discards (first cards in hand) to carry on.
+  def resolve_cleanup_discards!
+    while (choice = game.choices.last).is_a?(Magic::Choice::Discard)
+      game.resolve_choice!(card: choice.player.hand.first)
+    end
+  end
+
   def skip_to_combat!
     go_to_main_phase!
     current_turn.beginning_of_combat!

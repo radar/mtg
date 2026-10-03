@@ -377,6 +377,22 @@ module Magic
       game.battlefield.permanents.controlled_by(self)
     end
 
+    STARTING_MAXIMUM_HAND_SIZE = 7
+
+    # Rule 402.2: seven, unless a permanent says "You have no maximum hand size" (nil then).
+    def maximum_hand_size
+      return if permanents.any? { _1.card.respond_to?(:no_maximum_hand_size?) && _1.card.no_maximum_hand_size? }
+
+      STARTING_MAXIMUM_HAND_SIZE
+    end
+
+    # Rule 514.1: in the cleanup step the active player discards down to their maximum hand size.
+    def discard_down_to_maximum_hand_size!
+      return unless (maximum = maximum_hand_size)
+
+      [hand.count - maximum, 0].max.times { game.add_choice(Choice::Discard.new(player: self)) }
+    end
+
     # Vivid: the number of colors among permanents this player controls.
     def colors_among_permanents
       permanents.flat_map { |permanent| permanent.colors.to_a }.uniq.count

@@ -61,6 +61,7 @@ RSpec.describe Magic::Cards::TwilightDiviner do
       rise_again(Card("Grizzly Bears"))
       current_turn.end!
       current_turn.cleanup!
+      resolve_cleanup_discards!
       go_to_main_phase_for!(p2)
       go_to_main_phase_for!(p1)
       rise_again(Card("Wood Elves"))

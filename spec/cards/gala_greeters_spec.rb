@@ -72,6 +72,7 @@ RSpec.describe Magic::Cards::GalaGreeters do
       current_turn.second_main!
       current_turn.end!
       current_turn.cleanup!
+      resolve_cleanup_discards!
 
       ResolvePermanent("Elderfang Ritualist", owner: p1)
       choice = game.choices.last

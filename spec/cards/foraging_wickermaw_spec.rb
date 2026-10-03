@@ -59,6 +59,7 @@ RSpec.describe Magic::Cards::ForagingWickermaw do
       go_to_main_phase!
       current_turn.end!
       current_turn.cleanup!
+      resolve_cleanup_discards!
       game.next_turn
 
       activate(:white)

@@ -132,6 +132,12 @@ other FDN cards care about Gates.
   now generate cleanly ("Ready to generate": Celestial Armor, Halana and Alena, Heroes' Bane, Searslicer
   Goblin, Seeker's Folly, Stromkirk Bloodthief) but were not generated or spec'd here.
 
+- **2026-10-03 (hand size)**: the engine now enforces the maximum hand size (rule 514.1):
+  `Player#maximum_hand_size` (7, or nil with a `no_maximum_hand_size?` permanent such as
+  Niv-Mizzet, Visionary) and `Player#discard_down_to_maximum_hand_size!`, run from the turn's
+  cleanup transition, which queues one `Choice::Discard` per excess card. Six older specs that end
+  a turn holding 8+ cards now call the new `resolve_cleanup_discards!` spec helper.
+
 ## Cards by bucket
 
 Cards listed under every bucket they appear in.
