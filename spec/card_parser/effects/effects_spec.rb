@@ -419,6 +419,15 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Attach it to target land you control.")).to be_nil
   end
 
+  it "reads pay {X} as its own choice, with X in the following effects as the choice's x" do
+    expect(described_class.parse("Pay {X}.").choice_base).to eq("Magic::Choice::PayX")
+    expect(described_class.parse("Pay {1}{W}.").choice_base).to eq("Magic::Choice::PayMana")
+
+    list = Magic::CardParser::EffectList.parse("You may pay {X}. When you do, put X +1/+1 counters on ~.")
+    expect(list.effects.first).to be_a(e.const_get(:PayX))
+    expect(list.effects.last.resolve_call).to include("amount: x")
+  end
+
   it "parses a target player sacrificing a permanent of a type" do
     sacrifice = described_class.parse("Target player sacrifices a creature of their choice.")
     expect(sacrifice).to eq(e.const_get(:TargetPlayerSacrifices).new("player", %w[Creature]))

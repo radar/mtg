@@ -42,10 +42,15 @@ module Magic
       # a sentence of its own with that subject spelled out.
       DISCARD_AND_LOSE = /(?<who>Each opponent|Target opponent|Target player) (?<discard>discards? (?:a|\w+) cards?) and (?<lose>loses? \w+ life)/i
 
+      PAY_X = /\byou may pay \{X\}\./i
+
       # `text` as one effect (some span two sentences), else every sentence (or,
       # failing that, every clause of it) as an effect; nil unless all of them parse.
       def self.parse(text)
         text = text.gsub(DISCARD_AND_LOSE) { "#{$~[:who]} #{$~[:discard]}. #{$~[:who]} #{$~[:lose]}" }
+        # "you may pay {X}. When you do, put X counters ...": the X is what the Choice::PayX remembers as `x`.
+        return Number.with_x("x") { parse(text) } if PAY_X.match?(text) && !Number.x_bound?
+
         if (m = WHERE_X.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))
           return Number.with_x(count) { parse(text.sub(WHERE_X, "")) }
         elsif (m = EQUAL_TO.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))

@@ -21,6 +21,13 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     expect(life.effect_list.effects.first.resolve_call).to eq('trigger_effect(:gain_life, target: controller, life: 2 * controller.permanents.by_type("Gate").count)')
   end
 
+  it "parses another non-<Type> creature you control entering" do
+    trigger = parse("Whenever another non-Human creature you control enters, draw a card.")
+
+    expect(trigger.kind.name).to eq("NonTribalCreatureEntersTrigger")
+    expect(trigger.condition).to eq('another_creature? && under_your_control? && !event.permanent.type?("Human")')
+  end
+
   it "parses several effects" do
     effects = parse("When ~ enters, scry 2, then draw a card.").effect_list.effects
     expect(effects).to eq([e.const_get(:Scry).new(2), e.const_get(:DrawCards).new(1)])
