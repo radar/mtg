@@ -16,6 +16,7 @@ module Magic
       # ("exile it, then return it" is one effect; "draw a card, then discard a card" two).
       CLAUSE = /,? then |,? and (?=you |lose |gain |draw |put |~ endures )/i
       MAY = /\Ayou may /i
+      MAY_MULTI_SENTENCE = /\Ayou may (?<rest>[^.]+\.\s.+)\z/i
       IF_YOU_DO = /\A(?:If|When) you do, /i
       IF_YOU_DONT = /\AIf you don't, /i
       # "If a Dragon was beheld, ..." is the same check: Rules::BeholdCost's optional cost is the card's kicker_cost.
@@ -71,6 +72,10 @@ module Magic
         end
 
         effect = Effect.parse(text) and return (new(effects: [effect]) unless effect.earlier_target?)
+        # "you may <an effect that spans two sentences>" (Spinner of Souls' reveal-until).
+        if (m = MAY_MULTI_SENTENCE.match(text)) && (effect = Effect.parse(m[:rest])) && !effect.earlier_target? && !effect.may_choice?
+          return new(effects: [OptionalEffect.new(effect:)])
+        end
 
         effects = []
         clauses = text.split(SENTENCE).flat_map do |sentence|
@@ -192,7 +197,9 @@ module Magic
           if optional.any?
             sections << method("resolve!(target: nil)", ["return unless target", *statements])
           else
-            sections << method("resolve!#{'(target:)' if targeted.any?}", statements)
+            # An effect reading the spell's X ("Each player mills X cards") asks for it as a keyword.
+            params = [("target:" if targeted.any?), ("value_for_x: 0" if leaves(effects).any? { _1.respond_to?(:uses_x?) && _1.uses_x? })].compact
+            sections << method("resolve!#{"(#{params.join(', ')})" if params.any?}", statements)
           end
         end
         sections.join("\n")

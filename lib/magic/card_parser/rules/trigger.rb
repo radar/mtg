@@ -24,6 +24,8 @@ module Magic
         CREATURE_DIES = {
           "another creature you control" => "you? && event.permanent != actor",
           "another nontoken creature you control" => "you? && event.permanent != actor && !event.permanent.token?",
+          "a nontoken creature you control" => "you? && !event.permanent.token?",
+          "another nontoken creature" => "event.permanent != actor && !event.permanent.token?",
           "a creature you control" => "you?",
           "a creature an opponent controls" => "opponent?",
           "another creature" => "event.permanent != actor",
@@ -82,10 +84,13 @@ module Magic
                    PERMANENT_KINDS),
           Kind.new(/#{WHEN} an? #{TYPES} creature you control dies/, "TribalCreatureDiesTrigger", "TriggeredAbility",
                    :event_handlers, "Events::CreatureDied", ->(m) { "you? && #{TYPE_CHECK.(m)}" }, PERMANENT_KINDS),
-          Kind.new(/#{WHEN} (?<itself>~ or )?another #{TYPES} you control enters/, "TribalEntersTrigger",
+          Kind.new(/#{WHEN} (?<itself>~ or )?another (?<nontoken>nontoken )?#{TYPES} you control enters/, "TribalEntersTrigger",
                    "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
                    lambda { |m|
-                     m[:itself] ? "under_your_control? && (event.permanent == actor || #{TYPE_CHECK.(m)})" : "under_your_control? && event.permanent != actor && #{TYPE_CHECK.(m)}"
+                     typed = "#{'!event.permanent.token? && ' if m[:nontoken]}#{TYPE_CHECK.(m)}"
+                     next "under_your_control? && event.permanent != actor && #{typed}" unless m[:itself]
+
+                     "under_your_control? && (event.permanent == actor || #{m[:nontoken] ? "(#{typed})" : typed})"
                    },
                    PERMANENT_KINDS),
           Kind.new(/#{WHEN} an? #{TYPES} you control enters/, "TribalEntersTrigger",
@@ -107,6 +112,10 @@ module Magic
                    "creature? && event.permanent.controller != controller", PERMANENT_KINDS),
           Kind.new(/#{WHEN} a land #{ENTERS_UNDER_YOUR_CONTROL}/, "LandfallTrigger", "TriggeredAbility::Landfall",
                    :event_handlers, "Events::Landfall", "you?", PERMANENT_KINDS),
+          Kind.new(/#{WHEN} you gain life for the first time during each of your turns/, "FirstLifeGainTrigger", "TriggeredAbility",
+                   :event_handlers, "Events::LifeGain",
+                   "you? && controllers_turn? && game.current_turn.events.count { |e| e.is_a?(Events::LifeGain) && e.player == controller } == 1",
+                   PERMANENT_KINDS),
           Kind.new(/#{WHEN} (?<who>you|an opponent|a player) gains? life/, "LifeGainTrigger", "TriggeredAbility",
                    :event_handlers, "Events::LifeGain", ->(m) { LIFE_GAINERS.fetch(m[:who]) }, PERMANENT_KINDS),
           Kind.new(/At the beginning of your upkeep/, "UpkeepTrigger", "TriggeredAbility::BeginningOfYourUpkeep",

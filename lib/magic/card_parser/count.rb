@@ -40,7 +40,11 @@ module Magic
       # "other creatures you control named ~" (Hare Apparent): creatures sharing the object's name.
       OTHER_NAMED_THIS = /\A(?:the number of )?other creatures you control named ~\z/
 
+      # "the amount of life you gained this turn" (Midnight Snack), from the turn's event log.
+      LIFE_GAINED_THIS_TURN = /\A(?:the )?amount of life you gained this turn\z/
+
       def self.parse(text, this: "source")
+        return "game.current_turn.events.select { |e| e.is_a?(Events::LifeGain) && e.player == controller }.sum(&:life)" if LIFE_GAINED_THIS_TURN.match?(text)
         return "controller.creatures.count { _1 != #{this} && _1.name == #{this}.name }" if OTHER_NAMED_THIS.match?(text)
         return "controller.colors_among_permanents" if COLORS_AMONG.match?(text)
         return "controller.permanents.reject(&:land?).map(&:mana_value).uniq.count" if DIFFERENT_MANA_VALUES.match?(text)
