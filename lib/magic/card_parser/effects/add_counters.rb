@@ -33,7 +33,9 @@ module Magic
         ITEM = %r{(?:\d+|\w+) (?:[+-]1/[+-]1|[a-z]+) counters?}i
         ITEM_PARTS = %r{\A(?<amount>\d+|\w+) (?<type>[+-]1/[+-]1|[a-z]+) counters?\z}i
         LIST = /#{ITEM}(?:, #{ITEM})*(?:,? and #{ITEM})?/
-        LINE = %r{\APut (?<list>#{LIST}) on (?:(?<self>~)|(?<each>#{EACH})|#{PermanentTarget::REFERENCE})(?: for each (?<per>[^.]+?))?\.?\z}i
+        # "the entering creature" is what Rules::Trigger rewrites "that creature" to for "Whenever
+        # another creature you control enters": `event.permanent`.
+        LINE = %r{\APut (?<list>#{LIST}) on (?:(?<self>~)|(?<entering>the entering creature)|(?<each>#{EACH})|#{PermanentTarget::REFERENCE})(?: for each (?<per>[^.]+?))?\.?\z}i
 
         def self.parse(text)
           return unless (m = LINE.match(text))
@@ -53,6 +55,7 @@ module Magic
           end
 
           who, targets, optional, earlier = if m[:self] then [:self, nil, false, false]
+                                             elsif m[:entering] then [:entering, nil, false, false]
                                              elsif m[:each] then [:each, each_targets(m), false, false]
                                              else
                                                reference = PermanentTarget.reference(m)
@@ -76,6 +79,7 @@ module Magic
         def resolve_call
           case who
           when :self then add(THIS)
+          when :entering then add("event.permanent")
           when :each then "#{targets}.each { #{add('_1')} }"
           else add("target")
           end

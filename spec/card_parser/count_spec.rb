@@ -13,6 +13,10 @@ RSpec.describe Magic::CardParser::Count do
     expect(described_class.parse("Elf you control")).to eq('controller.permanents.by_type("Elf").count')
   end
 
+  it "counts Gates, the one land subtype the parser knows" do
+    expect(described_class.parse("Gate you control")).to eq('controller.permanents.by_type("Gate").count')
+  end
+
   it "leaves out whatever `this` names for \"other\"" do
     expect(described_class.parse("other Elf you control")).to eq('controller.permanents.by_type("Elf").except(source).count')
     expect(described_class.parse("other creature you control", this: "actor")).to eq("controller.creatures.except(actor).count")

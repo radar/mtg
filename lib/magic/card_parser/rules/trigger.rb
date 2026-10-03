@@ -181,6 +181,8 @@ module Magic
             effects = m[:effects]
             # "Whenever another nontoken creature you control enters, it endures X": "it" is the creature that entered.
             effects = effects.gsub(/\bit endures\b/, "that creature endures") if kind.name == "NontokenCreatureEntersTrigger"
+            # "... put a +1/+1 counter on that creature": the creature that entered (`event.permanent`).
+            effects = effects.gsub(/\bon that creature\b/, "on the entering creature") if %w[CreatureEntersTrigger NontokenCreatureEntersTrigger].include?(kind.name)
             condition =kind.condition.respond_to?(:call) ? kind.condition.call(m) : kind.condition
             # "When ~ enters, if it was kicked, ..." (kicker).
             if kind.name == "EntersTrigger" && (kicked = KICKED.match(effects))

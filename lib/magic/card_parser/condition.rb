@@ -73,6 +73,7 @@ module Magic
 
         plural = word.downcase.delete_suffix("s")
         return plural if Count::YOUR_PERMANENTS.key?(plural)
+        return Magic::Types::Lands::Gate if plural.capitalize == Magic::Types::Lands::Gate
 
         CreatureType.singular(word)
       end

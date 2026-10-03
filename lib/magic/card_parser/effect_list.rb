@@ -35,6 +35,9 @@ module Magic
       WHERE_X = /,? where X is (?<what>[^.]+)(?=\.|\z)/
       EQUAL_TO = /\b(?<verb>draw|gain|mill) (?<noun>cards|life) equal to (?<what>[^.]+?)(?=\.|,|\z)/i
 
+      # "gain 2 life for each Gate you control" (also lose): the amount is N times the count.
+      LIFE_FOR_EACH = /\b(?<verb>gain|lose|gains|loses) (?<amount>\d+|\w+) life for each (?<what>[^.]+?)(?=\.|,|\z)/i
+
       # `text` as one effect (some span two sentences), else every sentence (or,
       # failing that, every clause of it) as an effect; nil unless all of them parse.
       def self.parse(text)
@@ -43,6 +46,9 @@ module Magic
         elsif (m = EQUAL_TO.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))
           rewritten = text.sub(EQUAL_TO) { m[:noun] == "cards" ? "#{m[:verb]} X cards" : "#{m[:verb]} X life" }
           return Number.with_x(count) { parse(rewritten) }
+        elsif (m = LIFE_FOR_EACH.match(text)) && !Number.x_bound? && (count = Count.parse(m[:what], this: Effect::THIS))
+          rewritten = text.sub(LIFE_FOR_EACH) { "#{m[:verb]} X life" }
+          return Number.with_x("#{Number.parse(m[:amount])} * #{count}") { parse(rewritten) }
         end
 
         effect = Effect.parse(text) and return (new(effects: [effect]) unless effect.earlier_target?)
