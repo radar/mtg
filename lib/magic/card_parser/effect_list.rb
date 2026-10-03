@@ -14,9 +14,11 @@ module Magic
       SENTENCE = /(?<=\.)\s+/
       # Clauses of one sentence, when the sentence isn't one effect as a whole
       # ("exile it, then return it" is one effect; "draw a card, then discard a card" two).
-      CLAUSE = /,? then |,? and (?=you |lose |gain |draw |put |~ endures )/i
+      CLAUSE = /,? then |,? and (?=you |lose |gain |draw |put |exile the top |~ endures )/i
       MAY = /\Ayou may /i
-      MAY_MULTI_SENTENCE = /\Ayou may (?<rest>[^.]+\.\s.+)\z/i
+      # "exile the top card of your library. You may play that card this turn." -> one sentence (ExileTopPlayThisTurn).
+      EXILE_TOP_PLAY = /(exile the top card of your library)\. You may play that card this turn\./i
+      MAY_MULTI_SENTENCE =/\Ayou may (?<rest>[^.]+\.\s.+)\z/i
       IF_YOU_DO = /\A(?:If|When) you do, /i
       IF_YOU_DONT = /\AIf you don't, /i
       # "If a Dragon was beheld, ..." is the same check: Rules::BeholdCost's optional cost is the card's kicker_cost.
@@ -51,6 +53,7 @@ module Magic
       # `text` as one effect (some span two sentences), else every sentence (or,
       # failing that, every clause of it) as an effect; nil unless all of them parse.
       def self.parse(text)
+        text = text.gsub(EXILE_TOP_PLAY, '\1, playable this turn')
         if (m = FOR_EACH.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))
           times = Number.parse(m[:n])
           rewritten = text.sub(FOR_EACH) { "#{m[:verb]} X #{m[:noun] == 'life' ? 'life' : 'cards'}" }
@@ -87,6 +90,7 @@ module Magic
           prefix = sentence[IF_YOU_DO] || sentence[IF_YOU_DONT]
           [first, *rest.map { "#{prefix}#{_1}" }]
         end
+        may_open = false
         clauses.each do |sentence|
           if KICKED.match?(sentence)
             rest = sentence.sub(KICKED, "")
@@ -101,8 +105,10 @@ module Magic
             return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DONT, "")))
 
             effects[-1] = effects.last.with(if_you_dont: effects.last.if_you_dont + [effect])
-          elsif IF_YOU_DO.match?(sentence) && effects.last.respond_to?(:may_choice?) && effects.last.may_choice?
-            # "you may pay {M}. If you do, ...": the pay choice is the "may"; what follows runs once it's paid.
+          elsif IF_YOU_DO.match?(sentence) && (may_open || (effects.last.respond_to?(:may_choice?) && effects.last.may_choice?))
+            # "you may pay {M}. If you do, ...": the pay choice is the "may"; what follows runs once it's paid
+            # (every "If you do" clause after it, however many).
+            may_open = true
             effects << (parse_sentence(sentence.sub(IF_YOU_DO, "")) or return)
           elsif IF_YOU_DO.match?(sentence)
             return unless effects.last.is_a?(OptionalEffect) && (effect = parse_sentence(sentence.sub(IF_YOU_DO, "")))
@@ -110,9 +116,11 @@ module Magic
             effects[-1] = effects.last.with(if_you_do: effects.last.if_you_do + [effect])
           elsif MAY.match?(sentence)
             effect = parse_sentence(sentence.sub(MAY, "")) or return
+            may_open = false
             effects << (effect.respond_to?(:may_choice?) && effect.may_choice? ? effect : OptionalEffect.new(effect:, if_you_do: []))
           else
             effect = parse_sentence(sentence) or return
+            may_open = false
             effects << effect
           end
         end

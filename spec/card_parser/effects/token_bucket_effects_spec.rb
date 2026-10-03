@@ -211,6 +211,16 @@ RSpec.describe "CardParser effects from the FDN token bucket (sacrifice choice, 
     expect(game.exile.cards).to include(card)
   end
 
+  it "reads several 'If you do' effects after a may-sacrifice, an exile-top-play-this-turn pair, and a can't-block token" do
+    code = generate("Parsed Goblin {2}{R}\nCreature — Goblin\nWhen ~ enters, create two 1/1 black Rat creature tokens with \"This token can't block.\"\n" \
+                    "At the beginning of your upkeep, you may sacrifice another creature. If you do, put a +1/+1 counter on ~ and exile the top card of your library. You may play that card this turn.\n3/3\n")
+
+    expect(code).to include("def can_block?(_) = false")
+    expect(code).to include("Magic::Choice::SacrificePermanent")
+    expect(code).to include("grant_until_end_of_turn")
+    expect(code).to include("add_counter")
+  end
+
   it "reads nontoken Cat enters triggers for ~ or another" do
     load_card("Parsed Leader {1}\nCreature — Cat\nWhenever ~ or another nontoken Cat you control enters, create a 1/1 white Cat creature token.\n2/2\n")
     ResolvePermanent("Parsed Leader", owner: p1)

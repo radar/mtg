@@ -11,13 +11,14 @@ module Magic
       # "Create four 3/3 blue Serpent creature tokens named Koma's Coil."
       # "Create Scion of the Deep, a legendary 8/8 blue Octopus creature token."
       # "Create X 1/1 red Goblin creature tokens. They gain haste until end of turn."
-      class CreateToken < Data.define(:amount, :power, :toughness, :colors, :subtypes, :artifact, :keywords, :changeling, :who, :tapped, :legendary, :token_name, :haste_until_eot)
+      # "Create two 1/1 black Rat creature tokens with "This token can't block.""
+      class CreateToken < Data.define(:amount, :power, :toughness, :colors, :subtypes, :artifact, :keywords, :changeling, :who, :tapped, :legendary, :token_name, :haste_until_eot, :cant_block)
         include Effect
 
-        def initialize(changeling: false, who: nil, tapped: false, legendary: false, token_name: nil, haste_until_eot: false, **fields) = super
+        def initialize(changeling: false, who: nil, tapped: false, legendary: false, token_name: nil, haste_until_eot: false, cant_block: false, **fields) = super
 
         COLORS = %w[white blue black red green].freeze
-        LINE = %r{\A(?:(?<who>Target player|Target opponent) creates|[Cc]reate) (?:(?<given_name>[A-Z][\w' ]*?), an?|(?<amount>a number of|\w+)) (?<tapped>tapped )?(?<legendary>legendary )?(?<power>\d+)/(?<toughness>\d+) (?<colors>colorless|[a-z]+(?: and [a-z]+)?) (?<subtypes>(?:[A-Z][\w-]* )+)(?<artifact>artifact )?creature tokens?(?: named (?<name>[^.]+?))?(?: with (?<keywords>[\w ,]+?))?(?<tail> for each [^.]+| equal to [^.]+)?(?<haste>\. They gain haste until end of turn)?\.?\z}
+        LINE = %r{\A(?:(?<who>Target player|Target opponent) creates|[Cc]reate) (?:(?<given_name>[A-Z][\w' ]*?), an?|(?<amount>a number of|\w+)) (?<tapped>tapped )?(?<legendary>legendary )?(?<power>\d+)/(?<toughness>\d+) (?<colors>colorless|[a-z]+(?: and [a-z]+)?) (?<subtypes>(?:[A-Z][\w-]* )+)(?<artifact>artifact )?creature tokens?(?: named (?<name>[^.]+?))?(?: with (?<keywords>[\w ,]+?))?(?: with "(?<ability>This token can't block\.)")?(?<tail> for each [^.]+| equal to [^.]+)?(?<haste>\. They gain haste until end of turn)?\.?\z}
 
         def self.parse(text)
           return unless (m = LINE.match(text))
@@ -35,7 +36,7 @@ module Magic
               colors: colors.map(&:to_sym), subtypes: m[:subtypes].strip, artifact: !m[:artifact].nil?,
               keywords: keywords.keywords, changeling: changeling, who: m[:who]&.downcase,
               tapped: !m[:tapped].nil?, legendary: !m[:legendary].nil?, token_name: m[:given_name] || m[:name],
-              haste_until_eot: !m[:haste].nil?)
+              haste_until_eot: !m[:haste].nil?, cant_block: !m[:ability].nil?)
         end
 
         # "two" / "X" / "a number of ... equal to <count>" / "a ... for each <count>" -> an Integer or Ruby.
@@ -76,6 +77,7 @@ module Magic
           lines << "colors #{colors.map(&:inspect).join(', ')}" if colors.any?
           all_keywords = changeling ? [*keywords, :changeling] : keywords
           lines << "keywords #{all_keywords.map(&:inspect).join(', ')}" if all_keywords.any?
+          lines << "def can_block?(_) = false" if cant_block
           "#{token_const} = Token.create #{(token_name || subtypes).inspect} do\n#{lines.map { "  #{_1}\n" }.join}end\n"
         end
       end
