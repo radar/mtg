@@ -233,6 +233,8 @@ module Magic
             effects = effects.gsub(/\bit endures\b/, "that creature endures") if kind.name == "NontokenCreatureEntersTrigger"
             # "Whenever ~ deals combat damage to a player, put a +1/+1 counter on it": "it" is ~ (no target).
             effects = effects.gsub(/\bon it\b/, "on ~") if kind.name == "CombatDamageTrigger" && !effects.include?("target")
+            # "... target artifact or enchantment that player controls": the player damaged is the opponent (two-player games only).
+            effects = effects.gsub("that player controls", "an opponent controls") if kind.name == "CombatDamageTrigger"
             condition =kind.condition.respond_to?(:call) ? kind.condition.call(m) : kind.condition
             # "When ~ enters, if it was kicked, ..." (kicker).
             if kind.name == "EntersTrigger" && (kicked = KICKED.match(effects))

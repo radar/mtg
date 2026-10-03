@@ -116,6 +116,11 @@ RSpec.describe Magic::CardParser::Rules::Trigger, "(batch 3)" do
     expect(parse("Whenever you attack, put that many +1/+1 counters on ~.")).to be_nil
   end
 
+  it "reads 'that player controls' as 'an opponent controls' in a combat damage trigger" do
+    effect = parse("Whenever ~ deals combat damage to a player, you may destroy target artifact or enchantment that player controls.").effect_list.effects.first
+    expect(effect.effect.target_choices).to include("not_controlled_by(controller)")
+  end
+
   it "reads 'it' as ~ in a combat damage trigger" do
     expect(parse("Whenever ~ deals combat damage to a player, put a +1/+1 counter on it.").effect_list.effects.first.who).to eq(:self)
   end
