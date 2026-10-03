@@ -385,6 +385,18 @@ RSpec.describe Magic::CardParser::Effect do
     expect(described_class.parse("Each opponent sacrifices an artifact.").permanent_types).to eq(%w[Artifact])
   end
 
+  it "parses \"have it fight\" and counters on up to N targets" do
+    fight = described_class.parse("Have it fight target creature you don't control.")
+    expect(fight.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.fights!(target)")
+    expect(fight.target_choices).to eq("battlefield.not_controlled_by(controller).creatures")
+
+    counters = described_class.parse("Put a +1/+1 counter on each of up to two other target creatures you control.")
+    expect(counters.max_targets).to eq(2)
+    expect(counters.optional_target?).to be(true)
+    expect(counters.target_choices).to eq("(battlefield.controlled_by(controller).creatures - [#{Magic::CardParser::Effect::THIS}])")
+    expect(counters.resolve_call).to include("targets.each", '"+1/+1"')
+  end
+
   it "parses a target player sacrificing a permanent of a type" do
     sacrifice = described_class.parse("Target player sacrifices a creature of their choice.")
     expect(sacrifice).to eq(e.const_get(:TargetPlayerSacrifices).new("player", %w[Creature]))

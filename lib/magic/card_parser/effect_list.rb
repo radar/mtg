@@ -319,12 +319,15 @@ module Magic
       # "up to one target": choosing none (skip_choice! -> decline!), or having
       # nothing to choose, still runs the effects after it.
       def optional_target_choice(name, point, classes, after, context)
-        body = [method("choices", [expand(point.target_choices, "actor")]), "def choice_amount = 0..1\n", *classes]
+        # "each of up to two target creatures": several targets, resolved with `targets:`.
+        maximum = point.respond_to?(:max_targets) ? point.max_targets : 1
+        resolve = maximum > 1 ? "resolve!(targets:)" : "resolve!(target:)"
+        body = [method("choices", [expand(point.target_choices, "actor")]), "def choice_amount = 0..#{maximum}\n", *classes]
         if after.empty?
-          body << method("resolve!(target:)", [expand(point.resolve_call, "actor")])
+          body << method(resolve, [expand(point.resolve_call, "actor")])
           adds = ["choice = #{name}.new(actor: #{context.this})", "game.add_choice(choice) if choice.choices.any?"]
         else
-          body << method("resolve!(target:)", [expand(point.resolve_call, "actor"), "finish"])
+          body << method(resolve, [expand(point.resolve_call, "actor"), "finish"])
           body << "def decline! = finish\n"
           body << method("finish", after)
           adds = ["choice = #{name}.new(actor: #{context.this})", "choice.choices.any? ? game.add_choice(choice) : choice.finish"]
