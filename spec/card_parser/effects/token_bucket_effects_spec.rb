@@ -197,6 +197,20 @@ RSpec.describe "CardParser effects from the FDN token bucket (sacrifice choice, 
     expect(code).to include("keyword: :haste")
   end
 
+  it "copies a creature card put into a graveyard this turn as an extra type" do
+    load_card("Parsed Harvester {1}\nCreature — Demon\n{T}: Exile target creature card from a graveyard that was put there this turn. Create a token that's a copy of it, except it's a Nightmare in addition to its other types. Then exile all other Nightmare tokens you control.\n3/2\n")
+    harvester = ResolvePermanent("Parsed Harvester", owner: p1)
+    ResolvePermanent("Aegis Turtle", owner: p2).destroy!
+    game.settle!
+    card = p2.graveyard.cards.find { _1.name == "Aegis Turtle" }
+    p1.activate_ability(ability: harvester.activated_abilities.first) { _1.targeting(card) }
+    game.stack.resolve!
+
+    copy = tokens(p1, "Aegis Turtle").first
+    expect(copy.type?("Nightmare")).to eq(true)
+    expect(game.exile.cards).to include(card)
+  end
+
   it "reads nontoken Cat enters triggers for ~ or another" do
     load_card("Parsed Leader {1}\nCreature — Cat\nWhenever ~ or another nontoken Cat you control enters, create a 1/1 white Cat creature token.\n2/2\n")
     ResolvePermanent("Parsed Leader", owner: p1)
