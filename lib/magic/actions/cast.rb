@@ -62,7 +62,7 @@ module Magic
       def mana_cost
         @mana_cost ||= begin
           if @flashback && card.zone.graveyard?
-            cost = card.flashback_cost
+            cost = card.flashback_cost_now
           elsif @harmonize && card.zone.graveyard? && card.harmonize_cost
             cost = card.harmonize_cost
           elsif @blitz
@@ -127,6 +127,7 @@ module Magic
           return "#{card.name} is already on the stack" if already_on_stack?
           return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
           return "#{card.name} has no harmonize cost" if @harmonize && !card.harmonize_cost
+          return "#{card.name} has no flashback cost" if @flashback && !card.flashback_cost_now
           return "#{card.name}'s flashback requirements aren't met" if @flashback && card.respond_to?(:flashback_requirements_met?) && !card.flashback_requirements_met?(player)
 
           if !instant_speed? && (reason = sorcery_speed_reason)

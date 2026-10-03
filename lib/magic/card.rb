@@ -396,6 +396,19 @@ module Magic
       @harmonize_granted_turn = game.current_turn.number
     end
 
+    # Flashback granted by an effect until end of turn, its cost being the card's mana cost
+    # (Sphinx of Forgotten Lore). A card with its own `flashback` macro uses that cost instead.
+    def grant_flashback_until_end_of_turn!
+      @flashback_granted_turn = game.current_turn.number
+    end
+
+    # The flashback cost this card has right now (its own, or a granted one), or nil.
+    def flashback_cost_now
+      return flashback_cost if respond_to?(:flashback_cost)
+
+      cost if @flashback_granted_turn && @flashback_granted_turn == game.current_turn.number
+    end
+
     # The cost to cast this card from the graveyard with harmonize, or nil when it has none now.
     def harmonize_cost
       cost if @harmonize_granted_turn && @harmonize_granted_turn == game.current_turn.number
