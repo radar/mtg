@@ -174,6 +174,20 @@ RSpec.describe "CardParser effects from the FDN token bucket (sacrifice choice, 
     expect(back.type?("Angel")).to eq(true)
   end
 
+  it "makes a token per point of excess damage to a creature" do
+    load_card("Parsed Negotiation {X}{R}\nSorcery\n~ deals X damage to target creature. Create a number of 1/1 red Goblin creature tokens equal to the amount of excess damage dealt to that creature this way.\n")
+    bears = ResolvePermanent("Aegis Turtle", owner: p2) # 0/5
+    go_to_main_phase!
+    card = Card("Parsed Negotiation", owner: p1)
+    p1.hand.add(card)
+    p1.add_mana(red: 8)
+    p1.cast(card:, value_for_x: 7) { |a| a.pay_mana(x: { red: 7 }, red: 1).targeting(bears) }
+    game.stack.resolve!
+    game.settle!
+
+    expect(tokens(p1, "Goblin").size).to eq(2)
+  end
+
   it "reads nontoken Cat enters triggers for ~ or another" do
     load_card("Parsed Leader {1}\nCreature — Cat\nWhenever ~ or another nontoken Cat you control enters, create a 1/1 white Cat creature token.\n2/2\n")
     ResolvePermanent("Parsed Leader", owner: p1)
