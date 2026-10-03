@@ -238,7 +238,7 @@ module Magic
             # "Whenever another nontoken creature you control enters, it endures X": "it" is the creature that entered.
             effects = effects.gsub(/\bit endures\b/, "that creature endures") if kind.name == "NontokenCreatureEntersTrigger"
             # "Whenever ~ deals combat damage to a player, put a +1/+1 counter on it": "it" is ~ (no target).
-            effects = effects.gsub(/\bon it\b/, "on ~") if kind.name == "CombatDamageTrigger" && !effects.include?("target")
+            effects = effects.gsub(/\bon it\b/, "on ~") if %w[CombatDamageTrigger AttacksTrigger].include?(kind.name) && !effects.include?("target")
             # "... target artifact or enchantment that player controls": the player damaged is the opponent (two-player games only).
             effects = effects.gsub("that player controls", "an opponent controls") if kind.name == "CombatDamageTrigger"
             # "... put a +1/+1 counter on that creature": the creature that entered (`event.permanent`).
