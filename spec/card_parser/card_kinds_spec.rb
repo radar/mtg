@@ -49,8 +49,8 @@ RSpec.describe "CardParser card kinds" do
   it "lists every trigger handling an event" do
     source = generate("Collector {2}{B}\nCreature — Zombie\nWhenever a creature you control dies, draw a card.\n" \
                       "Whenever a creature an opponent controls dies, you gain 1 life.\nAt the beginning of your upkeep, draw a card.\n2/2\n")
-    expect(source).to include("def event_handlers = { Events::CreatureDied => [CreatureDiesTrigger1, CreatureDiesTrigger2], " \
-                              "Events::BeginningOfUpkeep => UpkeepTrigger }")
+    expect(source).to include("def event_handlers = super.merge({ Events::CreatureDied => [CreatureDiesTrigger1, CreatureDiesTrigger2], " \
+                              "Events::BeginningOfUpkeep => UpkeepTrigger })")
   end
 
   it "generates a legendary artifact" do

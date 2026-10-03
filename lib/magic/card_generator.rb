@@ -263,7 +263,8 @@ module Magic
         names = handlers.map(&:last)
         "#{event} => #{names.size == 1 ? names.first : "[#{names.join(', ')}]"}"
       end
-      "def event_handlers = { #{pairs.join(', ')} }\n"
+      # `super` holds the handlers keywords add (prowess's SpellCast trigger, ward's); merge so they aren't lost.
+      "def event_handlers = super.merge({ #{pairs.join(', ')} }) { |_, old, new| [*old, *new] }\n"
     end
 
     def indent(source)

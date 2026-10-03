@@ -28,8 +28,15 @@ module Magic
       # "the number of counters on ~" (Warden of the Grove).
       COUNTERS_ON_THIS = /\A(?:the number of )?counters on ~\z/
 
+      # "different mana value among nonland permanents you control" (Lunar Insight).
+      DIFFERENT_MANA_VALUES = /\Adifferent mana values? among nonland permanents you control\z/
+      # "attacking creature": the creatures declared as attackers (a trigger on `Events::FinalAttackersDeclared`).
+      ATTACKING_CREATURES = /\Aattacking creatures?\z/
+
       def self.parse(text, this: "source")
         return "controller.colors_among_permanents" if COLORS_AMONG.match?(text)
+        return "controller.permanents.reject(&:land?).map(&:mana_value).uniq.count" if DIFFERENT_MANA_VALUES.match?(text)
+        return "event.attacks.count { _1.attacker.controller == controller }" if ATTACKING_CREATURES.match?(text)
 
         text = text.delete_prefix("the number of ")
         if (m = PERMANENTS.match(text))

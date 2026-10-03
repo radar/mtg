@@ -5,24 +5,32 @@ module Magic
     module Rules
       # "~ enters with two +1/+1 counters on it." / "~ enters with three time
       # counters on it." (older: "enters the battlefield with")
-      class EntersWithCounters < Data.define(:amount, :counter_type)
+      #
+      # "~ enters with a divinity counter on it if you cast it from your hand." adds the counter only for a
+      # spell cast from the hand (`if_cast_from_hand: true`; Myojin of Night's Reach).
+      class EntersWithCounters < Data.define(:amount, :counter_type, :cast_from_hand)
         include Rule
 
-        LINE = %r{\A~ enters(?: the battlefield)? with (?<amount>\d+|\w+) (?<type>[\w+/-]+) counters? on it\.?\z}
+        LINE = %r{\A~ enters(?: the battlefield)? with (?<amount>\d+|\w+) (?<type>[\w+/-]+) counters? on it(?<hand> if you cast it from your hand)?\.?\z}
+
+        def initialize(amount:, counter_type:, cast_from_hand: false) = super
 
         def self.parse(line)
           return unless (m = LINE.match(line))
 
           type = m[:type].downcase
           Magic::Counters[type]
-          new(amount: Number.parse(m[:amount]), counter_type: type)
+          new(amount: Number.parse(m[:amount]), counter_type: type, cast_from_hand: !m[:hand].nil?)
         rescue RuntimeError => e
           raise unless e.message.start_with?("Unknown counter type")
         end
 
         # +1/+1 counters only mean something on creatures.
         def kinds = counter_type == "+1/+1" ? %i[creature] : PERMANENT_KINDS
-        def body_source = "enters_with_counters #{counter_type.inspect}, #{amount}\n"
+
+        def body_source
+          "enters_with_counters #{counter_type.inspect}, #{amount}#{', if_cast_from_hand: true' if cast_from_hand}\n"
+        end
       end
     end
   end

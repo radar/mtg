@@ -156,6 +156,9 @@ module Magic
 
         types = types.uniq
         types -= Magic::Types::Creatures.values if modifiers_by_type(Modifications::LoseCreatureTypes).any?
+        if (set = modifiers_by_type(Modifications::SetCreatureTypes).max_by(&:timestamp))
+          types = (types - Magic::Types::Creatures.values) | set.type_grants
+        end
         types -= static_abilities_for(permanent).of_type(Abilities::Static::TypeRemoval).flat_map(&:type_removal)
       end
 

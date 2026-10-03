@@ -79,6 +79,7 @@ module Magic
         action = prepare_activate_ability(ability: ability, **args, &block)
       end
       yield action if block_given?
+      action.verify_requirements! if action.respond_to?(:verify_requirements!)
       action.pay_self_tap if action.has_cost?(Magic::Costs::SelfTap) && auto_tap
       action.pay_self_sacrifice if action.has_cost?(Magic::Costs::SelfSacrifice)
       action.pay_self_exile if action.has_cost?(Magic::Costs::SelfExile)

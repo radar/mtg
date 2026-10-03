@@ -89,6 +89,24 @@ other FDN cards care about Gates.
   each card's Oracle text where it was checked and otherwise from the generated code, so a
   rules line the parser silently dropped on an unchecked card would not fail its spec.
 
+- **2026-10-03 (life / damage / draw bucket)**: 29 of the bucket's cards now generate (or are
+  hand-written) with specs: Duress, Pilfer, Chart a Course, Lunar Insight, Felling Blow, Fiery
+  Annihilation, Hidetsugu's Second Rite, Twinflame Tyrant, Gratuitous Violence, Linden, Ancestor
+  Dragon, Exemplar of Light, Erudite Wizard, Scrawling Crawler, Niv-Mizzet Visionary, Painful
+  Quandary, Mindsparker, Perforating Artist, Dictate of Kruphix, Heartfire Immolator, Cryptic Caves,
+  Mild-Mannered Librarian, Myojin of Night's Reach, Stromkirk Noble, Trygon Predator, Dragon Mage,
+  Drake Hatcher, Fynn, and Drakuseth (the only hand-written one: it needs chained "up to two other
+  targets" choices). Left: Kaito (planeswalker; loyalty-counter trigger, a can't-be-blocked `+1`, an
+  emblem). New parser pieces are listed in `docs/card_parser.md` ("Life / damage / draw batch").
+  Coverage after this batch: 202 of 427 implemented, 225 not (bucket: 33 → 1 card). Three
+  engine bugs found on the way: generated `def event_handlers = { ... }` dropped what keywords add
+  (prowess, ward) and `add_event_handler` wrote to a throwaway hash; `Game#start!` left the opening
+  hands in turn 1's event log (broke "second card each turn"); activation restrictions were
+  checked after costs (a sacrificed source no longer counted for Cryptic Caves' "five or more lands").
+  The changes also moved six cards to "Ready to generate" (raid and opponent-cast triggers):
+  Gorehorn Raider, Mischievous Mystic, Mold Adder, Searslicer Goblin, Skyship Buccaneer, Storm
+  Fleet Spy; not generated here (they belong to the ETB/dies bucket).
+
 ## Cards by bucket
 
 Cards listed under every bucket they appear in.

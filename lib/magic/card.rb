@@ -174,8 +174,10 @@ module Magic
       end
 
       # "~ enters with two +1/+1 counters on it."
-      def enters_with_counters(counter_type, amount)
-        define_method(:entering_counters) { { counter_type => amount } }
+      # "~ enters with a divinity counter on it if you cast it from your hand." (`if_cast_from_hand: true`:
+      # Permanent.resolve adds it only for a spell cast from the hand.)
+      def enters_with_counters(counter_type, amount, if_cast_from_hand: false)
+        define_method(if_cast_from_hand ? :entering_counters_if_cast_from_hand : :entering_counters) { { counter_type => amount } }
       end
 
       def additional_lands_per_turn(amount)
@@ -376,6 +378,11 @@ module Magic
 
     # Counters the permanent enters with ({ "+1/+1" => 2 }).
     def entering_counters
+      {}
+    end
+
+    # Counters it enters with only when cast from the hand (Myojin of Night's Reach).
+    def entering_counters_if_cast_from_hand
       {}
     end
 

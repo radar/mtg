@@ -11,6 +11,11 @@ module Magic
       define_method(:once_each_turn?) { true }
     end
 
+    # "Activate only once." (ever, per permanent: Mild-Mannered Librarian)
+    def self.activate_only_once
+      define_method(:once_ever?) { true }
+    end
+
     # "Activate only as a sorcery."
     def self.activate_only_as_sorcery
       define_method(:requirements_met?) { game.can_cast_sorcery?(controller) }
@@ -31,9 +36,13 @@ module Magic
 
     def once_each_turn? = false
 
-    # True when a once-each-turn ability of this source was already activated this turn.
+    def once_ever? = false
+
+    # True when a once-each-turn ability of this source was already activated this turn, or a
+    # once-ever one at all.
     def activation_limit_reached?
-      once_each_turn? && source.respond_to?(:activated_this_turn?) && source.activated_this_turn?(self.class)
+      (once_each_turn? && source.respond_to?(:activated_this_turn?) && source.activated_this_turn?(self.class)) ||
+        (once_ever? && source.respond_to?(:activated_ever?) && source.activated_ever?(self.class))
     end
 
     # Conditions beyond costs that must hold to activate (e.g. "activate only as a sorcery").

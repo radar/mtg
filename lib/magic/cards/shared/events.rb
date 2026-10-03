@@ -13,8 +13,11 @@ module Magic
           handlers
         end
 
+        # Writes to the card's own store, not `event_handlers` (a card that defines its handlers returns a
+        # fresh hash there, so the addition would be lost).
         def add_event_handler(event, klass)
-          event_handlers[event] = Array(event_handlers[event]) + [klass]
+          store = (@event_handlers ||= {})
+          store[event] = Array(store[event]) + [klass]
         end
 
         def trigger_effect(effect, source: self, **args)

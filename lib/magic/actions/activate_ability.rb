@@ -31,7 +31,16 @@ module Magic
         return "#{source.name}'s ability cannot be activated" if source.respond_to?(:can_activate_ability?) && !source.can_activate_ability?(ability)
         return "#{source.name}'s ability can only be activated once each turn" if ability.activation_limit_reached?
 
-        "the requirements to activate #{source.name}'s ability are not met" unless ability.requirements_met?
+        "the requirements to activate #{source.name}'s ability are not met" unless @requirements_verified || ability.requirements_met?
+      end
+
+      # Activation restrictions ("Activate only if you control five or more lands") are checked as the ability is
+      # proposed (rule 602.5b), before costs such as sacrificing the source are paid. `Player#activate_ability`
+      # calls this first; afterwards `illegal_reason` doesn't check them again.
+      def verify_requirements!
+        raise Magic::IllegalAction.new(self, "the requirements to activate #{ability.source.name}'s ability are not met") unless ability.requirements_met?
+
+        @requirements_verified = true
       end
 
       def valid_targets?(*targets)
@@ -47,6 +56,7 @@ module Magic
       # For "activate only once each turn".
       def record_activation!
         ability.source.activated_this_turn!(ability.class) if ability.once_each_turn?
+        ability.source.activated_ever!(ability.class) if ability.once_ever?
       end
 
       def countered!
