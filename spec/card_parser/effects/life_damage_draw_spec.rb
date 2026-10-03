@@ -191,6 +191,24 @@ RSpec.describe Magic::CardParser::Effect, "(exile attached equipment)" do
   end
 end
 
+RSpec.describe Magic::CardParser::Effect, "(becomes a creature type)" do
+  it "parses a permanent creature type change, but not the additive or temporary forms" do
+    expect(described_class.parse("~ becomes a Werewolf.").resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.become_creature_type!(T::Creatures[\"Werewolf\"])")
+    expect(described_class.parse("~ becomes a Blorb.")).to be_nil
+    expect(described_class.parse("~ becomes a Dragon in addition to its other types until end of turn.")).to be_a(Magic::CardParser::Effects::BecomeTypeInAddition)
+  end
+end
+
+RSpec.describe Magic::CardParser::Rules::ActivatedAbility, "activate only once" do
+  it "reads 'Activate only once.' and treats 'it' as ~ after a becomes sentence" do
+    rule = described_class.parse("{3}{G}: ~ becomes a Werewolf. Put two +1/+1 counters on it and you draw a card. Activate only once.")
+    expect(rule.once_ever).to be(true)
+    expect(rule.class_source("Ability")).to include("activate_only_once")
+    expect(rule.class_source("Ability")).to include("target: source, amount: 2")
+    expect(described_class.parse("{T}: Draw a card. Activate only once each turn.").once_ever).to be(false)
+  end
+end
+
 RSpec.describe Magic::CardParser::Effect, "(discard hand)" do
   it "parses discarding a whole hand" do
     expect(described_class.parse("Each opponent discards their hand.").resolve_call)

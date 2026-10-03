@@ -451,6 +451,15 @@ module Magic
       abilities_activated_this_turn << ability_class
     end
 
+    # For "activate only once": never reset, since this permanent is the object that was activated.
+    def activated_ever?(ability_class)
+      (@abilities_activated_ever ||= []).include?(ability_class)
+    end
+
+    def activated_ever!(ability_class)
+      (@abilities_activated_ever ||= []) << ability_class
+    end
+
     def abilities_activated_this_turn
       @abilities_activated_this_turn ||= []
     end

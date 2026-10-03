@@ -8,6 +8,12 @@ module Magic
         )
       end
 
+      # "~ becomes a Werewolf.": replaces its creature types (see Modifications::SetCreatureTypes).
+      def become_creature_type!(*types, until_eot: false)
+        modifiers << SetCreatureTypes.new(types: types, until_eot:)
+        apply_continuous_effects!
+      end
+
       # "~ becomes a 4/4 artifact creature until end of turn." (a manland, Firdoch Core)
       def become_creature!(power:, toughness:, types: [], until_eot: true)
         modifiers << AdditionalType.new(types: [T::Creature, *types], until_eot:)

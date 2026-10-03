@@ -56,6 +56,7 @@ module Magic
       # For "activate only once each turn".
       def record_activation!
         ability.source.activated_this_turn!(ability.class) if ability.once_each_turn?
+        ability.source.activated_ever!(ability.class) if ability.once_ever?
       end
 
       def countered!
