@@ -162,6 +162,18 @@ RSpec.describe "CardParser effects from the FDN token bucket (sacrifice choice, 
     expect(tokens(p1, "Cat").size).to eq(1)
   end
 
+  it "returns a dying nontoken, non-Angel creature with a counter, flying and the Angel type" do
+    load_card("Parsed Call {1}\nEnchantment\nWhenever a nontoken, non-Angel creature you control dies, return that card to the battlefield under its owner's control with a +1/+1 counter on it. It has flying and is an Angel in addition to its other types.\n")
+    ResolvePermanent("Parsed Call", owner: p1)
+    ResolvePermanent("Aegis Turtle", owner: p1).destroy!
+    game.settle!
+
+    back = p1.creatures.find { _1.name == "Aegis Turtle" }
+    expect(back.counters.count).to eq(1)
+    expect(back).to be_flying
+    expect(back.type?("Angel")).to eq(true)
+  end
+
   it "reads nontoken Cat enters triggers for ~ or another" do
     load_card("Parsed Leader {1}\nCreature — Cat\nWhenever ~ or another nontoken Cat you control enters, create a 1/1 white Cat creature token.\n2/2\n")
     ResolvePermanent("Parsed Leader", owner: p1)
