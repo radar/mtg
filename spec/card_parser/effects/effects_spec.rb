@@ -529,7 +529,20 @@ RSpec.describe Magic::CardParser::Effect do
     expect(ramp.choice_args).to eq(["to_zone: :battlefield", "enters_tapped: true", "upto: 1", "filter: Filter[:basic_lands]"])
     tutor = described_class.parse("Search your library for a creature card, reveal it, put it into your hand, then shuffle.")
     expect(tutor.choice_args).to eq(["to_zone: :hand", "enters_tapped: false", "upto: 1", "filter: Filter[:creatures]", "reveal: true"])
-    expect(described_class.parse("Search your library for an artifact card, put it into your hand, then shuffle.")).to be_nil
+    expect(described_class.parse("Search your library for an artifact card, put it into your hand, then shuffle.").choice_args)
+      .to include('filter: ->(card) { card.any_type?("Artifact") }')
+    expect(described_class.parse("Search your library for a card with the same name as that card, put it into your hand, then shuffle.")).to be_nil
+  end
+
+  it "parses searches for any card, a type union, a mana value, or onto the top of the library" do
+    any = described_class.parse("Search your library for a card, put it into your hand, then shuffle.")
+    expect(any.choice_args).to include("filter: ->(card) { true }")
+    union = described_class.parse("Search your library for an instant or sorcery card with mana value 1, reveal it, put it into your hand, then shuffle.")
+    expect(union.choice_args).to include('filter: ->(card) { card.any_type?("Instant", "Sorcery") && card.mana_value == 1 }', "reveal: true")
+    big = described_class.parse("Search your library for a creature card with mana value 6 or greater, put it into your hand, then shuffle.")
+    expect(big.choice_args).to include("filter: ->(card) { card.any_type?(\"Creature\") && card.mana_value >= 6 }")
+    top = described_class.parse("Search your library for a basic land card, reveal it, then shuffle and put that card on top.")
+    expect(top.choice_args).to include("to_zone: :top", "filter: Filter[:basic_lands]", "reveal: true")
   end
 
   it "parses Treasure, Food and Clue tokens" do

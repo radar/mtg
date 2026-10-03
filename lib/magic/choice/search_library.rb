@@ -26,6 +26,12 @@ module Magic
           targets.map do |target|
             target.move_to_hand!
           end
+        when :top
+          # "...then shuffle and put that card on top": shuffle first, then move it to the top.
+          trigger_effect(:reveal_cards, target: targets) if reveal
+          controller.shuffle!
+          targets.each { |target| target.move_zone!(to: controller.library) }
+          return targets
         end.tap { controller.shuffle! }
       end
 
