@@ -21,6 +21,8 @@ module Magic
             Mana.new(Costs::Parsers::Mana.parse(cost))
           when /Sacrifice a creature with defender/
             Sacrifice.new(source, source.controller.creatures.select(&:defender?))
+          when /Sacrifice another creature/
+            SacrificeAnother.new(source, source.controller.creatures.reject { _1 == source })
           when /Sacrifice a creature/
             # TODO: Make this target only creatures controlled by player
             Sacrifice.new(source, source.controller.creatures)
