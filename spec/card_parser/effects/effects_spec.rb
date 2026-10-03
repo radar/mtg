@@ -397,6 +397,13 @@ RSpec.describe Magic::CardParser::Effect do
     expect(counters.resolve_call).to include("targets.each", '"+1/+1"')
   end
 
+  it "parses a pump on creatures your opponents control, and \"that player loses N life\"" do
+    pump = described_class.parse("Creatures your opponents control get -2/-2 until end of turn.")
+    expect(pump.resolve_call).to start_with("battlefield.not_controlled_by(controller).creatures.each")
+    expect(pump.resolve_call).to include("power: -2, toughness: -2")
+    expect(described_class.parse("That player loses 2 life.").resolve_call).to eq("trigger_effect(:lose_life, target: event.permanent.controller, life: 2)")
+  end
+
   it "parses a target player sacrificing a permanent of a type" do
     sacrifice = described_class.parse("Target player sacrifices a creature of their choice.")
     expect(sacrifice).to eq(e.const_get(:TargetPlayerSacrifices).new("player", %w[Creature]))

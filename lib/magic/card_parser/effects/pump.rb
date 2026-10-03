@@ -11,7 +11,7 @@ module Magic
       class Pump < Data.define(:who, :reference, :power, :toughness, :per, :keywords, :until_next_turn)
         include Effect
 
-        WHO = /(?:(?<self>~)|(?<each>(?:other )?creatures you control)|(?<player_creatures>creatures target player controls)|#{PermanentTarget::REFERENCE})/i
+        WHO = /(?:(?<self>~)|(?<each>(?:other )?creatures you control)|(?<player_creatures>creatures target player controls)|(?<opponent_creatures>creatures your opponents control)|#{PermanentTarget::REFERENCE})/i
         KEYWORDS = /[\w ,]+?/
         PER = /[^.]+?/
         LINE = %r{\A#{WHO} (?:gets? (?<power>[+-](?:\d+|X))/(?<toughness>[+-](?:\d+|X))(?: for each (?<per>#{PER}))?(?: and gains? (?<with>#{KEYWORDS}))?|gains? (?<only>#{KEYWORDS})) (?<duration>until end of turn|until your next turn)(?: for each (?<per_after>#{PER}))?\.?\z}i
@@ -34,7 +34,7 @@ module Magic
           if (phrase = m[:per] || m[:per_after])
             return unless m[:power] && (per = Count.parse(phrase, this: THIS))
           end
-          who = m[:self] ? :self : m[:each]&.downcase || (:player_creatures if m[:player_creatures]) || :target
+          who = m[:self] ? :self : m[:each]&.downcase || (:player_creatures if m[:player_creatures]) || (:opponent_creatures if m[:opponent_creatures]) || :target
           reference = PermanentTarget.reference(m) if who == :target
           new(who:, reference:, power: stat(m[:power]), toughness: stat(m[:toughness]), per:,
               keywords:, until_next_turn:)
@@ -55,6 +55,7 @@ module Magic
           when :self then calls(THIS)
           when :target then calls(reference.object)
           when :player_creatures then each("target.creatures")
+          when :opponent_creatures then each("battlefield.not_controlled_by(controller).creatures")
           when "creatures you control" then each("battlefield.controlled_by(controller).creatures")
           else each("(battlefield.controlled_by(controller).creatures - [#{THIS}])")
           end
