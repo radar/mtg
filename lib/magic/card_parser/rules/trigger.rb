@@ -42,6 +42,17 @@ module Magic
           [m[:type], m[:type2]].compact.map { "event.permanent.type?(#{_1.inspect})" }.join(" || ").then { m[:type2] ? "(#{_1})" : _1 }
         end
 
+        COLORS = %w[white blue black red green].freeze
+        # "an opponent casts a [<colour> [or <colour>]] [<type> [or <type>]] spell" -> should_perform? (Mindsparker).
+        OPPONENT_SPELL = lambda do |m|
+          checks = ["opponent?"]
+          colors = [m[:color], m[:color2]].compact.map { "spell.colors.include?(:#{_1})" }
+          checks << (colors.one? ? colors.first : "(#{colors.join(' || ')})") if colors.any?
+          types = [m[:type], m[:type2]].compact.map { "spell.type?(#{_1.capitalize.inspect})" }
+          checks << (types.one? ? types.first : "(#{types.join(' || ')})") if types.any?
+          checks.join(" && ")
+        end
+
         # "When ~ enters or attacks" (see merge).
         ENTERS_OR_ATTACKS = "EntersOrAttacksTrigger"
         # "When ~ enters or dies" (see merge).
@@ -114,7 +125,35 @@ module Magic
                    :event_handlers, "Events::BeginningOfEndStep", nil, PERMANENT_KINDS),
           Kind.new(/#{WHEN} you gain life/, "LifeGainTrigger", "TriggeredAbility", :event_handlers, "Events::LifeGain", "you?",
                    PERMANENT_KINDS),
-          Kind.new(/#{WHEN} you draw a card/, "CardDrawTrigger", "TriggeredAbility", :event_handlers, "Events::CardDraw", "you?",
+          Kind.new(/#{WHEN} (?<who>you|an opponent) draws? a card/, "CardDrawTrigger", "TriggeredAbility", :event_handlers,
+                   "Events::CardDraw", ->(m) { m[:who] == "you" ? "you?" : "opponent?" }, PERMANENT_KINDS),
+          Kind.new(/#{WHEN} you draw your second card each turn/, "SecondCardDrawTrigger", "TriggeredAbility", :event_handlers,
+                   "Events::CardDraw",
+                   "you? && game.current_turn.events.count { |e| e.is_a?(Events::CardDraw) && e.player == event.player } == 2",
+                   PERMANENT_KINDS),
+          Kind.new(/At the beginning of each player's draw step/, "DrawStepTrigger", "TriggeredAbility", :event_handlers,
+                   "Events::DrawStep", nil, PERMANENT_KINDS),
+          Kind.new(/#{WHEN} an? (?:(?<color>#{COLORS.join('|')}) )?creature you control attacks/, "CreatureAttacksTrigger", "TriggeredAbility",
+                   :event_handlers, "Events::CreatureAttacked",
+                   lambda { |m|
+                     ["event.attacker.controller == controller", *("event.attacker.colors.include?(:#{m[:color]})" if m[:color])].join(" && ")
+                   },
+                   PERMANENT_KINDS),
+          Kind.new(/#{WHEN} one or more creatures you control attack/, "CreaturesAttackTrigger", "TriggeredAbility", :event_handlers,
+                   "Events::FinalAttackersDeclared", "event.active_player == controller && event.attacks.any?", PERMANENT_KINDS),
+          Kind.new(%r{#{WHEN} you put one or more (?<counter>[\w+/-]+) counters on ~}, "CountersPutOnThisTrigger", "TriggeredAbility",
+                   :event_handlers, "Events::CounterAddedToPermanent",
+                   lambda { |m|
+                     counter = "Counters::#{Magic::Counters[m[:counter].downcase].name.split('::').last}"
+                     "event.permanent == actor && Counters[event.counter_type] == #{counter} && (event.source.nil? || event.source.controller == controller)"
+                   },
+                   PERMANENT_KINDS),
+          Kind.new(/#{WHEN} a creature you control with (?<keyword>deathtouch|lifelink|flying|trample) deals combat damage to a player/,
+                   "KeywordCreatureCombatDamageTrigger", "TriggeredAbility", :event_handlers, "Events::CombatDamageDealt",
+                   lambda { |m|
+                     "event.source.is_a?(Magic::Permanent) && event.source.creature? && event.source.controller == controller && " \
+                       "event.source.has_keyword?(Magic::Cards::Keywords::#{m[:keyword].upcase}) && event.target.is_a?(Magic::Player)"
+                   },
                    PERMANENT_KINDS),
           Kind.new(/#{WHEN} (?<who>you sacrifice|a player sacrifices) (?:an?|(?<another>another)) (?<type>[\w-]+)/, "SacrificeTrigger",
                    "TriggeredAbility", :event_handlers, "Events::PermanentSacrificed",
@@ -157,12 +196,16 @@ module Magic
                      "you? && #{types.size == 1 ? types.first : "(#{types.join(' || ')})"}"
                    },
                    PERMANENT_KINDS),
+          Kind.new(/#{WHEN} an opponent casts an? (?:(?<color>#{COLORS.join('|')})(?: or (?<color2>#{COLORS.join('|')}))? )?(?:(?<type>instant|sorcery|creature|artifact|enchantment|planeswalker)(?: or (?<type2>instant|sorcery|creature|artifact|enchantment|planeswalker))? )?spell/,
+                   "OpponentSpellCastTrigger", "TriggeredAbility::SpellCast", :event_handlers, "Events::SpellCast", OPPONENT_SPELL, PERMANENT_KINDS),
           Kind.new(/#{WHEN} you cast a spell during an opponent's turn/, "OpponentsTurnSpellCastTrigger", "TriggeredAbility::SpellCast",
                    :event_handlers, "Events::SpellCast", "you? && !controllers_turn?", PERMANENT_KINDS)
         ].freeze
 
         # An italic ability word ("Landfall — ") is flavour; the rest is the trigger.
         ABILITY_WORD = /\A[A-Z][a-z]+(?: [a-z]+)* — /
+        PERMANENT_EVENTS = %w[Events::CounterAddedToPermanent Events::CreatureDied Events::EnteredTheBattlefield].freeze
+        ONCE_EACH_TURN =/ This ability triggers only once each turn\.?\z/
         KICKED = /\Aif (?:it|~) was kicked, /
         INTERVENING_IF = /\Aif (?<condition>[^,]+), (?<rest>.+)\z/
 
@@ -193,6 +236,14 @@ module Magic
             if (intervening = INTERVENING_IF.match(effects)) && (ruby = Condition.parse(intervening[:condition]))
               effects = intervening[:rest]
               condition = [condition || "super", "(#{ruby.gsub(/\bsource\b/, 'actor')})"].join(" && ")
+            end
+
+            # "... This ability triggers only once each turn."
+            if effects.sub!(ONCE_EACH_TURN, "")
+              # OncePerTurn keys on `event.permanent`, so only events that carry one.
+              return unless kind.base == "TriggeredAbility" && PERMANENT_EVENTS.include?(kind.event)
+
+              kind = kind.with(base: "TriggeredAbility::OncePerTurn")
             end
 
             effect_list = EffectList.parse(effects) or return

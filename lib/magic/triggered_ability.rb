@@ -24,6 +24,12 @@ module Magic
       game.current_turn.active_player == controller
     end
 
+    # "that player" in a trigger's effect: the player the event is about (who cast, drew or
+    # started a step), or the player who was dealt damage.
+    def that_player
+      event.respond_to?(:player) ? event.player : event.target
+    end
+
     def life_gained_by(controller)
       game.current_turn.life_gained_by_player(controller)
     end

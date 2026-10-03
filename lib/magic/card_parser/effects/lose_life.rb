@@ -7,7 +7,7 @@ module Magic
       class LoseLife < Data.define(:who, :amount)
         include Effect
 
-        LINE = /\A(?:(?<who>target player|target opponent|each opponent|you) )?loses? (?<amount>\d+|\w+) life\.?\z/i
+        LINE = /\A(?:(?<who>target player|target opponent|each opponent|that player|you) )?loses? (?<amount>\d+|\w+) life\.?\z/i
 
         def self.parse(text)
           new(who: ($~[:who] || "you").downcase, amount: Number.parse($~[:amount])) if LINE.match(text)
@@ -18,6 +18,7 @@ module Magic
         def resolve_call
           case who
           when "each opponent" then "game.opponents(controller).each { trigger_effect(:lose_life, target: _1, life: #{amount}) }"
+          when "that player" then "trigger_effect(:lose_life, target: that_player, life: #{amount})"
           when "you" then "trigger_effect(:lose_life, target: controller, life: #{amount})"
           else "trigger_effect(:lose_life, target: target, life: #{amount})"
           end

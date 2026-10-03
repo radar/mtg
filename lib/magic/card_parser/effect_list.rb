@@ -35,9 +35,18 @@ module Magic
       WHERE_X = /,? where X is (?<what>[^.]+)(?=\.|\z)/
       EQUAL_TO = /\b(?<verb>draw|gain|mill) (?<noun>cards|life) equal to (?<what>[^.]+?)(?=\.|,|\z)/i
 
+      # "draw a card for each <count>" / "you gain 1 life for each <count>": N times the count.
+      FOR_EACH = /\b(?<verb>draw|gain) (?<n>an?|\d+|\w+) (?<noun>cards?|life) for each (?<what>[^.]+?)(?=\.|,|\z)/i
+
       # `text` as one effect (some span two sentences), else every sentence (or,
       # failing that, every clause of it) as an effect; nil unless all of them parse.
       def self.parse(text)
+        if (m = FOR_EACH.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))
+          times = Number.parse(m[:n])
+          rewritten = text.sub(FOR_EACH) { "#{m[:verb]} X #{m[:noun] == 'life' ? 'life' : 'cards'}" }
+          return Number.with_x(times == 1 ? count : "#{times} * #{count}") { parse(rewritten) }
+        end
+
         if (m = WHERE_X.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))
           return Number.with_x(count) { parse(text.sub(WHERE_X, "")) }
         elsif (m = EQUAL_TO.match(text)) && (count = Count.parse(m[:what], this: Effect::THIS))

@@ -20,6 +20,7 @@ module Magic
         UNTARGETED = {
           "each opponent" => "game.opponents(controller)",
           "you" => "[controller]",
+          "that player" => "[that_player]",
           "each player" => "game.players",
           "each creature" => "battlefield.creatures",
           "each creature without flying" => "battlefield.creatures.reject(&:flying?)",

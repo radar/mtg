@@ -177,6 +177,9 @@ module Magic
       players.each do |player|
         7.times { player.draw! }
       end
+      # The opening hands are drawn before the game begins: they aren't "this turn" (Erudite Wizard
+      # counts the cards drawn each turn).
+      @current_turn.events.clear
       # "beginning" (the state Turn starts in, before its first untap!) is a
       # NO_PRIORITY_STEP like untap/cleanup, but unlike those it isn't a real rules
       # concept -- it only exists so specs can build a game and act (an instant, a mana

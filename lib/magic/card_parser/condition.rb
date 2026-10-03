@@ -26,6 +26,9 @@ module Magic
         "~ is enchanted" => 'source.attachments.any? { _1.type?("Aura") }'
       }.freeze
 
+      # "you attacked this turn" (raid): one of your creatures was declared as an attacker.
+      ATTACKED_THIS_TURN = "game.current_turn.events.any? { |e| e.is_a?(Events::CreatureAttacked) && e.attacker.controller == controller }"
+
       def self.parse(text)
         if (m = ONE.match(text))
           "#{permanents(m[:type])}#{'.except(source)' if m[:another]}.any?"
@@ -44,6 +47,8 @@ module Magic
           "game.current_turn.active_player #{m[:not] ? '!=' : '=='} controller"
         elsif text.match?(/\Ayou have no cards in hand\z/)
           "controller.hand.empty?"
+        elsif text == "you attacked this turn"
+          ATTACKED_THIS_TURN
         else
           SELF[text]
         end
