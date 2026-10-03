@@ -180,6 +180,17 @@ RSpec.describe Magic::CardParser::Rules::EntersWithCounters, "if cast from your 
   end
 end
 
+RSpec.describe Magic::CardParser::Effect, "(exile attached equipment)" do
+  it "parses 'exile up to one target Equipment attached to that creature' as acting on an earlier target" do
+    effect = described_class.parse("Exile up to one target Equipment attached to that creature.")
+    expect(effect.earlier_target?).to be(true)
+    expect(effect.resolve_call).to include("Magic::Choice::ExileAttachedEquipment.new")
+    list = Magic::CardParser::EffectList.parse("~ deals 5 damage to target creature. Exile up to one target Equipment attached to that creature. If that creature would die this turn, exile it instead.")
+    expect(list.effects.size).to eq(3)
+    expect(Magic::CardParser::EffectList.parse("Exile up to one target Equipment attached to that creature.")).to be_nil
+  end
+end
+
 RSpec.describe Magic::CardParser::Effect, "(discard hand)" do
   it "parses discarding a whole hand" do
     expect(described_class.parse("Each opponent discards their hand.").resolve_call)
