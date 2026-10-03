@@ -60,7 +60,7 @@ module Magic
     attr_accessor :controlled_since_turn
 
     def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false)
-      enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:)
+      enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:, controller:)
       card_zone = card.zone unless token || copy
 
       permanent = Magic::Permanent.new(
@@ -105,7 +105,13 @@ module Magic
       end
     end
 
-    def self.enters_tapped_after_replacements(game:, card:, enters_tapped:)
+    def self.enters_tapped_after_replacements(game:, card:, enters_tapped:, controller: nil)
+      # "Creatures your opponents control enter tapped" (Authority of the Consuls): a static ability
+      # answering `forces_creature_to_enter_tapped?(card, player)`.
+      if !enters_tapped && card.creature? && controller &&
+         game.battlefield.static_abilities.any? { _1.respond_to?(:forces_creature_to_enter_tapped?) && _1.forces_creature_to_enter_tapped?(card, controller) }
+        return true
+      end
       return enters_tapped unless enters_tapped && card.land?
 
       prevented = static_abilities(game, Abilities::Static::LandsEnterUntapped).any? do |ability|
