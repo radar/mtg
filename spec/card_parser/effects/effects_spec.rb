@@ -411,6 +411,14 @@ RSpec.describe Magic::CardParser::Effect do
                                 e.const_get(:DrawCards).new(1), e.const_get(:GainLife).new(2)])
   end
 
+  it "parses attaching itself to a target creature" do
+    attach = described_class.parse("Attach it to target Pirate you control.")
+
+    expect(attach.target_choices).to eq('battlefield.controlled_by(controller).creatures.by_any_type("Pirate")')
+    expect(attach.resolve_call).to eq("#{Magic::CardParser::Effect::THIS}.attach_to!(target)")
+    expect(described_class.parse("Attach it to target land you control.")).to be_nil
+  end
+
   it "parses a target player sacrificing a permanent of a type" do
     sacrifice = described_class.parse("Target player sacrifices a creature of their choice.")
     expect(sacrifice).to eq(e.const_get(:TargetPlayerSacrifices).new("player", %w[Creature]))
