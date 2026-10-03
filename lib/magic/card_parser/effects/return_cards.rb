@@ -25,7 +25,7 @@ module Magic
 
         KIND = /(?:creature|planeswalker|artifact|enchantment|land|nonland permanent|permanent)/i
         SUBTYPE = /(?-i:(?:#{PermanentTarget::CREATURE_TYPES})\b)/
-        FILTER = /(?:non-(?<nontype>#{PermanentTarget::CREATURE_TYPES}) )?(?:(?<kind>#{KIND}(?: or #{KIND})?)|(?<subtype>#{SUBTYPE}))?/
+        FILTER = /(?:non-(?<nontype>#{PermanentTarget::CREATURE_TYPES}) )?(?:(?<subtype>#{SUBTYPE}) ?)?(?<kind>#{KIND}(?: or #{KIND})?)?/
         MANA_VALUE = /with mana value (?:(?<n>\d+) or (?<cmp>less|greater)|less than or equal to ~'s power)/i
         LINE = /\A(?:Return|Put) (?<quant>all|(?:up to (?<count>\w+) )?(?<another>another )?target) (?<filter>[^.]*?)cards?(?: (?<with>#{MANA_VALUE}))? from (?<where>your graveyard|all graveyards|a graveyard) (?:to (?<hand>your hand)|(?:to|onto) the battlefield(?<control> under your control)?)\.?(?: If it's an? (?<ctype>#{PermanentTarget::CREATURE_TYPES}) card, draw a card\.?)?\z/i
 
@@ -52,11 +52,8 @@ module Magic
           return unless (m = /\A#{FILTER}\z/.match(text))
 
           conditions = []
-          if m[:kind]
-            conditions << kind_check(m[:kind].downcase)
-          elsif m[:subtype]
-            conditions << "_1.type?(#{m[:subtype].inspect})"
-          end
+          conditions << "_1.type?(#{m[:subtype].inspect})" if m[:subtype]
+          conditions << kind_check(m[:kind].downcase) if m[:kind]
           conditions << "!_1.type?(#{m[:nontype].inspect})" if m[:nontype]
           if mv
             conditions << if mv[:n] then "_1.mana_value #{mv[:cmp].downcase == 'less' ? '<=' : '>='} #{mv[:n]}"

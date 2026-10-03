@@ -7,9 +7,12 @@ module Magic
     # it's their turn now.
     # `this_turn` permissions ("you may cast the exiled cards this turn") end with the turn
     # they were granted on instead.
-    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free) do
+    # `graveyard`: the card is castable from the graveyard (Zul Ashur) rather than from exile.
+    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard) do
+      def initialize(graveyard: false, **args) = super
+
       def permits?(game, card, player)
-        card.equal?(self.card) && player == self.player && card.zone&.exile? && !expired?(game)
+        card.equal?(self.card) && player == self.player && (graveyard ? card.zone&.graveyard? : card.zone&.exile?) && !expired?(game)
       end
 
       def expired?(game)
@@ -31,8 +34,9 @@ module Magic
     end
 
     # `free: true`: "you may cast it without paying its mana cost" (Dream Harvest).
-    def grant_until_end_of_turn(card:, player:, free: false)
-      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: true, free:)
+    # `from_graveyard: true`: "you may cast target Zombie card from your graveyard this turn" (Zul Ashur).
+    def grant_until_end_of_turn(card:, player:, free: false, from_graveyard: false)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: true, free:, graveyard: from_graveyard)
     end
 
     # "Until your next end step, you may play those cards": through this turn when it's your turn
