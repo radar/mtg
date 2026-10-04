@@ -105,6 +105,9 @@ module Magic
           Kind.new(/#{WHEN} a creature an opponent controls enters/, "OpponentCreatureEntersTrigger",
                    "TriggeredAbility::EnterTheBattlefield", :event_handlers, "Events::EnteredTheBattlefield",
                    "creature? && event.permanent.controller != controller", PERMANENT_KINDS),
+          Kind.new(/#{WHEN} a Gate you control enters/, "GateEntersTrigger", "TriggeredAbility::EnterTheBattlefield",
+                   :event_handlers, "Events::EnteredTheBattlefield", 'under_your_control? && event.permanent.type?("Gate")',
+                   PERMANENT_KINDS),
           Kind.new(/#{WHEN} a land #{ENTERS_UNDER_YOUR_CONTROL}/, "LandfallTrigger", "TriggeredAbility::Landfall",
                    :event_handlers, "Events::Landfall", "you?", PERMANENT_KINDS),
           Kind.new(/#{WHEN} (?<who>you|an opponent|a player) gains? life/, "LifeGainTrigger", "TriggeredAbility",
@@ -298,9 +301,21 @@ module Magic
         def class_base_name = kind.name
         def handled_event = kind.event
 
+        # An effect that moves the card out of the graveyard (ReturnThisFromGraveyard) makes this a graveyard trigger.
+        def works_from_graveyard?
+          effect_list.effects.flat_map { _1.respond_to?(:all_effects) ? _1.all_effects : [_1] }
+                     .any? { _1.respond_to?(:works_from_graveyard?) && _1.works_from_graveyard? }
+        end
+
         def class_source(name)
           body = []
-          body << "def should_perform?\n  #{condition}\nend\n" if condition
+          if works_from_graveyard?
+            # A trigger that moves its own card out of the graveyard fires only from there (Card#receive_event).
+            body << "def self.works_from_graveyard? = true\n"
+            body << "def should_perform?\n  actor.zone&.graveyard?#{" && (#{condition})" if condition}\nend\n"
+          elsif condition
+            body << "def should_perform?\n  #{condition}\nend\n"
+          end
           body << effect_list.trigger_source
           "class #{name} < #{kind.base}\n#{body.join("\n").gsub(/^(?=.)/, '  ')}end\n"
         end

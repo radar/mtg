@@ -33,8 +33,13 @@ module Magic
       # "you attacked this turn" (raid): one of your creatures was declared as an attacker.
       ATTACKED_THIS_TURN = "game.current_turn.events.any? { |e| e.is_a?(Events::CreatureAttacked) && e.attacker.controller == controller }"
 
+      # "you control a creature with power 4 or greater" (ferocious).
+      POWER = /\Ayou control a creature with power (?<amount>\d+|\w+) or greater\z/
+
       def self.parse(text)
-        if (m = ONE.match(text))
+        if (m = POWER.match(text))
+          "controller.creatures.any? { _1.power >= #{Number.parse(m[:amount])} }"
+        elsif (m = ONE.match(text))
           "#{permanents(m[:type])}#{'.except(source)' if m[:another]}.any?"
         elsif (m = MANY.match(text))
           "#{permanents(singular(m[:types]))}.count >= #{Number.parse(m[:amount])}"

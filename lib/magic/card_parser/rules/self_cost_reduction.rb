@@ -13,7 +13,11 @@ module Magic
 
         LINE = /\A~ costs \{(?<amount>\d+)\} less to cast (?:for each (?<count>[^.]+)|if (?<condition>[^.]+))\.?\z/i
 
+        # "Affinity for Gates" (Gate Colossus) is "~ costs {1} less to cast for each Gate you control."
+        AFFINITY = /\AAffinity for (?<type>[A-Za-z]+)\z/
+
         def self.parse(line)
+          line = "~ costs {1} less to cast for each #{$~[:type].delete_suffix('s')} you control." if AFFINITY.match(line)
           return unless (m = LINE.match(line))
 
           if m[:count]

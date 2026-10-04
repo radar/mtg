@@ -554,6 +554,8 @@ module Magic
     def maximum_blockers = nil
     # "This creature must be blocked if able."
     def must_be_blocked? = false
+    # "This creature attacks each combat if able."
+    def must_attack? = false
     # How many attackers this creature can block at once; override for "can block an additional creature".
     def maximum_attackers_blocked = 1
     def can_activate_ability?(_) = true

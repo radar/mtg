@@ -634,6 +634,11 @@ module Magic
       !lost_all_abilities? && face.must_be_blocked?
     end
 
+    # "Attacks each combat if able."
+    def must_attack?
+      !lost_all_abilities? && face.must_attack?
+    end
+
     def maximum_attackers_blocked
       lost_all_abilities? ? 1 : face.maximum_attackers_blocked
     end

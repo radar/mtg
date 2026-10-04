@@ -201,6 +201,7 @@ module Magic
       def advance_step!
         event = NEXT_STEP_EVENTS.fetch(step.to_sym) { raise "No next step after #{step}" }
         if event == :attackers_declared!
+          combat.validate_attackers!(active_player)
           combat.attackers_declared? ? attackers_declared! : end_of_combat
         else
           public_send(event)
@@ -235,6 +236,7 @@ module Magic
       end
 
       def attackers_declared!
+        combat.validate_attackers!(active_player)
         combat.attacks.each do |attack|
           attack_declared = Events::AttackDeclared.new(
             active_player: active_player,
