@@ -409,6 +409,12 @@ module Magic
         copy_for_conspire if @conspired
       end
 
+      # "Whenever you cast an Elf spell, it gains haste until end of turn" (Tyvar Kell's emblem): the
+      # permanent this spell resolves into gets haste.
+      def gain_haste_on_resolve!
+        @gains_haste = true
+      end
+
       def choose_mode(mode_class, &)
         raise InvalidModes, "#{mode_class} is not a mode of #{card.name}" unless card.modes.include?(mode_class)
         raise InvalidModes, "#{mode_class} was already chosen" if @modes.any? { |mode| mode.mode.instance_of?(mode_class) }
@@ -478,6 +484,8 @@ module Magic
             controller: player,
           )
         end
+
+        resolved.grant_haste! if @gains_haste && resolved.is_a?(Permanent)
 
         if @blitz && resolved.is_a?(Permanent)
           resolved.grant_haste!
