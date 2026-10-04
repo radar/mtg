@@ -196,7 +196,9 @@ module Magic
           elsif optional.any?
             sections << method("resolve!(target: nil)", ["return unless target", *statements])
           else
-            sections << method("resolve!#{'(target:)' if targeted.any?}", statements)
+            # An effect using the spell's X (`uses_x?`) takes it as `value_for_x:`, which `Cast#resolve!` passes.
+            arguments = [("target:" if targeted.any?), ("value_for_x:" if leaves(effects).any? { _1.respond_to?(:uses_x?) && _1.uses_x? })].compact
+            sections << method("resolve!#{"(#{arguments.join(', ')})" if arguments.any?}", statements)
           end
         end
         sections.join("\n")
