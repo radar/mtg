@@ -18,7 +18,7 @@ module Magic
         # "Remove a counter from ~" (no type named) means -1/-1: the only cards that
         # phrase it this way ("enters with N -1/-1 counters on it", then this ability)
         # have no other counter type to be ambiguous with.
-        COST = /(?:\{(?:\d+|[WUBRGC]|[WUBRG]\/[WUBRG]|\d+\/[WUBRG])\})+|\{T\}|Sacrifice ~|Sacrifice a creature|Exile ~|Discard a card|Blight \d+|Remove (?:\d+|\w+) (?:[\w+\/-]+ )?counters? from ~(?: and sacrifice it)?/
+        COST = /(?:\{(?:\d+|[WUBRGC]|[WUBRG]\/[WUBRG]|\d+\/[WUBRG])\})+|\{T\}|Sacrifice ~|Sacrifice a creature|Sacrifice another creature|Exile ~|Discard a card|Blight \d+|Remove (?:\d+|\w+) (?:[\w+\/-]+ )?counters? from ~(?: and sacrifice it)?/
         LINE = /\A(?<costs>#{COST}(?:, #{COST})*): (?<effects>.+?)(?<sorcery> Activate only as a sorcery\.)?(?<once> Activate only once each turn\.)?(?<ever> Activate only once\.)?(?: Activate only if (?<only_if>[^.]+)\.)?\z/
         # "~ becomes a Werewolf. Put two +1/+1 counters on it and ...": "it" is ~, since nothing was targeted.
         BECOMES_THEN_IT = /\A(?<becomes>~ becomes an? [A-Z][\w-]*\. )(?<rest>.*)\z/
@@ -33,6 +33,8 @@ module Magic
           if (becomes = BECOMES_THEN_IT.match(effects)) && !effects.include?("target")
             effects = becomes[:becomes] + becomes[:rest].gsub(/\bon it\b/, "on ~")
           end
+          # "~ gains indestructible until end of turn. Tap it.": with no target, "it" is ~.
+          effects = effects.gsub(/\bTap it\b/, "Tap ~") if !effects.include?("target") && effects.start_with?("~")
           effect_list = EffectList.parse(effects) or return
           m[:costs].scan(/Remove \w+ (?:([\w+\/-]+) )?counters? from/) { Magic::Counters[($1 || "-1/-1").downcase] } # raises for an unknown counter type
           new(costs: costs(m[:costs]), effect_list:, sorcery_speed: !m[:sorcery].nil?, once_each_turn: !m[:once].nil?, only_if:, once_ever: !m[:ever].nil?)

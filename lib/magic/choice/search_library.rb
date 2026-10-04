@@ -26,6 +26,9 @@ module Magic
           targets.map do |target|
             target.move_to_hand!
           end
+        when :graveyard
+          # "search your library for a card, put that card into your graveyard, then shuffle" (Vile Entomber).
+          targets.map(&:move_to_graveyard!)
         when :top
           # "...then shuffle and put that card on top": shuffle first, then move it to the top.
           trigger_effect(:reveal_cards, target: targets) if reveal

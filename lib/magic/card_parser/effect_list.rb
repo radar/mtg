@@ -181,7 +181,9 @@ module Magic
         raise UnsupportedCard, "\"if this spell was kicked\" only works on instants and sorceries" if this == "source" && kicked?
         optional = leaves(effects).select(&:optional_target?)
         # Abilities (a planeswalker's, an activated one's) may leave "up to one target" unchosen; a spell can't.
-        raise UnsupportedCard, "\"up to one target\" is only supported in triggered and activated abilities" if optional.any? && this != "source"
+        # ... but "up to N target ..." (an effect with max_targets) is fine on a spell: `targeting(a, b)` takes any number.
+        spell_up_to = this == "self" && optional.any? && optional.all? { _1.respond_to?(:max_targets) && _1.max_targets > 1 }
+        raise UnsupportedCard, "\"up to one target\" is only supported in triggered and activated abilities" if optional.any? && this != "source" && !spell_up_to
         raise UnsupportedCard, "\"up to one target\" needs to be the only target" if optional.any? && leaves(effects).count(&:target_choices) > 1
 
         targeted = leaves(effects).select(&:target_choices)
@@ -202,10 +204,13 @@ module Magic
           sections << method("resolve!(targets:)", statements)
         else
           sections << "def target_choices\n  #{expand(targeted.first.target_choices, this)}\nend\n" if targeted.any?
-          if optional.any?
+          if spell_up_to
+            sections << method("resolve!(targets:)", statements)
+          elsif optional.any?
             sections << method("resolve!(target: nil)", ["return unless target", *statements])
           else
-            # An effect reading the spell's X ("Each player mills X cards") asks for it as a keyword.
+            # An effect reading the spell's X ("Each player mills X cards") asks for it as a keyword
+            # (`Cast#resolve!` passes it; the default keeps a direct `resolve!` call working).
             params = [("target:" if targeted.any?), ("value_for_x: 0" if leaves(effects).any? { _1.respond_to?(:uses_x?) && _1.uses_x? })].compact
             sections << method("resolve!#{"(#{params.join(', ')})" if params.any?}", statements)
           end

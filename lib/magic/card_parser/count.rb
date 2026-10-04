@@ -14,7 +14,9 @@ module Magic
     module Count
       TYPE = /[A-Za-z][\w-]*/
       PERMANENTS = /\A(?<other>other )?(?<type>#{TYPE}) you control\z/
-      GRAVEYARD = /\A(?:(?<type>#{TYPE}) )?cards? in your graveyard\z/
+      # "instant and sorcery cards" / "instant and/or sorcery cards": either of the two types.
+      INSTANT_OR_SORCERY = %r{instant (?:and/or|or|and) sorcery}
+      GRAVEYARD = /\A(?:(?<type>#{INSTANT_OR_SORCERY}|#{TYPE}) )?cards? in your graveyard\z/
 
       # Card types with a named collection on Player (and so on its permanents).
       YOUR_PERMANENTS = { "creature" => "creatures", "land" => "lands", "artifact" => "artifacts", "enchantment" => "enchantments",
@@ -66,8 +68,16 @@ module Magic
         elsif text == "card in your hand"
           "controller.hand.count"
         elsif (m = GRAVEYARD.match(text))
-          m[:type] ? "#{collection('controller.graveyard', GRAVEYARD_CARDS, m[:type])}.count" : "controller.graveyard.cards.count"
+          "#{graveyard_cards(m[:type])}.count"
         end
+      end
+
+      # The Ruby for the cards of `type` (nil: any) in your graveyard.
+      def self.graveyard_cards(type)
+        return "controller.graveyard.cards" unless type
+        return 'controller.graveyard.cards.by_any_type("Instant", "Sorcery")' if INSTANT_OR_SORCERY.match?(type)
+
+        collection("controller.graveyard", GRAVEYARD_CARDS, type)
       end
 
       # controller.creatures, or controller.permanents.by_type("Elf") for other types.

@@ -6,12 +6,18 @@ module Magic
       end
 
       def all
-        active_battlefield_permanents + active_emblems + active_players
+        active_battlefield_permanents + active_emblems + active_players + cards_outside_the_battlefield
       end
 
       private
 
       attr_reader :game
+
+      # Cards with a `zone_replacement_effects` of their own ("from anywhere"), wherever they are but the
+      # battlefield (a permanent applies its replacement effects itself).
+      def cards_outside_the_battlefield
+        game.zone_replacement_cards.reject { _1.zone&.battlefield? }
+      end
 
       def active_battlefield_permanents
         game.battlefield.reject { |permanent| ineligible_source?(permanent) }

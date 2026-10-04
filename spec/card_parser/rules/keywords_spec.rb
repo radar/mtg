@@ -60,9 +60,13 @@ RSpec.describe Magic::CardParser::Rules::Keywords, "keywords with values" do
     expect(dsl("Harmonize {X}{G}{G}{G}{G}")).to eq(["harmonize Costs::Mana.new(x: 1, green: 4)"])
   end
 
+  it "reads protection from everything" do
+    expect(dsl("Protection from everything")).to eq(["protections [Protection.new(condition: -> (_) { true })]"])
+  end
+
   it "rejects values it can't represent" do
     expect(described_class.parse("Ward—Discard a card.")).to be_nil
-    expect(described_class.parse("Protection from everything")).to be_nil
+    expect(described_class.parse("Protection from the chosen player")).to be_nil
     expect(described_class.parse("Kicker—Sacrifice a creature.")).to be_nil
   end
 

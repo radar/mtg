@@ -17,7 +17,9 @@ module Magic
       MANY = /\Ayou control (?<amount>\d+|\w+) or more (?<types>#{Count::TYPE})\z/
       NONE = /\Ayou control no (?<other>other )?(?<types>#{Count::TYPE})\z/
       LIFE = /\A(?<who>you have|an opponent has) (?<amount>\d+|\w+) or (?<cmp>more|less) life\z/
-      GRAVEYARD = /\Athere are (?<amount>\d+|\w+) or more (?:(?<type>creature|land|enchantment) )?cards in your graveyard\z/
+      GRAVEYARD = /\Athere are (?<amount>\d+|\w+) or more (?:(?<type>creature|land|enchantment|#{Count::INSTANT_OR_SORCERY}) )?cards in your graveyard\z/
+      # "you've gained 3 or more life this turn".
+      GAINED_LIFE = /\Ayou've gained (?<amount>\d+|\w+) or more life this turn\z/
       # "~ has three or more time counters on it" / "~ has a divinity counter on it" (one or more).
       COUNTERS = %r{\A(?:~|it) has (?:(?<amount>\d+|\w+) or more|an?) (?<counter>[\w+/-]+) counters? on it\z}
       SELF = {
@@ -31,8 +33,13 @@ module Magic
       # "you attacked this turn" (raid): one of your creatures was declared as an attacker.
       ATTACKED_THIS_TURN = "game.current_turn.events.any? { |e| e.is_a?(Events::CreatureAttacked) && e.attacker.controller == controller }"
 
+      # "you control a creature with power 4 or greater" (ferocious).
+      POWER = /\Ayou control a creature with power (?<amount>\d+|\w+) or greater\z/
+
       def self.parse(text)
-        if (m = ONE.match(text))
+        if (m = POWER.match(text))
+          "controller.creatures.any? { _1.power >= #{Number.parse(m[:amount])} }"
+        elsif (m = ONE.match(text))
           "#{permanents(m[:type])}#{'.except(source)' if m[:another]}.any?"
         elsif (m = MANY.match(text))
           "#{permanents(singular(m[:types]))}.count >= #{Number.parse(m[:amount])}"
@@ -41,8 +48,9 @@ module Magic
         elsif (m = LIFE.match(text))
           life(m)
         elsif (m = GRAVEYARD.match(text))
-          cards = m[:type] ? Count.collection("controller.graveyard", Count::GRAVEYARD_CARDS, m[:type]) : "controller.graveyard.cards"
-          "#{cards}.count >= #{Number.parse(m[:amount])}"
+          "#{Count.graveyard_cards(m[:type])}.count >= #{Number.parse(m[:amount])}"
+        elsif (m = GAINED_LIFE.match(text))
+          "game.current_turn.events.select { |e| e.is_a?(Events::LifeGain) && e.player == controller }.sum(&:life) >= #{Number.parse(m[:amount])}"
         elsif (m = COUNTERS.match(text))
           counters(m)
         elsif (m = /\Ait's (?<not>not )?your turn\z/.match(text))

@@ -21,13 +21,13 @@ module Magic
         FILTERS = { "basic land" => "Filter[:basic_lands]", "land" => "Filter[:lands]", "creature" => "Filter[:creatures]" }.freeze
         WORD = "basic land|land|creature|artifact|enchantment|instant|sorcery|planeswalker|(?-i:[A-Z][a-z]+)"
         COMPARISONS = { "or greater" => ">=", "or less" => "<=" }.freeze
-        LINE = /\ASearch your library for (?<upto>up to )?(?<amount>\d+|\w+) (?:(?<card>(?:#{WORD})(?: or (?:#{WORD}))?) )?cards?(?: with mana value (?<mv>\d+|\w+)(?: (?<cmp>or greater|or less))?)?(?:, |\. )(?<reveal>reveal (?:it|them|those cards), )?(?:put (?:it|them|those cards) (?:onto the battlefield(?<tapped> tapped)?|into your (?<hand>hand)), then shuffle|then shuffle and put (?:that card|those cards) (?<top>on top))\.?\z/i
+        LINE = /\ASearch your library for (?<upto>up to )?(?<amount>\d+|\w+) (?:(?<card>(?:#{WORD})(?: or (?:#{WORD}))?) )?cards?(?: with mana value (?<mv>\d+|\w+)(?: (?<cmp>or greater|or less))?)?(?:, |\. )(?<reveal>reveal (?:it|them|those cards), )?(?:put (?:it|them|those cards|that card) (?:onto the battlefield(?<tapped> tapped)?|into your (?<hand>hand|graveyard)), then shuffle|then shuffle and put (?:that card|those cards) (?<top>on top))\.?\z/i
 
         def self.parse(text)
           return unless (m = LINE.match(text))
           return unless m[:upto] || m[:amount].match?(/\A(?:a|an|one)\z/i)
 
-          to_zone = m[:top] ? :top : (m[:hand] ? :hand : :battlefield)
+          to_zone = m[:top] ? :top : (m[:hand] ? m[:hand].downcase.to_sym : :battlefield)
           mana_value = "#{COMPARISONS.fetch(m[:cmp]&.downcase, '==')} #{Number.parse(m[:mv])}" if m[:mv]
           new(card: m[:card]&.downcase, amount: Number.parse(m[:amount]), tapped: !m[:tapped].nil?,
               to_zone:, reveal: !m[:reveal].nil?, mana_value:)

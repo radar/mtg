@@ -13,8 +13,10 @@ module Magic
         @items.shuffle!
       end
 
+      # The top card, still in the library: the caller moves it (`Card#move_to_graveyard!`), so replacement
+      # effects see it in its zone ("If ~ would be put into a graveyard from anywhere", Darksteel Colossus).
       def mill
-        @items.shift
+        @items.first
       end
 
     end

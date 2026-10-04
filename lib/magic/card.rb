@@ -223,6 +223,7 @@ module Magic
       @protections = self.class::PROTECTIONS
       @modes = self.class::MODES
       @controller = @owner = owner
+      game.zone_replacement_cards << self if zone_replacement_effects.any?
     end
 
     def inspect
@@ -396,6 +397,19 @@ module Magic
       @harmonize_granted_turn = game.current_turn.number
     end
 
+    # Flashback granted by an effect until end of turn, its cost being the card's mana cost
+    # (Sphinx of Forgotten Lore). A card with its own `flashback` macro uses that cost instead.
+    def grant_flashback_until_end_of_turn!
+      @flashback_granted_turn = game.current_turn.number
+    end
+
+    # The flashback cost this card has right now (its own, or a granted one), or nil.
+    def flashback_cost_now
+      return flashback_cost if respond_to?(:flashback_cost)
+
+      cost if @flashback_granted_turn && @flashback_granted_turn == game.current_turn.number
+    end
+
     # The cost to cast this card from the graveyard with harmonize, or nil when it has none now.
     def harmonize_cost
       cost if @harmonize_granted_turn && @harmonize_granted_turn == game.current_turn.number
@@ -438,6 +452,25 @@ module Magic
 
     def replacement_effects
       {}
+    end
+
+    # Replacement effects the card applies to itself while in a zone other than the battlefield (hand,
+    # library, graveyard, exile, the stack): "If ~ would be put into a graveyard from anywhere, ... instead"
+    # (Darksteel Colossus). Same shape as #replacement_effects; the receiver is the Card.
+    def zone_replacement_effects
+      {}
+    end
+
+    def replacement_effect_for(context)
+      zone_replacement_effects.each do |matcher, replacement_effect|
+        next unless matcher.nil? || context.effect.is_a?(matcher)
+        next if context.applied_replacement_keys.include?([object_id, replacement_effect])
+
+        replacement = replacement_effect.new(receiver: self)
+        return replacement if replacement.applies_with_context?(context)
+      end
+
+      nil
     end
 
     def state_triggered_abilities
@@ -521,6 +554,8 @@ module Magic
     def maximum_blockers = nil
     # "This creature must be blocked if able."
     def must_be_blocked? = false
+    # "This creature attacks each combat if able."
+    def must_attack? = false
     # How many attackers this creature can block at once; override for "can block an additional creature".
     def maximum_attackers_blocked = 1
     def can_activate_ability?(_) = true

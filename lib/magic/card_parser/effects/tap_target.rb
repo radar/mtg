@@ -8,10 +8,15 @@ module Magic
       class TapTarget < Data.define(:reference)
         include Effect
 
-        LINE = /\ATap #{PermanentTarget::REFERENCE}\.?\z/i
+        LINE = /\ATap (?:(?<this>~)|#{PermanentTarget::REFERENCE})\.?\z/i
 
         def self.parse(text)
-          new(reference: PermanentTarget.reference($~)) if LINE.match(text)
+          return unless (m = LINE.match(text))
+
+          # "Tap ~." (also what "Tap it." means in an ability that targets nothing).
+          return new(reference: PermanentTarget::Reference.new(choices: nil, object: Effect::THIS)) if m[:this]
+
+          new(reference: PermanentTarget.reference(m))
         end
 
         def target_choices = reference.choices

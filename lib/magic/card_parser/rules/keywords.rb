@@ -78,7 +78,9 @@ module Magic
         def self.protections(text)
           protections = text.split(/\s+and from\s+/i).map do |quality|
             quality = quality.downcase
-            if COLORS.include?(quality)
+            if quality == "everything"
+              "Protection.new(condition: -> (_) { true })"
+            elsif COLORS.include?(quality)
               "Protection.from_color(:#{quality})"
             elsif quality == "multicolored"
               "Protection.new(condition: -> (card) { card.multi_colored? })"

@@ -28,7 +28,11 @@ module Magic
         KEYWORDS = /[\w ,]+?/
         LINE = %r{\A(?<subject>#{SUBJECTS.keys.join('|')}) (?:gets? (?<power>[+-]\d+)/(?<toughness>[+-]\d+)(?: for each (?<per>[^.]+?))?(?: and (?:has|have) (?<with>#{KEYWORDS}))?(?<all_types> and is all creature types)?|(?:has|have) (?<only>#{KEYWORDS}))(?: as long as (?<condition>[^.]+?))?\.?\z}i
 
+        # "As long as <condition>, <buff>." reads the same as "<buff> as long as <condition>."
+        LEADING_CONDITION = /\AAs long as (?<condition>[^,]+), (?<buff>.+?)\.?\z/i
+
         def self.parse(line)
+          line = "#{$~[:buff]} as long as #{$~[:condition]}" if LEADING_CONDITION.match(line)
           return unless (m = LINE.match(line))
           return if m[:all_types] && !%w[equipped enchanted].include?(m[:subject].downcase.split.first)
 

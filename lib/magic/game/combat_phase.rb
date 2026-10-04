@@ -3,6 +3,7 @@ module Magic
     class CombatPhase
       class AttackerHasProtection < StandardError; end
       class IllegalBlock < StandardError; end
+      class IllegalAttack < StandardError; end
       class IllegalDamageAssignment < StandardError; end
 
       class Attack
@@ -265,6 +266,17 @@ module Magic
         attack = attack_for_attacker(attacker)
         attack.declare_blocker(blocker)
         game.notify!(Events::CreatureBlocked.new(attacker: attacker, blocker: blocker))
+      end
+
+      # Rule 508.1d: a creature that "attacks each combat if able" and could attack (untapped, not summoning
+      # sick, not a defender) has to be declared as an attacker; checked when leaving declare attackers.
+      def validate_attackers!(active_player)
+        game.battlefield.creatures.each do |creature|
+          next unless creature.controller == active_player && creature.must_attack?
+          next if attacking?(creature) || creature.tapped? || creature.summoning_sick? || !creature.can_attack?
+
+          raise IllegalAttack, "#{creature.name} attacks each combat if able"
+        end
       end
 
       # Rule 509.1c: checked once all blockers are declared.

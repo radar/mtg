@@ -568,7 +568,8 @@ module Magic
     # leaves that card where it is).
     def put_into_graveyard!
       move_zone!(to: owner.graveyard)
-      unless copy? || token? || card.zone&.exile?
+      # (A replacement effect may have sent the card elsewhere already: exile, or shuffled into the library.)
+      unless copy? || token? || card.zone&.exile? || card.zone&.library?
         card.move_zone!(to: owner.graveyard)
       end
     end
@@ -631,6 +632,11 @@ module Magic
 
     def must_be_blocked?
       !lost_all_abilities? && face.must_be_blocked?
+    end
+
+    # "Attacks each combat if able."
+    def must_attack?
+      !lost_all_abilities? && face.must_attack?
     end
 
     def maximum_attackers_blocked
