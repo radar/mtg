@@ -1,0 +1,20 @@
+module Magic
+  module Cards
+    Thrive = Sorcery("Thrive") do
+      cost x: 1, green: 1
+    end
+
+    class Thrive < Sorcery
+      def target_choices
+        battlefield.creatures
+      end
+
+      # "Put a +1/+1 counter on each of X target creatures."
+      def resolve!(targets:)
+        targets.uniq.each do |target|
+          trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
+        end
+      end
+    end
+  end
+end
