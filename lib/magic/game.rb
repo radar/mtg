@@ -6,6 +6,11 @@ module Magic
     attr_reader :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn, :event_listeners, :monarch,
                 :play_permissions
 
+    # Cards with a `zone_replacement_effects` of their own ("If ~ would be put into a graveyard from anywhere"),
+    # registered when the card is built (`Card#initialize`), so finding replacement effects doesn't have to scan
+    # every card in every zone.
+    def zone_replacement_cards = (@zone_replacement_cards ||= [])
+
     class EmblemList
       include Enumerable
 
