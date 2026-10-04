@@ -138,6 +138,27 @@ other FDN cards care about Gates.
   cleanup transition, which queues one `Choice::Discard` per excess card. Six older specs that end
   a turn holding 8+ cards now call the new `resolve_cleanup_discards!` spec helper.
 
+- **2026-10-04 (graveyard recursion bucket)**: 28 of the bucket's 32 cards implemented, each with a spec:
+  Zombify, Cemetery Recruitment, Macabre Waltz, Sanguine Indulgence, Raise the Past, Rise of the Dark
+  Realms, Driver of the Dead, Nullpriest of Oblivion, Sun-Blessed Healer, Fiendish Panda, Alesha,
+  Ambush Wolf, Angel of Finality, Soul-Shackled Zombie, Immersturm Predator, Cephalid Inkmage, Ghitu
+  Lavarunner, Enigma Drake, Vile Entomber, Feldon's Cane, Sphinx of Forgotten Lore, Zul Ashur, Darksteel
+  Colossus, Progenitus, Dryad Militant, Flamewake Phoenix, Gate Colossus, Genesis Wave. FDN coverage
+  231 -> 259 of 427 implemented (bucket 32 -> 4). New parser pieces are in `docs/card_parser.md`
+  ("Graveyard recursion batch"). Engine changes: graveyard replacement effects from any zone
+  (`zone_replacement_effects`), `Effects::ShuffleIntoLibrary`, "attacks each combat if able"
+  (`must_attack?`, `CombatPhase#validate_attackers!`), granted flashback / graveyard cast permissions,
+  `Library#mill` no longer removes the card itself. Bugs found: `.to_a.each` over a zone skipped cards
+  when exiling a whole graveyard (Bojuka Bog's `graveyard.cards.each(&:exile!)` has the same problem, not
+  changed); a naive "all cards in all zones" scan for replacement effects made the suite take 16 minutes
+  instead of 6 seconds (fixed with a per-game registry). Not done, and why: **Wilt-Leaf Liege** (its discard
+  replacement needs to know a discard was caused by an opponent's spell or ability; discards don't carry a
+  cause, and `Choice::Discard` bypasses `Card#discard!`), **Quilled Greatwurm** ("cast from your graveyard by
+  removing six counters from among creatures you control" is a new additional-cost-plus-zone-permission
+  shape), **Tinybones** (no discard event exists; also stash counters on cards in exile and a conditional
+  play-from-exile static), **Finale of Revelation** (X-threshold "instead" branch, "untap up to five lands",
+  a permanent no-maximum-hand-size flag and self-exile in one card).
+
 ## Cards by bucket
 
 Cards listed under every bucket they appear in.
