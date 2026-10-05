@@ -11,4 +11,13 @@ RSpec.describe Magic::Cards::OrzhovBasilica do
     expect(basilica).to be_tapped
     expect(p1.hand.by_name("Forest").count).to eq(8)
   end
+
+  it "taps for {W}{B}" do
+    basilica = ResolvePermanent("Orzhov Basilica", owner: p1)
+    basilica.untap!
+    p1.activate_ability(ability: basilica.activated_abilities.first)
+
+    expect(p1.mana_pool[:white]).to eq(1)
+    expect(p1.mana_pool[:black]).to eq(1)
+  end
 end

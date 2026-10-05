@@ -26,9 +26,6 @@ module Magic
       end
 
       class ManaAbility < Magic::TapManaAbility
-        # A single fixed option, so `ManaAbility#resolve!` auto-selects it.
-        def choices = [:both]
-
         def mana_produced
           { black: 1, green: 1 }
         end

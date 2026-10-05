@@ -10,6 +10,10 @@ module Magic
       end
     end
 
+    # Abilities that always make the same mana (Selesnya Sanctuary: `mana_produced` => { green: 1, white: 1 }) have
+    # nothing to choose, so they never declare `choices`. A single placeholder choice lets #resolve! pick it itself.
+    def choices = [:fixed]
+
     def initialize(**args)
       super(**args)
     end
@@ -23,9 +27,13 @@ module Magic
     end
 
     def resolve!
-      @choice ||= choices.first if choices.length == 1
+      # An ability that fixes its mana by overriding `mana_produced` (a `{B}{G}` bounce land) has no
+      # choice to make, so it doesn't need `choices`.
+      if respond_to?(:choices)
+        @choice ||= choices.first if choices.length == 1
 
-      raise "Invalid choice made for mana ability. Choice: #{choice}, Choices: #{choices}" unless choices.include?(choice)
+        raise "Invalid choice made for mana ability. Choice: #{choice}, Choices: #{choices}" unless choices.include?(choice)
+      end
       mana = mana_produced
       if mana_restriction
         source.controller.add_mana(mana, restriction: mana_restriction)
