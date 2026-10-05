@@ -8,7 +8,8 @@ RSpec.describe Magic::CardParser::Rules::BeholdCost do
 
     expect(rule).to eq(described_class.new(type: "Dragon", mana: { generic: 1 }, optional: false, flash: false))
     expect(rule.body_source).to include("def additional_costs")
-    expect(rule.body_source).to include('Costs::Behold.new(self, type: "Dragon", or_mana: {:generic=>1})')
+    # Hash#inspect changed in Ruby 3.4 ({:generic=>1} became {generic: 1}).
+    expect(rule.body_source).to match(/Costs::Behold\.new\(self, type: "Dragon", or_mana: \{(:generic=>|generic: )1\}\)/)
   end
 
   it "parses a required behold with no alternative" do

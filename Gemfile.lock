@@ -3,6 +3,7 @@ PATH
   specs:
     magic (0.1.0)
       dry-types (~> 1.7)
+      logger
       state_machines
       zeitwerk
 
@@ -28,7 +29,9 @@ GEM
       dry-inflector (~> 1.0)
       dry-logic (~> 1.4)
       zeitwerk (~> 2.6)
+    logger (1.7.0)
     method_source (1.0.0)
+    ostruct (0.6.3)
     pry (0.14.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -53,11 +56,13 @@ PLATFORMS
   arm64-darwin-21
   arm64-darwin-22
   arm64-darwin-23
+  arm64-darwin-25
   x86_64-darwin-20
   x86_64-linux
 
 DEPENDENCIES
   magic!
+  ostruct
   pry
   rake (~> 13.0)
   rspec (~> 3.0)

@@ -45,6 +45,8 @@ module Magic
       end
 
       class ReboundTrigger < TriggeredAbility::BeginningOfYourUpkeep
+        def self.works_from_exile? = true
+
         def should_perform?
           super && !actor.rebound_triggered
         end

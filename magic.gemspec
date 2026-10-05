@@ -24,6 +24,8 @@ Gem::Specification.new do |spec|
   # spec.add_dependency "example-gem", "~> 1.0"
   spec.add_dependency 'state_machines'
   spec.add_dependency 'zeitwerk'
+  # No longer a default gem in Ruby 4.0.
+  spec.add_dependency 'logger'
   spec.add_dependency "dry-types", "~> 1.7"
 
   # For more information and examples about making a new gem, checkout our
