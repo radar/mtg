@@ -54,7 +54,7 @@ module Magic
     end
 
     def entering_counters = {}
-    def can_attack? = !defender?
+    def can_attack? = !keywords.include?(Keywords::DEFENDER)
     def can_block?(_) = true
     def can_be_blocked?(_) = true
     def maximum_blockers = nil

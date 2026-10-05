@@ -22,7 +22,7 @@ module Magic
           controller.reveal(target)
           target.move_to_hand!
           rest = @cards - [target]
-          rest.shuffle.each_with_index { |card, index| controller.library.add(card, controller.library.count + index) }
+          rest.shuffle.each { |card| controller.library.add(card, controller.library.count) }
         end
       end
 
@@ -38,7 +38,7 @@ module Magic
             game.add_choice(LandChoice.new(actor: actor, cards: cards))
           else
             cards.each { |card| controller.library.remove(card) }
-            cards.shuffle.each_with_index { |card, index| controller.library.add(card, controller.library.count + index) }
+            cards.shuffle.each { |card| controller.library.add(card, controller.library.count) }
           end
         end
       end

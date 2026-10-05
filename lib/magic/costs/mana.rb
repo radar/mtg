@@ -60,6 +60,9 @@ module Magic
             amount = reduction.respond_to?(:call) ? reduction.call : reduction
             original_cost + amount
           end
+          # Rule 601.2f: a cost reduction can't take the generic part below zero (a {G} spell that gets "costs {1}
+          # less" merges in generic: -1, which must not become a negative amount to pay).
+          @cost[:generic] = 0 if @cost[:generic]&.negative?
         end
 
         @balance = @cost.dup

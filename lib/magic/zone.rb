@@ -25,7 +25,8 @@ module Magic
 
     def add(card, placement = 0)
       card.zone = self
-      @items.insert(placement, card)
+      # Inserting past the end would pad the zone with nils.
+      @items.insert([placement, @items.size].min, card)
     end
 
     def remove(card)

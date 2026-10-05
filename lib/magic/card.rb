@@ -161,6 +161,8 @@ module Magic
       def enters_the_battlefield(&block)
         etb = Class.new(TriggeredAbility::EnterTheBattlefield)
         etb.define_method(:call, &block)
+        # Named, so a game holding a Permanent that uses this trigger can be Marshal-dumped.
+        const_set(:GeneratedEnterTheBattlefieldTrigger, etb)
 
         define_method(:etb_triggers) do
           [etb]
@@ -577,7 +579,12 @@ module Magic
 
     def receive_event(event)
       handler_class = event_handlers[event.class]
+      # On the battlefield the Permanent dispatches event handlers itself (with itself as the actor); a card that
+      # is still subscribed from an earlier zone must not handle the event a second time, as a bare card.
+      return if zone&.battlefield?
       return if zone&.graveyard? && !handler_class.respond_to?(:works_from_graveyard?)
+      # Likewise, an exiled card only handles events its handler says work from exile.
+      return if zone&.exile? && !handler_class.respond_to?(:works_from_exile?)
 
       if handler_class
         logger.debug "EVENT HANDLER: #{self} handling #{event}"

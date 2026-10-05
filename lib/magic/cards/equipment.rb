@@ -20,6 +20,9 @@ module Magic
           end
         end
 
+        # Named, so a game holding a Permanent that uses this ability can be Marshal-dumped.
+        const_set(:EquipAbility, equip)
+
         define_method(:activated_abilities) do
           [equip]
         end

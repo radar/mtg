@@ -11,6 +11,9 @@ module Magic
             .flat_map(&:lands)
             .flat_map(&:activated_abilities)
             .select { |ability| ability.is_a?(Magic::ManaAbility) }
+            # Two Exotic Orchards each asking what the other could produce would never finish: an Orchard's colours
+            # come from the other lands only (rulings: they produce nothing for each other).
+            .reject { |ability| ability.is_a?(ExoticOrchard::ManaAbility) }
             .flat_map(&:choices)
             .uniq
         end
