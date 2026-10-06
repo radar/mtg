@@ -644,7 +644,8 @@ module Magic
 
     # "Attacks each combat if able."
     def must_attack?
-      (!lost_all_abilities? && face.must_attack?) || goaded? || attachments.any? { _1.card.forces_enchanted_to_attack? }
+      (!lost_all_abilities? && face.must_attack?) || goaded? || attachments.any? { _1.card.forces_enchanted_to_attack? } ||
+        game.battlefield.static_abilities.of_type(Abilities::Static::MustAttack).any? { _1.applies_to?(self) }
     end
 
     # Goaded by an Aura ("Enchanted creature ... is goaded"): attacks each combat if able. With one opponent, "attacks a
