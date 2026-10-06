@@ -23,6 +23,24 @@ RSpec.describe Magic::Cards::ElvenAmbush do
     end
   end
 
+  context "with an Elf that is not a creature" do
+    before do
+      ResolvePermanent("Prowess Of The Fair", owner: p1)
+    end
+
+    subject { Card("Elven Ambush") }
+
+    it "counts it" do
+      p1.add_mana(green: 4)
+      p1.cast(card: subject) do
+        _1.pay_mana(generic: { green: 3 }, green: 1)
+      end
+      game.stack.resolve!
+
+      expect(p1.permanents.by_name("Elf Warrior").count).to eq(1)
+    end
+  end
+
   context "with two elves" do
     before do
       ResolvePermanent("Llanowar Elves", owner: p1)
