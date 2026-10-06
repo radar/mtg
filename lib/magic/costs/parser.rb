@@ -45,6 +45,8 @@ module Magic
             SelfSacrifice.new(source)
           when /Exile {this}/
             SelfExile.new(source)
+          when /\ADiscard your hand\z/
+            DiscardHand.new(source)
           when /Discard a card/
             Discard.new(source.controller)
           else

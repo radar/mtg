@@ -2,6 +2,8 @@
 
 Activation/casting costs — sacrifice, kicker, discard, exile-self, alternative costs, mana production. Part of the card-implementation pattern catalog — see `docs/card_patterns.md` for the index.
 
+**"Discard your hand" as a cost**: `costs "{1}{R}, {T}, Discard your hand"` parses to `Costs::DiscardHand`, which has nothing to choose, so it discards the whole hand in `finalize!` (like `Costs::PayLife`) and can always be paid, even with an empty hand. Example: `SubiraTulzidiCaravanner`.
+
 **Activated ability with sacrifice cost**: Use `costs "{1}, Sacrifice {this}"` string. Define `single_target? = true`, `target_choices`, and `resolve!(target:)`. Example: `ThrashingBrontodon`.
 
 **String mana cost format**: `cost "{2}{R}{G}"` is valid alongside the hash format `cost generic: 2, red: 1, green: 1`. Use string format when mixing more than two colors or for readability.
