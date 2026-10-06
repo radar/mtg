@@ -14,6 +14,12 @@ Keyword grants, CDA power/toughness, type changes, replacement effects, continuo
 
 **"Target creature's power and toughness are switched until end of turn"**: Use `permanent.switch_power_and_toughness!` (`lib/magic/permanents/modifications.rb`, adds a `Modifications::SwitchPowerToughness` marker, layer 7d — applied after 7c). Multiple switches on the same permanent commute (only parity matters), so no card needs to worry about ordering it against other effects.
 
+**"Loses <keyword> until end of turn"**: `permanent.lose_keyword!(Keywords::INDESTRUCTIBLE)` adds a `Modifications::KeywordRemoval` (layer 6, until end of turn) that `ContinuousEffects#calculate_keywords` subtracts from every source of keywords (it removes the keyword even if granted later). Example: `SoulSear`.
+
+**"Enchanted creature attacks each combat if able"**: an Aura defines `forces_enchanted_to_attack? = true`; `Permanent#must_attack?` reads it (like `goads_enchanted?`, but no goad). Example: `FurorOfTheBitten`.
+
+**"Deals triple damage" replacement**: `ReplacementEffect::DamageTripler.registrations` (a `DamageDoubler` that multiplies by 3, any source you control, any recipient). Replacement effects copy a damage effect with `effect.with_damage(n)`, never `instance_variable_set`. Example: `FieryEmancipation`.
+
 **Kindred (formerly Tribal)**: Use `type T::Kindred, T::Enchantment, T::Creatures["Elf"]` (or Instant/Sorcery). `T::Kindred` is `"Kindred"`. Example: `ProwessOfTheFair`.
 
 **Keyword granted only to a filtered subset of creatures (e.g. "Attacking Elves you control have deathtouch")**: Use the `applicable_targets { ... }` block macro (from `Magic::StaticAbility`) rather than overriding the method, combining `your.creatures` with `CardList` filters like `.attacking` and a `.select { |c| c.type?("Elf") }` for a subtype not covered by a built-in `CardList` filter. Contrast with the single-target "conditional keyword" pattern below, which returns `[source]` or `[]`. Example: `ElderfangVenom::DeathtouchGrant`.

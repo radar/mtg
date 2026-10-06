@@ -55,6 +55,7 @@ RSpec integration tests. See `spec/spec_helper.rb` for helpers/shared contexts.
 - `# frozen_string_literal: true` at top of `lib/magic/*.rb` and `spec/**/*_spec.rb`
 - Card files in `lib/magic/cards/` do **not** use the frozen_string_literal pragma
 - Follow Ruby conventions
+- Avoid `instance_variable_set` / `instance_variable_get` in `lib/`. To change a copy of an object, give it a real method: `Effect#with_amount(n)` and `Effect#with_damage(n)` (built on protected writers) are how replacement effects double, triple or halve an effect. Only `LoggerlessMarshal` (serialisation) may reach into instance variables.
 
 ### Workflow
 
