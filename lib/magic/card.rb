@@ -546,6 +546,20 @@ module Magic
       !!cycling_cost
     end
 
+    # What cycling does once the card is discarded: draw a card, or search for a land (landcycling). A card whose
+    # discard-from-hand ability does something else (Waker of Waves) overrides it.
+    def cycling_effect!
+      if cycling_search
+        game.add_choice(Magic::Choice::SearchLibrary.new(actor: self, to_zone: :hand, upto: 1, reveal: true, filter: Filter[cycling_search]))
+      else
+        trigger_effect(:draw_cards, number_to_draw: 1)
+      end
+    end
+
+    # "You may cast this card from your graveyard" (Demonic Embrace): castable from its owner's graveyard, with whatever
+    # additional costs the card asks for (`additional_costs`).
+    def may_cast_from_graveyard? = false
+
     def buyback?
       false
     end

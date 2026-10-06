@@ -40,7 +40,7 @@ module Magic
       (zone.library? && card == player.library.first && permitted_by_static_ability?(:permits_casting_from_top?, card)) ||
         (zone.exile? && (card.on_adventure || permitted_by_static_ability?(:permits_casting_from_exile?, card) ||
                          game.play_permissions.permits?(card, player))) ||
-        (zone.graveyard? && (permitted_by_emblem?(:permits_casting_from_graveyard?, card) || game.play_permissions.permits?(card, player)))
+        (zone.graveyard? && (card.may_cast_from_graveyard? || permitted_by_emblem?(:permits_casting_from_graveyard?, card) || game.play_permissions.permits?(card, player)))
     end
 
     # A permission method may take the player casting the card as a second argument

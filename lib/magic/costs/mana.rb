@@ -69,6 +69,14 @@ module Magic
         self
       end
 
+      # A cost increase found after some of the cost was already paid (a tax that depends on the spell's targets): the
+      # amount is added to what is owed, keeping the payments so far (unlike `adjusted_by`, which starts the balance over).
+      def increase_generic!(amount)
+        @cost[:generic] = (@cost[:generic] || 0) + amount
+        @balance[:generic] = (@balance[:generic] || 0) + amount
+        self
+      end
+
       def zero?
         @cost.values.all?(&:zero?)
       end

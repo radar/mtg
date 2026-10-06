@@ -204,7 +204,22 @@ module Magic
           raise InvalidTarget, "#{card.name} needs different targets"
         end
         @targets = targets
+        apply_target_cost_increases!
         self
+      end
+
+      # "Spells your opponents cast that target this creature cost {3} more to cast" (Pursued Whale): a static ability
+      # answering `cost_increase_for_targeting(card, targets, player)` with the extra generic mana. Only known once the
+      # targets are, so the extra must be paid after `targeting` (`pay_mana` again), or the spell can't be cast.
+      def apply_target_cost_increases!
+        extra = game.battlefield.static_abilities
+          .select { |ability| ability.respond_to?(:cost_increase_for_targeting) }
+          .sum { |ability| ability.cost_increase_for_targeting(card, targets, player) }
+        change = extra - (@target_cost_increase || 0)
+        return if change.zero?
+
+        mana_cost.increase_generic!(change)
+        @target_cost_increase = extra
       end
 
       def multi_target(*targets)
@@ -219,6 +234,7 @@ module Magic
         end
 
         @targets = targets
+        apply_target_cost_increases!
         self
       end
 
@@ -409,6 +425,16 @@ module Magic
         self
       end
 
+      # "Pay N life" as an additional cost (Demonic Embrace from the graveyard): the life is lost as the spell is cast.
+      def pay_additional_life
+        cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::PayLife) }
+        raise "Unknown additional life cost" unless cost
+        raise "#{player.inspect} can't pay #{cost.amount} life" unless cost.can_pay?(player)
+
+        @paid_additional_costs << cost
+        self
+      end
+
       def pay_discard(payment)
         if payment.is_a?(Array)
           cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::DiscardCards) }
@@ -443,6 +469,7 @@ module Magic
           end
         end
         mana_cost.finalize!(player)
+        @paid_additional_costs.each { |cost| cost.finalize!(player) if cost.is_a?(Costs::PayLife) }
         paid_offspring_costs.each { |cost| cost.finalize!(player) }
         player.consume_spell_cast!
         game.stack.add(self)
