@@ -20,6 +20,13 @@ module Magic
       end
     end
 
+    # "Spend this mana only to cast an instant or sorcery spell" (Vodalian Arcanist). Only spells, not abilities.
+    class InstantOrSorcerySpell < ManaRestriction
+      def permits?(use)
+        use.is_a?(Magic::Card) && (use.instant? || use.sorcery?)
+      end
+    end
+
     # "Spend this mana only to cast a legendary spell" (Plaza of Heroes). Only spells, not abilities.
     class LegendarySpell < ManaRestriction
       def permits?(use)
