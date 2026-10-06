@@ -13,7 +13,7 @@ module Magic
 
       class LifeGain < TriggeredAbility::EnterTheBattlefield
         def should_perform?
-          another_creature?
+          another_creature? && you?
         end
 
         def call
