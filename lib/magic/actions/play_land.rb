@@ -1,11 +1,17 @@
 module Magic
   module Actions
     class PlayLand < Action
-      attr_reader :card
+      attr_reader :card, :face
 
-      def initialize(card:, **args)
+      # `face: :back` plays a modal double-faced land (Needleverge Pathway // Pillarverge Pathway) as its back face.
+      def initialize(card:, face: :front, **args)
         @card = card
+        @face = face
         super(**args)
+      end
+
+      def back_face?
+        face == :back && !card.back_face.nil?
       end
 
       def inspect
@@ -27,7 +33,9 @@ module Magic
       end
 
       def perform
-        card.resolve!
+        permanent = card.resolve!
+        permanent.transform! if back_face? && permanent.respond_to?(:transform!)
+        permanent
       end
     end
   end

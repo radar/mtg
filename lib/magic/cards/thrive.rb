@@ -9,6 +9,11 @@ module Magic
         battlefield.creatures
       end
 
+      # "Each of X target creatures": exactly X of them, each a different creature.
+      def number_of_targets(x) = x
+
+      def distinct_targets? = true
+
       # "Put a +1/+1 counter on each of X target creatures."
       def resolve!(targets:)
         targets.uniq.each do |target|

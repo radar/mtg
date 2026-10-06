@@ -5,7 +5,7 @@ module Magic
 
       attr_reader :active_player, :number, :events, :combat, :actions
 
-      def_delegators :@game, :logger, :battlefield, :emblems, :players, :settle!
+      def_delegators :@game, :logger, :battlefield, :emblems, :players, :settle!, :add_effect
       def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :illegal_block_reason,
         :assign_combat_damage, :attacks, :attacking?, :blocking?
 
@@ -35,13 +35,21 @@ module Magic
           turn.notify!(
             Events::DrawStep.new(player: turn.active_player)
           )
-          turn.active_player.draw!
+          # An effect, so that replacement effects ("if you would draw a card", Abundance) see the turn's draw too.
+          turn.add_effect(Effects::DrawCards.new(source: turn.active_player, player: turn.active_player))
           turn.checkpoint!
         end
 
         after_transition to: :first_main do |turn|
           turn.notify!(
             Events::FirstMainPhase.new(active_player: turn.active_player)
+          )
+          turn.checkpoint!
+        end
+
+        after_transition to: :second_main do |turn|
+          turn.notify!(
+            Events::SecondMainPhase.new(active_player: turn.active_player)
           )
           turn.checkpoint!
         end
@@ -154,7 +162,21 @@ module Magic
         @events = EventLog.new
         @additional_combats = 0
         @combat = CombatPhase.new(game: game)
+        @combat_damage_exceptions = nil
         super()
+      end
+
+      # "Prevent all combat damage that would be dealt this turn by non-Spider creatures" (Arachnogenesis): creatures
+      # without one of +creature_types+ deal no combat damage for the rest of this turn. (Stored as plain data: games are
+      # copied with Marshal, which can't copy a block.)
+      def prevent_combat_damage_except_from(*creature_types)
+        @combat_damage_exceptions = ((@combat_damage_exceptions || []) + creature_types).uniq
+      end
+
+      def combat_damage_prevented_from?(source)
+        return false unless @combat_damage_exceptions
+
+        @combat_damage_exceptions.none? { |creature_type| source.type?(creature_type) }
       end
 
       # Rules 502.4, 514.3: nobody receives priority in the untap step, and normally not in cleanup.

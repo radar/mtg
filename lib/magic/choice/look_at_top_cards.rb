@@ -8,12 +8,13 @@ module Magic
 
       def initialize(actor:, amount:, filter:)
         @amount = amount
-        @filter = filter
         super(actor: actor)
         @looked_at = controller.library.first(amount)
+        # Applied now, not kept: a lambda can't be copied with Marshal, which arena does to games.
+        @choices = filter ? looked_at.select(&filter) : looked_at
       end
 
-      def choices = looked_at.select(&@filter)
+      attr_reader :choices
 
       # target: the card to reveal and put into hand, or nil to take none.
       def resolve!(target: nil)

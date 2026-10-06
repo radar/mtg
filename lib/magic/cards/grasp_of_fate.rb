@@ -8,11 +8,13 @@ module Magic
       class ExileEffect < Effects::ExilePermanent
         def resolve!
           super
-          source.exiled_cards << target.card
+          # An exiled token ceases to exist: there is nothing to return later.
+          source.exiled_cards << target.card unless target.token?
         end
       end
 
-      class Choice < Magic::Choice
+      # A target (rule 115), so hexproof, shroud and protection apply: see Choice::Targeted.
+      class Choice < Magic::Choice::Targeted
         attr_reader :choices
 
         def initialize(actor:)
@@ -21,6 +23,8 @@ module Magic
           end
           super
         end
+
+        def choice_amount = 1
 
         def resolve!(target:)
           actor.game.add_effect(ExileEffect.new(source: actor, target: target))
@@ -35,7 +39,7 @@ module Magic
 
       class LeavesTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          actor.exiled_cards.each(&:resolve!)
+          actor.exiled_cards.each(&:return_to_battlefield!)
         end
       end
 

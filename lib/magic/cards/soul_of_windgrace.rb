@@ -22,6 +22,10 @@ module Magic
       end
 
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
+        def should_perform?
+          event.permanent == actor
+        end
+
         def call
           choice = LandChoice.new(actor: actor)
           game.add_choice(choice) if choice.choices.any?

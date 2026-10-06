@@ -1,7 +1,7 @@
 module Magic
   module Cards
     EternalWitness = Creature("Eternal Witness") do
-      cost green: 1, generic: 2
+      cost generic: 1, green: 2
       power 2
       toughness 1
       creature_type "Human Shaman"

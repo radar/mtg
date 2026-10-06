@@ -66,6 +66,6 @@ RSpec.describe Magic::Actions::Cast, "choosing modes" do
   end
 
   it "leaves cards that don't declare a mode count unenforced" do
-    expect(Card("Rakdos Charm")).not_to respond_to(:modes_to_choose)
+    expect(Card("Casualties Of War")).not_to respond_to(:modes_to_choose)
   end
 end

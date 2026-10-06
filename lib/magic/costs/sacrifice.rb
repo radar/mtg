@@ -1,7 +1,7 @@
 module Magic
   module Costs
     class Sacrifice
-      attr_reader :permanent
+      attr_reader :permanent, :choices
       def initialize(permanent, choices)
         @permanent = permanent
         @choices = choices

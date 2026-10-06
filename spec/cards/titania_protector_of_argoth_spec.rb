@@ -13,6 +13,14 @@ RSpec.describe Magic::Cards::TitaniaProtectorOfArgoth do
     expect(p1.lands.by_name("Forest").count).to eq(1)
   end
 
+  it "does not ask again when another permanent enters" do
+    ResolvePermanent("Titania, Protector Of Argoth", owner: p1)
+    p1.graveyard.add(Card("Forest", owner: p1))
+    ResolvePermanent("Forest", owner: p1)
+
+    expect(game.choices).to be_empty
+  end
+
   it "creates an Elemental when your land goes to the graveyard" do
     ResolvePermanent("Titania, Protector Of Argoth", owner: p1)
     land = ResolvePermanent("Forest", owner: p1)

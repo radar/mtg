@@ -25,7 +25,7 @@ module Magic
       end
 
       def event_handlers
-        { Events::FirstMainPhase => MainPhaseTrigger }
+        { Events::FirstMainPhase => MainPhaseTrigger, Events::SecondMainPhase => MainPhaseTrigger }
       end
     end
   end

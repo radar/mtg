@@ -22,6 +22,9 @@ module Magic
           1
         end
 
+        # The opponent picks which of their own creatures to sacrifice; nothing is targeted.
+        def targets? = false
+
         def resolve!(target:)
           target.sacrifice!
         end

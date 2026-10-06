@@ -6,6 +6,11 @@ module Magic
 
     attr_reader :effects, :choices, :game
 
+    # Optional. Told about everything that goes on the stack or into the choice queue (`added(item)`), and wrapped around
+    # whatever resolves them (`resolving(item) { ... }`, which must yield), so a listener can tell which item an event
+    # happened under. arena's EventLog uses this to show what caused what.
+    attr_accessor :observer
+
     class TargetedCast
       class InvalidTarget < StandardError; end
 
@@ -41,12 +46,13 @@ module Magic
       @game = game
       @stack = stack
       @effects = Effects.new(effects)
-      @choices = Choices.new(choices)
+      @choices = Choices.new(choices).tap { |list| list.stack = self }
     end
 
     def add(item)
       logger.debug "Item added to stack: #{item}"
       @stack.unshift(item)
+      observer&.added(item)
     end
 
     def remove(target)
@@ -117,7 +123,7 @@ module Magic
 
       item = @stack.shift
       logger.debug "Resolving #{item.name}"
-      item.resolve!
+      observing(item) { item.resolve! }
 
       resolve_effects!
       game&.state_based_actions_checkpoint!
@@ -141,13 +147,25 @@ module Magic
     def skip_choice!
       logger.debug "Skipping Choice: #{@choices.first}"
       choice = choices.shift
-      choice.decline! if choice.respond_to?(:decline!)
+      observing(choice) { choice.decline! if choice.respond_to?(:decline!) }
     end
 
     def resolve_choice!(**args)
       choice = choices.shift
-      choice.resolve!(**args)
+      begin
+        observing(choice) { choice.resolve!(**args) }
+      rescue ArgumentError
+        # An answer the choice refuses (too many cards, two lands that don't share a type) leaves it to be answered again.
+        choices.unshift(choice)
+        raise
+      end
       game&.state_based_actions_checkpoint!
+    end
+
+    private
+
+    def observing(item, &block)
+      observer ? observer.resolving(item, &block) : yield
     end
   end
 end

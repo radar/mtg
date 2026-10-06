@@ -17,6 +17,12 @@ module Magic
     def graveyard = controller.graveyard
     def library = controller.library
 
+    # The text a UI shows the player; nil lets the UI fall back to a generic one.
+    def prompt = nil
+
+    # For choices resolved with `resolve!(mode:)`: each mode (as passed to resolve!) with its label.
+    def modes = {}
+
     def to_s = inspect
   end
 end

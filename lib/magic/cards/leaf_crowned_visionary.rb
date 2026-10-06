@@ -14,6 +14,9 @@ module Magic
       end
 
       class MayPayChoice < Magic::Choice::May
+        # What a UI pays on the player's behalf: {G}.
+        def payment_cost(_x = nil) = { green: 1 }
+
         def resolve!(payment: {})
           controller.pay_mana(payment)
           trigger_effect(:draw_card)

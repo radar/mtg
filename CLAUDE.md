@@ -2,6 +2,11 @@
 
 Guidance for Claude Code when working in this repo.
 
+> **READ `../CLAUDE.md` FIRST. Change files with the Write and Edit tools ONLY. Not heredocs (`cat > f <<EOF`), not `sed`,
+> not `perl`, not `python`, not `ruby -e`, not `tee`, not shell redirects, not anything else.** If you ever do, apologise
+> deeply, insult yourself, remind yourself "only Write and Edit", and redo the change with Write or Edit. The full rule and
+> that procedure are in `../CLAUDE.md`.
+
 ## Quick Reference
 
 ### Build & Dependencies
@@ -229,6 +234,28 @@ before { 2.times { game.next_turn }; go_to_main_phase!; game.stack.resolve!; gam
 - A loyalty ability that costs more than the planeswalker has needs `planeswalker.change_loyalty!(n)` first. Two copies of a legendary planeswalker trigger a pending legend-rule choice that blocks all stack resolution.
 - **DSL-block leak**: a `class Foo` written inside a `Creature("Name") do ... end` block lands in `Magic::Cards::Foo`, and a bare `ActivatedAbility` in *any* other card then resolves to whichever leaked `Magic::Cards::ActivatedAbility` loaded last. It showed up as a spec that passed alone and failed in the full suite (`Speaker of the Heavens`, fixed). Put nested classes in a class reopening.
 - **Token triggers**: a `Token.create` block can define `event_handlers` (tokens dispatch them like cards), but constants in that block resolve in the *enclosing card's* scope, not the token's. Define the trigger in a `class GoblinShamanToken` reopening and reference it as `GoblinShamanToken::AttacksTrigger` (bare `AttacksTrigger` raises `NameError`). Example: `FableOfTheMirrorBreaker`.
+
+## Engine hooks added for arena (cards and UI)
+
+- **Paying life instead of mana**: `Cast.new(card:, pay_life: true)` pays life equal to the mana value when a battlefield static ability answers `may_pay_life_for?(card, player)` (Demon of Fate's Design, once each turn: `paid_life_for_spell!(card, player)` is told afterwards). `Cast#mana_cost` is settled before the life is paid, because a "once each turn" permission stops applying once used.
+- **What an activation sacrificed**: `ActivateAbility#sacrificed`, passed to `resolve!(sacrificed:)` ("where X is the sacrificed enchantment's mana value").
+- **Per-permanent base power/toughness**: a `CharacteristicSetting` may define `set_base_power(permanent)` taking the permanent it applies to (Starfield of Nyx); `ContinuousEffects#setting_value` passes it when the method takes an argument.
+- **Prompt text and modes on a Choice**: `Choice#prompt` (nil by default) and `Choice#modes` (`{ mode => label }` for `resolve!(mode:)`) let a UI describe a choice without a table of class names of its own.
+- **Returning an Aura without casting it**: `Card#return_to_battlefield!` (an Aura asks its owner what to enchant: `Choice::AttachReturningAura`; anything else just resolves). Use it, not `resolve!`, for "return it to the battlefield" effects.
+- **Combat damage prevention for a turn**: `Turn#prevent_combat_damage_except_from("Spider")`. Stored as plain data on purpose: `Table` copies games with `Marshal`, which can't copy a lambda. A `Choice` must not keep one either: `LookAtTopCards`, `ReturnFromAmong`, `PutOntoBattlefieldFromAmong` and `SearchLibrary` apply their `filter:` lambda when built and keep only the resulting `choices` (`spec/game/choice_marshal_spec.rb`).
+- **Goad**: an Aura answers `goads_enchanted?`; `Permanent#must_attack?` is then true.
+- **The turn's draw is an effect** (`Effects::DrawCards` with the player as its source), so draw replacements (Abundance) see it. `Effect#controller` is the player when the source is one.
+- **Bargain**: an optional additional cost, modelled as the card's `kicker_cost` (a `Costs::SacrificeKicker`, paid with `pay_kicker(permanent)`; `choices_for(player)` lists what could be sacrificed).
+- **Tokens and exile**: `Effects::ExilePermanent` leaves a token's card alone, so exiling a token no longer crashes. A token never returns.
+- **Hooks a UI reads off a card or choice** (arena builds its prompts from them; none changes a rule):
+  - `Choice#payment_cost(x = nil)` on a "you may pay ..." choice: the mana to pay, as `{ green: 1 }`, `{ generic: 1 }` or (with X) `{ generic: 2 * x }`. The choice's `resolve!(payment:)` still pays it.
+  - `<keyword>_choices` for each keyword of a `resolve!(land:, elf:)`-style choice: one list per question (Bounty of Skemfar). `upto` on a `resolve!(targets:)` choice that is not a `SearchLibrary`. `amount` on a `resolve!(distribution:)` choice.
+  - `Card#number_of_targets(x)` for "X target creatures" (Thrive): `Cast#targeting` checks the count and, with `distinct_targets?`, that they differ.
+  - `Costs::SacrificeKicker#choices_for(player)`: what can be sacrificed for a sacrifice kicker (Beseech the Mirror's Bargain narrows it).
+  - `Card#graveyard_abilities` (instances) is the one list of abilities usable from the graveyard (Renew, Crown of Skemfar); an ordinary `activated_abilities` is not offered from there.
+- **Mana that remembers what it was spent on**: a `ManaRestriction` may answer `spent_on(use, player)`, called as `Player#spend_restricted_mana` spends its mana (Path of Ancestry's scry); `permits?` can simply be true. `ManaRestriction::LegendarySpell` is Plaza of Heroes'.
+- `Events::SecondMainPhase` exists alongside `FirstMainPhase`.
+- **`Choice::Targeted` is a target by default**: its `choices` (including a subclass's own) exclude what shroud, hexproof or protection keeps the source from targeting (`Targeted::TargetFilter`, prepended by `inherited`). A choice where a player merely picks among their own things ("sacrifice a creature", an opponent choosing what to sacrifice) must say `def targets? = false`. A choice that targets but extends plain `Magic::Choice` is not filtered: make it a `Targeted` with a `choice_amount`.
 
 ## Card Parser
 

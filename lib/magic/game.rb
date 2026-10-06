@@ -297,7 +297,8 @@ module Magic
           make_monarch!(event.source.controller)
         end
       when Events::BeginningOfEndStep
-        monarch.draw! if monarch == event.active_player
+        # An effect, so that replacement effects ("if you would draw a card", Abundance) apply to it as well.
+        add_effect(Effects::DrawCards.new(source: monarch, player: monarch)) if monarch == event.active_player
       end
     end
 

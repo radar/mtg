@@ -19,6 +19,8 @@ module Magic
             SelfTap.new(source)
           when /\A(?:\{[^}]+\})+\z/
             Mana.new(Costs::Parsers::Mana.parse(cost))
+          when /\ASacrifice (?<amount>ten) nonland permanents\z/
+            SacrificeNonlandPermanents.new(source, amount: 10)
           when /Sacrifice a creature with defender/
             Sacrifice.new(source, source.controller.creatures.select(&:defender?))
           when /Sacrifice another creature/
@@ -26,6 +28,13 @@ module Magic
           when /Sacrifice a creature/
             # TODO: Make this target only creatures controlled by player
             Sacrifice.new(source, source.controller.creatures)
+          when /\ASacrifice a land\z/
+            Sacrifice.new(source, source.controller.lands)
+          when /\ASacrifice a Treasure\z/
+            Sacrifice.new(source, source.controller.permanents.select { _1.type?("Treasure") })
+          when /\ASacrifice an? (?<type>[A-Z][\w-]*)\z/
+            # "Sacrifice an Elf": a creature of that type, which may be the source itself.
+            Sacrifice.new(source, source.controller.creatures.by_type($~[:type]))
           when /\ARemove (?<amount>\d+) (?<type>[\w+\/-]+) counters? from {this}\z/
             RemoveCounter.new(source, Counters[$~[:type].downcase], amount: $~[:amount].to_i)
           when /\ABlight (?<amount>\d+)\z/

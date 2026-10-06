@@ -201,7 +201,13 @@ module Magic
     end
 
     def max_lands_per_turn
-      1 + permanents.sum(&:additional_lands_per_turn)
+      1 + permanents.sum(&:additional_lands_per_turn) + (@extra_land_drops&.fetch(game.current_turn.number, 0) || 0)
+    end
+
+    # "You may play an additional land this turn." Stored as plain data per turn number so the game can still be Marshal-copied.
+    def grant_additional_land_this_turn!
+      @extra_land_drops ||= Hash.new(0)
+      @extra_land_drops[game.current_turn.number] += 1
     end
 
     def can_play_lands?
@@ -273,14 +279,16 @@ module Magic
     end
 
     def spend_restricted_mana(color, count, use)
-      spent = 0
+      used = []
       @restricted_mana.reject! do |unit|
-        next false unless spent < count && unit.color == color && unit.restriction.permits?(use)
+        next false unless used.size < count && unit.color == color && unit.restriction.permits?(use)
 
-        spent += 1
+        used << unit
         true
       end
-      spent
+      # A restriction may react to its mana being spent ("When that mana is spent to cast a creature spell, ...").
+      used.each { |unit| unit.restriction.spent_on(use, self) if unit.restriction.respond_to?(:spent_on) }
+      used.size
     end
     private :spend_restricted_mana
 
@@ -313,7 +321,8 @@ module Magic
     end
 
     def mill(amount)
-      cards = amount.times.map do
+      # Mill as many as the library holds (rule 701.17b); an empty library mills nothing.
+      cards = [amount, library.count].min.times.map do
         card = library.mill
         card.move_to_graveyard!
         game.notify!(
@@ -381,16 +390,23 @@ module Magic
 
     # Rule 402.2: seven, unless a permanent says "You have no maximum hand size" (nil then).
     def maximum_hand_size
-      return if permanents.any? { _1.card.respond_to?(:no_maximum_hand_size?) && _1.card.no_maximum_hand_size? }
+      return if permanents.any? { _1.card.no_maximum_hand_size? }
 
-      STARTING_MAXIMUM_HAND_SIZE
+      [STARTING_MAXIMUM_HAND_SIZE - opponents_maximum_hand_size_reduction, 0].max
+    end
+
+    # "Each opponent's maximum hand size is reduced by N" (Locust Miser): permanents answer
+    # `opponents_maximum_hand_size_reduction`.
+    def opponents_maximum_hand_size_reduction
+      game.opponents(self).flat_map(&:permanents).sum { _1.card.opponents_maximum_hand_size_reduction }
     end
 
     # Rule 514.1: in the cleanup step the active player discards down to their maximum hand size.
     def discard_down_to_maximum_hand_size!
       return unless (maximum = maximum_hand_size)
 
-      [hand.count - maximum, 0].max.times { game.add_choice(Choice::Discard.new(player: self)) }
+      excess = [hand.count - maximum, 0].max
+      game.add_choice(Choice::Discard.new(player: self, amount: excess)) if excess.positive?
     end
 
     # Vivid: the number of colors among permanents this player controls.

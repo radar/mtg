@@ -5,7 +5,7 @@ module Magic
       enters_tapped
 
       enters_the_battlefield do
-        game.add_choice(Choice.new(actor: actor))
+        game.add_choice(BojukaBog::Choice.new(actor: actor))
       end
     end
 

@@ -8,6 +8,7 @@ module Magic
       class ElfDiedTrigger < TriggeredAbility
         def should_perform?
           event.to.graveyard? &&
+            !event.permanent.token? && # a token ceases to exist: there is nothing to exile
             event.permanent.type?("Elf") &&
             event.permanent.controller == controller
         end
@@ -36,10 +37,9 @@ module Magic
       def static_abilities = [CastPermission]
 
       class ActivatedAbility < Magic::ActivatedAbility
-        costs "{T}"
+        costs "{T}, Pay 2 life"
 
         def resolve!
-          controller.lose_life(2)
           source.exile_cast_permission_turn = game.current_turn.number
         end
       end

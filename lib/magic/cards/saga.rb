@@ -26,7 +26,8 @@ module Magic
 
       class FirstMainPhaseTrigger < TriggeredAbility
         def should_perform?
-          event.active_player == controller
+          # A Saga that has transformed (Fable of the Mirror-Breaker's back face) is a creature now: no more chapters.
+          event.active_player == controller && actor.card.respond_to?(:chapters)
         end
 
         def call
@@ -36,17 +37,24 @@ module Magic
 
       class CounterAdded < TriggeredAbility::LoreCounterAdded
         def call
+          return unless actor.card.respond_to?(:chapters)
+
           lore_counters = actor.counters.of_type(Magic::Counters::Lore).count
 
-          chapter = actor.card.chapters[lore_counters - 1]
+          # Read before resolving: a chapter may transform the Saga (Fable of the Mirror-Breaker), after which its
+          # `card` is the back face, which has no chapters.
+          chapters = actor.card.chapters
+          chapter = chapters[lore_counters - 1]
           chapter.new(actor: actor).resolve!
+          final = chapter == chapters.last
 
-          game.notify!(Events::FinalChapterResolved.new(saga: actor)) if chapter == actor.card.chapters.last
+          game.notify!(Events::FinalChapterResolved.new(saga: actor)) if final
 
           # TODO: This must wait until the end of the resolution of the chapter
           # Rule 714.4. ... and it isn't the source of a chapter ability
           # that has triggered but not yet left the stack, ...
-          if chapter == actor.card.chapters.last
+          # A Saga that transformed as its final chapter is a creature now: it is not sacrificed.
+          if final && actor.card.respond_to?(:chapters)
             actor.trigger_effect(:sacrifice, source: actor, target: actor)
           end
         end

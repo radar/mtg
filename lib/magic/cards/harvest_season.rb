@@ -13,7 +13,9 @@ module Magic
       end
 
       def resolve!
-        game.choices.add(Choice.new(actor: self))
+        choice = Choice.new(actor: self)
+        # With no tapped creatures X is 0: there is nothing to search for, so nothing to ask.
+        game.choices.add(choice) if choice.upto.positive?
         super
       end
     end

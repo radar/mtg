@@ -33,15 +33,22 @@ module Magic
       def base_power
         last_by_timestamp(
           modifiers_by_type(Modifications::BasePower).map { [_1.timestamp, _1.base_power] } +
-          characteristic_settings.select(&:set_base_power).map { [_1.timestamp, _1.set_base_power] },
+          characteristic_settings.filter_map { |setting| (value = setting_value(setting, :set_base_power)) && [setting.timestamp, value] },
         ) || (copiable_card.base_power if copiable_card.respond_to?(:base_power)) || 0
       end
 
       def base_toughness
         last_by_timestamp(
           modifiers_by_type(Modifications::BaseToughness).map { [_1.timestamp, _1.base_toughness] } +
-          characteristic_settings.select(&:set_base_toughness).map { [_1.timestamp, _1.set_base_toughness] },
+          characteristic_settings.filter_map { |setting| (value = setting_value(setting, :set_base_toughness)) && [setting.timestamp, value] },
         ) || (copiable_card.base_toughness if copiable_card.respond_to?(:base_toughness)) || 0
+      end
+
+      # A characteristic-setting ability's base power/toughness may depend on the permanent it applies to (Starfield of
+      # Nyx: "equal to its mana value"): then `set_base_power(permanent)` takes it as an argument.
+      def setting_value(setting, name)
+        method = setting.method(name)
+        method.arity.zero? ? method.call : method.call(permanent)
       end
 
       def apply!
@@ -119,7 +126,8 @@ module Magic
         ]
           .flatten
           .sum(base_power) do |modification|
-            modification.power_modification
+            # A counter with no rules of its own (blessing, poison, page...) adds nothing, even to a creature.
+            modification.respond_to?(:power_modification) ? modification.power_modification : 0
           end
       end
 
@@ -132,7 +140,7 @@ module Magic
         ]
           .flatten
           .sum(base_toughness) do |modification|
-            modification.toughness_modification
+            modification.respond_to?(:toughness_modification) ? modification.toughness_modification : 0
           end
       end
 
@@ -160,6 +168,10 @@ module Magic
           types = (types - Magic::Types::Creatures.values) | set.type_grants
         end
         types -= static_abilities_for(permanent).of_type(Abilities::Static::TypeRemoval).flat_map(&:type_removal)
+        types -= modifiers_by_type(Modifications::RemoveTypes).flat_map(&:removed_types)
+        # Reconfigure (702.151): "While attached, this isn't a creature."
+        types -= [T::Creature] if permanent.attached_to && copiable_card.respond_to?(:reconfigure?) && copiable_card.reconfigure?
+        types
       end
 
       def calculate_color
@@ -172,11 +184,20 @@ module Magic
       def calculate_keywords
         [
           *(permanent.lost_all_abilities? ? [] : copiable_card.keywords),
-          *keyword_grant_static_abilities.flat_map { _1.keyword_grants_for(permanent) },
-          *modifiers_by_type(Modifications::KeywordGrant).map(&:keyword_grant),
-          *permanent.attachments.flat_map(&:keyword_grants),
-          *permanent.counters.filter_map { _1.keyword if _1.respond_to?(:keyword) },
+          *(keyword_grant_static_abilities.select { survives_losing_abilities?(_1.timestamp) }.flat_map { _1.keyword_grants_for(permanent) }),
+          *(modifiers_by_type(Modifications::KeywordGrant).select { survives_losing_abilities?(_1.timestamp) }.map(&:keyword_grant)),
+          *(permanent.attachments.select { survives_losing_abilities?(_1.timestamp) }.flat_map(&:keyword_grants)),
+          # Counters grant their ability as the permanent receives them, which we don't record: they count as oldest.
+          *(survives_losing_abilities?(0) ? permanent.counters.filter_map { _1.keyword if _1.respond_to?(:keyword) } : []),
         ]
+      end
+
+      # 613.1f and 613.7: "loses all abilities" (layer 6) removes the abilities other effects have granted *before* it,
+      # in timestamp order. An ability granted after it (Humility, then an Equipment that gives flying) is kept. Without
+      # such an effect, everything granted is kept.
+      def survives_losing_abilities?(granted_at)
+        latest_loss = characteristic_settings.select(&:loses_all_abilities?).map(&:timestamp).max
+        latest_loss.nil? || granted_at > latest_loss
       end
 
       def characteristic_settings
@@ -211,6 +232,7 @@ module Magic
       def granted_activated_abilities
         static_abilities_for(permanent)
           .of_type(Abilities::Static::GrantActivatedAbilities)
+          .select { survives_losing_abilities?(_1.timestamp) }
           .flat_map(&:granted_abilities)
       end
     end

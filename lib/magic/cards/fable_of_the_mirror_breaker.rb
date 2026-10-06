@@ -15,6 +15,9 @@ module Magic
       class DiscardUpToTwo < Magic::Choice::May
         def choices = hand.cards.to_a
 
+        # How many cards may be picked (a UI reads it).
+        def upto = 2
+
         def resolve!(cards:)
           cards = Array(cards)
           unless cards.size <= 2 && cards.all? { choices.include?(_1) }

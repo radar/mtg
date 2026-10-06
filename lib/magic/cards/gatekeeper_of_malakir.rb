@@ -26,6 +26,9 @@ module Magic
 
           def choice_amount = 1
 
+          # The player picks which of their own creatures to sacrifice; nothing is targeted.
+          def targets? = false
+
           def resolve!(target:)
             target.sacrifice!
           end

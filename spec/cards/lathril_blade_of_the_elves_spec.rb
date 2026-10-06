@@ -41,4 +41,20 @@ RSpec.describe Magic::Cards::LathrilBladeOfTheElves do
       expect(creatures.controlled_by(p1).count).to eq(3)
     end
   end
+
+  context "when another creature deals combat damage to a player" do
+    it "makes no tokens: only Lathril's own damage counts" do
+      attacker = ResolvePermanent("Grizzly Bears", owner: p2)
+      go_to_main_phase_for!(p2)
+      current_turn.beginning_of_combat!
+      current_turn.declare_attackers!
+      p2.declare_attacker(attacker: attacker, target: p1)
+      current_turn.attackers_declared!
+      current_turn.combat_damage!
+      game.settle!
+
+      expect(p1.life).to eq(p1.starting_life - 2)
+      expect(p1.creatures.by_name("Elf Warrior").count).to eq(0)
+    end
+  end
 end

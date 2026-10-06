@@ -18,9 +18,13 @@ module Magic
       # @param alternative [Boolean] When true, pays the card's alternative_cost instead of its mana cost
       # @param harmonize [Boolean] When true, casts from the graveyard for the card's harmonize cost
       #   (see #harmonize_tap) and exiles the spell after it resolves
-      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, evoked: false, adventure: false, alternative: false, by_effect: false, harmonize: false, **args)
+      # @param pay_life [Boolean] When true, pays life equal to the card's mana value rather than its mana cost, if a
+      #   static ability allows that for this card (`may_pay_life_for?`: Demon of Fate's Design)
+      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, evoked: false, adventure: false, alternative: false, by_effect: false, harmonize: false, pay_life: false, **args)
         super(**args)
         @card = card
+        @pay_life = pay_life
+        @stack_size_at_start = game.stack.count
         @targets = []
         @modes = []
         @additional_costs = (card.respond_to?(:additional_costs) ? card.additional_costs : []) + granted_additional_costs
@@ -42,7 +46,7 @@ module Magic
       alias_method :name, :inspect
 
       def countered!
-        kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold)
+        kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold) || kicker_cost.is_a?(Costs::Gift)
         game.notify!(Events::SpellCountered.new(spell: card, player: player))
         @harmonize ? card.exile! : card.move_to_graveyard!(card.owner)
       end
@@ -73,7 +77,7 @@ module Magic
             cost = card.adventure_cost
           elsif @alternative
             cost = card.alternative_cost
-          elsif free_from_exile?
+          elsif free_from_exile? || pays_life_instead?
             cost = Costs::Mana.new({})
           else
             cost = card.cost
@@ -112,8 +116,27 @@ module Magic
         card.kicker_cost
       end
 
+      # "You may pay life equal to a spell's mana value rather than pay its mana cost" (Bolas's Citadel), for a spell
+      # cast from the top of the library. Static abilities answer `pays_life_for?(card, player)`.
+      def pays_life_instead?
+        return false if @flashback || @harmonize || @blitz || @evoked || @adventure || @alternative
+        return true if @pay_life && static_ability_allows?(:may_pay_life_for?)
+
+        card.zone&.library? ? static_ability_allows?(:pays_life_for?) : false
+      end
+
+      # Whether this spell could be cast by paying life (an optional alternative cost, unlike Bolas's Citadel's).
+      def may_pay_life?
+        !@flashback && !@harmonize && !@blitz && !@evoked && !@adventure && !@alternative && static_ability_allows?(:may_pay_life_for?)
+      end
+
+      def life_payment
+        pays_life_instead? ? card.mana_value : 0
+      end
+
       def can_perform?
         return false if already_on_stack?
+        return false if player.life < life_payment
         return false unless castable_from_current_zone?
         return false unless modes_satisfiable?
         return true if mana_cost.zero?
@@ -135,7 +158,16 @@ module Magic
           end
         end
 
+        return "#{player.inspect} cannot pay #{life_payment} life for #{card.name}" if player.life < life_payment
+
         "#{player.inspect} cannot cast any more spells this turn" if player.spell_cast_limit_reached?
+      end
+
+      # Triggers that paying a cost sets off (a creature sacrificed as a cost dying) go on the stack before the spell does,
+      # but they don't stop it being cast at sorcery speed: only what was on the stack to begin with does.
+      def sorcery_speed_reason
+        reason = super
+        reason == "the stack is not empty" && @stack_size_at_start.zero? ? nil : reason
       end
 
       # Instants and spells with flash can be cast any time the player has priority.
@@ -150,6 +182,9 @@ module Magic
 
       def can_target?(target, index = nil)
         choices = index ? target_choices[index] : target_choices
+        # "target creature with mana value X" (Stolen by the Fae): the card says whether a target fits the X it is cast with.
+        return false if card.respond_to?(:target_fits_x?) && !card.target_fits_x?(target, value_for_x || mana_cost.x || 0)
+
         choices.include?(target) && Targetable.targetable_by?(target, source: card, controller: player)
       end
 
@@ -160,6 +195,13 @@ module Magic
 
         targets.each do |target|
           raise InvalidTarget, "Invalid target for #{card.name}: #{target}" unless can_target?(target)
+        end
+        # "X target creatures" (Thrive): the number of targets depends on X, which only the cast knows.
+        if card.respond_to?(:number_of_targets) && card.number_of_targets(value_for_x || mana_cost.x || 0) != targets.size
+          raise InvalidTarget, "#{card.name} needs #{card.number_of_targets(value_for_x || mana_cost.x || 0)} targets, got #{targets.size}"
+        end
+        if card.respond_to?(:distinct_targets?) && card.distinct_targets? && targets.uniq.size != targets.size
+          raise InvalidTarget, "#{card.name} needs different targets"
         end
         @targets = targets
         self
@@ -392,6 +434,14 @@ module Magic
         # Casting a card you don't own (from an opponent's exile) makes you its controller.
         card.controller = player
 
+        # Settled before the life is paid: "once each turn" permissions stop applying afterwards.
+        mana_cost
+        if pays_life_instead?
+          player.lose_life(life_payment)
+          if @pay_life
+            game.battlefield.static_abilities.each { _1.paid_life_for_spell!(card, player) if _1.respond_to?(:paid_life_for_spell!) }
+          end
+        end
         mana_cost.finalize!(player)
         paid_offspring_costs.each { |cost| cost.finalize!(player) }
         player.consume_spell_cast!
@@ -493,8 +543,8 @@ module Magic
           resolved.register_turn_trigger(Events::BeginningOfEndStep, Blitz::EndStepSacrificeTrigger)
         end
 
-        # The card's own optional behold cost outlives this cast: forget it was paid.
-        kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold)
+        # The card's own optional behold or gift cost outlives this cast: forget it was paid.
+        kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold) || kicker_cost.is_a?(Costs::Gift)
 
         if resolved.is_a?(Permanent)
           @paid_additional_costs.each { |cost| cost.resolved!(resolved) if cost.respond_to?(:resolved!) }

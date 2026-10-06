@@ -25,6 +25,9 @@ module Magic
 
         def choices = player.library.select(&:basic_land?)
 
+        # "Up to three basic land cards."
+        def upto = 3
+
         def may? = true
 
         def decline!

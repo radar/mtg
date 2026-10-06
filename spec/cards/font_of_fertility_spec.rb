@@ -14,8 +14,7 @@ RSpec.describe Magic::Cards::FontOfFertility do
       expect(subject.activated_abilities.count).to eq(1)
       p1.add_mana(green: 2)
       p1.activate_ability(ability: subject.activated_abilities.first) do
-        _1
-          .pay_mana(green: 1)
+        _1.pay_mana(generic: { green: 1 }, green: 1)
       end
 
       game.stack.resolve!

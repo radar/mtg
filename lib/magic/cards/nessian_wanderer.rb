@@ -3,7 +3,7 @@ module Magic
     NessianWanderer = Creature("Nessian Wanderer") do
       cost generic: 1, green: 1
       creature_type "Satyr Scout"
-      power 2
+      power 1
       toughness 3
     end
 

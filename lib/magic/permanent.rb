@@ -49,6 +49,8 @@ module Magic
     # The mana it was cast with, as { color => amount } ("if {W}{W} was spent to cast it"), and whether
     # it was cast for its evoke cost (sacrificed when it enters).
     attr_writer :mana_spent
+    # The X a permanent spell was cast with (nil when it had none).
+    attr_accessor :x_value
     attr_accessor :evoked
     # "You may have this enter as a copy of ...": a not-yet-copied 0/0 mustn't die to state-based
     # actions while its enters trigger is still asking (cleared once that's answered).
@@ -59,7 +61,7 @@ module Magic
     # The number of the turn during which the current controller gained control of this permanent.
     attr_accessor :controlled_since_turn
 
-    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false)
+    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false, value_for_x: nil)
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:, controller:)
       card_zone = card.zone unless token || copy
 
@@ -74,6 +76,7 @@ module Magic
         copy: copy,
       )
       permanent.mana_spent = mana_spent
+      permanent.x_value = value_for_x
       permanent.copy_choice_pending = card.enters_as_copy?
       permanent.evoked = evoked
 
@@ -81,6 +84,8 @@ module Magic
       permanent.tap! if enters_tapped
       permanent.attach_to!(attach_to) if attach_to
       card.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
+      # "enters with X +1/+1 counters" (Jacked Rabbit's ravenous): the X it was cast with.
+      card.entering_counters_for_x(value_for_x.to_i).each { |counter_type, amount| permanent.add_counter(counter_type, amount:) } if value_for_x
       if cast && card_zone&.hand?
         card.entering_counters_if_cast_from_hand.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       end
@@ -184,8 +189,9 @@ module Magic
     end
 
     def name = copiable_card.name
-    def cmc = copiable_card.cmc
-    def mana_value = copiable_card.mana_value
+    # A token has no mana cost, so its mana value is 0.
+    def cmc = copiable_card.respond_to?(:cmc) ? copiable_card.cmc : 0
+    def mana_value = copiable_card.respond_to?(:mana_value) ? copiable_card.mana_value : 0
     # A color set by continuous effects (layer 5 -- ContinuousEffects resolves any competing
     # Modifications::Color/CharacteristicSetting#set_colors by timestamp), else the card's colors.
     def colors
@@ -550,10 +556,11 @@ module Magic
     end
 
     # Rule 701.7: indestructible permanents can't be destroyed. Returns whether it was destroyed.
-    def destroy!
+    # `regenerate: false` is "it can't be regenerated" (Rapid Hybridization): a regeneration shield is not used.
+    def destroy!(regenerate: true)
       return false if indestructible?
 
-      if regeneration_shield?
+      if regenerate && regeneration_shield?
         regenerated!
         return false
       end
@@ -586,7 +593,8 @@ module Magic
 
     def return_to_hand
       move_zone!(to: owner.hand)
-      card.move_zone!(to: owner.hand)
+      # A token (or a copy) has no card of its own to put in the hand: it ceases to exist.
+      card.move_zone!(to: owner.hand) unless copy? || token?
     end
 
     def can_activate_ability?(ability)
@@ -636,7 +644,13 @@ module Magic
 
     # "Attacks each combat if able."
     def must_attack?
-      !lost_all_abilities? && face.must_attack?
+      (!lost_all_abilities? && face.must_attack?) || goaded?
+    end
+
+    # Goaded by an Aura ("Enchanted creature ... is goaded"): attacks each combat if able. With one opponent, "attacks a
+    # player other than you if able" changes nothing, so goad is modelled as that.
+    def goaded?
+      attachments.any? { _1.card.goads_enchanted? }
     end
 
     def maximum_attackers_blocked
@@ -730,7 +744,7 @@ module Magic
     end
 
     def remove_from_exile(card)
-      @exiled_cards -= [card]
+      @exiled_cards = Magic::CardList.new(@exiled_cards.to_a - [card])
       game.exile.remove(card)
     end
 
@@ -738,8 +752,8 @@ module Magic
       card.trigger_effect(effect, source: source, **args)
     end
 
-    def create_token(token_class:, amount: 1, controller: self.controller)
-      trigger_effect(:create_token, token_class: token_class, amount: amount, controller: controller)
+    def create_token(token_class:, amount: 1, controller: self.controller, **args)
+      trigger_effect(:create_token, token_class: token_class, amount: amount, controller: controller, **args)
     end
 
     def add_choice(choice, **args)

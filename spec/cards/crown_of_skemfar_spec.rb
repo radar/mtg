@@ -33,7 +33,7 @@ RSpec.describe Magic::Cards::CrownOfSkemfar do
 
     it "returns to hand" do
       graveyard_card = p1.graveyard.by_name("Crown of Skemfar").first
-      ability = graveyard_card.activated_abilities.first
+      ability = graveyard_card.graveyard_abilities.first
       p1.add_mana(green: 3)
       p1.activate_ability(ability: ability) do
         _1.pay_mana(generic: { green: 2 }, green: 1)

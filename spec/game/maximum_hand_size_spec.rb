@@ -23,8 +23,36 @@ RSpec.describe "Maximum hand size (rule 514.1)" do
     end_turn!
 
     discards = game.choices.select { _1.is_a?(Magic::Choice::Discard) }
-    expect(discards.count).to eq(2)
-    expect(discards.map(&:player)).to all(eq(p1))
+    expect(discards.count).to eq(1)
+    expect(discards.first.player).to eq(p1)
+    expect(discards.first.amount).to eq(2)
+  end
+
+  it "lets the player discard several cards at once" do
+    fill_hand(p1, 10)
+    end_turn!
+    discarded = p1.hand.first(3)
+    game.resolve_choice!(cards: discarded)
+
+    expect(p1.hand.count).to eq(7)
+    expect(game.choices).to be_empty
+  end
+
+  it "asks again for what is left when the player picks fewer cards than needed" do
+    fill_hand(p1, 10)
+    end_turn!
+    game.resolve_choice!(cards: p1.hand.first(1))
+
+    expect(p1.hand.count).to eq(9)
+    expect(game.choices.map(&:amount)).to eq([2])
+  end
+
+  it "refuses more cards than needed" do
+    fill_hand(p1, 8)
+    end_turn!
+
+    expect { game.resolve_choice!(cards: p1.hand.first(2)) }.to raise_error(ArgumentError)
+    expect(game.choices.count).to eq(1)
   end
 
   it "discards the card the player picks" do
@@ -66,6 +94,6 @@ RSpec.describe "Maximum hand size (rule 514.1)" do
     fill_hand(p1, 9)
     end_turn!
 
-    expect(game.choices.count { _1.is_a?(Magic::Choice::Discard) }).to eq(2)
+    expect(game.choices.sum { _1.is_a?(Magic::Choice::Discard) ? _1.amount : 0 }).to eq(2)
   end
 end

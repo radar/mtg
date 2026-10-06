@@ -37,8 +37,10 @@ module Magic
         false
       end
 
-      def activated_abilities
-        [ReturnFromGraveyard]
+      # "{2}{G}: Return this card from your graveyard to your hand." Only usable from the graveyard, so it is listed as a
+      # graveyard ability (instances), not an ordinary one.
+      def graveyard_abilities
+        [ReturnFromGraveyard.new(source: self)]
       end
     end
   end

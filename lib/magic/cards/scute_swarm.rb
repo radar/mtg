@@ -1,6 +1,7 @@
 module Magic
   module Cards
     ScuteSwarm = Creature("Scute Swarm") do
+      cost generic: 2, green: 1
       creature_type "Insect"
       power 1
       toughness 1

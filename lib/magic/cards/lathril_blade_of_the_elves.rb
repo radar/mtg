@@ -17,7 +17,8 @@ module Magic
       end
 
       class ActivatedAbility < Magic::ActivatedAbility
-        def costs = [Costs::SelfTap.new(source), Costs::MultiTap.new(10) { controller.creatures.by_type("Elf").untapped }]
+        # "{T}, Tap ten untapped Elves you control": Lathril is tapped for the {T}, so he is not one of the ten.
+        def costs = [Costs::SelfTap.new(source), Costs::MultiTap.new(10) { controller.creatures.by_type("Elf").untapped.except(source) }]
 
         def resolve!
           opponents = game.opponents(source.controller)
@@ -33,7 +34,8 @@ module Magic
 
       class ElfSpawner < TriggeredAbility
         def should_perform?
-          event.combat? && event.target.player?
+          # Only damage Lathril itself deals counts, not any creature's.
+          event.combat? && event.source == actor && event.target.player?
         end
 
         def call

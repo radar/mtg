@@ -17,19 +17,32 @@ RSpec.describe Magic::Cards::CalixDestinysHand do
     context "when the top four cards of the library include an enchantment" do
       let!(:glorious_anthem) { add_to_library("Glorious Anthem", player: p1) }
 
-      it "puts the enchantment into hand" do
+      it "lets you put the enchantment into hand, and the rest go to the bottom" do
+        others = p1.library.first(4) - [glorious_anthem]
         p1.activate_loyalty_ability(ability: ability)
         game.stack.resolve!
         game.tick!
 
         expect(planeswalker.loyalty).to eq(5)
+        game.resolve_choice!(target: glorious_anthem)
         expect(p1.hand.cards).to include(glorious_anthem)
         expect(glorious_anthem.zone).to eq(p1.hand)
+        expect(p1.library.last(3)).to match_array(others)
+      end
+
+      it "lets you take nothing" do
+        p1.activate_loyalty_ability(ability: ability)
+        game.stack.resolve!
+        game.tick!
+        game.resolve_choice!(target: nil)
+
+        expect(p1.hand.cards).not_to include(glorious_anthem)
+        expect(p1.library.last(4)).to include(glorious_anthem)
       end
     end
 
     context "when the top four cards of the library have no enchantment" do
-      it "leaves the library untouched" do
+      it "puts all four on the bottom without asking" do
         top_four = p1.library.first(4)
 
         p1.activate_loyalty_ability(ability: ability)
@@ -37,7 +50,8 @@ RSpec.describe Magic::Cards::CalixDestinysHand do
         game.tick!
 
         expect(planeswalker.loyalty).to eq(5)
-        expect(p1.library.first(4)).to eq(top_four)
+        expect(game.choices).to be_empty
+        expect(p1.library.last(4)).to match_array(top_four)
       end
     end
   end
@@ -45,27 +59,51 @@ RSpec.describe Magic::Cards::CalixDestinysHand do
   context "-3 loyalty ability" do
     let(:ability) { planeswalker.loyalty_abilities[1] }
     let!(:wood_elves) { ResolvePermanent("Wood Elves", owner: p2) }
+    let!(:my_anthem) { ResolvePermanent("Glorious Anthem", owner: p1) }
 
-    it "exiles the target creature" do
+    def activate(exiled, enchantment)
       p1.activate_loyalty_ability(ability: ability) do
-        _1.targeting(wood_elves)
+        _1.targeting(exiled, enchantment)
       end
       game.stack.resolve!
       game.tick!
+    end
+
+    it "exiles the target creature" do
+      activate(wood_elves, my_anthem)
 
       expect(planeswalker.loyalty).to eq(1)
       expect(wood_elves.card.zone).to be_exile
     end
 
-    context "when targeting an enchantment" do
+    it "returns the exiled card when the enchantment leaves the battlefield" do
+      activate(wood_elves, my_anthem)
+
+      my_anthem.destroy!
+      game.settle!
+
+      expect(wood_elves.card.zone).to be_battlefield
+      expect(game.battlefield.creatures.by_name("Wood Elves").controlled_by(p2).count).to eq(1)
+    end
+
+    it "keeps the card exiled while the enchantment stays" do
+      activate(wood_elves, my_anthem)
+      game.settle!
+
+      expect(wood_elves.card.zone).to be_exile
+    end
+
+    it "cannot target an enchantment you do not control as the second target" do
+      their_anthem = ResolvePermanent("Glorious Anthem", owner: p2)
+
+      expect { activate(wood_elves, their_anthem) }.to raise_error(/Invalid target/)
+    end
+
+    context "when targeting an enchantment to exile" do
       let!(:glorious_anthem) { ResolvePermanent("Glorious Anthem", owner: p2) }
 
       it "exiles the target enchantment" do
-        p1.activate_loyalty_ability(ability: ability) do
-          _1.targeting(glorious_anthem)
-        end
-        game.stack.resolve!
-        game.tick!
+        activate(glorious_anthem, my_anthem)
 
         expect(glorious_anthem.card.zone).to be_exile
       end

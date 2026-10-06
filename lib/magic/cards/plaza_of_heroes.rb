@@ -15,6 +15,8 @@ module Magic
       class LegendarySpellManaAbility < Magic::ManaAbility
         costs "{T}"
         choices :all
+
+        def mana_restriction = ManaRestriction::LegendarySpell.new
       end
 
       class LegendaryPermanentColorManaAbility < Magic::ManaAbility

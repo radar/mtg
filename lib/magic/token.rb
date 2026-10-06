@@ -64,6 +64,8 @@ module Magic
     # How many attackers this creature can block at once; override for "can block an additional creature".
     def maximum_attackers_blocked = 1
     def can_activate_ability?(_) = true
+    def no_maximum_hand_size? = false
+    def opponents_maximum_hand_size_reduction = 0
 
     def zone=(zone)
       @zone = zone

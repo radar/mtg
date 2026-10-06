@@ -40,6 +40,9 @@ module Magic
           super(actor: actor)
         end
 
+        # The opponent picks which of their own permanents to sacrifice; nothing is targeted.
+        def targets? = false
+
         def resolve!(target:)
           target.sacrifice!
         end

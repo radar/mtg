@@ -8,6 +8,11 @@ module Magic
         )
       end
 
+      # "The token isn't legendary": the permanent stops being of these types.
+      def remove_types(*types, until_eot: true)
+        modifiers << RemoveTypes.new(types: types, until_eot:)
+      end
+
       # "~ becomes a Werewolf.": replaces its creature types (see Modifications::SetCreatureTypes).
       def become_creature_type!(*types, until_eot: false)
         modifiers << SetCreatureTypes.new(types: types, until_eot:)

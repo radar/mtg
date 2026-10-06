@@ -1,7 +1,7 @@
 module Magic
   module Actions
     class ActivateAbility < Action
-      attr_reader :ability, :costs, :targets
+      attr_reader :ability, :costs, :targets, :sacrificed
 
       def initialize(ability:, **args)
         @ability = ability
@@ -80,8 +80,10 @@ module Magic
         pay(:multi_tap, targets)
       end
 
+      # What was sacrificed is passed to `resolve!(sacrificed:)` for abilities that care about it (Demon of Fate's Design).
       def pay_sacrifice(targets)
         pay(:sacrifice, targets)
+        @sacrificed = Array(targets)
       end
 
       def pay_self_sacrifice
@@ -170,7 +172,7 @@ module Magic
       end
 
       def resolve!
-        resolve_with_args(ability, target: targets.first, targets: targets)
+        resolve_with_args(ability, target: targets.first, targets: targets, sacrificed: sacrificed)
       end
     end
   end

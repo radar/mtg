@@ -32,6 +32,14 @@ RSpec.describe Magic::Cards::TheEldestReborn do
     expect(saga.counters.of_type(Magic::Counters::Lore).count).to eq(1)
   end
 
+  it "I — offers a creature with hexproof too: nothing is targeted" do
+    # Chapter I has already put its choice up (see the `before`), so check what it offered.
+    opponents_bears.grant_keyword(Magic::Cards::Keywords::HEXPROOF)
+    game.tick!
+
+    expect(game.choices.last.choices).to include(opponents_bears)
+  end
+
   it "I — each opponent sacrifices a creature or planeswalker of their choice" do
     choice = game.choices.last
     expect(choice.choices).to contain_exactly(opponents_bears, opponents_elves)

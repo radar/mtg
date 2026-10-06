@@ -6,6 +6,10 @@ RSpec.describe Magic::Cards::Wellwisher do
   subject { ResolvePermanent("Wellwisher") }
   let(:activated_ability) { subject.activated_abilities.first }
 
+  it "costs {1}{G}" do
+    expect(Card("Wellwisher").cost.cost).to eq({ generic: 1, green: 1 })
+  end
+
   context "activated ability" do
     it "gains life for its controller" do
       original_life = p1.life

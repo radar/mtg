@@ -14,6 +14,11 @@ module Magic
     # nothing to choose, so they never declare `choices`. A single placeholder choice lets #resolve! pick it itself.
     def choices = [:fixed]
 
+    # True for "add one mana of any type that a land you control could produce" (Reflecting Pool, Exotic Orchard). Such an
+    # ability asks every land's mana abilities for their choices, so it must skip other abilities that do the same, or
+    # they would ask each other forever (rule 106.7: ignore mana abilities that depend on themselves).
+    def reflects_other_lands? = false
+
     def initialize(**args)
       super(**args)
     end

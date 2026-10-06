@@ -33,6 +33,7 @@ module Magic
       end
 
       modes ExileGraveyard, DestroyArtifact, DamageEachCreature
+      choose_modes 1
     end
   end
 end

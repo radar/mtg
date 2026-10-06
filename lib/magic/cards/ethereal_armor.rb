@@ -8,7 +8,7 @@ module Magic
       enchant "Creature"
 
       def target_choices
-        battlefield.controlled_by(controller).creatures
+        battlefield.creatures
       end
 
       class PowerAndToughnessModification < Abilities::Static::PowerAndToughnessModification

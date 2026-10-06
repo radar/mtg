@@ -27,6 +27,26 @@ RSpec.describe Magic::Cards::PactOfTheSerpent do
     expect(p2.life).to eq(life_before - 2)
   end
 
+  it "asks for the creature type as it resolves when none was chosen" do
+    2.times { ResolvePermanent("Bloom Tender", owner: p2) }
+    life_before = p2.life
+    cards_before = p2.hand.count
+
+    p1.add_mana(black: 3)
+    p1.cast(card: pact_of_the_serpent) do |a|
+      a.targeting(p2)
+      a.pay_mana(generic: { black: 1 }, black: 2)
+    end
+    game.stack.resolve!
+
+    choice = game.choices.last
+    expect(choice).to be_a(described_class::TypeChoice)
+    game.resolve_choice!(creature_type: "Elf")
+
+    expect(p2.life).to eq(life_before - 2)
+    expect(p2.hand.count).to eq(cards_before + 2)
+  end
+
   it "only counts creatures of the chosen type the target player controls" do
     ResolvePermanent("Bloom Tender", owner: p2)
 

@@ -15,6 +15,8 @@ module Magic
       end
 
       class DamageChoice < Magic::Choice::Targeted
+        def choice_amount = 1
+
         def choices
           game.any_target
         end

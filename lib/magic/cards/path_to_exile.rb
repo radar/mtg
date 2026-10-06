@@ -12,7 +12,8 @@ module Magic
         controller = target.controller
         trigger_effect(:exile, target: target)
         choice = Magic::Choice::SearchLibrary.new(
-          actor: target.card,
+          # The permanent, not its card: a token's card has no controller.
+          actor: target,
           to_zone: :battlefield,
           enters_tapped: true,
           filter: Filter[:basic_lands],

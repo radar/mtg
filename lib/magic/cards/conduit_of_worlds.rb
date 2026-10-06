@@ -11,7 +11,7 @@ module Magic
         costs "{T}"
 
         def target_choices
-          controller.graveyard.nonland
+          controller.graveyard.cards.permanents.nonland
         end
 
         def requirements_met?

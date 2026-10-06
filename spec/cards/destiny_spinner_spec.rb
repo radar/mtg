@@ -3,6 +3,19 @@ require "spec_helper"
 RSpec.describe Magic::Cards::DestinySpinner do
   include_context "two player game"
 
+  it "stops your creature and enchantment spells being countered, but not other spells or an opponent's" do
+    ResolvePermanent("Destiny Spinner", owner: p1)
+    creature = Card("Grizzly Bears", owner: p1)
+    enchantment = Card("Phyrexian Arena", owner: p1)
+    instant = Card("Shock", owner: p1)
+    theirs = Card("Grizzly Bears", owner: p2)
+    [creature, enchantment, instant].each { |card| p1.hand.add(card) }
+    p2.hand.add(theirs)
+
+    expect([creature, enchantment].map(&:can_be_countered?)).to eq([false, false])
+    expect([instant, theirs].map(&:can_be_countered?)).to eq([true, true])
+  end
+
   it "can animate a land" do
     spinner = ResolvePermanent("Destiny Spinner", owner: p1)
     land = ResolvePermanent("Forest", owner: p1)

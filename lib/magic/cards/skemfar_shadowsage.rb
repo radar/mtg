@@ -14,6 +14,13 @@ module Magic
         DRAIN = :drain
         GAIN = :gain
 
+        def modes
+          {
+            DRAIN => "Each opponent loses X life, where X is the greatest number of creatures you control that share a type",
+            GAIN => "You gain X life, where X is the greatest number of creatures you control that share a type"
+          }
+        end
+
         def resolve!(mode:)
           raise ArgumentError, "unknown mode #{mode.inspect}" unless [DRAIN, GAIN].include?(mode)
 

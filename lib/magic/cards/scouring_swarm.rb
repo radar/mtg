@@ -23,8 +23,13 @@ module Magic
         end
 
         def call
-          token_class = controller.graveyard.cards.lands.count >= 7 ? ScouringSwarm : InsectToken
-          actor.create_token(token_class: token_class, enters_tapped: true)
+          if controller.graveyard.cards.lands.count >= 7
+            # "...create a tapped token that's a copy of this creature instead."
+            copy = ScouringSwarm.new(game: game, owner: controller)
+            Permanent.resolve(game: game, owner: controller, card: copy, token: true, copy: true, cast: false, enters_tapped: true)
+          else
+            trigger_effect(:create_token, token_class: InsectToken, enters_tapped: true)
+          end
         end
       end
 

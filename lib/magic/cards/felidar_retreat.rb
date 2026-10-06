@@ -23,6 +23,13 @@ module Magic
       end
 
       class Choice < Magic::Choice
+        def modes
+          {
+            token: "Create a 2/2 white Cat Beast creature token",
+            counter: "Put a +1/+1 counter on each creature you control; they gain vigilance until end of turn"
+          }
+        end
+
         def resolve!(mode:)
           case mode
           when :token

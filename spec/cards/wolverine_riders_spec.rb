@@ -35,6 +35,11 @@ RSpec.describe Magic::Cards::WolverineRiders do
     expect { ResolvePermanent("Llanowar Elves", owner: p1) }.to change { p1.life }.by(1)
   end
 
+  it "gains nothing, and does not fail, for an Elf that has no toughness (a Kindred Enchantment)" do
+    expect { ResolvePermanent("Prowess Of The Fair", owner: p1) }.not_to raise_error
+    expect(p1.life).to eq(p1.starting_life)
+  end
+
   it "does not gain life for an opponent's Elf entering" do
     expect { ResolvePermanent("Llanowar Elves", owner: p2) }.not_to change { p1.life }
   end

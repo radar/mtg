@@ -18,7 +18,8 @@ module Magic
     end
 
     def controller
-      source.controller
+      # The turn's draw is an effect with the player as its source.
+      source.is_a?(Magic::Player) ? source : source.controller
     end
 
     def requires_targets?

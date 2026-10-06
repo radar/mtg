@@ -32,6 +32,8 @@ module Magic
           super(**args)
         end
 
+        def choice_amount = 1
+
         def choices
           game.any_target
         end

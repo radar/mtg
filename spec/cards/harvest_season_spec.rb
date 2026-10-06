@@ -33,7 +33,7 @@ RSpec.describe Magic::Cards::HarvestSeason do
     end
   end
 
-  it "searches for zero lands when no creatures are tapped" do
+  it "asks nothing when no creatures are tapped: it would search for zero lands" do
     ResolvePermanent("Grizzly Bears", owner: p1)
 
     spell = Card("Harvest Season", owner: p1)
@@ -43,10 +43,7 @@ RSpec.describe Magic::Cards::HarvestSeason do
     p1.cast(card: spell) { |a| a.pay_mana(generic: { green: 2 }, green: 1) }
     game.stack.resolve!
 
-    choice = game.choices.last
-    expect(choice.upto).to eq(0)
-
-    game.resolve_choice!(targets: [])
+    expect(game.choices).to be_empty
   end
 
   it "does not count tapped creatures controlled by an opponent" do

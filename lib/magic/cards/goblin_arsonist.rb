@@ -9,6 +9,7 @@ module Magic
 
     class GoblinArsonist < Creature
       class DamageChoice < Magic::Choice::Targeted
+        def prompt = "Choose a target for Goblin Arsonist to deal 1 damage to."
         def choices = game.any_target
         def choice_amount = 1
 
@@ -18,6 +19,8 @@ module Magic
       end
 
       class MayDamageChoice < Magic::Choice::May
+        def prompt = "Goblin Arsonist died. Have it deal 1 damage to any target?"
+
         def resolve!
           game.choices.add(DamageChoice.new(actor: actor))
         end

@@ -326,7 +326,16 @@ module Magic
       controller.hand
     end
 
-    def resolve!(enters_tapped: enters_tapped?, kicked: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false)
+    # Puts the card onto the battlefield without casting it (back from exile, say), under its owner's control. An Aura
+    # needs something to enchant, so its owner is asked (see Choice::AttachReturningAura); with nothing legal it stays put.
+    def return_to_battlefield!
+      return resolve! unless is_a?(Cards::Aura)
+
+      choice = Choice::AttachReturningAura.new(actor: self)
+      game.add_choice(choice) if choice.choices.any?
+    end
+
+    def resolve!(enters_tapped: enters_tapped?, kicked: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false, value_for_x: nil)
       if permanent?
         permanent = Magic::Permanent.resolve(
           game: game,
@@ -339,6 +348,7 @@ module Magic
           attach_to: attach_to,
           mana_spent: mana_spent,
           evoked: evoked,
+          value_for_x: value_for_x,
         )
         # A card resolving from the stack has no zone, so Permanent.resolve can't move it.
         move_zone!(to: battlefield) unless zone&.battlefield?
@@ -381,6 +391,11 @@ module Magic
 
     # Counters the permanent enters with ({ "+1/+1" => 2 }).
     def entering_counters
+      {}
+    end
+
+    # Counters it enters with because of the X it was cast with (Jacked Rabbit: X +1/+1 counters).
+    def entering_counters_for_x(_x)
       {}
     end
 
@@ -558,9 +573,15 @@ module Magic
     def must_be_blocked? = false
     # "This creature attacks each combat if able."
     def must_attack? = false
+    # An Aura that goads the creature it enchants (Ghoulish Impetus).
+    def goads_enchanted? = false
     # How many attackers this creature can block at once; override for "can block an additional creature".
     def maximum_attackers_blocked = 1
     def can_activate_ability?(_) = true
+    # "You have no maximum hand size."
+    def no_maximum_hand_size? = false
+    # "Each opponent's maximum hand size is reduced by N." (Locust Miser)
+    def opponents_maximum_hand_size_reduction = 0
 
     def add_choice(choice, **args)
       case choice

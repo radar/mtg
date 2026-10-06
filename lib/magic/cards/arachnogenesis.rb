@@ -12,8 +12,12 @@ module Magic
         keywords :reach
       end
 
+      # "Create X 1/2 green Spider creature tokens with reach, where X is the number of creatures attacking you. Prevent
+      # all combat damage that would be dealt this turn by non-Spider creatures."
       def resolve!
-        trigger_effect(:create_token, token_class: SpiderToken, amount: attacking_creatures.count)
+        attacking_you = game.current_turn.attacks.count { |attack| attack.defending_player == controller }
+        trigger_effect(:create_token, token_class: SpiderToken, amount: attacking_you)
+        game.current_turn.prevent_combat_damage_except_from("Spider")
         super
       end
     end
