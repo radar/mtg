@@ -575,6 +575,8 @@ module Magic
     def must_attack? = false
     # An Aura that goads the creature it enchants (Ghoulish Impetus).
     def goads_enchanted? = false
+    # An Aura that makes the creature it enchants attack each combat if able (Furor of the Bitten).
+    def forces_enchanted_to_attack? = false
     # How many attackers this creature can block at once; override for "can block an additional creature".
     def maximum_attackers_blocked = 1
     def can_activate_ability?(_) = true
