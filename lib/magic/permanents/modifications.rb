@@ -69,6 +69,11 @@ module Magic
         modifiers << KeywordGrant.new(keyword_grant: keyword, until_eot: until_eot)
       end
 
+      def lose_keyword!(keyword, until_eot: true)
+        modifiers << KeywordRemoval.new(keyword_removal: keyword, until_eot: until_eot)
+        apply_continuous_effects!
+      end
+
       def lose_creature_types!(until_eot: true)
         modifiers << LoseCreatureTypes.new(until_eot:)
         apply_continuous_effects!

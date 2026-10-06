@@ -189,7 +189,11 @@ module Magic
           *(permanent.attachments.select { survives_losing_abilities?(_1.timestamp) }.flat_map(&:keyword_grants)),
           # Counters grant their ability as the permanent receives them, which we don't record: they count as oldest.
           *(survives_losing_abilities?(0) ? permanent.counters.filter_map { _1.keyword if _1.respond_to?(:keyword) } : []),
-        ]
+        ].reject { |keyword| removed_keywords.any? { |removed| keyword == removed || (removed.is_a?(Class) && keyword.is_a?(removed)) } }
+      end
+
+      def removed_keywords
+        modifiers_by_type(Modifications::KeywordRemoval).map(&:keyword_removal)
       end
 
       # 613.1f and 613.7: "loses all abilities" (layer 6) removes the abilities other effects have granted *before* it,

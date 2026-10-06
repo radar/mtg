@@ -35,8 +35,19 @@ module Magic
     # A copy of this effect with a different amount. Replacement effects that double or halve an
     # effect use this so everything else the original specified carries over.
     def with_amount(amount)
-      dup.tap { |effect| effect.instance_variable_set(:@amount, amount) }
+      dup.tap { |effect| effect.amount = amount }
     end
+
+    # The same, for the damage dealt (`DealDamage`, `DealCombatDamage`): damage doublers and triplers use it.
+    def with_damage(damage)
+      dup.tap { |effect| effect.damage = damage }
+    end
+
+    protected
+
+    attr_writer :amount, :damage
+
+    public
 
     # Rule 702.80 (wither): damage a source with wither deals to a creature is dealt as -1/-1 counters.
     # Everything else about the damage (lifelink, events, prevention) is unchanged.
