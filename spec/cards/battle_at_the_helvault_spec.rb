@@ -31,6 +31,13 @@ RSpec.describe Magic::Cards::BattleAtTheHelvault do
       expect(choices.last.choices).to match_array([theirs])
     end
 
+    it "says whose permanents each choice shows" do
+      prompts = game.choices.to_a.map(&:prompt)
+
+      expect(prompts.first).to include("your permanents")
+      expect(prompts.last).to include("#{p2.name}'s permanents")
+    end
+
     it "exiles what is chosen, and only until the Saga leaves" do
       game.resolve_choice!(target: mine)
       game.resolve_choice!(target: theirs)

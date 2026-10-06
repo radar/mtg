@@ -32,6 +32,7 @@ module Magic
 
       class LoyaltyAbility1 < LoyaltyAbility
         def loyalty_change = 1
+        def description = "Create a 1/1 black and green Insect creature token, then mill a card. If an Insect card was milled this way, put a loyalty counter on Grist and repeat this process."
 
         def resolve!
           loop do
@@ -73,6 +74,7 @@ module Magic
 
       class LoyaltyAbility2 < LoyaltyAbility
         def loyalty_change = -2
+        def description = "You may sacrifice a creature. When you do, destroy target creature or planeswalker."
 
         def resolve!
           choice = SacrificeChoice.new(actor: source)
@@ -82,6 +84,7 @@ module Magic
 
       class LoyaltyAbility3 < LoyaltyAbility
         def loyalty_change = -5
+        def description = "Each opponent loses life equal to the number of creature cards in your graveyard."
 
         def resolve!
           amount = graveyard.creatures.count

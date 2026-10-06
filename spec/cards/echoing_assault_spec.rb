@@ -35,8 +35,8 @@ RSpec.describe Magic::Cards::EchoingAssault do
 
   it "creates a tapped, attacking 1/1 copy of an attacking nontoken creature" do
     attack(angel)
-    game.resolve_choice!(target: angel)
 
+    expect(game.choices).to be_empty
     expect(copies.count).to eq(1)
     expect([copies.first.power, copies.first.toughness]).to eq([1, 1])
     expect(copies.first).to be_tapped
@@ -66,7 +66,6 @@ RSpec.describe Magic::Cards::EchoingAssault do
 
   it "sacrifices the copy at the beginning of the next end step" do
     attack(angel)
-    game.resolve_choice!(target: angel)
     copy = copies.first
     current_turn.end!
     game.settle!

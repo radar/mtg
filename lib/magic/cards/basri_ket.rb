@@ -30,6 +30,7 @@ module Magic
 
       class LoyaltyAbility1 < Magic::LoyaltyAbility
         def loyalty_change = 1
+        def description = "Put a +1/+1 counter on up to one target creature. It gains indestructible until end of turn."
 
         def single_target?
           true
@@ -53,6 +54,7 @@ module Magic
 
       class LoyaltyAbility2 < Magic::LoyaltyAbility
         def loyalty_change = -2
+        def description = "Whenever one or more nontoken creatures attack this turn, create that many 1/1 white Soldier creature tokens that are tapped and attacking."
 
         def resolve!
           source.register_turn_trigger(Events::PreliminaryAttackersDeclared, SoldierTokensTrigger)
@@ -61,6 +63,7 @@ module Magic
 
       class LoyaltyAbility3 < Magic::LoyaltyAbility
         def loyalty_change = -6
+        def description = "You get an emblem with \"At the beginning of combat on your turn, create a 1/1 white Soldier creature token, then put a +1/+1 counter on each creature you control.\""
 
         def resolve!
           game.add_emblem(Emblem.new(game: game, owner: source.controller))

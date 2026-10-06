@@ -42,6 +42,31 @@ RSpec.describe Magic::Cards::AdelineResplendentCathar do
     expect([humans.first.power, humans.first.toughness]).to eq([1, 1])
   end
 
+  context "when the opponent controls a planeswalker" do
+    let!(:walker) { ResolvePermanent("Ajani, Outland Chaperone", owner: p2) }
+
+    def attack_with_adeline
+      skip_to_combat!
+      current_turn.declare_attackers!
+      p1.declare_attacker(attacker: adeline, target: p2)
+      current_turn.attackers_declared!
+    end
+
+    it "asks whether the Human attacks the player or the planeswalker" do
+      attack_with_adeline
+
+      expect(game.choices.last.choices).to contain_exactly(p2, walker)
+    end
+
+    it "makes the Human attack the planeswalker when chosen" do
+      attack_with_adeline
+      game.resolve_choice!(target: walker)
+
+      expect(current_turn.attacking?(humans.first)).to be true
+      expect(current_turn.attacks.find { _1.attacker == humans.first }.target).to eq(walker)
+    end
+  end
+
   it "makes the Human attack the opponent" do
     skip_to_combat!
     current_turn.declare_attackers!

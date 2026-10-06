@@ -26,10 +26,16 @@ module Magic
         end
       end
 
-      # "When this creature dies, you may draw a card." Drawing is never worse, so it always does.
+      # "When this creature dies, you may draw a card."
+      class MayDrawChoice < Magic::Choice::May
+        def resolve!
+          trigger_effect(:draw_card)
+        end
+      end
+
       class DiesTrigger < TriggeredAbility::Death
         def call
-          trigger_effect(:draw_card)
+          game.choices.add(MayDrawChoice.new(actor: actor))
         end
       end
 

@@ -7,6 +7,7 @@ module Magic
 
       class LoyaltyAbility1 < Magic::LoyaltyAbility
         def loyalty_change = 2
+        def description = "Ugin deals 3 damage to any target."
         def target_choices = battlefield.cards + game.players
         def single_target? = true
 
@@ -17,6 +18,7 @@ module Magic
 
       class LoyaltyAbility2 < Magic::LoyaltyAbility
         def loyalty_change = :X
+        def description = "Exile each permanent with mana value X or less that's one or more colors."
 
         def resolve!(value_for_x:)
           permanents = game.battlefield.permanents.select do |permanent|
@@ -32,6 +34,7 @@ module Magic
 
       class LoyaltyAbility3 < Magic::LoyaltyAbility
         def loyalty_change = -7
+        def description = "You gain 7 life, draw seven cards, then put up to seven permanent cards from your hand onto the battlefield."
 
         def resolve!
           controller = source.controller

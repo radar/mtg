@@ -659,7 +659,10 @@ module Magic
     end
 
 
+    # Rule 514.2: damage wears off, and "until end of turn" effects end, as the cleanup step begins.
     def cleanup!
+      @damage = 0
+      @marked_for_death = false
       @turn_triggers = {}
       @turn_replacements = []
       @regeneration_shields = 0

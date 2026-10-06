@@ -14,3 +14,5 @@ module Magic
   class Error < StandardError; end
   # Your code goes here...
 end
+
+Magic::Randomness.install!

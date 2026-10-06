@@ -57,7 +57,8 @@ module Magic
         def call
           event.attacks.map(&:target).select { _1.respond_to?(:player?) && _1.player? }.uniq.each do |defender|
             choice = CopyChoice.new(actor: actor, defender: defender)
-            game.choices.add(choice) if choice.choices.any?
+            # Mandatory, so a lone legal target is chosen for you (Stack#add_choice).
+            game.add_choice(choice) if choice.choices.any?
           end
         end
       end

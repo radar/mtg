@@ -10,6 +10,7 @@ module Magic
       # cards exiled this way."
       class LoyaltyAbility1 < LoyaltyAbility
         def loyalty_change = 1
+        def description = "Discard your hand, then exile the top three cards of your library. Until end of turn, you may play cards exiled this way."
 
         def resolve!
           [*controller.hand.cards].each(&:discard!)
@@ -23,6 +24,7 @@ module Magic
       # "+1: Chandra deals 2 damage to any target."
       class LoyaltyAbility2 < LoyaltyAbility
         def loyalty_change = 1
+        def description = "Chandra deals 2 damage to any target."
 
         def target_choices = game.any_target
 
@@ -37,6 +39,7 @@ module Magic
       # shuffle. You may cast them this turn. Add six {R}." Takes every one, which is never worse than taking fewer.
       class LoyaltyAbility3 < LoyaltyAbility
         def loyalty_change = -9
+        def description = "Search your graveyard and library for any number of red instant and/or sorcery cards, exile them, then shuffle. You may cast them this turn. Add six {R}."
 
         def resolve!
           cards = [*controller.graveyard.cards, *controller.library.cards].select do |card|

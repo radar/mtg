@@ -8,6 +8,7 @@ module Magic
 
       class LoyaltyAbility1 < LoyaltyAbility
         def loyalty_change = 1
+        def description = "Reveal the top four cards of your library. Put all land cards revealed this way into your hand and the rest into your graveyard."
 
         def resolve!
           cards = library.first(4)
@@ -38,6 +39,7 @@ module Magic
 
       class LoyaltyAbility2 < LoyaltyAbility
         def loyalty_change = 0
+        def description = "Put any number of land cards from your hand onto the battlefield tapped."
 
         def resolve!
           game.choices.add(Choice.new(actor: source))
@@ -57,6 +59,7 @@ module Magic
 
       class LoyaltyAbility3 < LoyaltyAbility
         def loyalty_change = -3
+        def description = "Create a green Treefolk creature token with reach and \"This token's power and toughness are each equal to the number of lands you control.\""
 
         def resolve!
           source.trigger_effect(:create_token, token_class: TreefolkToken)
@@ -65,6 +68,7 @@ module Magic
 
       class LoyaltyAbility4 < LoyaltyAbility
         def loyalty_change = -8
+        def description = "Return all permanent cards from your graveyard to your hand. You get an emblem with \"You have no maximum hand size.\""
 
         def resolve!
           graveyard.permanents.each(&:move_to_hand!)

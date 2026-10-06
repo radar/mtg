@@ -8,9 +8,26 @@ module Magic
     end
 
     class SuturePriest < Creature
-      # Both triggers say "you may", and doing it is never worse, so they always happen. One handler decides which
-      # of the two it is: another creature of yours gains you 1 life, a creature an opponent controls costs its
-      # controller 1.
+      # "Whenever another creature you control enters, you may gain 1 life."
+      class GainLifeChoice < Magic::Choice::May
+        def resolve!
+          trigger_effect(:gain_life, target: controller, life: 1)
+        end
+      end
+
+      # "Whenever a creature an opponent controls enters, you may have that player lose 1 life."
+      class LoseLifeChoice < Magic::Choice::May
+        def initialize(actor:, player:)
+          @player = player
+          super(actor: actor)
+        end
+
+        def resolve!
+          trigger_effect(:lose_life, target: @player, life: 1)
+        end
+      end
+
+      # One handler decides which of the two it is, from who controls the creature that entered.
       class CreatureEnteredTrigger < TriggeredAbility::EnterTheBattlefield
         def should_perform?
           creature? && event.permanent != actor
@@ -18,9 +35,9 @@ module Magic
 
         def call
           if under_your_control?
-            trigger_effect(:gain_life, target: controller, life: 1)
+            game.add_choice(GainLifeChoice.new(actor: actor))
           else
-            trigger_effect(:lose_life, target: event.permanent.controller, life: 1)
+            game.add_choice(LoseLifeChoice.new(actor: actor, player: event.permanent.controller))
           end
         end
       end

@@ -16,6 +16,7 @@ module Magic
       # "+1: Create a 1/1 green and white Kithkin creature token."
       class KithkinAbility < Magic::LoyaltyAbility
         def loyalty_change = 1
+        def description = "Create a 1/1 green and white Kithkin creature token."
 
         def resolve!
           trigger_effect(:create_token, token_class: KithkinToken)
@@ -25,6 +26,7 @@ module Magic
       # "−2: Ajani deals 4 damage to target tapped creature."
       class DamageAbility < Magic::LoyaltyAbility
         def loyalty_change = -2
+        def description = "Ajani deals 4 damage to target tapped creature."
 
         def single_target? = true
 
@@ -60,6 +62,7 @@ module Magic
       # battlefield. Then shuffle."
       class TopCardsAbility < Magic::LoyaltyAbility
         def loyalty_change = -8
+        def description = "Look at the top X cards of your library, where X is your life total. You may put any number of nonland permanent cards with mana value 3 or less from among them onto the battlefield. Then shuffle."
 
         def resolve!
           cards = controller.library.first([controller.life, 0].max)

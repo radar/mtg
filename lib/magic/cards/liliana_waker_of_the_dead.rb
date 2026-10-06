@@ -10,6 +10,7 @@ module Magic
       # asked which to discard.
       class LoyaltyAbility1 < LoyaltyAbility
         def loyalty_change = 1
+        def description = "Each player discards a card. Each opponent who can't loses 3 life."
 
         def resolve!
           game.players.each do |player|
@@ -25,6 +26,7 @@ module Magic
       # "-3: Target creature gets -X/-X until end of turn, where X is the number of cards in your graveyard."
       class LoyaltyAbility2 < LoyaltyAbility
         def loyalty_change = -3
+        def description = "Target creature gets -X/-X until end of turn, where X is the number of cards in your graveyard."
 
         def target_choices = battlefield.creatures
 
@@ -62,6 +64,7 @@ module Magic
 
       class LoyaltyAbility3 < LoyaltyAbility
         def loyalty_change = -7
+        def description = "You get an emblem with \"At the beginning of combat on your turn, put target creature card from a graveyard onto the battlefield under your control. It gains haste.\""
 
         def resolve!
           game.add_emblem(Emblem.new(game: game, owner: controller))

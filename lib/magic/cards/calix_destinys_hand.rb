@@ -10,6 +10,7 @@ module Magic
       # card into your hand. Put the rest on the bottom of your library in a random order.
       class LoyaltyAbility1 < LoyaltyAbility
         def loyalty_change = 1
+        def description = "Look at the top four cards of your library. You may reveal an enchantment card from among them and put that card into your hand. Put the rest on the bottom of your library in a random order."
 
         def resolve!
           choice = Magic::Choice::LookAtTopCards.new(actor: source, amount: 4, filter: ->(card) { card.enchantment? })
@@ -39,6 +40,7 @@ module Magic
       # battlefield.
       class LoyaltyAbility2 < LoyaltyAbility
         def loyalty_change = -3
+        def description = "Exile target creature or enchantment you don't control until target enchantment you control leaves the battlefield."
 
         def multi_target? = true
 
@@ -63,6 +65,7 @@ module Magic
       # −7: Return all enchantment cards from your graveyard to the battlefield.
       class LoyaltyAbility3 < LoyaltyAbility
         def loyalty_change = -7
+        def description = "Return all enchantment cards from your graveyard to the battlefield."
 
         def resolve!
           graveyard.cards.enchantments.each(&:resolve!)

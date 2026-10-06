@@ -30,9 +30,19 @@ RSpec.describe Magic::Cards::SolemnSimulacrum do
     solemn = ResolvePermanent("Solemn Simulacrum", owner: p1)
     game.skip_choice!
 
-    expect do
-      solemn.destroy!
-      game.settle!
-    end.to change { p1.hand.count }.by(1)
+    solemn.destroy!
+    game.settle!
+
+    expect { game.resolve_choice! }.to change { p1.hand.count }.by(1)
+  end
+
+  it "may decline to draw when it dies" do
+    solemn = ResolvePermanent("Solemn Simulacrum", owner: p1)
+    game.skip_choice!
+
+    solemn.destroy!
+    game.settle!
+
+    expect { game.skip_choice! }.not_to change { p1.hand.count }
   end
 end

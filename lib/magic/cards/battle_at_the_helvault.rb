@@ -23,6 +23,11 @@ module Magic
           super(actor: actor)
         end
 
+        def prompt
+          whose = victim == controller ? "your" : "#{victim.name}'s"
+          "Battle at the Helvault: exile one of #{whose} permanents?"
+        end
+
         def choices
           victim.permanents.nonland.reject { |permanent| permanent.card.is_a?(Saga) }
         end

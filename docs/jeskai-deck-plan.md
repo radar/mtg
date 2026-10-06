@@ -37,9 +37,10 @@ Arena:
   for a choice, an ability, cycling, or an X or kicker payment that is made from the pool.
 - `audit_castable.rb` now has Islands and Mountains; it is silent for this deck.
 
-Not modelled: Adeline's token always attacks the player, never a planeswalker; Suture Priest and Solemn Simulacrum always
-take their "may" (it is never worse to); Skyclave Apparition, Sun Titan and Echoing Assault ask for their target even when
-there is only one.
+Known gaps, all closed (2026-10-07; see `arena/docs/jeskai-deck-playtest.md`, which also has the 50-seed sweep): Adeline's
+token can attack a planeswalker (`AttackTargetChoice`); Suture Priest's triggers and Solemn Simulacrum's death draw are
+real "may" choices; Echoing Assault picks a lone target for you; arena taps hybrid-cost filter lands for mana. Skyclave
+Apparition and Sun Titan still ask for a lone target, on purpose: both are optional.
 
 ## Earlier status (2026-10-05)
 

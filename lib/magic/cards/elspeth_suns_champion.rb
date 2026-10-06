@@ -16,6 +16,7 @@ module Magic
       # +1: Create three 1/1 white Soldier creature tokens.
       class LoyaltyAbility1 < Magic::LoyaltyAbility
         def loyalty_change = 1
+        def description = "Create three 1/1 white Soldier creature tokens."
 
         def resolve!
           trigger_effect(:create_token, token_class: SoldierToken, amount: 3, controller: controller)
@@ -25,6 +26,7 @@ module Magic
       # −3: Destroy all creatures with power 4 or greater.
       class LoyaltyAbility2 < Magic::LoyaltyAbility
         def loyalty_change = -3
+        def description = "Destroy all creatures with power 4 or greater."
 
         def resolve!
           game.battlefield.creatures.select { |creature| creature.power >= 4 }.each do |creature|
@@ -52,6 +54,7 @@ module Magic
 
       class LoyaltyAbility3 < Magic::LoyaltyAbility
         def loyalty_change = -7
+        def description = "You get an emblem with \"Creatures you control get +2/+2 and have flying.\""
 
         def resolve!
           game.add_emblem(Emblem.new(game: game, owner: controller))

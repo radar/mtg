@@ -13,6 +13,8 @@ module Magic
           1
         end
 
+        def description = "Draw a card, then discard a card."
+
         def resolve!
           trigger_effect(:draw_cards)
           add_choice(:discard)
@@ -25,6 +27,8 @@ module Magic
         def loyalty_change
           -3
         end
+
+        def description = "Target creature you don't control phases out."
 
         def target_choices
           battlefield.creatures.not_controlled_by(controller)
@@ -41,6 +45,8 @@ module Magic
         def loyalty_change
           -10
         end
+
+        def description = "Take two extra turns after this one."
 
         def resolve!
           2.times { game.take_additional_turn }

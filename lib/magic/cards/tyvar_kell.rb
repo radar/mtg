@@ -32,6 +32,7 @@ module Magic
       # of turn."
       class PlusOneAbility < LoyaltyAbility
         def loyalty_change = 1
+        def description = "Put a +1/+1 counter on up to one target Elf. Untap it. It gains deathtouch until end of turn."
 
         def target_choices
           battlefield.creatures.select { _1.type?("Elf") }
@@ -49,6 +50,7 @@ module Magic
       # "0: Create a 1/1 green Elf Warrior creature token."
       class ZeroAbility < LoyaltyAbility
         def loyalty_change = 0
+        def description = "Create a 1/1 green Elf Warrior creature token."
 
         def resolve!
           trigger_effect(:create_token, token_class: ElfWarriorToken)
@@ -68,6 +70,7 @@ module Magic
 
       class UltimateAbility < LoyaltyAbility
         def loyalty_change = -6
+        def description = "You get an emblem with \"Whenever you cast an Elf spell, it gains haste until end of turn and you draw two cards.\""
 
         def resolve!
           game.add_emblem(Emblem.new(game: game, owner: controller))

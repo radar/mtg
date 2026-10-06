@@ -27,6 +27,7 @@ module Magic
 
       class LoyaltyAbility1 < LoyaltyAbility
         def loyalty_change = 1
+        def description = "Up to one target creature gets +3/+3 and gains trample until end of turn."
 
         def resolve!
           choice = PumpChoice.new(actor: source)
@@ -36,6 +37,7 @@ module Magic
 
       class LoyaltyAbility2 < LoyaltyAbility
         def loyalty_change = -2
+        def description = "Create a 3/3 green Beast creature token. Then if an opponent controls more creatures than you, put a loyalty counter on Garruk."
 
         def resolve!
           trigger_effect(:create_token, token_class: BeastToken)
@@ -58,6 +60,7 @@ module Magic
 
       class LoyaltyAbility3 < LoyaltyAbility
         def loyalty_change = -7
+        def description = "You get an emblem with \"At the beginning of your end step, you may search your library for a creature card, put it onto the battlefield, then shuffle.\""
 
         def resolve!
           game.add_emblem(Emblem.new(game: game, owner: controller))
