@@ -320,6 +320,11 @@ module Magic
       library.shuffle!
     end
 
+    # Rule 705: flip a coin. True if the player wins the flip. Specs stub this for a known result.
+    def flip_coin!
+      [true, false].sample
+    end
+
     def mill(amount)
       # Mill as many as the library holds (rule 701.17b); an empty library mills nothing.
       cards = [amount, library.count].min.times.map do
