@@ -52,9 +52,7 @@ module Magic
         def receive_event(event)
           return unless event.is_a?(Events::BeginningOfEndStep) && event.active_player == owner
 
-          game.choices.add(
-            Magic::Choice::SearchLibrary.new(actor: self, to_zone: :battlefield, upto: 1, filter: ->(card) { card.creature? })
-          )
+          game.search_library(self, find: :creatures, to: :battlefield)
         end
       end
 

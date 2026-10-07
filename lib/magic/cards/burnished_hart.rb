@@ -12,7 +12,7 @@ module Magic
         costs "{3}, Sacrifice {this}"
 
         def resolve!
-          game.choices.add(Magic::Choice::SearchLibrary.new(actor: source, to_zone: :battlefield, enters_tapped: true, upto: 2, filter: Filter[:basic_lands]))
+          game.search_library(source, find: :basic_lands, to: :battlefield, tapped: true, upto: 2)
         end
       end
 

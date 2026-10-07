@@ -11,7 +11,7 @@ module Magic
     class RuneScarredDemon < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          game.choices.add(Magic::Choice::SearchLibrary.new(actor: actor, to_zone: :hand, enters_tapped: false, upto: 1, filter: ->(card) { true }))
+          game.search_library(actor, find: ->(card) { true }, to: :hand)
         end
       end
 

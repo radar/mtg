@@ -11,7 +11,7 @@ module Magic
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         class MayChoice < Magic::Choice::May
           def resolve!
-            game.choices.add(Magic::Choice::SearchLibrary.new(actor: actor, to_zone: :hand, enters_tapped: false, upto: 1, filter: ->(card) { card.any_type?("Creature") && card.mana_value >= 6 }, reveal: true))
+            game.search_library(actor, find: ->(card) { card.any_type?("Creature") && card.mana_value >= 6 }, to: :hand, reveal: true)
           end
         end
 

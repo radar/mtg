@@ -550,7 +550,7 @@ module Magic
     # discard-from-hand ability does something else (Waker of Waves) overrides it.
     def cycling_effect!
       if cycling_search
-        game.add_choice(Magic::Choice::SearchLibrary.new(actor: self, to_zone: :hand, upto: 1, reveal: true, filter: Filter[cycling_search]))
+        game.search_library(self, find: cycling_search, to: :hand, reveal: true)
       else
         trigger_effect(:draw_cards, number_to_draw: 1)
       end

@@ -11,14 +11,8 @@ module Magic
       def resolve!(target:)
         controller = target.controller
         trigger_effect(:exile, target: target)
-        choice = Magic::Choice::SearchLibrary.new(
-          # The permanent, not its card: a token's card has no controller.
-          actor: target,
-          to_zone: :battlefield,
-          enters_tapped: true,
-          filter: Filter[:basic_lands],
-        )
-        target.game.add_choice(choice) if controller.library.basic_lands.any?
+        # The permanent, not its card, is the actor: a token's card has no controller.
+        target.game.search_library(target, find: :basic_lands, to: :battlefield, tapped: true) if controller.library.basic_lands.any?
       end
     end
   end

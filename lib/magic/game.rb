@@ -290,6 +290,31 @@ module Magic
       add_choice(Choice::RingBearer.new(player: player)) if player.creatures.any?
     end
 
+    # `find` is a card type ("Forest"), a `Filter[...]` name (`:basic_lands`) or a lambda taking a card.
+    def search_library(actor, find:, to:, tapped: false, upto: 1, reveal: false, prompt: nil)
+      noun, filter = case find
+      when String then [find, ->(card) { card.any_type?(find) }]
+      when Symbol then [find.to_s.tr("_", " ").chomp("s"), Filter[find]]
+      else [nil, find]
+      end
+      prompt ||= search_library_prompt(noun, to: to, tapped: tapped, upto: upto) if noun
+
+      add_choice(Choice::SearchLibrary.new(actor: actor, filter: filter, to_zone: to, enters_tapped: tapped, upto: upto, reveal: reveal, prompt: prompt))
+    end
+
+    def search_library_prompt(noun, to:, tapped:, upto:)
+      many = upto > 1
+      cards = many ? "up to #{{ 2 => "two", 3 => "three" }.fetch(upto, upto)} #{noun} cards" : "a #{noun} card"
+      it = many ? "They" : "It"
+      outcome = case to
+      when :battlefield then "#{it} #{many ? "enter" : "enters"} the battlefield#{" tapped" if tapped}."
+      when :hand then "Put #{many ? "them" : "it"} into your hand."
+      when :graveyard then "Put #{many ? "them" : "it"} into your graveyard."
+      when :top then "Put #{many ? "them" : "it"} on top of your library."
+      end
+      "Search your library for #{cards}. #{outcome}"
+    end
+
     def receive_event(event)
       case event
       when Events::CombatDamageDealt

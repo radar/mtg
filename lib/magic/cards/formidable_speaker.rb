@@ -34,7 +34,7 @@ module Magic
 
             def resolve!(card:)
               super
-              game.choices.add(Magic::Choice::SearchLibrary.new(actor: actor, to_zone: :hand, enters_tapped: false, upto: 1, filter: Filter[:creatures], reveal: true))
+              game.search_library(actor, find: :creatures, to: :hand, reveal: true)
             end
           end
 

@@ -11,7 +11,7 @@ module Magic
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         class MayChoice < Magic::Choice::May
           def resolve!
-            game.choices.add(Magic::Choice::SearchLibrary.new(actor: actor, to_zone: :top, enters_tapped: false, upto: 1, filter: Filter[:basic_lands], reveal: true))
+            game.search_library(actor, find: :basic_lands, to: :top, reveal: true)
           end
         end
 
