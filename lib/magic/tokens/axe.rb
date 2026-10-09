@@ -23,6 +23,8 @@ module Magic
           creatures_you_control
         end
 
+        def equip? = true
+
         def resolve!(target:)
           source.attach_to!(target)
         end
