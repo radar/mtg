@@ -10,11 +10,17 @@ module Magic
     # `graveyard`: the card is castable from the graveyard (Zul Ashur) rather than from exile.
     # `forever`: lasts for as long as the card stays in exile (Thranduil's Decree).
     # `pay_life`: casting it pays life equal to its mana value rather than its mana cost (Inside Information).
-    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard, :forever, :pay_life) do
-      def initialize(graveyard: false, forever: false, pay_life: false, **args) = super
+    # `requires_type`: only while the player controls a permanent of that type (Flameshape: "if you control a Wizard").
+    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard, :forever, :pay_life, :requires_type) do
+      def initialize(graveyard: false, forever: false, pay_life: false, requires_type: nil, **args) = super
 
       def permits?(game, card, player)
-        card.equal?(self.card) && player == self.player && (graveyard ? card.zone&.graveyard? : card.zone&.exile?) && !expired?(game)
+        card.equal?(self.card) && player == self.player && (graveyard ? card.zone&.graveyard? : card.zone&.exile?) &&
+          !expired?(game) && requirement_met?(game)
+      end
+
+      def requirement_met?(game)
+        requires_type.nil? || game.battlefield.controlled_by(player).any? { _1.type?(requires_type) }
       end
 
       def expired?(game)
@@ -39,6 +45,11 @@ module Magic
     # "You may cast that card without paying its mana cost for as long as it remains exiled."
     def grant_free_while_exiled(card:, player:)
       @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: true, forever: true)
+    end
+
+    # "For as long as it remains exiled, you may play it if you control a <type>" (Flameshape).
+    def grant_while_exiled_if_controlling(card:, player:, type:)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false, forever: true, requires_type: type)
     end
 
     # `free: true`: "you may cast it without paying its mana cost" (Dream Harvest).
