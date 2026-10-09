@@ -8,14 +8,16 @@ module Magic
     # `this_turn` permissions ("you may cast the exiled cards this turn") end with the turn
     # they were granted on instead.
     # `graveyard`: the card is castable from the graveyard (Zul Ashur) rather than from exile.
-    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard) do
-      def initialize(graveyard: false, **args) = super
+    # `forever`: lasts for as long as the card stays in exile (Thranduil's Decree).
+    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard, :forever) do
+      def initialize(graveyard: false, forever: false, **args) = super
 
       def permits?(game, card, player)
         card.equal?(self.card) && player == self.player && (graveyard ? card.zone&.graveyard? : card.zone&.exile?) && !expired?(game)
       end
 
       def expired?(game)
+        return false if forever
         return game.current_turn.number > granted_on_turn if this_turn
 
         game.turns.any? do |turn|
@@ -31,6 +33,11 @@ module Magic
 
     def grant_until_end_of_next_turn(card:, player:)
       @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false)
+    end
+
+    # "You may cast that card without paying its mana cost for as long as it remains exiled."
+    def grant_free_while_exiled(card:, player:)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: true, forever: true)
     end
 
     # `free: true`: "you may cast it without paying its mana cost" (Dream Harvest).
