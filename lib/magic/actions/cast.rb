@@ -121,6 +121,7 @@ module Magic
       def pays_life_instead?
         return false if @flashback || @harmonize || @blitz || @evoked || @adventure || @alternative
         return true if @pay_life && static_ability_allows?(:may_pay_life_for?)
+        return true if card.zone&.exile? && game.play_permissions.pay_life?(card, player)
 
         card.zone&.library? ? static_ability_allows?(:pays_life_for?) : false
       end

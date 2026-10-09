@@ -9,8 +9,9 @@ module Magic
     # they were granted on instead.
     # `graveyard`: the card is castable from the graveyard (Zul Ashur) rather than from exile.
     # `forever`: lasts for as long as the card stays in exile (Thranduil's Decree).
-    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard, :forever) do
-      def initialize(graveyard: false, forever: false, **args) = super
+    # `pay_life`: casting it pays life equal to its mana value rather than its mana cost (Inside Information).
+    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard, :forever, :pay_life) do
+      def initialize(graveyard: false, forever: false, pay_life: false, **args) = super
 
       def permits?(game, card, player)
         card.equal?(self.card) && player == self.player && (graveyard ? card.zone&.graveyard? : card.zone&.exile?) && !expired?(game)
@@ -54,6 +55,18 @@ module Magic
       else
         grant_until_end_of_next_turn(card:, player:)
       end
+    end
+
+    # "You may play those cards this turn. If you cast a spell this way, pay life equal to its mana value rather
+    # than pay its mana cost."
+    def grant_until_end_of_turn_paying_life(card:, player:)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: true, free: false, pay_life: true)
+    end
+
+    # Whether casting `card` under a permission pays life instead of mana.
+    def pay_life?(card, player)
+      @permissions.reject! { _1.expired?(@game) }
+      @permissions.any? { _1.pay_life && _1.permits?(@game, card, player) }
     end
 
     # Whether a permission lets `player` cast `card` without paying its mana cost.
