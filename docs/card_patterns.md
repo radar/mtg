@@ -43,3 +43,12 @@ which file covers a given ability shape.
 - `.tapped` / `.attacking` — combat/state filters
 
 These return a new `CardList`, so they chain: `source.exiled_cards.creatures.flat_map(&:activated_abilities)`. Prefer these over `select { |c| c.types.include?(T::Creature) }` or similar manual filters.
+
+## The Hobbit (HOB) helpers
+
+- **Storied / enduring story**: `Magic::Storied.enduring_story?(player)` (`lib/magic/storied.rb`) latches `Player#enduring_story` once the player controls three artifacts/legendaries/Sagas; use it in a static ability `conditions { }` (`OinTheBrave`, `ThorinOakenshield`).
+- **Cost that depends on the targets**: a card defining `cost_change_for_targets(targets)` (negative = cheaper) is applied by `Cast#targeting`; call `targeting` before `pay_mana` in specs (`UneasyPartings`).
+- **"Cast it free for as long as it remains exiled"**: `game.play_permissions.grant_free_while_exiled(card:, player:)` (`ThranduilsDecree`).
+- **Instant-speed adventure half**: define `adventure_instant? = true` on the card (`VelvetwingButterflies`); the adventure's targets use the card's `target_choices` and `adventure_resolve!(targets:)`.
+- **Delayed "at the beginning of the next upkeep"** from a resolved instant: keep state on the card and a `works_from_graveyard?` handler on `Events::BeginningOfUpkeep` (`TheEaglesAreComing`).
+- A land with a basic land type (`T::Lands::Mountain`) already has the intrinsic mana ability appended to `activated_abilities`; don't add your own, and find your other abilities by class in specs (`TheLonelyMountain`). Spec helper `Card("...")` only strips non-ASCII letters, so write "Oin The Brave", "The Mountain King's Return".
