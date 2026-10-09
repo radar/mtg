@@ -9,6 +9,8 @@ module Magic
     # default -- nothing outside GameRunner reads it, so every other caller keeps driving
     # the player directly.
     attr_accessor :agent
+    # "You have an enduring story" (Storied, The Hobbit): latched by Magic::Storied, lasts for the rest of the game.
+    attr_accessor :enduring_story
 
     def_delegators :@game, :logger
 
@@ -83,6 +85,7 @@ module Magic
       action.pay_self_tap if action.has_cost?(Magic::Costs::SelfTap) && auto_tap
       action.pay_self_sacrifice if action.has_cost?(Magic::Costs::SelfSacrifice)
       action.pay_self_exile if action.has_cost?(Magic::Costs::SelfExile)
+      action.pay_self_discard if action.has_cost?(Magic::Costs::SelfDiscard)
       action.finalize_costs!(self)
       game.take_action(action)
     end
