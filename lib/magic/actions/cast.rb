@@ -215,6 +215,8 @@ module Magic
         extra = game.battlefield.static_abilities
           .select { |ability| ability.respond_to?(:cost_increase_for_targeting) }
           .sum { |ability| ability.cost_increase_for_targeting(card, targets, player) }
+        # The card's own "costs {N} less if it targets ..." (Uneasy Partings): a negative generic change.
+        extra += card.cost_change_for_targets(targets) if card.respond_to?(:cost_change_for_targets)
         change = extra - (@target_cost_increase || 0)
         return if change.zero?
 
@@ -348,11 +350,14 @@ module Magic
         end
       end
 
-      # Pays the next unpaid offspring cost, in #offspring_costs order.
-      def pay_offspring(payment)
+      # Pays +cost+ (one of #offspring_costs: the card's own or a granted one), or the next
+      # unpaid one in #offspring_costs order when none is given. Any subset can be paid.
+      def pay_offspring(payment, cost = nil)
         # By identity: two equal grants (two Zinnias) are still separate costs.
-        cost = offspring_costs.find { |c| paid_offspring_costs.none? { |paid| paid.equal?(c) } }
+        unpaid = offspring_costs.reject { |c| paid_offspring_costs.any? { |paid| paid.equal?(c) } }
+        cost ||= unpaid.first
         raise "#{card.name} has no unpaid offspring cost" unless cost
+        raise "#{card.name} offspring cost is not available" unless unpaid.any? { |c| c.equal?(cost) }
 
         cost.pay(player:, payment:)
         paid_offspring_costs << cost
@@ -472,6 +477,9 @@ module Magic
         @paid_additional_costs.each { |cost| cost.finalize!(player) if cost.is_a?(Costs::PayLife) }
         paid_offspring_costs.each { |cost| cost.finalize!(player) }
         player.consume_spell_cast!
+        if card.zone&.graveyard?
+          game.battlefield.static_abilities.each { _1.cast_from_graveyard!(card, player) if _1.respond_to?(:cast_from_graveyard!) }
+        end
         game.stack.add(self)
 
         game.notify!(Events::SpellCast.new(
