@@ -488,6 +488,7 @@ module Magic
       end
 
       return if attachments.any?(&:does_not_untap_during_untap_step?)
+      return if card.respond_to?(:skips_untap_step?) && card.skips_untap_step?(self)
 
       untap!
     end
