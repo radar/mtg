@@ -408,6 +408,17 @@ module Magic
         self
       end
 
+      # Pays whichever additional cost is a `cost_class` through its own `pay(player:, payment:)`
+      # (Stir Up Trouble's `Costs::SacrificeOrMana`).
+      def pay_additional_cost(cost_class, payment)
+        cost = additional_costs.find { |additional_cost| additional_cost.is_a?(cost_class) }
+        raise "Unknown additional #{cost_class} cost" unless cost
+
+        cost.pay(player:, payment: payment)
+        @paid_additional_costs << cost
+        self
+      end
+
       # "Behold a <type> [and exile it] [or pay {M}]" as an additional cost: `payment` is the
       # permanent or card to behold, or a mana payment hash for the "or pay" alternative.
       def pay_behold(payment)
