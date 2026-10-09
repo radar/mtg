@@ -13,6 +13,12 @@ module Magic
         modifiers << RemoveTypes.new(types: types, until_eot:)
       end
 
+      # "It has '{2}, {T}, Sacrifice this artifact: ...'": adds an activated ability class to this permanent.
+      def grant_activated_ability!(ability_class, until_eot: false)
+        modifiers << GrantActivatedAbility.new(ability_class:, until_eot:)
+        apply_continuous_effects!
+      end
+
       # "~ becomes a Werewolf.": replaces its creature types (see Modifications::SetCreatureTypes).
       def become_creature_type!(*types, until_eot: false)
         modifiers << SetCreatureTypes.new(types: types, until_eot:)

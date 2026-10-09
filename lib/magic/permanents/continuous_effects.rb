@@ -227,6 +227,7 @@ module Magic
           # Land types specifically give one mana ability each
           *class_types.flat_map { |type| type::ManaAbility},
           *granted_activated_abilities,
+          *modifiers_by_type(Modifications::GrantActivatedAbility).map(&:ability_class),
         ]
         .map do |ability|
           ability.new(source: permanent)
