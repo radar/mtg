@@ -565,6 +565,7 @@ module Magic
             kicked: kicker_cost.paid?,
             mana_spent: mana_cost.is_a?(Costs::Mana) ? mana_cost.mana_spent : {},
             evoked: @evoked,
+            flashback: @flashback,
             value_for_x: mana_cost.x,
             controller: player,
           )
