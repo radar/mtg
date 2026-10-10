@@ -454,6 +454,19 @@ module Magic
       @modes_chosen_this_turn ||= []
     end
 
+    # For "choose one that hasn't been chosen" with no turn limit (the choice is remembered while the permanent stays).
+    def mode_chosen?(mode)
+      modes_chosen.include?(mode)
+    end
+
+    def choose_mode!(mode)
+      modes_chosen << mode
+    end
+
+    def modes_chosen
+      @modes_chosen ||= []
+    end
+
     def triggered_once_this_turn?(key)
       triggered_once_keys_this_turn.include?(key)
     end
