@@ -13,7 +13,7 @@ module Magic
       raise CardNotFound if card.nil?
 
       # keep only relevant keys
-      card.slice("name", "mana_cost", "type_line", "oracle_text", "colors", "color_identity", "power", "toughness", "loyalty")
+      card.slice("name", "mana_cost", "type_line", "oracle_text", "colors", "color_identity", "power", "toughness", "loyalty", "card_faces")
     end
 
     # Every card whose Scryfall set code is +code+ (e.g. "ecl"), as raw Oracle hashes
