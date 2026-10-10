@@ -23,6 +23,8 @@ module Magic
             SacrificeNonlandPermanents.new(source, amount: 10)
           when /Sacrifice a creature with defender/
             Sacrifice.new(source, source.controller.creatures.select(&:defender?))
+          when /\ASacrifice another creature or enchantment\z/
+            SacrificeAnother.new(source, source.controller.permanents.select { (_1.creature? || _1.enchantment?) && _1 != source })
           when /Sacrifice another creature/
             SacrificeAnother.new(source, source.controller.creatures.reject { _1 == source })
           when /Sacrifice a creature/
