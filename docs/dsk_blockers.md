@@ -18,3 +18,5 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Rampaging Soulrager: "two or more unlocked doors among Rooms you control" needs Room/door unlocking; the engine has no Room support.
 - Unable to Scream: "as long as enchanted creature is face down, it can't be turned face up" needs face-down permanents; the engine has no face-down permanent support (same gap as Manifest Dread).
 - Toby, Beastie Befriender: the Beast token "can't attack or block alone" needs a check on the whole declared attacker/blocker set; combat declares attackers one at a time (`can_attack?` only sees the single creature), so there is no hook for a group-level restriction.
+- Cathartic Parting: "up to four target cards from your graveyard" alongside a separate target artifact/enchantment; casting supports one target per list (`multi_target?`) but no variable-count ("up to N") target list.
+- Creeping Peeper: "Spend this mana only to cast an enchantment spell, unlock a door, or turn a permanent face up" needs Room unlocking and face-down permanents (the spend restriction itself is supported). Also blocks Overgrown Zealot's second ability (turn permanents face up).
