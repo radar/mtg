@@ -515,6 +515,10 @@ module Magic
     def exile_as_it_resolves? = false
     # X paid for a "blight X" additional cost (Costs::BlightX).
     attr_accessor :x_blighted
+    # True once mana from a Treasure was spent to cast this card (set by ManaRestriction::FromTreasure, reset when the
+    # cost is paid). Read by "if mana from a Treasure was spent to cast it".
+    attr_accessor :treasure_mana_spent
+    def treasure_mana_spent? = !!treasure_mana_spent
 
     def evoke_cost
       self.class.const_defined?(:EVOKE_COST, false) ? Costs::Mana.new(self.class::EVOKE_COST.dup) : nil

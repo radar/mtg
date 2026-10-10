@@ -53,6 +53,16 @@ module Magic
       end
     end
 
+    # Mana from a Treasure. Not a restriction (any spend is allowed); it rides on the mana so that spending it can mark
+    # the spell as paid for with Treasure mana ("if mana from a Treasure was spent to cast it", Smaug, Wicked Worm).
+    class FromTreasure < ManaRestriction
+      def permits?(_use) = true
+
+      def spent_on(use, _player)
+        use.treasure_mana_spent = true if use.respond_to?(:treasure_mana_spent=)
+      end
+    end
+
     # "Spend this mana only to cast Elemental spells or activate abilities of Elemental sources."
     class OfType < ManaRestriction
       def initialize(type:)

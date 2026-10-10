@@ -116,6 +116,7 @@ module Magic
         raise Overpayment.new(cost, balance) if overpaid?
         raise CannotPay.new(cost, player) unless can_pay?(player)
 
+        for_use.treasure_mana_spent = false if for_use.respond_to?(:treasure_mana_spent=)
         player.pay_mana(@payments[:generic], for_use: for_use) if @payments[:generic].any?
         if @any_color
           player.pay_mana(@actual_color_payments, for_use: for_use) if @actual_color_payments.any?
