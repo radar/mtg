@@ -508,7 +508,8 @@ module Magic
           mana_cost: mana_cost,
           x_value: value_for_x,
           flashback: @flashback,
-          targets: targets,
+          # A modal spell's targets belong to its chosen modes, so ward and the like must read them from there too.
+          targets: [*targets, *@modes.flat_map(&:targets)].uniq,
         ))
 
         copy_for_conspire if @conspired

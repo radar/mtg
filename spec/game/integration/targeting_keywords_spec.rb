@@ -140,6 +140,30 @@ RSpec.describe "Targeting keywords: hexproof, shroud, protection and ward" do
       end
     end
 
+    context "targeted by a modal spell" do
+      # A modal spell's targets belong to its chosen modes, not to the spell itself; ward must still see them.
+      let!(:big_target) { creature("Big Ward Test Bear {2}{G}\nCreature — Bear\nWard {2}\n3/3\n", owner: p1) }
+
+      before do
+        p2.add_mana(white: 3)
+        p2.cast(card: Card("Pyrrhic Strike", owner: p2)) do |action|
+          action.pay_mana(generic: { white: 2 }, white: 1)
+          action.choose_mode(Magic::Cards::PyrrhicStrike::DestroyCreature) { _1.targeting(big_target) }
+        end
+        game.stack.resolve_top!
+      end
+
+      it "asks the opponent to pay" do
+        expect(game.choices.last).to be_a(Magic::Choice::Ward)
+      end
+
+      it "counters the spell when the opponent does not pay" do
+        game.resolve_choice!(payment: {})
+
+        expect(game.stack.spells).to be_empty
+      end
+    end
+
     it "does not trigger for its controller's own spell" do
       shock(p1) { _1.targeting(target) }
 

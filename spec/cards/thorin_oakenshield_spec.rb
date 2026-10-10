@@ -63,5 +63,20 @@ RSpec.describe Magic::Cards::ThorinOakenshield do
 
       expect(game.choices.last).to be_a(Magic::Choice::Ward)
     end
+
+    it "also covers a permanent targeted by a mode of a modal spell" do
+      spatula = p1.permanents.find { _1.name == "Well-Worn Spatula" }
+      go_to_main_phase_for!(p2)
+      strike = Card("Pyrrhic Strike", owner: p2)
+      p2.hand.add(strike)
+      p2.add_mana(white: 3)
+      p2.cast(card: strike) do |a|
+        a.pay_mana(generic: { white: 2 }, white: 1)
+        a.choose_mode(Magic::Cards::PyrrhicStrike::DestroyArtifactOrEnchantment) { _1.targeting(spatula) }
+      end
+      game.settle!
+
+      expect(game.choices.last).to be_a(Magic::Choice::Ward)
+    end
   end
 end
