@@ -457,6 +457,19 @@ module Magic
       @triggered_once_keys_this_turn ||= []
     end
 
+    # "This ability triggers only once." Unlike the per-turn pair above, never reset.
+    def triggered_ever?(key)
+      triggered_ever_keys.include?(key)
+    end
+
+    def trigger_ever!(key)
+      triggered_ever_keys << key
+    end
+
+    def triggered_ever_keys
+      @triggered_ever_keys ||= []
+    end
+
     # For "activate only once each turn": the ability classes activated this turn.
     def activated_this_turn?(ability_class)
       abilities_activated_this_turn.include?(ability_class)
