@@ -40,3 +40,4 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Under the Skin: manifest dread needs face-down 2/2 permanents; the engine has no face-down permanent support (same gap as Manifest Dread).
 - Unwilling Vessel: Eerie needs the "you fully unlock a Room" event; the engine has no Room (split enchantment, door unlocking) support.
 - Bottomless Pool // Locker Room: Room cards are split enchantments with two lockable doors; the engine has no Room support.
+- Central Elevator // Promising Stairs: Room cards are split enchantments with two lockable doors; the engine has no Room support.
