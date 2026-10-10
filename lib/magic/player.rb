@@ -164,7 +164,14 @@ module Magic
     end
 
     # A static ability of a permanent can define `prevents_life_gain?(player)` (Mornsong Aria).
+    # A one-shot effect can also stop a player gaining life for the rest of the game (Screaming Nemesis).
+    def cant_gain_life!
+      @cant_gain_life = true
+    end
+
     def can_gain_life?
+      return false if @cant_gain_life
+
       game.battlefield.static_abilities.none? { |ability| ability.respond_to?(:prevents_life_gain?) && ability.prevents_life_gain?(self) }
     end
 
