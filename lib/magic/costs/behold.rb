@@ -8,7 +8,8 @@ module Magic
     # `Behold::ReturnExiledCardTrigger` returns to its owner's hand when that permanent leaves.
     # Like `Costs::BlightOrMana`, `Actions::Cast` never calls `finalize!` on additional costs.
     class Behold
-      attr_reader :source, :type, :exiled_card
+      # `beheld` is whatever was chosen or revealed (Monstrous Emergence reads its power), `nil` if mana was paid instead.
+      attr_reader :source, :type, :exiled_card, :beheld
 
       def initialize(source, type:, exile: false, or_mana: nil)
         @source = source
@@ -33,6 +34,7 @@ module Magic
 
         raise "#{payment.name} can't be beheld for #{source.name}" unless candidates(player).include?(payment)
 
+        @beheld = payment
         payment.reveal! if payment.is_a?(Magic::Card)
         return unless @exile
 
