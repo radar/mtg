@@ -402,6 +402,12 @@ module Magic
       modifiers.last.until_turn_of = player
     end
 
+    # "Loses flying until your next turn."
+    def lose_keyword_until_turn_of!(keyword, player)
+      lose_keyword!(keyword, until_eot: false)
+      modifiers.last.until_turn_of = player
+    end
+
     # "Gains all creature types. (This effect doesn't end.)"
     def gain_all_creature_types!
       @gained_all_creature_types = true
