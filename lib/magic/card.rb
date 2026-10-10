@@ -198,11 +198,11 @@ module Magic
         end
 
         spell_trigger = Class.new(TriggeredAbility::SpellCast) do
-          define_method(:should_perform?) { opponents.include?(event.player) && event.targets.include?(actor) }
+          define_method(:should_perform?) { opponents.include?(event.player) && event.targets.include?(actor) && !actor.ward_suppressed? }
           define_method(:call) { ward_call.call(self, spell: event.spell) }
         end
         ability_trigger = Class.new(TriggeredAbility) do
-          define_method(:should_perform?) { opponents.include?(event.player) && event.targets.include?(actor) }
+          define_method(:should_perform?) { opponents.include?(event.player) && event.targets.include?(actor) && !actor.ward_suppressed? }
           define_method(:call) { ward_call.call(self, ability: event.ability) }
         end
         const_set(:WARD_TRIGGER, spell_trigger)

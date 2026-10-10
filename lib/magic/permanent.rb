@@ -656,10 +656,20 @@ module Magic
       return false if shroud?
 
       opposing = opponents.include?(controller)
-      return false if opposing && hexproof?
+      return false if opposing && hexproof? && !hexproof_ignored?
       return false if opposing && source.colors.any? { hexproof_from?(_1) }
 
       !protected_from?(source)
+    end
+
+    # Nowhere to Run: "can be the targets of spells and abilities as though they didn't have hexproof".
+    def hexproof_ignored?
+      game.battlefield.static_abilities.of_type(Abilities::Static::IgnoreHexproof).any? { _1.ignores_hexproof_of?(self) }
+    end
+
+    # Nowhere to Run: "Ward abilities of those creatures don't trigger."
+    def ward_suppressed?
+      game.battlefield.static_abilities.of_type(Abilities::Static::IgnoreHexproof).any? { _1.suppresses_ward_of?(self) }
     end
 
     def can_attack?

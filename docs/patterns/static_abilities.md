@@ -2,6 +2,8 @@
 
 Keyword grants, CDA power/toughness, type changes, replacement effects, continuous modifiers. Part of the card-implementation pattern catalog — see `docs/card_patterns.md` for the index.
 
+- **"Can be targeted as though it didn't have hexproof" / "ward abilities don't trigger"**: return `Abilities::Static::IgnoreHexproof` from `static_abilities`. `Permanent#can_be_targeted_by?` skips plain hexproof when `hexproof_ignored?`, and the `ward` keyword's triggers check `ward_suppressed?`. Hand-written ward triggers (`ThorinOakenshield`, `DwarvenMattock`, `HexingSquelcher`) don't check it yet. Example: `NowhereToRun`.
+
 **Conditional keyword (only on your turn)**: Subclass `Abilities::Static::KeywordGrant`, override `applicable_targets` to return `[source]` when `game.current_turn.active_player == controller`, else `[]`. Example: `RadhaHeartOfKeld::FirstStrikeGrant`.
 
 **Changeling / "is all creature types"**: `keywords :changeling` (cards and tokens). `Types#type?` also answers true for every creature type (`Types::Creatures`) when `all_creature_types?` is true: a card or token with changeling (printed, so it works in every zone), or a permanent whose Equipment/Aura defines `grants_all_creature_types? = true` (`Attachment` default false). `CardList#by_type`, `TriggeredAbility#type?` and `SpellCast#type?` all go through `type?`, so check types with `type?`, not `types.include?`. Example: `StalactiteDagger`.
