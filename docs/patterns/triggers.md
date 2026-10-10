@@ -76,3 +76,5 @@ Pre-built subclasses in `lib/magic/triggered_ability/` — use these to avoid re
 **Fight**: `creature.fights!(other)` (rule 701.14): both deal damage equal to their power to each other, and neither does if either has left the battlefield. `Permanents::Creature#fight` is one-way combat damage used by `CombatPhase`, not the keyword action. Example: `PitilessFists`, `PrimalMight`.
 
 **"Up to one target" in a trigger**: `def choice_amount = 0..1` on the `Choice::Targeted`; `Stack#add_choice` only auto-picks a lone target when the minimum is at least 1, and `game.skip_choice!` chooses nothing (calls `decline!`).
+
+**Enduring** ("When this dies, if it was a creature, return it to the battlefield. It's an enchantment."): `def death_triggers = [TriggeredAbility::EnduringReturn]`. It returns the card, then removes `T::Creature` and adds `T::Enchantment` permanently (same idea as `TomBertAndWilliam`). Example: `EnduringTenacity`.
