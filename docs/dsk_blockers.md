@@ -14,3 +14,6 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Inquisitive Glimmer: "Unlock costs you pay cost {1} less" needs Room/door unlocking; the engine has no Room support (the enchantment-spell cost reduction alone would leave the card half-implemented).
 - Resurrected Cultist: needs a finality counter ("if a creature with a finality counter would die, exile it instead"); the engine has no finality counter type or die-to-exile replacement keyed on it.
 - Leyline of the Void: "If this card is in your opening hand, you may begin the game with it on the battlefield" needs a pregame opening-hand step; the engine has none. Also blocks the other Leylines (Hope, Mutation, Resonance, Transformation).
+- Balustrade Wurm: Delirium reanimation returns it "with a finality counter on it"; the engine has no finality counter or die-to-exile replacement keyed on it (same gap as Resurrected Cultist).
+- Rampaging Soulrager: "two or more unlocked doors among Rooms you control" needs Room/door unlocking; the engine has no Room support.
+- Unable to Scream: "as long as enchanted creature is face down, it can't be turned face up" needs face-down permanents; the engine has no face-down permanent support (same gap as Manifest Dread).
