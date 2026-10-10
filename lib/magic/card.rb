@@ -519,6 +519,9 @@ module Magic
     # cost is paid). Read by "if mana from a Treasure was spent to cast it".
     attr_accessor :treasure_mana_spent
     def treasure_mana_spent? = !!treasure_mana_spent
+    # Set on an instant or sorcery cast by an effect that says "if that spell would be put into your graveyard, exile
+    # it instead" (Bilbo, Thief in the Night). Actions::Cast exiles the card as it resolves or is countered, then clears it.
+    attr_accessor :exile_instead_of_graveyard
 
     def evoke_cost
       self.class.const_defined?(:EVOKE_COST, false) ? Costs::Mana.new(self.class::EVOKE_COST.dup) : nil

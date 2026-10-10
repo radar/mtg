@@ -48,7 +48,12 @@ module Magic
       def countered!
         kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold) || kicker_cost.is_a?(Costs::Gift)
         game.notify!(Events::SpellCountered.new(spell: card, player: player))
-        @harmonize ? card.exile! : card.move_to_graveyard!(card.owner)
+        if @harmonize || card.exile_instead_of_graveyard
+          card.exile_instead_of_graveyard = false
+          card.exile!
+        else
+          card.move_to_graveyard!(card.owner)
+        end
       end
 
       def return_to_hand!
@@ -616,6 +621,9 @@ module Magic
           elsif card.rebound? && card.zone.hand?
             card.exile!
           elsif card.exile_as_it_resolves?
+            card.exile!
+          elsif card.exile_instead_of_graveyard
+            card.exile_instead_of_graveyard = false
             card.exile!
           elsif card.buyback? && kicker_cost.paid?
             card.move_to_hand!(card.owner)
