@@ -43,3 +43,4 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Central Elevator // Promising Stairs: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Charred Foyer // Warped Space: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Dazzling Theater // Prop Room: Room cards are split enchantments with two lockable doors; the engine has no Room support.
+- Defiled Crypt // Cadaver Lab: Room cards are split enchantments with two lockable doors; the engine has no Room support.
