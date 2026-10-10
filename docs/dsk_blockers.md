@@ -41,3 +41,4 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Unwilling Vessel: Eerie needs the "you fully unlock a Room" event; the engine has no Room (split enchantment, door unlocking) support.
 - Bottomless Pool // Locker Room: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Central Elevator // Promising Stairs: Room cards are split enchantments with two lockable doors; the engine has no Room support.
+- Charred Foyer // Warped Space: Room cards are split enchantments with two lockable doors; the engine has no Room support.
