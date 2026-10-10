@@ -51,3 +51,11 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Grand Entryway // Elegant Rotunda: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Greenhouse // Rickety Gazebo: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Meat Locker // Drowned Diner: Room cards are split enchantments with two lockable doors; the engine has no Room support.
+- Leyline of Hope: "begin the game with it on the battlefield" needs a pregame opening-hand step; the engine has none (same gap as Leyline of the Void).
+- Leyline of Mutation: needs the opening-hand step (same gap as Leyline of the Void) and a free-form alternative cost for every spell you cast.
+- Leyline of Transformation: needs the opening-hand step (same gap as Leyline of the Void) and a chosen creature type added to creatures, spells and cards outside the battlefield.
+- Leyline of Resonance: needs the opening-hand step (same gap as Leyline of the Void) and copying a spell that targets only one creature you control.
+- Overlord of the Floodpits: Impending needs an alternative cost with time counters and a not-a-creature-until-last-counter-removed state (same gap as Overlord of the Mistmoors).
+- Overlord of the Boilerbilges: Impending is not supported (same gap as Overlord of the Mistmoors).
+- Overlord of the Balemurk: Impending is not supported (same gap as Overlord of the Mistmoors).
+- Overlord of the Hauntwoods: Impending is not supported (same gap as Overlord of the Mistmoors), and the "Everywhere" land token that is every basic land type needs a token with all basic land types.
