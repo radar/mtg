@@ -50,3 +50,4 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Glassworks // Shattered Yard: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Grand Entryway // Elegant Rotunda: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Greenhouse // Rickety Gazebo: Room cards are split enchantments with two lockable doors; the engine has no Room support.
+- Meat Locker // Drowned Diner: Room cards are split enchantments with two lockable doors; the engine has no Room support.
