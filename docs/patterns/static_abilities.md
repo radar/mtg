@@ -2,6 +2,8 @@
 
 Keyword grants, CDA power/toughness, type changes, replacement effects, continuous modifiers. Part of the card-implementation pattern catalog — see `docs/card_patterns.md` for the index.
 
+**"You don't lose the game for having 0 or less life"**: override `prevents_losing_at_zero_life? = true` on the card (default false in `Card`); `StateBasedActions#make_players_lose` skips the life check while the player controls such a permanent. **"Prevent damage to an opponent and mill instead"**: subclass `ReplacementEffect::DamageDoubler` (it supplies the source-you-control check and the `DealDamage`/`DealCombatDamage` registrations), override `call` to return any object responding to `resolve!`. Examples: `MarinaVendrellsGrimoire`, `TheMindskinner`.
+
 - **"Can be targeted as though it didn't have hexproof" / "ward abilities don't trigger"**: return `Abilities::Static::IgnoreHexproof` from `static_abilities`. `Permanent#can_be_targeted_by?` skips plain hexproof when `hexproof_ignored?`, and the `ward` keyword's triggers check `ward_suppressed?`. Hand-written ward triggers (`ThorinOakenshield`, `DwarvenMattock`, `HexingSquelcher`) don't check it yet. Example: `NowhereToRun`.
 
 **Conditional keyword (only on your turn)**: Subclass `Abilities::Static::KeywordGrant`, override `applicable_targets` to return `[source]` when `game.current_turn.active_player == controller`, else `[]`. Example: `RadhaHeartOfKeld::FirstStrikeGrant`.

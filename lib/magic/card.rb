@@ -614,6 +614,8 @@ module Magic
     def can_activate_ability?(_) = true
     # "You have no maximum hand size."
     def no_maximum_hand_size? = false
+    # "You don't lose the game for having 0 or less life." (Marina Vendrell's Grimoire)
+    def prevents_losing_at_zero_life? = false
     # "Each opponent's maximum hand size is reduced by N." (Locust Miser)
     def opponents_maximum_hand_size_reduction = 0
 
