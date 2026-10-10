@@ -50,7 +50,25 @@ module Magic
       def targeting(*targets)
         raise "Invalid target specified for #{ability}: #{targets}" unless valid_targets?(*targets)
         @targets = targets
+        apply_target_cost_reductions!
         self
+      end
+
+      # "Equip abilities you activate that target this creature cost {2} less to activate" (Dwarven Mauler): a
+      # battlefield static ability answering `activation_cost_reduction_for_targets(ability, targets, player)` with
+      # the generic mana to take off. Only known once the targets are, so call `targeting` before paying.
+      def apply_target_cost_reductions!
+        mana = costs.find { |cost| cost.is_a?(Costs::Mana) }
+        return unless mana
+
+        reduction = game.battlefield.static_abilities
+          .select { |static| static.respond_to?(:activation_cost_reduction_for_targets) }
+          .sum { |static| static.activation_cost_reduction_for_targets(ability, targets, player) }
+        change = reduction - (@target_cost_reduction || 0)
+        return if change.zero?
+
+        mana.adjusted_by(generic: -change)
+        @target_cost_reduction = reduction
       end
 
       # For "activate only once each turn".
