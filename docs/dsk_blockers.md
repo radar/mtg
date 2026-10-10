@@ -47,3 +47,4 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Derelict Attic // Widow's Walk: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Dollmaker's Shop // Porcelain Gallery: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Funeral Room // Awakening Hall: Room cards are split enchantments with two lockable doors; the engine has no Room support.
+- Glassworks // Shattered Yard: Room cards are split enchantments with two lockable doors; the engine has no Room support.
