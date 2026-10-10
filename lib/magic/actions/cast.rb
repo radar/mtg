@@ -27,7 +27,9 @@ module Magic
         @stack_size_at_start = game.stack.count
         @targets = []
         @modes = []
-        @additional_costs = (card.respond_to?(:additional_costs) ? card.additional_costs : []) + granted_additional_costs
+        # An adventure side with its own additional cost (Allure of Power) answers `adventure_additional_costs`.
+        printed_costs = adventure && card.respond_to?(:adventure_additional_costs) ? card.adventure_additional_costs : (card.respond_to?(:additional_costs) ? card.additional_costs : [])
+        @additional_costs = printed_costs + granted_additional_costs
         @paid_additional_costs = []
         @flashback = flashback
         @harmonize = harmonize
