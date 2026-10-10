@@ -9,6 +9,8 @@ module Magic
 
     class VerduranEnchantress < Creature
       class Choice < Magic::Choice::May
+        def prompt = "Draw a card?"
+
         def resolve!
           controller.draw!
         end

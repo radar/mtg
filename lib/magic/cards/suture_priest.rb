@@ -10,6 +10,8 @@ module Magic
     class SuturePriest < Creature
       # "Whenever another creature you control enters, you may gain 1 life."
       class GainLifeChoice < Magic::Choice::May
+        def prompt = "Gain 1 life?"
+
         def resolve!
           trigger_effect(:gain_life, target: controller, life: 1)
         end
@@ -17,6 +19,8 @@ module Magic
 
       # "Whenever a creature an opponent controls enters, you may have that player lose 1 life."
       class LoseLifeChoice < Magic::Choice::May
+        def prompt = "Have #{@player.name} lose 1 life?"
+
         def initialize(actor:, player:)
           @player = player
           super(actor: actor)

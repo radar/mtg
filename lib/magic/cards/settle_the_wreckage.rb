@@ -13,7 +13,7 @@ module Magic
           @choices = player.library.filter(Filter[:basic_lands])
         end
 
-        def controller = @player
+        def chooser = @player
       end
 
       def single_target?

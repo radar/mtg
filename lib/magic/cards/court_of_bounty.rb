@@ -10,6 +10,8 @@ module Magic
 
     class CourtOfBounty < Enchantment
       class PutCardChoice < Magic::Choice::Targeted
+        def prompt = controller.monarch? ? "Put a land or creature card from your hand onto the battlefield." : "Put a land card from your hand onto the battlefield."
+
         def choices
           if controller.monarch?
             hand.by_any_type("Land", "Creature")
@@ -24,6 +26,8 @@ module Magic
       end
 
       class MayPutCardChoice < Magic::Choice::May
+        def prompt = "Put a card from your hand onto the battlefield?"
+
         def resolve!
           game.choices.add(PutCardChoice.new(actor: actor))
         end

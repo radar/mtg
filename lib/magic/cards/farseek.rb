@@ -6,7 +6,8 @@ module Magic
 
       class Choice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, to_zone: :battlefield, enters_tapped: true, filter: ->(card) { card.any_type?("Plains", "Island", "Swamp", "Mountain") })
+          super(actor: actor, to_zone: :battlefield, enters_tapped: true, filter: ->(card) { card.any_type?("Plains", "Island", "Swamp", "Mountain") },
+                prompt: "Search your library for a Plains, Island, Swamp or Mountain card. It enters the battlefield tapped.")
         end
       end
 

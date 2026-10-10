@@ -3,6 +3,7 @@ module Magic
     ShelteredThicket = Card("Sheltered Thicket") do
       type T::Land, T::Lands::Mountain, T::Lands::Forest
       enters_tapped
+      cycling generic: 2
     end
 
     class ShelteredThicket < Card
@@ -10,15 +11,7 @@ module Magic
         choices :red, :green
       end
 
-      class CyclingAbility < Magic::ActivatedAbility
-        costs "{2}"
-
-        def resolve!
-          source.controller.draw!
-        end
-      end
-
-      def activated_abilities = [ManaAbility, CyclingAbility]
+      def activated_abilities = [ManaAbility]
     end
   end
 end

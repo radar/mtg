@@ -18,6 +18,17 @@ RSpec.describe Magic::Cards::SpringbloomDruid do
     expect(p1.lands).to all(be_tapped)
   end
 
+  it "lets the player choose which land to sacrifice" do
+    island = ResolvePermanent("Island", owner: p1)
+    ResolvePermanent("Springbloom Druid", owner: p1)
+
+    expect(game.choices.first.method(:resolve!).parameters).to include([:key, :sacrifice])
+    game.resolve_choice!(sacrifice: island)
+
+    expect(p1.graveyard.cards.map(&:name)).to eq(["Island"])
+    expect(forest.zone).to be_battlefield
+  end
+
   it "does nothing when declined" do
     ResolvePermanent("Springbloom Druid", owner: p1)
     game.skip_choice!

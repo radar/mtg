@@ -13,6 +13,8 @@ module Magic
       class Choice < Magic::Choice
         attr_reader :choices
 
+        def prompt = "Exile all cards from target player's graveyard."
+
         def initialize(actor:)
           @choices = actor.game.players
           super

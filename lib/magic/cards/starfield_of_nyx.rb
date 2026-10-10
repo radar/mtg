@@ -8,6 +8,8 @@ module Magic
       # At the beginning of your upkeep, you may return target enchantment card from your graveyard to the battlefield.
       # (An Aura would need something to enchant, so only non-Aura enchantment cards are offered.)
       class UpkeepChoice < Magic::Choice::May
+        def prompt = "Return an enchantment card from your graveyard to the battlefield?"
+
         def choices
           controller.graveyard.cards.enchantments.reject { |card| card.is_a?(Aura) }
         end

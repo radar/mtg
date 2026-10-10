@@ -23,6 +23,8 @@ module Magic
 
       # "Then you may choose a token you control. If you do, each other token you control becomes a copy of that token."
       class CopyChoice < Magic::Choice::Targeted
+        def prompt = "Choose a token you control. Each other token you control becomes a copy of it."
+
         def targets? = false
 
         def choices = controller.permanents.select(&:token?)

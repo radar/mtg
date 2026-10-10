@@ -23,6 +23,8 @@ module Magic
       class TopOrBottom < Magic::Choice
         attr_reader :target, :player
 
+        def chooser = player
+
         def initialize(actor:, target:)
           super(actor:)
           @target = target

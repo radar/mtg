@@ -11,6 +11,8 @@ module Magic
     class DualcasterMage < Creature
       # "When this creature enters, copy target instant or sorcery spell. You may choose new targets for the copy."
       class CopyChoice < Magic::Choice::Targeted
+        def prompt = "Copy target instant or sorcery spell."
+
         def targets? = false
 
         def choices

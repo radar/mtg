@@ -18,6 +18,8 @@ module Magic
 
       # "Return another target nonland permanent to its owner's hand."
       class BounceChoice < Magic::Choice::Targeted
+        def prompt = "Return another target nonland permanent to its owner's hand."
+
         def choices = game.battlefield.permanents.nonland - [actor]
         def choice_amount = 1
 
@@ -30,6 +32,8 @@ module Magic
         BIRD = :bird
         BOUNCE = :bounce
         DRAW = :draw
+
+        def prompt = "Choose one: create a Bird, return another nonland permanent to its owner's hand, or draw a card."
 
         def modes
           {

@@ -8,6 +8,8 @@ module Magic
       class Choice < Magic::Choice
         attr_reader :revealed
 
+        def prompt = "Put a land card onto the battlefield tapped and an Elf card into your hand. The rest go on the bottom of your library."
+
         def initialize(actor:)
           super(actor: actor)
           @revealed = Magic::CardList.new(actor.controller.library.first(6))

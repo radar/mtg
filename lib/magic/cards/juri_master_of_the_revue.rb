@@ -27,6 +27,8 @@ module Magic
       class DamageChoice < Magic::Choice::Targeted
         attr_reader :amount
 
+        def prompt = "Juri deals damage equal to its power to any target."
+
         def initialize(amount:, **args)
           @amount = amount
           super(**args)

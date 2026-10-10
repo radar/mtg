@@ -18,15 +18,19 @@ module Magic
       end
 
       class ReturnFromGraveyardAbility < Magic::ActivatedAbility
-        costs "{1}{G}"
+        costs "{1}{G}, Return two lands you control to their owner's hand"
+
+        def requirements_met?
+          source.zone&.graveyard? && source.owner == controller
+        end
 
         def resolve!
-          source.card.move_to_hand!(source.controller)
+          source.move_to_hand!(source.owner)
         end
       end
 
       def static_abilities = [DynamicPowerAndToughness]
-      def activated_abilities = [ReturnFromGraveyardAbility]
+      def graveyard_abilities = [ReturnFromGraveyardAbility.new(source: self)]
     end
   end
 end

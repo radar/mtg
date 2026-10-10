@@ -9,6 +9,8 @@ module Magic
 
     class BraidsArisenNightmare < Creature
       class EndStepChoice < Magic::Choice::May
+        def prompt = "Sacrifice a permanent? Each opponent may sacrifice one that shares a card type, or lose 2 life and you draw a card."
+
         def choices
           controller.permanents
         end
@@ -40,6 +42,11 @@ module Magic
           super(actor: actor)
         end
 
+        def prompt = "Sacrifice a permanent that shares a card type with the one Braids' controller sacrificed? If you don't, you lose 2 life and they draw a card."
+
+        # The opponent decides, so the choice is theirs, not Braids' controller's.
+        def chooser = @opponent
+
         # The opponent picks which of their own permanents to sacrifice; nothing is targeted.
         def targets? = false
 
@@ -49,11 +56,15 @@ module Magic
 
         def decline!
           @opponent.lose_life(2)
-          controller.draw!
+          actor.controller.draw!
         end
       end
 
       class EndStepTrigger < TriggeredAbility::BeginningOfEndStep
+        def should_perform?
+          controllers_end_step?
+        end
+
         def call
           game.add_choice(EndStepChoice.new(actor: actor)) if controller.permanents.any?
         end

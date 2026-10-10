@@ -15,6 +15,8 @@ module Magic
       end
 
       class DamageChoice < Magic::Choice::Targeted
+        def prompt = "Mayhem Devil deals 1 damage to any target."
+
         def choice_amount = 1
 
         def choices

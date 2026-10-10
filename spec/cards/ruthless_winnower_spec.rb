@@ -24,6 +24,7 @@ RSpec.describe Magic::Cards::RuthlessWinnower do
       choice = game.choices.last
       expect(choice).to be_a(described_class::SacrificeChoice)
       expect(choice.choices).to eq([grizzly_bears])
+      expect(choice.chooser).to eq(p1)
 
       game.resolve_choice!(target: grizzly_bears)
 

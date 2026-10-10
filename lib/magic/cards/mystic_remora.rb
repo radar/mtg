@@ -8,6 +8,8 @@ module Magic
       # Cumulative upkeep {1}: "At the beginning of your upkeep, put an age counter on this permanent, then sacrifice
       # it unless you pay its upkeep cost for each age counter on it." Declining (or being unable to pay) sacrifices it.
       class UpkeepChoice < Magic::Choice::May
+        def prompt = "Pay the cumulative upkeep? If you don't, sacrifice Mystic Remora."
+
         # What a UI pays on the player's behalf: {1} for each age counter.
         def payment_cost(_x = nil) = { generic: actor.counters.count { _1.is_a?(Counters["age"]) } }
 
@@ -37,8 +39,10 @@ module Magic
           @player = player
         end
 
+        def prompt = "Pay {4}? If you don't, #{actor.controller.name} draws a card."
+
         # The caster decides, and pays, not the Remora's controller.
-        def controller = player
+        def chooser = player
 
         def payment_cost(_x = nil) = { generic: 4 }
 

@@ -17,6 +17,8 @@ module Magic
       end
 
       class ColorChoice < Magic::Choice::Color
+        def prompt = "Choose a color of mana to add for each Island your opponents control."
+
         def resolve!(color:)
           islands = game.opponents(controller).sum { |opponent| opponent.lands.by_any_type("Island").count }
           controller.add_mana(color => islands)

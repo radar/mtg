@@ -25,7 +25,7 @@ module Magic
           @player = player
         end
 
-        def controller = player
+        def chooser = player
 
         def choices = player.library.to_a
 

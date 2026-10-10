@@ -10,6 +10,8 @@ module Magic
       class ColorChoice < Magic::Choice::Color
         COLORS = %i[white blue black green]
 
+        def prompt = "Choose a color other than red. Thriving Bluff taps for red or the chosen color."
+
         def resolve!(color:)
           raise "Invalid color chosen for Thriving Bluff" unless COLORS.include?(color)
 

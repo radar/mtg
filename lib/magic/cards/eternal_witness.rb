@@ -13,6 +13,8 @@ module Magic
 
     class EternalWitness < Creature
       class Choice < Magic::Choice::May
+        def prompt = "Return a card from your graveyard to your hand."
+
         def choices
           controller.graveyard
         end

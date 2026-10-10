@@ -11,7 +11,8 @@ module Magic
 
       class Choice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, to_zone: :battlefield, upto: actor.kicker_cost.paid? ? 2 : 1, filter: Filter[:basic_lands])
+          super(actor: actor, to_zone: :battlefield, upto: actor.kicker_cost.paid? ? 2 : 1, filter: Filter[:basic_lands],
+                prompt: "Search your library for #{actor.kicker_cost.paid? ? 'up to two basic land cards' : 'a basic land card'}. #{actor.kicker_cost.paid? ? 'They enter' : 'It enters'} the battlefield.")
         end
 
         def resolve!(targets:)

@@ -9,6 +9,8 @@ module Magic
       class OpponentChoice < Magic::Choice
         attr_reader :face_down, :face_up, :player
 
+        def chooser = player
+
         def initialize(actor:, player:, face_down:, face_up:)
           @player = player
           @face_down = face_down

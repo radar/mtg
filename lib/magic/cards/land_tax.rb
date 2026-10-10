@@ -5,6 +5,8 @@ module Magic
       cost white: 1
 
       class UpkeepChoice < Magic::Choice::May
+        def prompt = "An opponent controls more lands than you. Search your library for up to three basic land cards?"
+
         def resolve!
           game.add_choice(SearchChoice.new(actor: actor))
         end
@@ -12,7 +14,8 @@ module Magic
 
       class SearchChoice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, upto: 3, to_zone: :hand, filter: Filter[:basic_lands])
+          super(actor: actor, upto: 3, to_zone: :hand, filter: Filter[:basic_lands],
+                prompt: "Search your library for up to three basic land cards to reveal and put into your hand.")
         end
       end
 

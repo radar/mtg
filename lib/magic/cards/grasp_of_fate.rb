@@ -17,6 +17,8 @@ module Magic
       class Choice < Magic::Choice::Targeted
         attr_reader :choices
 
+        def prompt = "Exile up to one target nonland permanent an opponent controls until Grasp of Fate leaves the battlefield."
+
         def initialize(actor:)
           @choices = actor.game.opponents(actor.controller).flat_map do |opponent|
             opponent.permanents.nonland

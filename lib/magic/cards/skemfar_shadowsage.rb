@@ -14,6 +14,8 @@ module Magic
         DRAIN = :drain
         GAIN = :gain
 
+        def prompt = "Choose one: each opponent loses X life, or you gain X life. X is the greatest number of creatures you control that share a creature type."
+
         def modes
           {
             DRAIN => "Each opponent loses X life, where X is the greatest number of creatures you control that share a type",

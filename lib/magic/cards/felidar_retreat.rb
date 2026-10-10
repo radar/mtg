@@ -23,6 +23,8 @@ module Magic
       end
 
       class Choice < Magic::Choice
+        def prompt = "Choose one: create a 2/2 Cat Beast, or put a +1/+1 counter on each creature you control. They gain vigilance until end of turn."
+
         def modes
           {
             token: "Create a 2/2 white Cat Beast creature token",

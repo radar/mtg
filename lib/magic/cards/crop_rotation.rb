@@ -10,7 +10,8 @@ module Magic
 
       class Choice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, to_zone: :battlefield, filter: Filter[:lands])
+          super(actor: actor, to_zone: :battlefield, filter: Filter[:lands],
+                prompt: "Search your library for a land card. It enters the battlefield.")
         end
       end
 

@@ -28,7 +28,7 @@ module Magic
       # "Landfall -- Whenever a land you control enters, you may pay {1}{G}{U}. If you do, return this card from your
       # graveyard to your hand."
       class ReturnChoice < Magic::Choice::PayMana
-        def controller = actor.owner
+        def chooser = actor.owner
 
         def resolve!(**args)
           super(**args)

@@ -14,6 +14,8 @@ module Magic
       class ReturnChoice < Magic::Choice::Targeted
         attr_reader :choices
 
+        def prompt = "Return a creature card destroyed this way to the battlefield under your control."
+
         def initialize(actor:, choices:)
           @choices = choices
           super(actor: actor)

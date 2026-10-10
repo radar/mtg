@@ -24,6 +24,8 @@ module Magic
           super(actor: actor)
         end
 
+        def prompt = "Choose a nontoken creature attacking #{@defender.name} to create a tapped and attacking 1/1 copy of."
+
         def choices
           game.current_turn.attacks.select { |attack| attack.target == @defender }.map(&:attacker).reject(&:token?).select { _1.controller == controller }
         end

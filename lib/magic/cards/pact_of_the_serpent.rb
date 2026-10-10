@@ -11,6 +11,8 @@ module Magic
       class TypeChoice < Magic::Choice::CreatureType
         attr_reader :target
 
+        def prompt = "Choose a creature type. #{target.name} draws a card and loses 1 life for each creature of that type they control."
+
         def initialize(actor:, target:)
           @target = target
           super(actor: actor)

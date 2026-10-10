@@ -9,13 +9,27 @@ module Magic
     end
 
     class TheGitrogMonster < Creature
-      class UpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
-        def should_perform?
-          super && controller.lands.empty?
+      # "At the beginning of your upkeep, sacrifice The Gitrog Monster unless you sacrifice a land."
+      # Accepting sacrifices the chosen land; declining sacrifices The Gitrog Monster.
+      class SacrificeLandChoice < Magic::Choice::SacrificePermanent
+        def prompt = "Sacrifice a land? If you don't, sacrifice The Gitrog Monster."
+
+        def initialize(actor:)
+          super(actor: actor, type: "Land", other: false)
         end
 
-        def call
+        def decline!
           actor.sacrifice!
+        end
+      end
+
+      class UpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
+        def call
+          if controller.permanents.any? { _1.type?("Land") }
+            game.add_choice(SacrificeLandChoice.new(actor: actor))
+          else
+            actor.sacrifice!
+          end
         end
       end
 

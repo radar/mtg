@@ -13,7 +13,8 @@ module Magic
         def description = "Look at the top four cards of your library. You may reveal an enchantment card from among them and put that card into your hand. Put the rest on the bottom of your library in a random order."
 
         def resolve!
-          choice = Magic::Choice::LookAtTopCards.new(actor: source, amount: 4, filter: ->(card) { card.enchantment? })
+          choice = Magic::Choice::LookAtTopCards.new(actor: source, amount: 4, filter: ->(card) { card.enchantment? },
+                                                           prompt: "Reveal an enchantment card from the top four cards of your library and put it into your hand. The rest go on the bottom.")
           # With nothing to reveal there is nothing to choose, but the cards still go to the bottom.
           choice.choices.empty? ? choice.resolve! : game.choices.add(choice)
         end

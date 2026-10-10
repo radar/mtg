@@ -9,6 +9,8 @@ module Magic
 
     class ShamanOfThePack < Creature
       class LifeLossChoice < Magic::Choice::Targeted
+        def prompt = "Target opponent loses life equal to the number of Elves you control."
+
         def choices
           game.opponents(controller)
         end

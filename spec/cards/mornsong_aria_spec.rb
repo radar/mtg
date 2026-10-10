@@ -79,7 +79,7 @@ RSpec.describe Magic::Cards::MornsongAria do
       game.settle!
 
       choice = game.choices.last
-      expect(choice.controller).to eq(p2)
+      expect(choice.chooser).to eq(p2)
       expect(p2.life).to eq(17)
       expect(p1.life).to eq(20)
     end

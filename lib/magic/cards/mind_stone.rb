@@ -10,6 +10,8 @@ module Magic
       end
 
       class DrawAbility < Magic::ActivatedAbility
+        def description = "Draw a card"
+
         def costs
           [
             Costs::Mana.new(generic: 1),

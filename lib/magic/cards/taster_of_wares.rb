@@ -36,6 +36,8 @@ module Magic
       class RevealChoice < Magic::Choice
         attr_reader :player, :amount
 
+        def chooser = player
+
         def initialize(actor:, player:, amount:)
           super(actor:)
           @player = player

@@ -16,7 +16,7 @@ module Magic
 
         attr_reader :player
 
-        def controller = player
+        def chooser = player
 
         def prompt = "Abundance: choose what to draw instead, or draw a card normally."
 

@@ -26,6 +26,8 @@ module Magic
       class Choice < Magic::Choice
         attr_reader :choices
 
+        def prompt = "Put a number of +1/+1 counters equal to Szarel's power on another creature you control."
+
         def initialize(actor:, choices:)
           @choices = choices
           super(actor: actor)
@@ -35,6 +37,15 @@ module Magic
           target.add_counter("+1/+1", amount: actor.power)
         end
       end
+
+      # "You may play lands from your graveyard."
+      class PlayLandsFromGraveyard < StaticAbility
+        def permits_casting_from_graveyard?(card, player)
+          card.land? && player == controller && card.owner == player
+        end
+      end
+
+      def static_abilities = [PlayLandsFromGraveyard]
 
       def event_handlers
         { Events::PermanentSacrificed => PermanentSacrificedTrigger }

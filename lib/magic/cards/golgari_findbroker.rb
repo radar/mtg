@@ -9,6 +9,8 @@ module Magic
 
     class GolgariFindbroker < Creature
       class ReturnChoice < Magic::Choice::Targeted
+        def prompt = "Return target permanent card from your graveyard to your hand."
+
         def choices
           controller.graveyard.cards.permanents
         end

@@ -11,6 +11,8 @@ module Magic
     class SunTitan < Creature
       # "you may return target permanent card with mana value 3 or less from your graveyard to the battlefield."
       class ReturnChoice < Magic::Choice::Targeted
+        def prompt = "Return a permanent card with mana value 3 or less from your graveyard to the battlefield."
+
         def targets? = false
 
         def choices

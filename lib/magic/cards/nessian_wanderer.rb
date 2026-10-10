@@ -11,6 +11,8 @@ module Magic
       class LandChoice < Magic::Choice
         attr_reader :choices
 
+        def prompt = "Reveal a land card from the top three cards of your library and put it into your hand. The rest go on the bottom."
+
         def initialize(actor:, cards:)
           @cards = cards
           @choices = cards.select(&:land?)

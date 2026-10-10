@@ -32,6 +32,8 @@ module Magic
           super(actor: actor)
         end
 
+        def prompt = "Choose which player or planeswalker the tapped and attacking Human token attacks."
+
         def targets? = false
 
         def choice_amount = 1

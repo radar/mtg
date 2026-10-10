@@ -11,6 +11,8 @@ module Magic
     class PlumecreedEscort < Creature
       # "target creature you control gains hexproof until end of turn."
       class HexproofChoice < Magic::Choice::Targeted
+        def prompt = "Target creature you control gains hexproof until end of turn."
+
         def choices = controller.creatures
         def choice_amount = 1
 

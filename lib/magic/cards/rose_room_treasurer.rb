@@ -10,6 +10,8 @@ module Magic
     class RoseRoomTreasurer < Creature
       # "When you do, this creature deals X damage to any target."
       class DamageChoice < Magic::Choice::Targeted
+        def prompt = "Rose Room Treasurer deals #{@damage} damage to any target."
+
         def initialize(actor:, damage:)
           @damage = damage
           super(actor: actor)
@@ -25,6 +27,8 @@ module Magic
 
       # "you may pay {X}."
       class MayPayChoice < Magic::Choice::May
+        def prompt = "Pay {X}? If you do, Rose Room Treasurer deals X damage to any target."
+
         # What a UI pays on the player's behalf: X generic mana.
         def payment_cost(x = nil) = { generic: x.to_i }
 

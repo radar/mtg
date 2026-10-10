@@ -35,6 +35,8 @@ module Magic
       class CastExiledChoice < Magic::Choice::May
         attr_reader :card
 
+        def prompt = "Cast #{card.name} without paying its mana cost? If you don't, it goes into your hand."
+
         def initialize(actor:, card:)
           @card = card
           super(actor: actor)
@@ -52,6 +54,8 @@ module Magic
       # "Search your library for a card, exile it face down, then shuffle."
       class SearchChoice < Magic::Choice
         attr_reader :choices
+
+        def prompt = "Search your library for a card to exile face down."
 
         def initialize(actor:)
           @choices = actor.controller.library.cards

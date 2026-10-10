@@ -9,6 +9,8 @@ module Magic
 
     class ReclamationSage < Creature
       class DestroyChoice < Magic::Choice::Targeted
+        def prompt = "Destroy target artifact or enchantment."
+
         def choices
           game.battlefield.by_any_type("Artifact", "Enchantment")
         end
@@ -23,6 +25,8 @@ module Magic
       end
 
       class MayDestroyChoice < Magic::Choice::May
+        def prompt = "Destroy target artifact or enchantment?"
+
         def resolve!
           game.choices.add(ReclamationSage::DestroyChoice.new(actor: actor))
         end

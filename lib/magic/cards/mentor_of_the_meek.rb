@@ -10,6 +10,8 @@ module Magic
     class MentorOfTheMeek < Creature
       # "you may pay {1}. If you do, draw a card."
       class MayPayChoice < Magic::Choice::May
+        def prompt = "Pay {1} to draw a card?"
+
         # What a UI pays on the player's behalf.
         def payment_cost(_x = nil) = { generic: 1 }
 

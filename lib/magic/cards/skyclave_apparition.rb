@@ -17,6 +17,8 @@ module Magic
 
       # "exile up to one target nonland, nontoken permanent you don't control with mana value 4 or less."
       class ExileChoice < Magic::Choice::Targeted
+        def prompt = "Exile up to one nonland, nontoken permanent you don't control with mana value 4 or less."
+
         def choices
           game.opponents(controller).flat_map { |opponent| opponent.permanents.nonland }.reject(&:token?).select { _1.mana_value <= 4 }
         end

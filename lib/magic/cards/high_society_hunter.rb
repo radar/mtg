@@ -15,8 +15,8 @@ module Magic
         end
 
         class SacrificeChoice < Magic::Choice::SacrificePermanent
-          def resolve!(**args)
-            super(**args)
+          def resolve!(sacrifice: nil)
+            super
             trigger_effect(:add_counter, counter_type: "+1/+1", target: actor, amount: 1)
           end
         end

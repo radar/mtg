@@ -17,6 +17,10 @@ module Magic
       end
 
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
+        def should_perform?
+          event.permanent == actor
+        end
+
         def call
           actor.add_counter("stun", amount: 6)
         end

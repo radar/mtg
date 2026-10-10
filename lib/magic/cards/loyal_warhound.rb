@@ -16,6 +16,7 @@ module Magic
             to_zone: :battlefield,
             enters_tapped: true,
             filter: ->(card) { card.basic_land? && card.any_type?("Plains") },
+            prompt: "Search your library for a basic Plains card. It enters the battlefield tapped.",
           )
         end
       end

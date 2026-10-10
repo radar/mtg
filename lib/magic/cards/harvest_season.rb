@@ -8,7 +8,8 @@ module Magic
       class Choice < Magic::Choice::SearchLibrary
         def initialize(actor:)
           super(actor: actor, to_zone: :battlefield, enters_tapped: true, filter: Filter[:basic_lands],
-                upto: actor.controller.creatures.tapped.count)
+                upto: actor.controller.creatures.tapped.count,
+                prompt: "Search your library for up to X basic land cards, where X is the number of tapped creatures you control. They enter the battlefield tapped.")
         end
       end
 

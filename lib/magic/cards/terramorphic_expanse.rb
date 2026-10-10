@@ -7,7 +7,8 @@ module Magic
     class TerramorphicExpanse < Card
       class BasicLandChoice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, to_zone: :battlefield, enters_tapped: true, filter: Filter[:basic_lands])
+          super(actor: actor, to_zone: :battlefield, enters_tapped: true, filter: Filter[:basic_lands],
+                prompt: "Search your library for a basic land card. It enters the battlefield tapped.")
         end
       end
 

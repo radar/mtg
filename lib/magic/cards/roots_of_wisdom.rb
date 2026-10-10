@@ -6,6 +6,8 @@ module Magic
 
     class RootsOfWisdom < Sorcery
       class ReturnChoice < Magic::Choice::SearchGraveyard
+        def prompt = "Return a land card or Elf card from your graveyard to your hand."
+
         def choices
           controller.graveyard.select { |card| card.land? || card.type?("Elf") }
         end

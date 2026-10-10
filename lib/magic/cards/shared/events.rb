@@ -34,6 +34,8 @@ module Magic
             game.add_effect(Effects::CounterSpell.new(source: source, **args))
           when :create_token
             game.add_effect(Effects::CreateToken.new(source: source, **args))
+          when :create_token_copy
+            game.add_effect(Effects::CreateTokenCopy.new(source: source, **args))
           when :deal_combat_damage
             game.add_effect(Effects::DealCombatDamage.new(source: source, **args))
           when :deal_damage

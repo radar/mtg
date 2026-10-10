@@ -18,6 +18,8 @@ module Magic
       class LandChoice < Magic::Choice
         attr_reader :choices
 
+        def prompt = "Return a land card from your graveyard to the battlefield."
+
         def initialize(actor:)
           @choices = actor.controller.graveyard.cards.lands
           super

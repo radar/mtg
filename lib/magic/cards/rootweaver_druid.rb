@@ -21,7 +21,7 @@ module Magic
         end
 
         # The searching opponent makes the decision, not the Druid's controller.
-        def controller = player
+        def chooser = player
 
         def choices = player.library.select(&:basic_land?)
 
@@ -69,7 +69,7 @@ module Magic
           @cards = cards
         end
 
-        def controller = player
+        def chooser = player
 
         # Picking among their own cards, not targeting.
         def targets? = false

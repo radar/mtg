@@ -11,7 +11,8 @@ module Magic
     class MaestrosTheater < Card
       class LandChoice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, to_zone: :battlefield, enters_tapped: true, filter: Filter[:basic_lands])
+          super(actor: actor, to_zone: :battlefield, enters_tapped: true, filter: Filter[:basic_lands],
+                prompt: "Search your library for a basic Island, Swamp or Mountain card. It enters the battlefield tapped, then you gain 1 life.")
         end
 
         def choices

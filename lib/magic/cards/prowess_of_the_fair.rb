@@ -14,6 +14,8 @@ module Magic
       end
 
       class CreateTokenChoice < Magic::Choice::May
+        def prompt = "Create a 1/1 green Elf Warrior creature token?"
+
         def resolve!
           actor.trigger_effect(:create_token, token_class: ElfWarriorToken)
         end

@@ -20,6 +20,8 @@ module Magic
           super(actor: actor, to_zone: :battlefield, enters_tapped: true, upto: 2, filter: Filter[:basic_lands])
         end
 
+        def prompt = "Search your library for up to two basic land cards that share a land type. They enter the battlefield tapped."
+
         def resolve!(targets:)
           targets = Array(targets)
           if targets.size == 2 && BASIC_LAND_TYPES.none? { |type| targets.all? { _1.type?(type) } }

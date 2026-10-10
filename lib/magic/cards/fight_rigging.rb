@@ -10,6 +10,8 @@ module Magic
       class HideawayChoice < Magic::Choice::Targeted
         attr_reader :choices
 
+        def prompt = "Hideaway 5: exile one of the top five cards of your library face down. The rest go on the bottom in a random order."
+
         def initialize(actor:, cards:)
           @choices = cards
           super(actor: actor)
@@ -38,6 +40,8 @@ module Magic
       # You may play the exiled card without paying its mana cost. It isn't the
       # main phase, so a land can't be played.
       class PlayExiledCardChoice < Magic::Choice::May
+        def prompt = "Cast the exiled card without paying its mana cost?"
+
         def resolve!
           actor.exiled_cards.nonland.each do |card|
             actor.remove_from_exile(card)
@@ -52,6 +56,8 @@ module Magic
         end
 
         class TargetChoice < Magic::Choice::Targeted
+          def prompt = "Put a +1/+1 counter on target creature you control."
+
           def choices = battlefield.controlled_by(controller).creatures
 
           def choice_amount = 1

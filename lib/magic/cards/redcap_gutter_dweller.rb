@@ -27,8 +27,8 @@ module Magic
 
       class UpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         class SacrificeChoice < Magic::Choice::SacrificePermanent
-          def resolve!(**args)
-            super(**args)
+          def resolve!(sacrifice: nil)
+            super
             trigger_effect(:add_counter, counter_type: "+1/+1", target: actor, amount: 1)
             if (top = controller.library.first)
               trigger_effect(:exile, target: top)

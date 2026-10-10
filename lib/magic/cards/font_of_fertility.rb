@@ -12,7 +12,8 @@ module Magic
             actor: actor,
             to_zone: :battlefield,
             enters_tapped: true,
-            filter: Filter[:basic_lands]
+            filter: Filter[:basic_lands],
+            prompt: "Search your library for a basic land card. It enters the battlefield tapped."
           )
         end
       end

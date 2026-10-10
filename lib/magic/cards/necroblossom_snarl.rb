@@ -8,6 +8,8 @@ module Magic
       def enters_tapped? = true
 
       class RevealChoice < Magic::Choice::Targeted
+        def prompt = "Reveal a Swamp or Forest card from your hand."
+
         def choices = hand.lands.by_any_type("Swamp", "Forest")
         def choice_amount = 1
 
@@ -18,6 +20,8 @@ module Magic
       end
 
       class MayRevealChoice < Magic::Choice::May
+        def prompt = "Reveal a Swamp or Forest card from your hand to have Necroblossom Snarl enter untapped?"
+
         def resolve!
           game.choices.add(RevealChoice.new(actor: actor))
         end

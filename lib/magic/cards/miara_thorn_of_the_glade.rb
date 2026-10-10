@@ -10,6 +10,8 @@ module Magic
     class MiaraThornOfTheGlade < Creature
       # "you may pay {1} and 1 life. If you do, draw a card." (Can't pay life you don't have.)
       class MayPayChoice < Magic::Choice::May
+        def prompt = "Pay {1} and 1 life to draw a card?"
+
         # What a UI pays on the player's behalf: {1} (the life is paid as the choice resolves).
         def payment_cost(_x = nil) = { generic: 1 }
 

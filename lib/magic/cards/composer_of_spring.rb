@@ -26,6 +26,8 @@ module Magic
       end
 
       class LandChoice < Magic::Choice::May
+        def prompt = "Put a land card from your hand onto the battlefield tapped?"
+
         def choices
           hand.lands
         end
@@ -36,6 +38,8 @@ module Magic
       end
 
       class LandOrCreatureChoice < Magic::Choice::May
+        def prompt = "Put a land or creature card from your hand onto the battlefield tapped?"
+
         def choices
           hand.lands + hand.creatures
         end

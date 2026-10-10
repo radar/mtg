@@ -23,6 +23,8 @@ module Magic
       class GraveyardChoice < Magic::Choice::May
         attr_reader :choices
 
+        def prompt = "Exile up to one non-Aura enchantment card from your graveyard to create a 3/3 black Zombie token copy of it."
+
         def initialize(actor:)
           @choices = actor.controller.graveyard.cards.enchantments
             .reject { |card| card.is_a?(Cards::Aura) }

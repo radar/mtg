@@ -9,6 +9,13 @@ module Magic
 
     class RuthlessWinnower < Creature
       class SacrificeChoice < Magic::Choice::Targeted
+        attr_reader :player
+
+        # The player sacrificing makes the choice, not Ruthless Winnower's controller.
+        def chooser = player
+
+        def prompt = "Sacrifice a non-Elf creature."
+
         def initialize(actor:, player:)
           @player = player
           super(actor: actor)

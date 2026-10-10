@@ -46,6 +46,8 @@ module Magic
         end
 
         class Choice < Magic::Choice::MoveToBattlefield
+          def prompt = "Put any number of land cards from your hand onto the battlefield tapped."
+
           def choices
             lands = hand.lands
             Magic::Targets::Choices.new(amount: 0..lands.count, choices: lands)

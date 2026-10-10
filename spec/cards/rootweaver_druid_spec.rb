@@ -42,7 +42,7 @@ RSpec.describe Magic::Cards::RootweaverDruid do
 
     it "asks the opponent which one goes under your control, before any land is put onto the battlefield" do
       expect(choice).to be_a(Magic::Cards::RootweaverDruid::GiveChoice)
-      expect(choice.controller).to eq(p2)
+      expect(choice.chooser).to eq(p2)
       expect(choice.choices).to match_array(lands)
       expect(choice.prompt).to include("under #{p1.name}'s control")
       expect(p1.permanents.lands + p2.permanents.lands).to be_empty
