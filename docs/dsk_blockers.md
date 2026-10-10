@@ -36,3 +36,4 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Niko, Light of Hope: needs Shard tokens that later "become copies" of an exiled creature until the next end step, plus a blink returning at the next end step; the engine has no temporary become-a-copy effect for existing permanents.
 - The Rollercrusher Ride: "deals X damage to each of up to X target creatures" needs a variable-count ("up to X") target list (same gap as Cathartic Parting).
 - The Tale of Tamiyo: chapter IV exiles cards from the graveyard, copies them as spells and casts the copies, and the mill-and-repeat chapters need shared-type checks on milled cards; the engine has no copy-a-card-and-cast-the-copy support.
+- Break Down the Door: the third mode is manifest dread, which needs face-down 2/2 permanents; the engine has no face-down permanent support (same gap as Manifest Dread).
