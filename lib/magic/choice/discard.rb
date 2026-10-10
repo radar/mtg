@@ -3,6 +3,8 @@ module Magic
     class Discard < Magic::Choice
       attr_reader :player, :cards, :amount
 
+      def chooser = player
+
       # `actor` is optional (nil by default) for existing callers that never subclass
       # this to run a follow-up effect ("discard a card. If you do, X") and so never
       # need `game`/`controller`/`trigger_effect` on the choice itself.

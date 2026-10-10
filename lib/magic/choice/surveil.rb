@@ -10,11 +10,11 @@ module Magic
       end
 
       def choices
-        controller.library.first(amount)
+        chooser.library.first(amount)
       end
 
       def resolve!(graveyard: [], top: [])
-        controller.surveil(amount:, graveyard:, top:)
+        chooser.surveil(amount:, graveyard:, top:)
       end
     end
   end

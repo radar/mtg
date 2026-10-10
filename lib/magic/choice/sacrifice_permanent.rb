@@ -15,7 +15,7 @@ module Magic
       end
 
       def candidates
-        controller.permanents.select { _1.type?(type) && !(other && _1 == actor) }
+        chooser.permanents.select { _1.type?(type) && !(other && _1 == actor) }
       end
 
       def resolve!(sacrifice: nil)

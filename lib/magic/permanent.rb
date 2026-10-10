@@ -36,8 +36,11 @@ module Magic
     # Set by ContinuousEffects from Abilities::Static::CharacteristicSetting.
     attr_accessor :color_override, :lost_all_abilities_by_effect
 
-    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :additional_lands_per_turn, :power_modification, :toughness_modification, :type_grants
+    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :toughness_modification, :type_grants
     def_delegators :@game, :logger
+
+    # What this permanent adds to the creature it's attached to. Each hone counter on an Equipment grants +1/+0.
+    def power_modification = @card.power_modification + counters.of_type(Counters::Hone).count
 
     class Protections < SimpleDelegator
       def player
@@ -536,7 +539,28 @@ module Magic
     def static_abilities
       return [] if lost_all_abilities?
 
-      face.static_abilities.map { |ability| ability.new(source: self) }
+      (face.static_abilities + station_static_abilities).map { |ability| ability.new(source: self) }
+    end
+
+    def charge_counters = counters.of_type(Counters::Charge).size
+
+    # The "N+ |" lines of a Spacecraft (see Cards::Spacecraft) that its charge counters have reached.
+    def station_levels_reached
+      return [] unless card.respond_to?(:station_levels)
+
+      card.station_levels.select { |level| charge_counters >= level.threshold }
+    end
+
+    def additional_lands_per_turn
+      card.additional_lands_per_turn + station_levels_reached.sum(&:additional_lands)
+    end
+
+    def station_static_abilities
+      return [] unless card.respond_to?(:station_levels)
+
+      creature_at = card.station_creature_threshold
+      creature = creature_at && charge_counters >= creature_at ? [Abilities::Static::StationCreature] : []
+      station_levels_reached.flat_map(&:static_abilities) + creature
     end
 
     # "It loses all abilities": its own keywords, activated, triggered, static and
@@ -645,8 +669,13 @@ module Magic
 
     # "Attacks each combat if able."
     def must_attack?
-      (!lost_all_abilities? && face.must_attack?) || goaded? || attachments.any? { _1.card.forces_enchanted_to_attack? } ||
+      (!lost_all_abilities? && face.must_attack?) || goaded? || @must_attack_turn == game.current_turn.number || attachments.any? { _1.card.forces_enchanted_to_attack? } ||
         game.battlefield.static_abilities.of_type(Abilities::Static::MustAttack).any? { _1.applies_to?(self) }
+    end
+
+    # "...attacks that opponent this turn if able" (Encore). With one opponent, which player it attacks changes nothing.
+    def must_attack_this_turn!
+      @must_attack_turn = game.current_turn.number
     end
 
     # Goaded by an Aura ("Enchanted creature ... is goaded"): attacks each combat if able. With one opponent, "attacks a
@@ -796,11 +825,12 @@ module Magic
     # Fires +trigger_class+ for this permanent (queued or run at once), counting
     # trigger doublers. Public for triggers the engine adds itself (offspring).
     def perform_trigger!(trigger_class, event)
-      additional_triggers = game.battlefield.static_abilities
+      doublers = game.battlefield.static_abilities
         .of_type(Abilities::Static::TriggeredAbilityDoubler)
-        .count { |doubler| doubler.doubles_trigger_for?(self, event) }
+        .select { |doubler| doubler.doubles_trigger_for?(self, event) }
+      doublers.each { |doubler| game.notify!(Events::TriggerDoubled.new(source: doubler.source, permanent: self)) }
 
-      (1 + additional_triggers).times do
+      (1 + doublers.size).times do
         ability = trigger_class.new(actor: self, event: event)
         next unless ability.trigger!
 

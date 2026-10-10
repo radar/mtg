@@ -7,6 +7,8 @@ module Magic
     class LoseLifeUnless < Magic::Choice::May
       attr_reader :player, :life, :discard, :sacrifice
 
+      def chooser = player
+
       def initialize(actor:, player:, life:, discard: false, sacrifice: false)
         super(actor: actor)
         @player = player

@@ -10,7 +10,7 @@ module Magic
           legal = super
           return legal unless targets? && legal.respond_to?(:select)
 
-          legal.select { |target| Targetable.targetable_by?(target, source: actor, controller: controller) }
+          legal.select { |target| Targetable.targetable_by?(target, source: actor, controller: chooser) }
         end
       end
 

@@ -13,9 +13,14 @@ module Magic
 
     def controller = actor.controller
     def game = actor.game
-    def hand = controller.hand
-    def graveyard = controller.graveyard
-    def library = controller.library
+
+    # The player who makes this choice. Usually the actor's controller; a choice overrides it when someone else decides
+    # (the opponent sacrificing to Ruthless Winnower, the caster paying for Mystic Remora).
+    def chooser = actor.controller
+
+    def hand = chooser.hand
+    def graveyard = chooser.graveyard
+    def library = chooser.library
 
     # The text a UI shows the player; nil lets the UI fall back to a generic one.
     def prompt = nil

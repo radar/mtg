@@ -30,8 +30,13 @@ module Magic
             Sacrifice.new(source, source.controller.creatures)
           when /\ASacrifice a land\z/
             Sacrifice.new(source, source.controller.lands)
+          when /\AReturn two lands you control to their owner's hand\z/
+            ReturnLands.new(source, 2)
           when /\ASacrifice a Treasure\z/
             Sacrifice.new(source, source.controller.permanents.select { _1.type?("Treasure") })
+          when /\ASacrifice another (?<type>[A-Z][\w-]*)\z/
+            # "Sacrifice another Goblin": a creature of that type other than the source.
+            SacrificeAnother.new(source, source.controller.creatures.by_type($~[:type]).reject { _1 == source })
           when /\ASacrifice an? (?<type>[A-Z][\w-]*)\z/
             # "Sacrifice an Elf": a creature of that type, which may be the source itself.
             Sacrifice.new(source, source.controller.creatures.by_type($~[:type]))
@@ -45,6 +50,8 @@ module Magic
             SelfSacrifice.new(source)
           when /Exile {this}/
             SelfExile.new(source)
+          when /\ADiscard {this}\z/
+            SelfDiscard.new(source)
           when /\ADiscard your hand\z/
             DiscardHand.new(source)
           when /Discard a card/

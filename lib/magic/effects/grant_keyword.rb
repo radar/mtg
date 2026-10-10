@@ -10,7 +10,9 @@ module Magic
 
 
       def resolve!
-        target.grant_keyword(Keywords.one(keyword))
+        granted = Keywords.one(keyword)
+        target.grant_keyword(granted)
+        game.notify!(Events::KeywordGranted.new(source: source, target: target, keyword: granted))
       end
     end
   end

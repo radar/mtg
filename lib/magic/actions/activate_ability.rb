@@ -1,7 +1,7 @@
 module Magic
   module Actions
     class ActivateAbility < Action
-      attr_reader :ability, :costs, :targets, :sacrificed
+      attr_reader :ability, :costs, :targets, :sacrificed, :tapped
 
       def initialize(ability:, **args)
         @ability = ability
@@ -94,8 +94,11 @@ module Magic
         pay(:tap, target)
       end
 
+      # What was tapped is passed to `resolve!(tapped:)` for abilities that care about it (Station counts its power).
       def pay_multi_tap(targets)
         pay(:multi_tap, targets)
+        @tapped = Array(targets)
+        self
       end
 
       # What was sacrificed is passed to `resolve!(sacrificed:)` for abilities that care about it (Demon of Fate's Design).
@@ -104,12 +107,20 @@ module Magic
         @sacrificed = Array(targets)
       end
 
+      def pay_return_lands(lands)
+        pay(:return_lands, lands)
+      end
+
       def pay_self_sacrifice
         pay(:self_sacrifice)
       end
 
       def pay_self_exile
         pay(:self_exile)
+      end
+
+      def pay_self_discard
+        pay(:self_discard)
       end
 
       def pay_discard(targets)
@@ -143,10 +154,14 @@ module Magic
           Costs::Blight
         when :sacrifice
           Costs::Sacrifice
+        when :return_lands
+          Costs::ReturnLands
         when :self_sacrifice
           Costs::SelfSacrifice
         when :self_exile
           Costs::SelfExile
+        when :self_discard
+          Costs::SelfDiscard
         else
           raise "unknown cost type: #{cost_type}"
         end
@@ -190,7 +205,7 @@ module Magic
       end
 
       def resolve!
-        resolve_with_args(ability, target: targets.first, targets: targets, sacrificed: sacrificed)
+        resolve_with_args(ability, target: targets.first, targets: targets, sacrificed: sacrificed, tapped: tapped)
       end
     end
   end

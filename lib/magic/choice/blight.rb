@@ -5,6 +5,8 @@ module Magic
     class Blight < Targeted
       attr_reader :amount, :player
 
+      def chooser = player
+
       def self.possible?(player, game) = game.battlefield.controlled_by(player).creatures.any?
 
       def initialize(actor:, amount:, player: actor.controller)

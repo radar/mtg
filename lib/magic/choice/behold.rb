@@ -15,7 +15,7 @@ module Magic
 
       # Permanents of the type you control, then cards of the type in your hand.
       def candidates
-        [*controller.permanents.select { _1.type?(type) }, *hand.cards.select { _1.type?(type) }]
+        [*chooser.permanents.select { _1.type?(type) }, *hand.cards.select { _1.type?(type) }]
       end
 
       def resolve!(beheld: nil)

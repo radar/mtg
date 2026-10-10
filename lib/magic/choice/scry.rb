@@ -9,12 +9,14 @@ module Magic
         super(actor: actor)
       end
 
+      def prompt = "Scry #{amount}: put any number of the top #{amount == 1 ? 'card' : "#{amount} cards"} of your library on the bottom and the rest on top in any order."
+
       def choices
-        controller.library.first(amount)
+        chooser.library.first(amount)
       end
 
       def resolve!(top: [], bottom: [])
-        controller.scry(amount:, top:, bottom:)
+        chooser.scry(amount:, top:, bottom:)
       end
     end
   end

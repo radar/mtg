@@ -7,15 +7,15 @@ module Magic
     class PayX < Magic::Choice::May
       attr_reader :x
 
-      def can_pay? = Costs::Mana.new(generic: 1).can_pay?(controller)
+      def can_pay? = Costs::Mana.new(generic: 1).can_pay?(chooser)
 
       def resolve!(x: 0)
         @x = x
         return if x.zero?
 
         cost = Costs::Mana.new(generic: x)
-        cost.auto_pay(player: controller)
-        cost.finalize!(controller)
+        cost.auto_pay(player: chooser)
+        cost.finalize!(chooser)
       end
     end
   end

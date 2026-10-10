@@ -3,8 +3,9 @@ module Magic
     class SearchLibrary < Choice
       extend TargetNormalizer
 
-      attr_reader :enters_tapped, :reveal, :to_zone, :choices, :upto
-      def initialize(actor:, filter:, enters_tapped: false, reveal: false, upto: 1, to_zone:)
+      attr_reader :enters_tapped, :reveal, :to_zone, :choices, :upto, :prompt
+      def initialize(actor:, filter:, enters_tapped: false, reveal: false, upto: 1, to_zone:, prompt: nil)
+        @prompt = prompt
         @upto = upto
         @reveal = reveal
         @to_zone = to_zone
@@ -32,10 +33,10 @@ module Magic
         when :top
           # "...then shuffle and put that card on top": shuffle first, then move it to the top.
           trigger_effect(:reveal_cards, target: targets) if reveal
-          controller.shuffle!
-          targets.each { |target| target.move_zone!(to: controller.library) }
+          chooser.shuffle!
+          targets.each { |target| target.move_zone!(to: chooser.library) }
           return targets
-        end.tap { controller.shuffle! }
+        end.tap { chooser.shuffle! }
       end
 
       normalize_targets :resolve!

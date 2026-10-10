@@ -13,7 +13,7 @@ module Magic
         super(actor: player)
       end
 
-      def controller = @player
+      def chooser = @player
       def choices = triggers
       def choice_amount = 1
 

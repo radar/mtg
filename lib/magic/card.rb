@@ -438,6 +438,12 @@ module Magic
       []
     end
 
+    # Abilities a card activates from its owner's hand (Channel, "{1}{G}, Discard this card: ..."), as instances:
+    # `[ChannelAbility.new(source: self)]`.
+    def hand_abilities
+      []
+    end
+
     def etb_triggers
       []
     end
