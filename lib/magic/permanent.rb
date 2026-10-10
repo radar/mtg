@@ -92,6 +92,9 @@ module Magic
       if cast && card_zone&.hand?
         card.entering_counters_if_cast_from_hand.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       end
+      if cast && card_zone&.graveyard?
+        card.entering_counters_if_cast_from_graveyard.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
+      end
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       add_additional_counters_for_entering(game:, permanent:) if card.creature?
       move_card_to_battlefield(game:, card:, permanent:, from: card_zone)

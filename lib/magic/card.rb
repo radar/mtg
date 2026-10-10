@@ -404,6 +404,11 @@ module Magic
       {}
     end
 
+    # Counters it enters with only when cast from the graveyard (Undead Sprinter).
+    def entering_counters_if_cast_from_graveyard
+      {}
+    end
+
     def activated_abilities
       []
     end
