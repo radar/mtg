@@ -23,7 +23,7 @@ module Magic
     end
 
     def call
-      [*castable_spells, *playable_lands, *cyclable_cards, *unlockable_doors, *activatable_abilities, *activatable_loyalty_abilities,
+      [*castable_spells, *playable_lands, *cyclable_cards, *unlockable_doors, *turnable_face_up, *activatable_abilities, *activatable_loyalty_abilities,
        *declarable_attackers, *declarable_blockers, nil]
     end
 
@@ -69,6 +69,10 @@ module Magic
       player.permanents.select(&:room?).flat_map do |room|
         room.card.locked_doors.filter_map { |door| keep(Actions::UnlockDoor.new(game: game, player: player, permanent: room, door: door)) }
       end
+    end
+
+    def turnable_face_up
+      player.permanents.select(&:face_down?).filter_map { |permanent| keep(Actions::TurnFaceUp.new(game: game, player: player, permanent: permanent)) }
     end
 
     def activatable_abilities

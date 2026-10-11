@@ -290,6 +290,12 @@ module Magic
       add_choice(Choice::RingBearer.new(player: player)) if player.creatures.any?
     end
 
+    # Rule 701.40: puts +card+ onto the battlefield face down as a 2/2 creature under +controller+'s control. It can be
+    # turned face up for its mana cost if it's a creature card (`Actions::TurnFaceUp`).
+    def manifest!(card, controller: card.owner)
+      Permanent.resolve(game: self, card: card, from_zone: card.zone, cast: false, controller: controller, face_down: true)
+    end
+
     # `find` is a card type ("Forest"), a `Filter[...]` name (`:basic_lands`) or a lambda taking a card.
     def search_library(actor, find:, to:, tapped: false, upto: 1, reveal: false, prompt: nil)
       noun, filter = case find

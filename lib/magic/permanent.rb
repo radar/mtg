@@ -64,7 +64,8 @@ module Magic
     # The number of the turn during which the current controller gained control of this permanent.
     attr_accessor :controlled_since_turn
 
-    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false, value_for_x: nil)
+    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false, value_for_x: nil, face_down: false)
+      enters_tapped = false if face_down
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:, controller:)
       card_zone = card.zone unless token || copy
       card.begin_entering! if card.is_a?(Cards::Room)
@@ -78,26 +79,29 @@ module Magic
         cast: cast,
         token: token,
         copy: copy,
+        face_down: face_down,
       )
       permanent.mana_spent = mana_spent
       permanent.x_value = value_for_x
-      permanent.copy_choice_pending = card.enters_as_copy?
+      permanent.copy_choice_pending = card.enters_as_copy? && !face_down
       permanent.evoked = evoked
 
+      # A face-down permanent has no abilities, so none of the card's "enters with counters" apply.
+      entering = permanent.face
       permanent.entered_from_zone = card_zone
       permanent.tap! if enters_tapped
       permanent.attach_to!(attach_to) if attach_to
-      card.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
+      entering.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       # "enters with X +1/+1 counters" (Jacked Rabbit's ravenous): the X it was cast with.
-      card.entering_counters_for_x(value_for_x.to_i).each { |counter_type, amount| permanent.add_counter(counter_type, amount:) } if value_for_x
+      entering.entering_counters_for_x(value_for_x.to_i).each { |counter_type, amount| permanent.add_counter(counter_type, amount:) } if value_for_x
       if cast && card_zone&.hand?
-        card.entering_counters_if_cast_from_hand.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
+        entering.entering_counters_if_cast_from_hand.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       end
       if cast && card_zone&.graveyard?
-        card.entering_counters_if_cast_from_graveyard.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
+        entering.entering_counters_if_cast_from_graveyard.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       end
       permanent.move_zone!(from: from_zone, to: game.battlefield)
-      add_additional_counters_for_entering(game:, permanent:) if card.creature?
+      add_additional_counters_for_entering(game:, permanent:) if entering.creature?
       move_card_to_battlefield(game:, card:, permanent:, from: card_zone)
       permanent.announce_unlocked_doors! if card.is_a?(Cards::Room)
       permanent
@@ -139,7 +143,7 @@ module Magic
 
     def self.static_abilities(game, type) = game.battlefield.static_abilities.of_type(type)
 
-    def initialize(game:, owner:, card:, controller: owner, token: false, cast: true, kicked: false, copy: false, timestamp: Permanents::ContinuousEffect.next_timestamp)
+    def initialize(game:, owner:, card:, controller: owner, token: false, cast: true, kicked: false, copy: false, face_down: false, timestamp: Permanents::ContinuousEffect.next_timestamp)
       @game = game
       @owner = owner
       @controller = controller
@@ -148,20 +152,22 @@ module Magic
       @cast = cast
       @kicked = kicked
       @copy = copy
-      @base_types = card.types
+      @face_down = face_down
+      @entered_face_down = face_down
+      @base_types = face.types
       @attachments = []
       @turn_triggers = {}
       @turn_replacements = []
       @modifiers = []
       @tapped = false
-      @types = card.types
-      @keyword_grants = card.keyword_grants
-      @keywords = card.keywords.dup
-      @activated_abilities = card.activated_abilities
+      @types = face.types
+      @keyword_grants = face.keyword_grants
+      @keywords = face.keywords.dup
+      @activated_abilities = face.activated_abilities
       @counters = Counters::Collection.new([])
       @damage = 0
       @regeneration_shields = 0
-      @protections = Protections.new(card.protections.dup)
+      @protections = Protections.new(face.protections.dup)
       @exiled_cards = Magic::CardList.new([])
       @pending_mana_ability_uses = 0
       @phased_out = false
@@ -175,12 +181,44 @@ module Magic
     end
 
     # The face of a double-faced card that's currently up (the card itself when it isn't
-    # double-faced or hasn't transformed). Its characteristics and abilities are the permanent's.
+    # double-faced or hasn't transformed). Its characteristics and abilities are the permanent's. A face-down permanent
+    # (manifest dread) is a bare 2/2 creature: its face is a `Cards::FaceDownCreature`, whatever the card is.
     def face
+      return face_down_card if face_down?
+
       @transformed ? card.back_face : card
     end
 
     def transformed? = @transformed || false
+
+    def face_down? = @face_down || false
+
+    # Whether it entered the battlefield face down (still true after it is turned face up).
+    def entered_face_down? = @entered_face_down || false
+
+    def face_down_card
+      @face_down_card ||= Cards::FaceDownCreature.new(game: game, owner: owner)
+    end
+
+    # Rule 701.40f / 708.8: the permanent's controller may turn it face up at any time they have priority, for its mana
+    # cost if it's a creature card. `Actions::TurnFaceUp` does that; this is the turning itself. A static ability
+    # answering `prevents_turning_face_up?(permanent)` (Unable to Scream) stops it. Fires `Events::TurnedFaceUp`.
+    def turn_face_up!
+      return false unless can_be_turned_face_up?
+
+      @face_down = false
+      @base_types = face.types
+      @keyword_grants = face.keyword_grants
+      @activated_abilities = face.activated_abilities
+      @state_triggered_abilities = nil
+      apply_continuous_effects!
+      game.notify!(Events::TurnedFaceUp.new(permanent: self))
+      true
+    end
+
+    def can_be_turned_face_up?
+      face_down? && game.battlefield.static_abilities.none? { _1.respond_to?(:prevents_turning_face_up?) && _1.prevents_turning_face_up?(self) }
+    end
 
     # Free-form per-permanent state for cards that level up or remember something (Figure of Fable).
     def state = (@state ||= {})
@@ -292,7 +330,7 @@ module Magic
     end
 
     def state_triggered_abilities
-      @state_triggered_abilities ||= card.state_triggered_abilities.map { |ability| ability.new(source: self) }
+      @state_triggered_abilities ||= face.state_triggered_abilities.map { |ability| ability.new(source: self) }
     end
 
     alias_method :to_s, :inspect
@@ -371,7 +409,7 @@ module Magic
     def replacement_effect_for(context)
       return nil if lost_all_abilities?
 
-      (card.replacement_effects.to_a + @turn_replacements).each do |matcher, replacement_effect|
+      (face.replacement_effects.to_a + @turn_replacements).each do |matcher, replacement_effect|
         next unless replacement_matcher_applies?(matcher, context.effect)
 
         replacement_key = [object_id, replacement_effect]
@@ -696,7 +734,7 @@ module Magic
     end
 
     def can_activate_ability?(ability)
-      card.can_activate_ability?(ability) && attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
+      face.can_activate_ability?(ability) && attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
     end
 
     # Can `source` (a card, permanent or token) target this permanent when `controller` is the
@@ -724,7 +762,7 @@ module Magic
     end
 
     def can_attack?
-      (lost_all_abilities? || card.can_attack?) && attachments.all?(&:can_attack?)
+      (lost_all_abilities? || face.can_attack?) && attachments.all?(&:can_attack?)
     end
 
     def can_block?(permanent)

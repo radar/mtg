@@ -106,6 +106,15 @@ This does **not** yet let a player respond to a trigger with an instant — that
 
 `Permanent#destroy!` is the replacement point: indestructible returns false, then a regeneration shield (`regenerate!` adds one; `regenerated!` spends it: tap, clear damage and `@marked_for_death`, `CombatPhase#remove_from_combat`, fire `Events::Regenerated`) returns false too. Both also cover SBA lethal damage/deathtouch since it calls `destroy!`. Shields reset in `Permanent#cleanup!`. `put_into_graveyard!`/`sacrifice!` bypass both. Protection prevents damage in `TargetedEffect#damage_prevented?` (used by `DealDamage`, `DealCombatDamage`), which resolves an ability source to its permanent. "Can't be regenerated" is not modelled.
 
+## Face-down permanents (manifest, manifest dread)
+
+A face-down permanent is a normal `Permanent` whose `face` is a `Cards::FaceDownCreature` (a 2/2 colourless creature with no name, cost, abilities or subtypes) while `card` stays the real card, so it goes to the graveyard as itself. Everything that reads characteristics or abilities through `face`/`copiable_card` (types, keywords, triggers, static and replacement abilities, `can_attack?`) sees the blank 2/2.
+
+- **Manifest**: `game.manifest!(card, controller:)` is `Permanent.resolve(..., face_down: true)`. It enters untapped, with no ETB trigger and none of the card's "enters with counters". `permanent.entered_face_down?` stays true after it is turned up (Oblivious Bookworm).
+- **Manifest dread**: `Magic::Choice::ManifestDread.perform(actor:, player: actor.controller)` looks at the top two cards. With two it adds the choice (`game.resolve_choice!(target: card)`: that one goes face down, the other to the graveyard), with one it manifests it, with none nothing happens. `player:` is "its controller manifests dread" (Unwanted Remake).
+- **Turning face up**: `player.turn_face_up(permanent:) { |a| a.pay_mana(...) }` runs `Actions::TurnFaceUp` (special action, no stack) and pays the creature card's mana cost; a non-creature card can't be turned up. `Permanent#turn_face_up!` swaps `face` back, recomputes characteristics, keeps counters/damage/tapped state and fires `Events::TurnedFaceUp` (not an enters-the-battlefield event). A static ability answering `prevents_turning_face_up?(permanent)` stops it (Unable to Scream).
+- `Permanent#face_down?`, `LegalActions` offers `TurnFaceUp` when affordable. Hidden information (the opponent not seeing the card) is not modelled.
+
 ## Rooms (doors)
 
 A Room is `Cards::Room` with two `Room::Door` half-cards (`doors LeftDoor, RightDoor` names it "A // B"; see `spec/game/room_spec.rb` for a full example). Spec constant lookup strips non-letters, so `Card("Test Parlor Test Cellar")` finds it. Each door is an ordinary card class: own `card_name`, `cost`, `static_abilities`, `activated_abilities`, `event_handlers`, etc. The Room delegates those lists to its *unlocked* doors, so a locked door has no abilities.

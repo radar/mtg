@@ -81,6 +81,12 @@ module Magic
       game.take_action(action)
     end
 
+    # Pays a face-down creature card's mana cost to turn it face up.
+    def turn_face_up(permanent:, **args, &block)
+      action = prepare_action(Magic::Actions::TurnFaceUp, permanent: permanent, **args, &block)
+      game.take_action(action)
+    end
+
     def prepare_activate_ability(ability:, **args, &block)
       prepare_action(Magic::Actions::ActivateAbility, ability: ability, **args)
     end
