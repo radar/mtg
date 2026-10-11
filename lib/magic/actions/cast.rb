@@ -20,11 +20,15 @@ module Magic
       #   (see #harmonize_tap) and exiles the spell after it resolves
       # @param pay_life [Boolean] When true, pays life equal to the card's mana value rather than its mana cost, if a
       #   static ability allows that for this card (`may_pay_life_for?`: Demon of Fate's Design)
-      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, evoked: false, adventure: false, alternative: false, by_effect: false, harmonize: false, pay_life: false, door: nil, **args)
+      # @param pay_nothing [Boolean] When true, pays {0} rather than the card's mana cost, if a static ability allows that
+      #   for this card (`may_pay_nothing_for?(card, player)`: Warped Space). It answers `paid_nothing_for_spell!` once
+      #   the spell is cast.
+      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, evoked: false, adventure: false, alternative: false, by_effect: false, harmonize: false, pay_life: false, pay_nothing: false, door: nil, **args)
         super(**args)
         @card = card
         @door = door && card.door(door)
         @pay_life = pay_life
+        @pay_nothing = pay_nothing
         @stack_size_at_start = game.stack.count
         @targets = []
         @modes = []
@@ -87,7 +91,7 @@ module Magic
             cost = @door.cost
           elsif @alternative
             cost = card.alternative_cost
-          elsif free_from_exile? || pays_life_instead?
+          elsif free_from_exile? || pays_life_instead? || pays_nothing_instead?
             cost = Costs::Mana.new({})
           else
             cost = card.cost
@@ -134,6 +138,14 @@ module Magic
         return true if card.zone&.exile? && game.play_permissions.pay_life?(card, player)
 
         card.zone&.library? ? static_ability_allows?(:pays_life_for?) : false
+      end
+
+      # "You may pay {0} rather than pay the mana cost" (Warped Space), chosen by casting with `pay_nothing: true`.
+      def pays_nothing_instead?
+        return false if @flashback || @harmonize || @blitz || @evoked || @adventure || @alternative || @door
+        return false if @pay_life
+
+        @pay_nothing && static_ability_allows?(:may_pay_nothing_for?)
       end
 
       # Whether this spell could be cast by paying life (an optional alternative cost, unlike Bolas's Citadel's).
@@ -499,6 +511,9 @@ module Magic
           if @pay_life
             game.battlefield.static_abilities.each { _1.paid_life_for_spell!(card, player) if _1.respond_to?(:paid_life_for_spell!) }
           end
+        end
+        if pays_nothing_instead?
+          game.battlefield.static_abilities.each { _1.paid_nothing_for_spell!(card, player) if _1.respond_to?(:paid_nothing_for_spell!) }
         end
         mana_cost.finalize!(player)
         @paid_additional_costs.each { |cost| cost.finalize!(player) if cost.is_a?(Costs::PayLife) }
