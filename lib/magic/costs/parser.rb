@@ -36,6 +36,8 @@ module Magic
             ReturnLands.new(source, 2)
           when /\ASacrifice a Treasure\z/
             Sacrifice.new(source, source.controller.permanents.select { _1.type?("Treasure") })
+          when /\ASacrifice a Room\z/
+            Sacrifice.new(source, source.controller.rooms)
           when /\ASacrifice another (?<type>[A-Z][\w-]*)\z/
             # "Sacrifice another Goblin": a creature of that type other than the source.
             SacrificeAnother.new(source, source.controller.creatures.by_type($~[:type]).reject { _1 == source })
