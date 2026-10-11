@@ -2,6 +2,9 @@ module Magic
   module Actions
     # Special action (rule 116.2k): pay a locked door's mana cost to unlock it, any time you could cast a sorcery.
     class UnlockDoor < Action
+      # What unlock mana is being spent on, as `Costs::Mana#for_use` (for "spend this mana only to unlock a door").
+      Use = Data.define(:permanent, :door)
+
       attr_reader :permanent, :door
 
       def initialize(permanent:, door:, **args)
@@ -20,7 +23,7 @@ module Magic
       # answering `unlock_cost_adjustment(door, player)` with a hash such as `{ generic: -1 }`, or nil).
       def mana_cost
         @mana_cost ||= Costs::Mana.new(door.cost.cost.dup).tap do |cost|
-          cost.for_use = permanent.card
+          cost.for_use = Use.new(permanent: permanent, door: door)
           game.battlefield.static_abilities.each do |ability|
             next unless ability.respond_to?(:unlock_cost_adjustment)
 

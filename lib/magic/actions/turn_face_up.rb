@@ -4,6 +4,10 @@ module Magic
     # manifested creature card the price is its mana cost (rule 701.40b). A face-down card that isn't a creature card
     # has no cost to pay, so it can't be turned up.
     class TurnFaceUp < Action
+      # What turn-face-up mana is being spent on, as `Costs::Mana#for_use` (for "spend this mana only to turn permanents
+      # face up").
+      Use = Data.define(:permanent)
+
       attr_reader :permanent
 
       def initialize(permanent:, **args)
@@ -20,7 +24,7 @@ module Magic
       def mana_cost
         return unless permanent.card.creature?
 
-        @mana_cost ||= Costs::Mana.new(permanent.card.cost.cost.dup).tap { |cost| cost.for_use = permanent }
+        @mana_cost ||= Costs::Mana.new(permanent.card.cost.cost.dup).tap { |cost| cost.for_use = Use.new(permanent: permanent) }
       end
 
       def pay_mana(payment)

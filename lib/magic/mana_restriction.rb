@@ -34,6 +34,18 @@ module Magic
       end
     end
 
+    # "Spend this mana only to turn permanents face up" (Overgrown Zealot).
+    class TurnFaceUp < ManaRestriction
+      def permits?(use) = use.is_a?(Magic::Actions::TurnFaceUp::Use)
+    end
+
+    # "Spend this mana only to cast an enchantment spell, unlock a door, or turn a permanent face up" (Creeping Peeper).
+    class EnchantmentDoorOrFaceUp < ManaRestriction
+      def permits?(use)
+        (use.is_a?(Magic::Card) && use.enchantment?) || use.is_a?(Magic::Actions::UnlockDoor::Use) || use.is_a?(Magic::Actions::TurnFaceUp::Use)
+      end
+    end
+
     # Path of Ancestry: "When that mana is spent to cast a creature spell that shares a creature type with your
     # commander, scry 1." Not a restriction at all (any spend is allowed), but riding on the mana lets `spent_on` see what
     # it was spent on.
