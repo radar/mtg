@@ -16,8 +16,18 @@ module Magic
 
       def uses_priority? = false
 
+      # The door's mana cost, less what static abilities say ("unlock costs you pay cost {1} less": a static ability
+      # answering `unlock_cost_adjustment(door, player)` with a hash such as `{ generic: -1 }`, or nil).
       def mana_cost
-        @mana_cost ||= Costs::Mana.new(door.cost.cost.dup).tap { |cost| cost.for_use = permanent.card }
+        @mana_cost ||= Costs::Mana.new(door.cost.cost.dup).tap do |cost|
+          cost.for_use = permanent.card
+          game.battlefield.static_abilities.each do |ability|
+            next unless ability.respond_to?(:unlock_cost_adjustment)
+
+            adjustment = ability.unlock_cost_adjustment(door, player)
+            cost.adjusted_by(adjustment) if adjustment
+          end
+        end
       end
 
       def pay_mana(payment)
