@@ -110,6 +110,10 @@ This does **not** yet let a player respond to a trigger with an instant — that
 
 A card or token answers `cant_attack_alone?` / `cant_block_alone?` (default false; `Permanent` delegates to its face unless it lost all abilities). Combat checks them against the whole declared set: `CombatPhase#validate_attackers!` raises `IllegalAttack` when the only attacker can't attack alone, and `validate_blocks!` (run on the way to combat damage) raises `IllegalBlock` when a player's only blocker can't block alone. Example: the Beast token of `TobyBeastieBefriender`.
 
+## "Copy it. You may cast the copy"
+
+For a card that isn't on the stack (exiled by an effect), add `Magic::Choice::MayCastCopy.new(actor:, card:)` per card: `game.resolve_choice!` accepts (then `resolve_choice!(target:)` if the copy has a target), `game.skip_choice!` declines. The copy resolves directly without paying its cost (`CopyEffect.resolve!`). Example: `TheTaleOfTamiyo` chapter IV (`ArcaneBombardment` has the same logic inline).
+
 ## Delayed triggers (no permanent)
 
 "Until end of turn, whenever a creature you control dies, ...": `game.add_delayed_trigger(source: spell_card, event_class: Events::CreatureDied, trigger_class: MyTrigger)` registers a `Magic::DelayedTrigger` as an event listener. It builds `trigger_class.new(actor: source, event:)` for each event (so `controller` is the source's controller) and stops at the end of the turn it was made in. Use `permanent.register_turn_trigger` instead when the trigger belongs to a permanent. Example: `WaltzOfRage`.
