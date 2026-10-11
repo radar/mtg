@@ -72,8 +72,9 @@ module Magic
 
     # A card put onto the battlefield by an effect rather than cast (a flicker or reanimation, a token being created).
     # `face_down: true` is manifesting it (see `Game#manifest!`): a blank 2/2 creature that enters untapped.
-    def self.put_onto_battlefield(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil, face_down: false)
-      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: false, face_down:)
+    # `counters: { "finality" => 1 }` is "return it to the battlefield with a finality counter on it".
+    def self.put_onto_battlefield(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil, face_down: false, counters: {})
+      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: false, face_down:, counters:)
     end
 
     # A token that is a copy of `card`. The card itself stays where it is.
@@ -81,7 +82,7 @@ module Magic
       enter(game:, card:, owner:, controller:, from_zone: nil, enters_tapped:, attach_to: nil, token: true, copy: true, cast: false)
     end
 
-    def self.enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token:, copy:, cast:, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil, face_down: false)
+    def self.enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token:, copy:, cast:, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil, face_down: false, counters: {})
       enters_tapped = false if face_down
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:, controller:)
       card_zone = card.zone unless token || copy
@@ -99,6 +100,7 @@ module Magic
       permanent.tap! if enters_tapped
       permanent.attach_to!(attach_to) if attach_to
       add_entering_counters(permanent:, card: entering, value_for_x:, cast_from_hand: cast && card_zone&.hand?, cast_from_graveyard: cast && card_zone&.graveyard?)
+      counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       add_additional_counters_for_entering(game:, permanent:) if entering.creature?
       move_card_to_battlefield(game:, card:, permanent:, from: card_zone)
@@ -418,9 +420,11 @@ module Magic
     end
 
     def replacement_effect_for(context)
-      return nil if lost_all_abilities?
+      # A finality counter is not an ability, so it works even on a permanent that lost all abilities.
+      candidates = finality_replacements
+      candidates += face.replacement_effects.to_a + @turn_replacements unless lost_all_abilities?
 
-      (face.replacement_effects.to_a + @turn_replacements).each do |matcher, replacement_effect|
+      candidates.each do |matcher, replacement_effect|
         next unless replacement_matcher_applies?(matcher, context.effect)
 
         replacement_key = [object_id, replacement_effect]
@@ -449,6 +453,13 @@ module Magic
       dispatch_lifecycle_triggers(event)
       dispatch_event_handlers(event)
       dispatch_turn_triggers(event)
+    end
+
+    # "If a creature with a finality counter on it would die, exile it instead."
+    def finality_replacements
+      return [] unless counters.of_type(Counters::Finality).any? && creature?
+
+      [[Effects::MovePermanentZone, ReplacementEffect::ExileInsteadOfDying]]
     end
 
     # A replacement effect that lasts until end of turn ("if it would die this turn, exile it instead").
