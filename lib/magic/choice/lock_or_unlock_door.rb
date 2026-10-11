@@ -1,8 +1,7 @@
 module Magic
   class Choice
-    # "Lock or unlock a door of target Room you control": pick the Room, then the door, which is locked if it is
-    # unlocked and unlocked if it is locked (`Choice::SelectDoor` asks, one question per door state). Resolve with
-    # `resolve!(target: room_permanent)`.
+    # "Lock or unlock a door of target Room you control": pick the Room, then one of its doors, which is locked if it
+    # is unlocked and unlocked if it is locked. Resolve with `resolve!(target: room_permanent)`, then `door:`.
     class LockOrUnlockDoor < Targeted
       def prompt = "Lock or unlock a door of target Room you control."
 
@@ -11,9 +10,7 @@ module Magic
       def choice_amount = 1
 
       def resolve!(target:)
-        doors = target.card.doors
-        # Both doors may be toggled, so ask about locking and unlocking as one pick of a door.
-        game.add_choice(Toggle.new(actor: actor, room: target, doors: doors))
+        game.add_choice(Toggle.new(actor: actor, room: target, doors: target.card.doors))
       end
 
       # Picks a door and flips it.
