@@ -32,9 +32,10 @@ module Magic
       # @param pay_nothing [Boolean] When true, pays {0} rather than the card's mana cost, if a static ability allows that
       #   for this card (`may_pay_nothing_for?(card, player)`: Warped Space). It answers `paid_nothing_for_spell!` once
       #   the spell is cast.
-      def initialize(card:, value_for_x: nil, controller: card.controller, by_effect: false, pay_life: false, pay_nothing: false, **args)
+      def initialize(card:, value_for_x: nil, controller: card.controller, by_effect: false, pay_life: false, pay_nothing: false, pay_static_alternative: false, **args)
         super(**args)
         @card = card
+        @pay_static_alternative = pay_static_alternative
         @pay_life = pay_life
         @pay_nothing = pay_nothing
         @stack_size_at_start = game.stack.count
@@ -134,6 +135,21 @@ module Magic
         return false if @pay_life
 
         @pay_nothing && static_ability_allows?(:may_pay_nothing_for?)
+      end
+
+      # "You may pay {W}{U}{B}{R}{G} rather than pay the mana cost for spells you cast" (Leyline of Mutation), chosen by
+      # casting with `pay_static_alternative: true`: a static ability answers `alternative_cost_for(card, player)` with a
+      # `Costs::Mana`, or nil.
+      def static_alternative_cost
+        return unless @pay_static_alternative && plain_cost?
+
+        game.battlefield.static_abilities.each do |ability|
+          next unless ability.respond_to?(:alternative_cost_for)
+
+          cost = ability.alternative_cost_for(card, player)
+          return cost if cost
+        end
+        nil
       end
 
       # Whether this spell could be cast by paying life (an optional alternative cost, unlike Bolas's Citadel's).
@@ -651,6 +667,8 @@ module Magic
 
       # The cost this cast starts from, before cost adjustments.
       def base_cost
+        return static_alternative_cost if static_alternative_cost
+
         free_from_exile? || pays_life_instead? || pays_nothing_instead? ? Costs::Mana.new({}) : card.cost
       end
 
