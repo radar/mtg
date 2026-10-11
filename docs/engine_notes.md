@@ -114,6 +114,10 @@ A card or token answers `cant_attack_alone?` / `cant_block_alone?` (default fals
 
 `ninjutsu Costs::Mana.new(...)` in a card's DSL block; `player.ninjutsu(card: card_in_hand, attacker: unblocked_attacker) { |a| a.pay_mana(...) }` runs `Actions::Ninjutsu`. It is only legal in the declare-blockers step for an unblocked attacker you control: paying the cost removes the attacker from combat and returns it to hand, and the action goes on the stack. On resolving, the card enters tapped (`put_onto_battlefield(enters_tapped: true)`) and is added to combat attacking the same player or planeswalker, without being "declared" as an attacker. `LegalActions` offers it. Example: `KaitoBaneOfNightmares`, whose "during your turn he's a 3/4 Ninja creature" is three static abilities sharing a `conditions` block, and whose emblem is a `Magic::Emblem` with a `static_abilities` buff.
 
+## Suspend and "exile with time counters"
+
+`suspend 3, generic: 1, black: 1` in a card class; `player.suspend(card:) { |a| a.pay_mana(...) }` runs `Actions::Suspend`, a special action that exiles the card from hand and sets `card.time_counters`. The class gets `Suspend::UpkeepTrigger` as a `BeginningOfUpkeep` handler; it works from exile (`works_from_exile?`), ignores other players' upkeeps, removes a counter, and on the last casts the card for free (`Suspend.cast_free`). A spell that needs a target gets a `Suspend::TargetChoice` first. A spell that exiles itself with counters as it resolves (Suspended Sentence) sets `exile_with_time_counters = n`; `Cast#move_after_resolving` then exiles it and sets `time_counters`. `Card#suspended?` is true while it waits in exile. Leaving exile clears the counters.
+
 ## "Copy it. You may cast the copy"
 
 For a card that isn't on the stack (exiled by an effect), add `Magic::Choice::MayCastCopy.new(actor:, card:)` per card: `game.resolve_choice!` accepts (then `resolve_choice!(target:)` if the copy has a target), `game.skip_choice!` declines. The copy resolves directly without paying its cost (`CopyEffect.resolve!`). Example: `TheTaleOfTamiyo` chapter IV (`ArcaneBombardment` has the same logic inline).

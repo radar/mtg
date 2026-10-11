@@ -710,6 +710,10 @@ module Magic
           card.exile_with_dream_counter = false
           card.exile!
           card.dream_counter = true
+        elsif card.exile_with_time_counters
+          counters = card.exile_with_time_counters
+          card.exile!
+          card.time_counters = counters
         elsif card.rebound? && card.zone.hand?
           card.exile!
         elsif card.exile_as_it_resolves?

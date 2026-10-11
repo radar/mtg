@@ -87,6 +87,12 @@ module Magic
       game.take_action(action)
     end
 
+    # Suspend: pays +card+'s suspend cost to exile it from hand with its time counters.
+    def suspend(card:, **args, &block)
+      action = prepare_action(Magic::Actions::Suspend, card: card, **args, &block)
+      game.take_action(action)
+    end
+
     # Pays a face-down creature card's mana cost to turn it face up.
     def turn_face_up(permanent:, **args, &block)
       action = prepare_action(Magic::Actions::TurnFaceUp, permanent: permanent, **args, &block)

@@ -22,6 +22,9 @@ module Magic
     # A dream counter (Goliath Daydreamer) on a card in exile; lost when it leaves exile.
     # `exile_with_dream_counter` marks a spell that will go to exile with one as it resolves.
     attr_accessor :dream_counter, :exile_with_dream_counter
+    # Suspend (and "exile it with three time counters on it"): the time counters on a card in exile, and how many a spell
+    # puts on itself as it resolves. See `suspend` and `Actions::Suspend`.
+    attr_accessor :time_counters, :exile_with_time_counters
 
     COST = {}
     KICKER_COST = {}
@@ -75,6 +78,17 @@ module Magic
 
       def blitz(cost)
         const_set(:BLITZ_COST, cost)
+      end
+
+      # "Suspend N--{cost}": from your hand, pay it to exile this card with N time counters (`player.suspend(card:)`). At the
+      # beginning of its owner's upkeep a counter comes off; when the last does, its owner may cast it without paying its
+      # mana cost. A card with `suspend` also handles the upkeep from exile (`Suspend::UpkeepTrigger`).
+      def suspend(count, cost)
+        define_method(:suspend_count) { count }
+        define_method(:suspend_cost) { cost }
+        define_method(:event_handlers) do
+          super().merge(Events::BeginningOfUpkeep => Suspend::UpkeepTrigger) { |_, old, new| [*old, *new] }
+        end
       end
 
       # "Ninjutsu {cost}": from your hand, pay it and return an unblocked attacker you control to hand to put this card
@@ -323,6 +337,8 @@ module Magic
       @on_adventure = false unless zone&.exile?
       @dream_counter = false unless zone&.exile?
       @exile_with_dream_counter = false
+      @time_counters = nil unless zone&.exile?
+      @exile_with_time_counters = nil
       # Only a spell (or a permanent's card) can be controlled by someone other than its owner.
       @controller = owner unless zone&.battlefield?
       @zone = zone
@@ -436,6 +452,9 @@ module Magic
     end
 
     def begins_on_battlefield? = false
+
+    # In exile with time counters, waiting to be cast (suspend).
+    def suspended? = !!zone&.exile? && time_counters.to_i.positive?
 
     # How many times X appears in the mana cost: 2 for {X}{X}. The mana to pay is X times this.
     def x_multiplier = 1
