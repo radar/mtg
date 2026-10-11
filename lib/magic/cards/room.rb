@@ -34,6 +34,18 @@ module Magic
         # The Room this is a door of.
         attr_accessor :room
 
+        class << self
+          # "When you unlock this door, ...": the block is the trigger's `call`. For one that needs a `Choice`, define an
+          # `UnlockTrigger` subclass and list it in `unlock_triggers` instead.
+          def when_unlocked(&block)
+            trigger = Class.new(UnlockTrigger)
+            trigger.define_method(:call, &block)
+            # Named, so a game holding a Permanent that uses this trigger can be Marshal-dumped.
+            const_set(:GeneratedUnlockTrigger, trigger)
+            define_method(:unlock_triggers) { [trigger] }
+          end
+        end
+
         # "When you unlock this door, ...": TriggeredAbility classes (subclasses of Room::UnlockTrigger).
         def unlock_triggers = []
       end
