@@ -27,6 +27,13 @@ module Magic
       end
     end
 
+    # "Spend this mana only to cast instant, sorcery, Demon, and Spirit spells" (Séance Board). Only spells, not abilities.
+    class InstantSorceryDemonOrSpirit < ManaRestriction
+      def permits?(use)
+        use.is_a?(Magic::Card) && (use.instant? || use.sorcery? || use.type?("Demon") || use.type?("Spirit"))
+      end
+    end
+
     # "Spend this mana only to cast a legendary spell" (Plaza of Heroes). Only spells, not abilities.
     class LegendarySpell < ManaRestriction
       def permits?(use)
