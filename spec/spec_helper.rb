@@ -18,11 +18,20 @@ module CardHelper
   # settle: false opts out of the auto-settle below -- needed when a spec is mid-way
   # through building up other pending stack items/choices it wants to stay pending
   # (settling would resolve them out from under it).
-  # `doors: [:left]` puts a Room onto the battlefield with those doors unlocked.
-  def ResolvePermanent(name, summoning_sick: false, settle: true, doors: nil, **args)
+  # A spell resolving by default; `cast: false` puts the card onto the battlefield as an effect would, and
+  # `token: true` or `copy: true` makes a token copy of it. `doors: [:left]` puts a Room onto the battlefield with those
+  # doors unlocked.
+  def ResolvePermanent(name, summoning_sick: false, settle: true, cast: true, token: false, copy: false, doors: nil, **args)
     card = Card(name, owner: args.fetch(:owner, p1))
     card.preunlock!(*doors) if doors
-    permanent = Magic::Permanent.resolve(game: game, card: card, **args)
+    permanent =
+      if token || copy
+        Magic::Permanent.token_copy(game: game, card: card, **args)
+      elsif cast
+        Magic::Permanent.resolve_spell(game: game, card: card, **args)
+      else
+        Magic::Permanent.put_onto_battlefield(game: game, card: card, **args)
+      end
     permanent.controlled_since_turn = 0 unless summoning_sick
     # Skip auto-settling for Auras: fixtures often build one unattached and call
     # #attach_to! as a separate step, and settling in between would kill it to SBA
@@ -43,8 +52,12 @@ module CardHelper
     card
   end
 
-  def cast_action(card:, player: card.owner, targeting: nil, flashback: false, alternative: false, &block)
-    action = Magic::Actions::Cast.new(card: card, player: player, game: game, flashback: flashback, alternative: alternative)
+  def cast_action(card:, player: card.owner, targeting: nil, &block)
+    cast_action_as(:normal, card:, player:, targeting:, &block)
+  end
+
+  def cast_action_as(mode, card:, player: card.owner, targeting: nil, &block)
+    action = Magic::Actions::Cast.for_mode(mode).new(card: card, player: player, game: game)
     action.targeting(targeting) if targeting
     yield action if block_given?
     action

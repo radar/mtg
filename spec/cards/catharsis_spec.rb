@@ -8,10 +8,10 @@ RSpec.describe Magic::Cards::Catharsis do
 
   let(:card) { Card("Catharsis", owner: p1) }
 
-  def cast(mana, payment, **options)
+  def cast(mana, payment, mode = :normal)
     p1.hand.add(card)
     p1.add_mana(mana)
-    p1.cast(card:, **options) { _1.pay_mana(payment) }
+    p1.cast_as(mode, card:) { _1.pay_mana(payment) }
     game.stack.resolve!
     game.settle!
   end
@@ -58,7 +58,7 @@ RSpec.describe Magic::Cards::Catharsis do
 
   describe "evoked" do
     it "is sacrificed when it enters, but still triggers on the mana spent" do
-      cast({ white: 2 }, { white: 2 }, evoked: true)
+      cast({ white: 2 }, { white: 2 }, :evoked)
 
       expect(catharsis).to be_nil
       expect(card.zone).to be_graveyard
@@ -69,7 +69,7 @@ RSpec.describe Magic::Cards::Catharsis do
       p1.hand.add(card)
       p1.add_mana(white: 1)
 
-      expect { p1.cast(card:, evoked: true) { _1.pay_mana(white: 1) } }.to raise_error(StandardError)
+      expect { p1.cast_as(:evoked, card:) { _1.pay_mana(white: 1) } }.to raise_error(StandardError)
     end
   end
 end

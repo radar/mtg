@@ -71,7 +71,7 @@ RSpec.describe Magic::Cards::HighSocietyHunter do
     end
 
     it "does not draw for a token dying" do
-      copy = Magic::Permanent.resolve(game:, owner: p1, card: ResolvePermanent("Grizzly Bears", owner: p2).copiable_card, token: true, copy: true, cast: false)
+      copy = Magic::Permanent.token_copy(game:, owner: p1, card: ResolvePermanent("Grizzly Bears", owner: p2).copiable_card)
       expect { copy.destroy!; game.settle! }.not_to(change { p1.hand.count })
     end
 

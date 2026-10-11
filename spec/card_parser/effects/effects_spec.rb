@@ -348,7 +348,7 @@ RSpec.describe Magic::CardParser::Effect do
   it "parses flickering a target back under its owner's control" do
     flicker = described_class.parse("Exile another target creature you control, then return that card to the battlefield under its owner's control.")
     expect(flicker.target_choices).to eq("(battlefield.controlled_by(controller).creatures - [#{Magic::CardParser::Effect::THIS}])")
-    expect(flicker.resolve_call).to include("trigger_effect(:exile, target: target)", "Permanent.resolve(", "cast: false")
+    expect(flicker.resolve_call).to include("trigger_effect(:exile, target: target)", "Permanent.put_onto_battlefield(")
     expect(described_class.parse("Exile target creature, then return it to the battlefield under your control.")).to be_nil
   end
 
@@ -502,7 +502,7 @@ RSpec.describe Magic::CardParser::Effect do
   it "copies a target permanent as a token" do
     copy = described_class.parse("Create a token that's a copy of target Kithkin you control.")
     expect(copy.target_choices).to eq('battlefield.controlled_by(controller).creatures.by_any_type("Kithkin")')
-    expect(copy.resolve_call).to include("token: true, copy: true", "target.copiable_card")
+    expect(copy.resolve_call).to include("Permanent.token_copy(", "target.copiable_card")
   end
 
   it "affects the creatures of a target player" do

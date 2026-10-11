@@ -30,7 +30,7 @@ module Magic
         cards.each do |card|
           next if card.token?
 
-          Permanent.resolve(game: game, card: card, owner: card.owner, cast: false)
+          Permanent.put_onto_battlefield(game: game, card: card, owner: card.owner)
         end
       end
     end

@@ -59,7 +59,7 @@ RSpec.describe Magic::Cards::SpinnerOfSouls do
 
   it "triggers for another nontoken creature of yours, but not a token, an opponent's creature, or itself" do
     stock_library(*lands, bears_card, trailing)
-    token = Magic::Permanent.resolve(game:, owner: p1, card: victim.copiable_card, token: true, copy: true, cast: false)
+    token = Magic::Permanent.token_copy(game:, owner: p1, card: victim.copiable_card)
     theirs = ResolvePermanent("Grizzly Bears", owner: p2)
     [token, theirs, spinner].each(&:destroy!)
     game.settle!

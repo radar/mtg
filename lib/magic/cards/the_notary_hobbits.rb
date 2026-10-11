@@ -17,7 +17,7 @@ module Magic
 
         def call
           2.times do
-            copy = Permanent.resolve(game: game, owner: controller, card: actor.copiable_card, token: true, copy: true, cast: false)
+            copy = Permanent.token_copy(game: game, owner: controller, card: actor.copiable_card)
             copy.remove_types(T::Super::Legendary, until_eot: false)
             copy.apply_continuous_effects!
           end

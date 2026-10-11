@@ -86,7 +86,7 @@ module Magic
       def unlocked?(side) = unlocked_doors.include?(door(side))
       def fully_unlocked? = doors.all? { unlocked?(_1) }
 
-      # Permanent.resolve calls this just before the Room enters: only the door it was cast as is unlocked.
+      # `Permanent.enter` calls this just before the Room enters: only the door it was cast as is unlocked.
       def begin_entering!
         @entered_unlocked = [@cast_door].compact
         @unlocked_doors = @entered_unlocked if @cast_door

@@ -24,7 +24,7 @@ RSpec.describe Magic::Cards::MomentOfGlory do
   it "from the graveyard also buffs each other creature you control, then is exiled" do
     p1.graveyard.add(card)
     p1.add_mana(white: 5)
-    p1.cast(card:, flashback: true) { |a| a.targeting(bear).pay_mana(generic: { white: 4 }, white: 1) }
+    p1.cast_as(:flashback,card:) { |a| a.targeting(bear).pay_mana(generic: { white: 4 }, white: 1) }
     game.stack.resolve!
     expect(bear.power).to eq(6)
     expect(other.power).to eq(6)

@@ -34,11 +34,11 @@ module Magic
     def castable_spells
       cast_candidate_cards.flat_map do |card|
         # A Room is cast as one of its two doors.
-        next Cards::Room::SIDES.keys.map { |side| keep(Actions::Cast.new(game: game, player: player, card: card, door: side)) } if card.is_a?(Cards::Room)
+        next Cards::Room::SIDES.keys.map { |side| keep(Actions::Cast::Door.new(game: game, player: player, card: card, door: side)) } if card.is_a?(Cards::Room)
 
         candidates = [keep(Actions::Cast.new(game: game, player: player, card: card))]
-        candidates << keep(Actions::Cast.new(game: game, player: player, card: card, flashback: true)) if card.zone&.graveyard? && card.flashback_cost_now
-        candidates << keep(Actions::Cast.new(game: game, player: player, card: card, harmonize: true)) if card.zone&.graveyard? && card.harmonize_cost
+        candidates << keep(Actions::Cast::Flashback.new(game: game, player: player, card: card)) if card.zone&.graveyard? && card.flashback_cost_now
+        candidates << keep(Actions::Cast::Harmonize.new(game: game, player: player, card: card)) if card.zone&.graveyard? && card.harmonize_cost
         candidates
       end.compact
     end

@@ -9,43 +9,46 @@ module Magic
       def_delegators :@card, :enchantment?, :artifact?, :multi_target?
       attr_reader :card, :targets, :value_for_x, :controller, :modes, :additional_costs
 
-      # @param flashback [Boolean] When true, allows casting from graveyard and exiles after resolution
-      # @param blitz [Boolean] When true, pays the card's blitz cost instead of its mana cost
+      # The class that casts a spell in a given way (`:flashback`, `:harmonize`, `:blitz`, `:evoked`, `:adventure`,
+      # `:alternative`, `:door` for a Room), or a plain `Cast` for `:normal`. See `Player#cast_as`.
+      def self.for_mode(mode)
+        {
+          normal: Cast,
+          flashback: Flashback,
+          harmonize: Harmonize,
+          blitz: Blitz,
+          evoked: Evoked,
+          adventure: Adventure,
+          alternative: Alternative,
+          door: Door,
+        }.fetch(mode) { raise ArgumentError, "unknown way to cast a spell: #{mode.inspect}" }
+      end
+
       # @param by_effect [Boolean] When true, the spell is being cast because an effect instructed it (rebound,
       #   "you may cast it" during resolution), so its zone and timing restrictions are ignored (rule 608.2g)
-      # @param adventure [Boolean] When true, pays the card's adventure cost, resolves via
-      #   #adventure_resolve! instead of #resolve!, and exiles the card afterward
-      # @param alternative [Boolean] When true, pays the card's alternative_cost instead of its mana cost
-      # @param harmonize [Boolean] When true, casts from the graveyard for the card's harmonize cost
-      #   (see #harmonize_tap) and exiles the spell after it resolves
       # @param pay_life [Boolean] When true, pays life equal to the card's mana value rather than its mana cost, if a
       #   static ability allows that for this card (`may_pay_life_for?`: Demon of Fate's Design)
       # @param pay_nothing [Boolean] When true, pays {0} rather than the card's mana cost, if a static ability allows that
       #   for this card (`may_pay_nothing_for?(card, player)`: Warped Space). It answers `paid_nothing_for_spell!` once
       #   the spell is cast.
-      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, evoked: false, adventure: false, alternative: false, by_effect: false, harmonize: false, pay_life: false, pay_nothing: false, door: nil, **args)
+      def initialize(card:, value_for_x: nil, controller: card.controller, by_effect: false, pay_life: false, pay_nothing: false, **args)
         super(**args)
         @card = card
-        @door = door && card.door(door)
         @pay_life = pay_life
         @pay_nothing = pay_nothing
         @stack_size_at_start = game.stack.count
         @targets = []
         @modes = []
-        # An adventure side with its own additional cost (Allure of Power) answers `adventure_additional_costs`.
-        printed_costs = adventure && card.respond_to?(:adventure_additional_costs) ? card.adventure_additional_costs : (card.respond_to?(:additional_costs) ? card.additional_costs : [])
-        @additional_costs = printed_costs + granted_additional_costs
+        @additional_costs = printed_additional_costs + granted_additional_costs
         @paid_additional_costs = []
-        @flashback = flashback
-        @harmonize = harmonize
-        @blitz = blitz
-        @evoked = evoked
-        @adventure = adventure
-        @alternative = alternative
         @by_effect = by_effect
-
         @value_for_x = value_for_x
       end
+
+      def flashback? = false
+      def harmonize? = false
+      def evoked? = false
+      def adventure? = false
 
       def inspect
         "#<Actions::Cast card: #{card.name}, player: #{player.inspect}>"
@@ -55,7 +58,7 @@ module Magic
       def countered!
         kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold) || kicker_cost.is_a?(Costs::Gift)
         game.notify!(Events::SpellCountered.new(spell: card, player: player))
-        if @harmonize || card.exile_instead_of_graveyard
+        if harmonize? || card.exile_instead_of_graveyard
           card.exile_instead_of_graveyard = false
           card.exile!
         else
@@ -77,25 +80,7 @@ module Magic
 
       def mana_cost
         @mana_cost ||= begin
-          if @flashback && card.zone.graveyard?
-            cost = card.flashback_cost_now
-          elsif @harmonize && card.zone.graveyard? && card.harmonize_cost
-            cost = card.harmonize_cost
-          elsif @blitz
-            cost = card.blitz_cost
-          elsif @evoked
-            cost = card.evoke_cost
-          elsif @adventure
-            cost = card.adventure_cost
-          elsif @door
-            cost = @door.cost
-          elsif @alternative
-            cost = card.alternative_cost
-          elsif free_from_exile? || pays_life_instead? || pays_nothing_instead?
-            cost = Costs::Mana.new({})
-          else
-            cost = card.cost
-          end
+          cost = base_cost
 
           mana_cost_adjustment_abilities = game.battlefield.static_abilities
           .of_type(Abilities::Static::ManaCostAdjustment)
@@ -134,7 +119,7 @@ module Magic
       # "You may pay life equal to a spell's mana value rather than pay its mana cost" (Bolas's Citadel), for a spell
       # cast from the top of the library. Static abilities answer `pays_life_for?(card, player)`.
       def pays_life_instead?
-        return false if @flashback || @harmonize || @blitz || @evoked || @adventure || @alternative || @door
+        return false unless plain_cost?
         return true if @pay_life && static_ability_allows?(:may_pay_life_for?)
         return true if card.zone&.exile? && game.play_permissions.pay_life?(card, player)
 
@@ -143,7 +128,7 @@ module Magic
 
       # "You may pay {0} rather than pay the mana cost" (Warped Space), chosen by casting with `pay_nothing: true`.
       def pays_nothing_instead?
-        return false if @flashback || @harmonize || @blitz || @evoked || @adventure || @alternative || @door
+        return false unless plain_cost?
         return false if @pay_life
 
         @pay_nothing && static_ability_allows?(:may_pay_nothing_for?)
@@ -151,7 +136,7 @@ module Magic
 
       # Whether this spell could be cast by paying life (an optional alternative cost, unlike Bolas's Citadel's).
       def may_pay_life?
-        !@flashback && !@harmonize && !@blitz && !@evoked && !@adventure && !@alternative && static_ability_allows?(:may_pay_life_for?)
+        plain_cost? && static_ability_allows?(:may_pay_life_for?)
       end
 
       def life_payment
@@ -169,16 +154,13 @@ module Magic
       end
 
       def illegal_reason
-        return "#{card.name} is a Room, so it is cast as one of its doors" if card.is_a?(Cards::Room) && !@door
-        return "#{card.name} is not a Room" if @door && !card.is_a?(Cards::Room)
+        return "#{card.name} is a Room, so it is cast as one of its doors" if card.is_a?(Cards::Room) && !casts_as_door?
 
         unless @by_effect
-          return "#{card.name} is a land, and lands are played, not cast" if card.land? && !@adventure
+          return "#{card.name} is a land, and lands are played, not cast" if card.land? && !adventure?
           return "#{card.name} is already on the stack" if already_on_stack?
           return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
-          return "#{card.name} has no harmonize cost" if @harmonize && !card.harmonize_cost
-          return "#{card.name} has no flashback cost" if @flashback && !card.flashback_cost_now
-          return "#{card.name}'s flashback requirements aren't met" if @flashback && card.respond_to?(:flashback_requirements_met?) && !card.flashback_requirements_met?(player)
+          return cost_mode_illegal_reason if cost_mode_illegal_reason
 
           if !instant_speed? && (reason = sorcery_speed_reason)
             return "#{card.name} can only be cast at sorcery speed, but #{reason}"
@@ -199,7 +181,7 @@ module Magic
 
       # Instants and spells with flash can be cast any time the player has priority.
       def instant_speed?
-        card.instant? || card.flash? || (@adventure && card.respond_to?(:adventure_instant?) && card.adventure_instant?) || (kicker_cost.respond_to?(:grants_flash?) && kicker_cost.grants_flash?) ||
+        card.instant? || card.flash? || adventure_instant? || (kicker_cost.respond_to?(:grants_flash?) && kicker_cost.grants_flash?) ||
           static_ability_allows?(:may_cast_with_flash?)
       end
 
@@ -330,7 +312,7 @@ module Magic
       # by an amount of generic mana equal to its power (no more than the generic mana left).
       # Like #convoke it reduces the cost itself, so call it before any mana payment.
       def harmonize_tap(creature)
-        raise "#{card.name} is not being cast with harmonize" unless @harmonize
+        raise "#{card.name} is not being cast with harmonize" unless harmonize?
         raise "#{creature.name} is tapped" if creature.tapped?
         raise "#{player.inspect} does not control #{creature.name}" unless creature.controller == player
 
@@ -503,7 +485,7 @@ module Magic
 
         # Casting a card you don't own (from an opponent's exile) makes you its controller.
         card.controller = player
-        card.cast_door = @door if @door
+        prepare_card
 
         # Settled before the life is paid: "once each turn" permissions stop applying afterwards.
         mana_cost
@@ -530,7 +512,7 @@ module Magic
           player: player,
           mana_cost: mana_cost,
           x_value: value_for_x,
-          flashback: @flashback,
+          flashback: flashback?,
           # A modal spell's targets belong to its chosen modes, so ward and the like must read them from there too.
           targets: [*targets, *@modes.flat_map(&:targets)].uniq,
         ))
@@ -603,13 +585,13 @@ module Magic
           modes.each { |mode| mode.resolve! }
         else
           resolved = resolve_with_args(card,
-            method: @adventure ? :adventure_resolve! : :resolve!,
+            method: resolve_method,
             target: targets.first,
             targets: targets,
             kicked: kicker_cost.paid?,
             mana_spent: mana_cost.is_a?(Costs::Mana) ? mana_cost.mana_spent : {},
-            evoked: @evoked,
-            flashback: @flashback,
+            evoked: evoked?,
+            flashback: flashback?,
             value_for_x: mana_cost.x && mana_cost.x / card.x_multiplier,
             controller: player,
           )
@@ -617,11 +599,7 @@ module Magic
 
         resolved.grant_haste! if @gains_haste && resolved.is_a?(Permanent)
 
-        if @blitz && resolved.is_a?(Permanent)
-          resolved.grant_haste!
-          resolved.register_turn_trigger(Events::CreatureDied, Blitz::DeathDrawTrigger)
-          resolved.register_turn_trigger(Events::BeginningOfEndStep, Blitz::EndStepSacrificeTrigger)
-        end
+        after_resolving(resolved)
 
         # The card's own optional behold or gift cost outlives this cast: forget it was paid.
         kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold) || kicker_cost.is_a?(Costs::Gift)
@@ -632,38 +610,14 @@ module Magic
 
         queue_offspring_triggers(resolved) if paid_offspring_costs.any?
 
-        if @adventure
-          card.exile!
-          card.on_adventure = true
-        elsif card.sorcery? || card.instant?
-          if @flashback || @harmonize
-            card.exile!
-          elsif card.zone&.graveyard? && game.emblems.any? { |emblem| emblem.owner == player && emblem.respond_to?(:exiles_after_graveyard_cast?) && emblem.exiles_after_graveyard_cast?(card) }
-            card.exile!
-          elsif card.exile_with_dream_counter
-            card.exile_with_dream_counter = false
-            card.exile!
-            card.dream_counter = true
-          elsif card.rebound? && card.zone.hand?
-            card.exile!
-          elsif card.exile_as_it_resolves?
-            card.exile!
-          elsif card.exile_instead_of_graveyard
-            card.exile_instead_of_graveyard = false
-            card.exile!
-          elsif card.buyback? && kicker_cost.paid?
-            card.move_to_hand!(card.owner)
-          else
-            card.move_to_graveyard!(card.owner)
-          end
-        end
+        move_after_resolving
       end
 
       # \"When you do, copy it\": a copy of a permanent spell becomes a token; any other copy may
       # choose new targets.
       def copy_for_conspire
         if card.permanent?
-          Permanent.resolve(game:, owner: player, card:, token: true, copy: true, cast: false, from_zone: nil)
+          Permanent.token_copy(game:, owner: player, card:)
         else
           Magic::CopyEffect.resolve_with_choice!(actor: card, receiver: card, targets:, copies: 1)
         end
@@ -684,7 +638,66 @@ module Magic
       end
 
       def castable_from_current_zone?
-        in_permitted_zone?(card, flashback: @flashback || @harmonize)
+        in_permitted_zone?(card, flashback: casts_from_graveyard?)
+      end
+
+      # --- Hooks the cost-mode subclasses override (see `Cast::Flashback` and friends) ---
+
+      # The cost this cast starts from, before cost adjustments.
+      def base_cost
+        free_from_exile? || pays_life_instead? || pays_nothing_instead? ? Costs::Mana.new({}) : card.cost
+      end
+
+      # A Room is cast as one of its doors (`Cast::Door`).
+      def casts_as_door? = false
+
+      # Anything the card needs done to it as it is cast (a Room remembers which door).
+      def prepare_card = nil
+
+      # False for every mode that replaces the card's mana cost (so no paying life instead of it).
+      def plain_cost? = true
+
+      def casts_from_graveyard? = false
+
+      def exiles_after_resolving? = false
+
+      def resolve_method = :resolve!
+
+      def adventure_instant? = false
+
+      # An adventure side with its own additional cost (Allure of Power) answers `adventure_additional_costs`.
+      def printed_additional_costs
+        card.respond_to?(:additional_costs) ? card.additional_costs : []
+      end
+
+      # Why this mode of casting is illegal for the card, or nil.
+      def cost_mode_illegal_reason = nil
+
+      def after_resolving(resolved) = nil
+
+      def move_after_resolving
+        return unless card.sorcery? || card.instant?
+
+        if exiles_after_resolving?
+          card.exile!
+        elsif card.zone&.graveyard? && game.emblems.any? { |emblem| emblem.owner == player && emblem.respond_to?(:exiles_after_graveyard_cast?) && emblem.exiles_after_graveyard_cast?(card) }
+          card.exile!
+        elsif card.exile_with_dream_counter
+          card.exile_with_dream_counter = false
+          card.exile!
+          card.dream_counter = true
+        elsif card.rebound? && card.zone.hand?
+          card.exile!
+        elsif card.exile_as_it_resolves?
+          card.exile!
+        elsif card.exile_instead_of_graveyard
+          card.exile_instead_of_graveyard = false
+          card.exile!
+        elsif card.buyback? && kicker_cost.paid?
+          card.move_to_hand!(card.owner)
+        else
+          card.move_to_graveyard!(card.owner)
+        end
       end
 
       # Rule 405.2: once a spell is on the stack it isn't in any zone it could be cast

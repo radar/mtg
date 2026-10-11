@@ -26,7 +26,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            creature = Permanent.resolve(game: game, card: target, owner: controller, from_zone: target.zone, enters_tapped: true, cast: false)
+            creature = Permanent.put_onto_battlefield(game: game, card: target, owner: controller, from_zone: target.zone, enters_tapped: true)
             game.current_turn.declare_attacker(creature)
           end
         end

@@ -17,7 +17,7 @@ module Magic
         def resolve!(target:)
           raise ArgumentError, "#{target.name} is not a valid choice" unless choices.include?(target)
 
-          Permanent.resolve(game: game, card: target, from_zone: target.zone, cast: false, controller: controller)
+          Permanent.put_onto_battlefield(game: game, card: target, from_zone: target.zone, controller: controller)
         end
       end
 

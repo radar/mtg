@@ -27,7 +27,7 @@ module Magic
         # "When you unlock this door, return all creature cards from your graveyard to the battlefield."
         when_unlocked do
           controller.graveyard.cards.select(&:creature?).each do |card|
-            Permanent.resolve(game: game, card: card, from_zone: card.zone, cast: false, controller: controller)
+            Permanent.put_onto_battlefield(game: game, card: card, from_zone: card.zone, controller: controller)
           end
         end
       end

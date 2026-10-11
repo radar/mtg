@@ -17,7 +17,7 @@ module Magic
 
         def resolve!(target:)
           target.exile!
-          copy = Permanent.resolve(game: game, owner: controller, card: target, token: true, copy: true, cast: false)
+          copy = Permanent.token_copy(game: game, owner: controller, card: target)
           copy.add_types(T::Creatures["Nightmare"], until_eot: false)
           controller.permanents.select { _1.token? && _1.type?("Nightmare") && _1 != copy }.each(&:exile!)
         end

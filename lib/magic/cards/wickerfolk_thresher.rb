@@ -20,7 +20,7 @@ module Magic
         def prompt = "Put #{card.name} onto the battlefield? Otherwise it goes into your hand."
 
         def resolve!
-          Permanent.resolve(card: card, game: game, from_zone: card.zone, cast: false, controller: controller)
+          Permanent.put_onto_battlefield(card: card, game: game, from_zone: card.zone, controller: controller)
         end
 
         def decline!

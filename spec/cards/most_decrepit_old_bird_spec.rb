@@ -35,7 +35,7 @@ RSpec.describe Magic::Cards::MostDecrepitOldBird do
       spell = Card("Moment Of Glory", owner: p1)
       p1.library.add(Card("Forest", owner: p1))
       p1.library.add(spell)
-      p1.cast(card:, adventure: true) { |a| a.pay_mana(generic: { blue: 1 }, blue: 1) }
+      p1.cast_as(:adventure,card:) { |a| a.pay_mana(generic: { blue: 1 }, blue: 1) }
       game.stack.resolve!
       expect(game.choices.last.choices).to eq([spell])
       game.resolve_choice!(target: spell)
@@ -44,7 +44,7 @@ RSpec.describe Magic::Cards::MostDecrepitOldBird do
     end
 
     it "may take nothing" do
-      p1.cast(card:, adventure: true) { |a| a.pay_mana(generic: { blue: 1 }, blue: 1) }
+      p1.cast_as(:adventure,card:) { |a| a.pay_mana(generic: { blue: 1 }, blue: 1) }
       game.stack.resolve!
       expect(p1.graveyard.cards.count).to be >= 4
     end

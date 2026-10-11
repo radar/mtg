@@ -293,7 +293,7 @@ module Magic
     # Rule 701.40: puts +card+ onto the battlefield face down as a 2/2 creature under +controller+'s control. It can be
     # turned face up for its mana cost if it's a creature card (`Actions::TurnFaceUp`).
     def manifest!(card, controller: card.owner)
-      Permanent.resolve(game: self, card: card, from_zone: card.zone, cast: false, controller: controller, face_down: true)
+      Permanent.put_onto_battlefield(game: self, card: card, from_zone: card.zone, controller: controller, face_down: true)
     end
 
     # `find` is a card type ("Forest"), a `Filter[...]` name (`:basic_lands`) or a lambda taking a card.

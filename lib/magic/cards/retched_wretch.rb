@@ -20,7 +20,7 @@ module Magic
   def call
     card = actor.card
     come_back = lambda do |zone|
-      returned = Permanent.resolve(game:, card:, owner: card.owner, from_zone: zone, cast: false)
+      returned = Permanent.put_onto_battlefield(game:, card:, owner: card.owner, from_zone: zone)
       returned.lose_all_abilities!
     end
 

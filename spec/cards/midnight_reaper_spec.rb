@@ -24,7 +24,7 @@ RSpec.describe Magic::Cards::MidnightReaper do
   end
 
   it "does not trigger for a token" do
-    token = Magic::Permanent.resolve(game:, owner: p1, card: ResolvePermanent("Grizzly Bears", owner: p2).copiable_card, token: true, copy: true, cast: false)
+    token = Magic::Permanent.token_copy(game:, owner: p1, card: ResolvePermanent("Grizzly Bears", owner: p2).copiable_card)
 
     expect { token.destroy!; game.settle! }.not_to(change { [p1.hand.count, p1.life] })
   end

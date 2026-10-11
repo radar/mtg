@@ -16,7 +16,7 @@ module Magic
         trigger_effect(:destroy_target, target: target)
         return unless card.creature? && card.zone&.graveyard?
 
-        returned = Permanent.resolve(game: game, card: card, from_zone: card.zone, cast: false, controller: controller)
+        returned = Permanent.put_onto_battlefield(game: game, card: card, from_zone: card.zone, controller: controller)
         returned.register_turn_trigger(Events::BeginningOfEndStep, Blitz::EndStepSacrificeTrigger)
       end
     end

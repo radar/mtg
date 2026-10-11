@@ -14,7 +14,7 @@ module Magic
         end
 
         def call
-          Permanent.resolve(game: game, owner: controller, card: actor.copiable_card, token: true, copy: true, cast: false)
+          Permanent.token_copy(game: game, owner: controller, card: actor.copiable_card)
         end
       end
 

@@ -8,10 +8,10 @@ RSpec.describe Magic::Cards::Emptiness do
 
   let(:card) { Card("Emptiness", owner: p1) }
 
-  def cast(mana, payment, **options)
+  def cast(mana, payment, mode = :normal)
     p1.hand.add(card)
     p1.add_mana(mana)
-    p1.cast(card:, **options) { _1.pay_mana(payment) }
+    p1.cast_as(mode, card:) { _1.pay_mana(payment) }
     game.stack.resolve!
     game.settle!
   end
@@ -66,7 +66,7 @@ RSpec.describe Magic::Cards::Emptiness do
 
   it "is sacrificed when evoked, and its triggers still use the mana spent" do
     p1.graveyard.add(Card("Grizzly Bears", owner: p1))
-    cast({ white: 2 }, { white: 2 }, evoked: true)
+    cast({ white: 2 }, { white: 2 }, :evoked)
 
     expect(p1.creatures.map(&:name)).to eq(["Grizzly Bears"])
     expect(card.zone).to be_graveyard

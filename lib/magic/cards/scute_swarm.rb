@@ -24,11 +24,10 @@ module Magic
           if lands < 6
             trigger_effect(:create_token, token_class: InsectToken)
           else
-            Permanent.resolve(
+            Permanent.token_copy(
               game: game,
               owner: actor.controller,
               card: actor.card,
-              token: true,
             )
           end
         end

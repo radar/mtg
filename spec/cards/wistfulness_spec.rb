@@ -8,10 +8,10 @@ RSpec.describe Magic::Cards::Wistfulness do
 
   let(:card) { Card("Wistfulness", owner: p1) }
 
-  def cast(mana, payment, **options)
+  def cast(mana, payment, mode = :normal)
     p1.hand.add(card)
     p1.add_mana(mana)
-    p1.cast(card:, **options) { _1.pay_mana(payment) }
+    p1.cast_as(mode, card:) { _1.pay_mana(payment) }
     game.stack.resolve!
     game.settle!
   end
@@ -58,7 +58,7 @@ RSpec.describe Magic::Cards::Wistfulness do
   end
 
   it "is sacrificed when evoked" do
-    cast({ blue: 2 }, { blue: 2 }, evoked: true)
+    cast({ blue: 2 }, { blue: 2 }, :evoked)
     game.resolve_choice!(card: p1.hand.cards.first)
 
     expect(p1.creatures).to be_empty

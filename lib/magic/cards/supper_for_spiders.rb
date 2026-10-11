@@ -16,7 +16,7 @@ module Magic
       # 3 life.' (They lose all other types and subtypes.)"
       def resolve!
         fresh_corpses.each do |card|
-          permanent = Permanent.resolve(card: card, game: game, from_zone: card.zone, cast: false, controller: controller)
+          permanent = Permanent.put_onto_battlefield(card: card, game: game, from_zone: card.zone, controller: controller)
           lost = permanent.types - [T::Artifact]
           permanent.remove_types(*lost, until_eot: false)
           permanent.add_types(T::Artifact, "Food", until_eot: false)

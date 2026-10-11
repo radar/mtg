@@ -29,7 +29,7 @@ module Magic
 
         def resolve_call
           source = targets ? "target" : THIS
-          call = "Permanent.resolve(game: game, owner: controller, card: #{source}.copiable_card, token: true, copy: true, cast: false)"
+          call = "Permanent.token_copy(game: game, owner: controller, card: #{source}.copiable_card)"
           return call unless haste_and_sacrifice
 
           "copy = #{call}\ncopy.grant_haste!\ncopy.register_turn_trigger(Events::BeginningOfEndStep, SacrificeTokenTrigger)"

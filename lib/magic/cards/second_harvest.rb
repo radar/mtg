@@ -10,7 +10,7 @@ module Magic
       def resolve!
         tokens = battlefield.controlled_by(controller).select(&:token?)
         tokens.each do |token|
-          Permanent.resolve(game: game, owner: controller, card: token.copiable_card, token: true, copy: true, cast: false)
+          Permanent.token_copy(game: game, owner: controller, card: token.copiable_card)
         end
       end
     end

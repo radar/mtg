@@ -13,7 +13,7 @@ module Magic
         raise ArgumentError, "chosen tokens must have different names" if targets.map(&:name).uniq.size < targets.size
 
         targets.each do |target|
-          Permanent.resolve(game: game, owner: chooser, card: target.card.class.new(game: game, owner: chooser), token: true, cast: false)
+          Permanent.token_copy(game: game, owner: chooser, card: target.card.class.new(game: game, owner: chooser))
         end
       end
     end

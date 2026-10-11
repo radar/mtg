@@ -39,7 +39,7 @@ RSpec.describe Magic::Cards::ThranduilSindarinLiege do
 
     def cast_rally
       p1.add_mana(green: 3)
-      p1.cast(card:, adventure: true) { _1.pay_mana(generic: { green: 1 }, green: 2) }
+      p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { green: 1 }, green: 2) }
       game.stack.resolve!
     end
 

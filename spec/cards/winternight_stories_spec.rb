@@ -25,7 +25,7 @@ RSpec.describe Magic::Cards::WinternightStories do
     p1.graveyard.add(card)
     p1.add_mana(blue: 3)
 
-    p1.cast(card: card, harmonize: true) do |a|
+    p1.cast_as(:harmonize,card: card) do |a|
       a.harmonize_tap(bear)
       a.pay_mana(generic: { blue: 2 }, blue: 1)
     end

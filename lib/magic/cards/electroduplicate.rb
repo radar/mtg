@@ -15,7 +15,7 @@ module Magic
       end
 
       def resolve!(target:)
-        copy = Permanent.resolve(game: game, owner: controller, card: target.copiable_card, token: true, copy: true, cast: false)
+        copy = Permanent.token_copy(game: game, owner: controller, card: target.copiable_card)
         copy.grant_haste!
         copy.register_turn_trigger(Events::BeginningOfEndStep, SacrificeTokenTrigger)
       end

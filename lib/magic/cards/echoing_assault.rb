@@ -33,13 +33,10 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          copy = Permanent.resolve(
+          copy = Permanent.token_copy(
             game: game,
             owner: controller,
             card: target.copiable_card,
-            token: true,
-            copy: true,
-            cast: false,
             enters_tapped: true,
           )
           copy.modify_base_power(1, until_eot: false)

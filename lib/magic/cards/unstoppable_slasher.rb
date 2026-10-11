@@ -31,7 +31,7 @@ module Magic
         def call
           card = actor.card
           come_back = lambda do |zone|
-            returned = Permanent.resolve(game:, card:, owner: card.owner, from_zone: zone, cast: false, enters_tapped: true)
+            returned = Permanent.put_onto_battlefield(game:, card:, owner: card.owner, from_zone: zone, enters_tapped: true)
             returned.add_counter("stun", amount: 2)
           end
 

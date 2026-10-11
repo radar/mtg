@@ -189,7 +189,7 @@ RSpec.describe Magic::Game, "action legality -- casting spells" do
       p1.add_mana(red: 3)
       go_to_main_phase!
 
-      p1.cast(card: lindblum, adventure: true) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
+      p1.cast_as(:adventure,card: lindblum) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
 
       expect(game.stack.spells.map(&:card)).to eq([lindblum])
     end

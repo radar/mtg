@@ -24,7 +24,7 @@ RSpec.describe Magic::Cards::GollumSilentSlinker do
     end
 
     it "puts a +1/+1 counter on the creature, gains 2 life, and exiles the card" do
-      p1.cast(card:, adventure: true) { |a| a.targeting(bear, p1).pay_mana(black: 1) }
+      p1.cast_as(:adventure,card:) { |a| a.targeting(bear, p1).pay_mana(black: 1) }
       game.stack.resolve!
       expect(bear.power).to eq(6)
       expect(p1.life).to eq(22)
@@ -32,14 +32,14 @@ RSpec.describe Magic::Cards::GollumSilentSlinker do
     end
 
     it "allows no creature target" do
-      p1.cast(card:, adventure: true) { |a| a.targeting(nil, p2).pay_mana(black: 1) }
+      p1.cast_as(:adventure,card:) { |a| a.targeting(nil, p2).pay_mana(black: 1) }
       game.stack.resolve!
       expect(bear.power).to eq(5)
       expect(p2.life).to eq(22)
     end
 
     it "lets you cast Gollum from exile afterwards" do
-      p1.cast(card:, adventure: true) { |a| a.targeting(bear, p1).pay_mana(black: 1) }
+      p1.cast_as(:adventure,card:) { |a| a.targeting(bear, p1).pay_mana(black: 1) }
       game.stack.resolve!
       p1.add_mana(black: 4)
       p1.cast(card:) { |a| a.pay_mana(generic: { black: 3 }, black: 1) }

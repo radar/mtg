@@ -19,7 +19,7 @@ module Magic
 
         def resolve!
           amount.times.map do
-            Permanent.resolve(game:, owner: token_controller, card: creature.copiable_card, token: true, copy: true, cast: false)
+            Permanent.token_copy(game:, owner: token_controller, card: creature.copiable_card)
           end
         end
       end

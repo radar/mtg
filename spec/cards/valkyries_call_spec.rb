@@ -63,7 +63,7 @@ RSpec.describe Magic::Cards::ValkyriesCall do
   end
 
   it "does not return a token" do
-    token = Magic::Permanent.resolve(game:, owner: p1, card: ResolvePermanent("Grizzly Bears", owner: p2).copiable_card, token: true, copy: true, cast: false)
+    token = Magic::Permanent.token_copy(game:, owner: p1, card: ResolvePermanent("Grizzly Bears", owner: p2).copiable_card)
     token.destroy!
     game.settle!
 

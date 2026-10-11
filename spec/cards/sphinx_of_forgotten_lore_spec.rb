@@ -31,7 +31,7 @@ RSpec.describe Magic::Cards::SphinxOfForgottenLore do
     game.resolve_choice!(target: lightning)
     p1.add_mana(red: 1)
 
-    action = cast_action(player: p1, card: lightning, flashback: true)
+    action = cast_action_as(:flashback,player: p1, card: lightning)
     action.pay_mana(red: 1).targeting(p2)
     game.take_action(action)
     game.stack.resolve!
@@ -46,7 +46,7 @@ RSpec.describe Magic::Cards::SphinxOfForgottenLore do
     attack!
     game.resolve_choice!(target: lightning)
 
-    expect(cast_action(player: p1, card: other_instant, flashback: true).legal?).to eq(false)
+    expect(cast_action_as(:flashback,player: p1, card: other_instant).legal?).to eq(false)
   end
 
   it "lasts until end of turn only" do
@@ -57,7 +57,7 @@ RSpec.describe Magic::Cards::SphinxOfForgottenLore do
     game.next_turn
     game.next_turn
 
-    expect(cast_action(player: p1, card: lightning, flashback: true).legal?).to eq(false)
+    expect(cast_action_as(:flashback,player: p1, card: lightning).legal?).to eq(false)
   end
 
   it "can't target a creature card or an opponent's graveyard" do

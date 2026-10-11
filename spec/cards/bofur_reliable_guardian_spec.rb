@@ -22,7 +22,7 @@ RSpec.describe Magic::Cards::BofurReliableGuardian do
 
     def cast_care(target)
       p1.add_mana(white: 2)
-      p1.cast(card:, adventure: true) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(target) }
+      p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(target) }
       game.stack.resolve!
       game.tick!
     end
@@ -54,7 +54,7 @@ RSpec.describe Magic::Cards::BofurReliableGuardian do
       p1.add_mana(white: 2)
 
       expect {
-        p1.cast(card:, adventure: true) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(theirs) }
+        p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(theirs) }
       }.to raise_error(StandardError)
     end
 

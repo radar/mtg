@@ -40,7 +40,7 @@ RSpec.describe Magic::Cards::TidingsOfWar do
   it "amasses Goblins 3 instead when cast with flashback from the graveyard" do
     p1.graveyard.add(card)
     p1.add_mana(red: 4)
-    p1.cast(card:, flashback: true) { _1.pay_mana(generic: { red: 3 }, red: 1) }
+    p1.cast_as(:flashback,card:) { _1.pay_mana(generic: { red: 3 }, red: 1) }
     game.stack.resolve!
     game.tick!
 

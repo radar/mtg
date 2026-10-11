@@ -90,7 +90,7 @@ RSpec.describe Magic::Cards::JaxisTheTroublemaker do
 
     it "can be cast for {1}{R}, gaining haste" do
       p1.add_mana(generic: 1, red: 1)
-      p1.cast(card: card, blitz: true) do |a|
+      p1.cast_as(:blitz,card: card) do |a|
         a.pay_mana(generic: { generic: 1 }, red: 1)
       end
       game.stack.resolve!
@@ -102,7 +102,7 @@ RSpec.describe Magic::Cards::JaxisTheTroublemaker do
 
     it "sacrifices itself at the beginning of the next end step and draws a card when it dies" do
       p1.add_mana(generic: 1, red: 1)
-      p1.cast(card: card, blitz: true) do |a|
+      p1.cast_as(:blitz,card: card) do |a|
         a.pay_mana(generic: { generic: 1 }, red: 1)
       end
       game.stack.resolve!

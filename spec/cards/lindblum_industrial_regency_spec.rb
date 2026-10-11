@@ -36,7 +36,7 @@ RSpec.describe Magic::Cards::LindblumIndustrialRegency do
       p1.hand.add(card)
       p1.add_mana(red: 3)
 
-      p1.cast(card: card, adventure: true) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
+      p1.cast_as(:adventure,card: card) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
       game.stack.resolve!
 
       token = p1.permanents.by_name("Wizard").first
@@ -51,7 +51,7 @@ RSpec.describe Magic::Cards::LindblumIndustrialRegency do
       p1.hand.add(card)
       p1.add_mana(red: 3)
 
-      p1.cast(card: card, adventure: true) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
+      p1.cast_as(:adventure,card: card) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
       game.stack.resolve!
 
       p1.play_land(land: card)
@@ -64,7 +64,7 @@ RSpec.describe Magic::Cards::LindblumIndustrialRegency do
       card = Card("Lindblum, Industrial Regency")
       p1.hand.add(card)
       p1.add_mana(red: 3)
-      p1.cast(card: card, adventure: true) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
+      p1.cast_as(:adventure,card: card) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
       game.stack.resolve!
 
       p1.add_mana(red: 1)
@@ -81,7 +81,7 @@ RSpec.describe Magic::Cards::LindblumIndustrialRegency do
       card = Card("Lindblum, Industrial Regency")
       p1.hand.add(card)
       p1.add_mana(red: 3)
-      p1.cast(card: card, adventure: true) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
+      p1.cast_as(:adventure,card: card) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
       game.stack.resolve!
 
       p1.add_mana(red: 1)

@@ -24,7 +24,7 @@ RSpec.describe Magic::Cards::SelfReflection do
     card = Card("Self-Reflection", owner: p1)
     p1.graveyard.add(card)
     p1.add_mana(blue: 4)
-    p1.cast(card:, flashback: true) { |a| a.pay_mana(generic: { blue: 3 }, blue: 1).targeting(bears) }
+    p1.cast_as(:flashback,card:) { |a| a.pay_mana(generic: { blue: 3 }, blue: 1).targeting(bears) }
     game.stack.resolve!
     game.settle!
 

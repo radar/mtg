@@ -113,14 +113,22 @@ module Magic
       game.take_action(action)
     end
 
-    def prepare_cast(card:, **args)
-      action = prepare_action(Magic::Actions::Cast, card: card, **args)
+    # @param cast_class [Class] `Actions::Cast`, or a subclass such as `Actions::Cast::Flashback`
+    def prepare_cast(cast_class = Magic::Actions::Cast, card:, **args)
+      action = prepare_action(cast_class, card: card, **args)
       yield action if block_given?
       action
     end
 
+    # A Room is cast as one of its doors: `cast(card: room, door: :left)` is `cast_as(:door, card: room, door: :left)`.
     def cast(card:, **args, &block)
-      action = prepare_cast(card: card, **args, &block)
+      cast_as(args.key?(:door) ? :door : :normal, card:, **args, &block)
+    end
+
+    # @param mode [Symbol] How the spell is cast: `:flashback`, `:harmonize`, `:blitz`, `:evoked`, `:adventure`,
+    #   `:alternative`, `:door` (a Room) or `:normal` (see `Actions::Cast.for_mode`)
+    def cast_as(mode, card:, **args, &block)
+      action = prepare_cast(Magic::Actions::Cast.for_mode(mode), card: card, **args, &block)
       game.take_action(action)
       action
     end

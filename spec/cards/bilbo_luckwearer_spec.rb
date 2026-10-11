@@ -53,7 +53,7 @@ RSpec.describe Magic::Cards::BilboLuckwearer do
 
     def cast_plot(*targets)
       p1.add_mana(blue: 5)
-      p1.cast(card:, adventure: true) { _1.pay_mana(generic: { blue: 4 }, blue: 1).targeting(*targets) }
+      p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { blue: 4 }, blue: 1).targeting(*targets) }
       game.stack.resolve!
       game.settle!
     end
