@@ -46,6 +46,13 @@ module Magic
       end
     end
 
+    # "Spend this mana only to cast Room spells and unlock doors" (Smoky Lounge).
+    class RoomSpellOrUnlock < ManaRestriction
+      def permits?(use)
+        (use.is_a?(Magic::Card) && use.is_a?(Magic::Cards::Room)) || use.is_a?(Magic::Actions::UnlockDoor::Use)
+      end
+    end
+
     # Path of Ancestry: "When that mana is spent to cast a creature spell that shares a creature type with your
     # commander, scry 1." Not a restriction at all (any spend is allowed), but riding on the mana lets `spent_on` see what
     # it was spent on.
