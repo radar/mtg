@@ -145,6 +145,8 @@ module Magic
         define_method(ability_list) { unlocked_doors.flat_map(&ability_list) }
       end
 
+      def no_maximum_hand_size? = unlocked_doors.any?(&:no_maximum_hand_size?)
+
       def replacement_effects
         unlocked_doors.map(&:replacement_effects).reduce({}) { |all, effects| all.merge(effects) }
       end

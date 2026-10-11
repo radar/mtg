@@ -38,6 +38,12 @@ module Magic
         self
       end
 
+      # Pays with whatever mana is in the pool.
+      def auto_pay
+        mana_cost.auto_pay(player: player)
+        self
+      end
+
       def can_perform?
         mana_cost.can_pay?(player)
       end
