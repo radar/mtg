@@ -131,6 +131,11 @@ module Magic
         pay(:blight, creature)
       end
 
+      # The cards to exile from the graveyard ("Exile this card and two other cards named ..."), source included if it is one.
+      def pay_exile_from_graveyard(cards)
+        pay(:exile_from_graveyard, cards)
+      end
+
       def perform
         record_activation!
         game.stack.add(self)
@@ -162,6 +167,8 @@ module Magic
           Costs::SelfExile
         when :self_discard
           Costs::SelfDiscard
+        when :exile_from_graveyard
+          Costs::ExileFromGraveyard
         else
           raise "unknown cost type: #{cost_type}"
         end
