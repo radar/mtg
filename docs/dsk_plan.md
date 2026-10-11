@@ -27,7 +27,7 @@ Rooms plus face-down cover about 75% of the blocked cards.
 5. Count of unlocked doors, "target Room" filter, unlock cost reduction (Inquisitive Glimmer).
 6. Order: the 12 Room cards, then Eerie cards, then the "also blocks" cards.
 
-Status (2026-10-11): steps 1-4 done (`Cards::Room`, `Actions::UnlockDoor`, both events, `Cast door:`, `LegalActions`), see "Rooms (doors)" in `docs/engine_notes.md`. Step 5 and all cards remain.
+Status (2026-10-11): **done**, except Creeping Peeper (needs Phase 2 too). Engine: `Cards::Room`, `Actions::UnlockDoor`, both events, `Cast door:`, `LegalActions`, `TriggeredAbility::Eerie`, `Choice::UnlockDoor`/`LockOrUnlockDoor`/`SelectDoor`, unlock cost adjustments, `Player#rooms`/`#unlocked_doors`; see "Rooms (doors)" in `docs/engine_notes.md`. Cards: all 12 Rooms and 23 others (Eerie creatures, Keys to the House, Marina Vendrell, Anthropede, Rampaging Soulrager, Intruding Soulrager, Ghostly Keybearer, Inquisitive Glimmer, ...).
 
 ## Phase 2: Face-down permanents (~31 cards)
 
