@@ -142,6 +142,25 @@ RSpec.shared_context "two player game" do
     game.tick!
   end
 
+  # The two things that set off Eerie for p1: an enchantment entering, and fully unlocking a Room.
+  def eerie_enchantment_enters!
+    ResolvePermanent("Sanctum Of Calm Waters", owner: p1)
+    game.settle!
+  end
+
+  # A Room that is a permanent already, so that entering is not what sets Eerie off while a spec measures the unlock.
+  def eerie_room
+    go_to_main_phase!
+    ResolvePermanent("Funeral Room Awakening Hall", owner: p1, doors: [:right])
+  end
+
+  def eerie_fully_unlock_room!(room = eerie_room)
+    go_to_main_phase!
+    p1.add_mana(black: 3)
+    p1.unlock_door(permanent: room, door: :left) { |a| a.pay_mana(generic: { black: 2 }, black: 1) }
+    game.settle!
+  end
+
   before do
     p1_library.each_with_index { p1.library.add(_1, _2) }
     p2_library.each_with_index { p2.library.add(_1, _2) }
