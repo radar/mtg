@@ -185,6 +185,7 @@ module Magic
       # The opening hands are drawn before the game begins: they aren't "this turn" (Erudite Wizard
       # counts the cards drawn each turn).
       @current_turn.events.clear
+      offer_opening_hand_cards!
       # "beginning" (the state Turn starts in, before its first untap!) is a
       # NO_PRIORITY_STEP like untap/cleanup, but unlike those it isn't a real rules
       # concept -- it only exists so specs can build a game and act (an instant, a mana
@@ -288,6 +289,14 @@ module Magic
       notify!(Events::TheRingTemptsPlayer.new(player: player))
 
       add_choice(Choice::RingBearer.new(player: player)) if player.creatures.any?
+    end
+
+    # Rule 103.6: after the opening hands are drawn, each player in turn order may begin the game with their Leylines
+    # ("If this card is in your opening hand, you may begin the game with it on the battlefield") on the battlefield.
+    def offer_opening_hand_cards!
+      players.each do |player|
+        player.hand.cards.select(&:begins_on_battlefield?).each { |card| add_choice(Choice::BeginOnBattlefield.new(card: card)) }
+      end
     end
 
     # Rule 701.40: puts +card+ onto the battlefield face down as a 2/2 creature under +controller+'s control. It can be

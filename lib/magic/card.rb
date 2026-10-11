@@ -77,6 +77,12 @@ module Magic
         const_set(:BLITZ_COST, cost)
       end
 
+      # "If this card is in your opening hand, you may begin the game with it on the battlefield" (Leylines):
+      # `Game#start!` offers it to its owner once the opening hands are drawn.
+      def begins_on_battlefield
+        define_method(:begins_on_battlefield?) { true }
+      end
+
       # "Impending N--{cost}": an alternative cost (`Actions::Cast::Impending`); the permanent enters with N time
       # counters and isn't a creature while it has any, losing one at the beginning of its controller's end step.
       #
@@ -422,6 +428,8 @@ module Magic
     def activated_abilities
       []
     end
+
+    def begins_on_battlefield? = false
 
     # How many times X appears in the mana cost: 2 for {X}{X}. The mana to pay is X times this.
     def x_multiplier = 1

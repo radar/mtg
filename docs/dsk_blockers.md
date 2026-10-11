@@ -3,14 +3,12 @@
 Cards skipped because they need an engine feature that doesn't exist yet.
 
 - Waltz of Rage: needs a player-level delayed triggered ability ("until end of turn, whenever a creature you control dies"); the engine only has per-permanent turn triggers (`Permanent#add_turn_trigger`), nothing registered on the game with no source permanent.
-- Leyline of the Void: "If this card is in your opening hand, you may begin the game with it on the battlefield" needs a pregame opening-hand step; the engine has none. Also blocks the other Leylines (Hope, Mutation, Resonance, Transformation).
 - Toby, Beastie Befriender: the Beast token "can't attack or block alone" needs a check on the whole declared attacker/blocker set; combat declares attackers one at a time (`can_attack?` only sees the single creature), so there is no hook for a group-level restriction.
 - Valgavoth, Terror Eater: ward-sacrifice-three-nonland-permanents has no non-mana ward cost, and "you may play cards exiled with Valgavoth" paying life instead of the mana cost needs a linked-exile cast permission with an alternative cost.
 - Kaito, Bane of Nightmares: needs ninjutsu (unblocked-attacker return cost, put onto the battlefield attacking), a planeswalker that is also a creature during your turn only, and a Ninja emblem; the engine has none of these.
 - The Jolly Balloon Man: the token copy of another creature "except it's a 1/1 red Balloon creature in addition to its other colors and types and has flying and haste" needs a copy token with characteristic overrides (`CreateTokenCopy` only sets base P/T for offspring) and a sacrifice at the beginning of the next end step registered for a token with no source trigger.
 - Niko, Light of Hope: needs Shard tokens that later "become copies" of an exiled creature until the next end step, plus a blink returning at the next end step; the engine has no temporary become-a-copy effect for existing permanents.
 - The Tale of Tamiyo: chapter IV exiles cards from the graveyard, copies them as spells and casts the copies, and the mill-and-repeat chapters need shared-type checks on milled cards; the engine has no copy-a-card-and-cast-the-copy support.
-- Leyline of Hope: "begin the game with it on the battlefield" needs a pregame opening-hand step; the engine has none (same gap as Leyline of the Void).
-- Leyline of Mutation: needs the opening-hand step (same gap as Leyline of the Void) and a free-form alternative cost for every spell you cast.
-- Leyline of Transformation: needs the opening-hand step (same gap as Leyline of the Void) and a chosen creature type added to creatures, spells and cards outside the battlefield.
-- Leyline of Resonance: needs the opening-hand step (same gap as Leyline of the Void) and copying a spell that targets only one creature you control.
+- Leyline of Mutation: a free-form alternative cost ({W}{U}{B}{R}{G}) for every spell you cast (the opening-hand step exists now).
+- Leyline of Transformation: a chosen creature type added to creatures, spells and cards outside the battlefield (the opening-hand step exists now).
+- Leyline of Resonance: copying a spell that targets only one creature you control (the opening-hand step exists now).

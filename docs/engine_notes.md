@@ -106,6 +106,10 @@ This does **not** yet let a player respond to a trigger with an instant — that
 
 `Permanent#destroy!` is the replacement point: indestructible returns false, then a regeneration shield (`regenerate!` adds one; `regenerated!` spends it: tap, clear damage and `@marked_for_death`, `CombatPhase#remove_from_combat`, fire `Events::Regenerated`) returns false too. Both also cover SBA lethal damage/deathtouch since it calls `destroy!`. Shields reset in `Permanent#cleanup!`. `put_into_graveyard!`/`sacrifice!` bypass both. Protection prevents damage in `TargetedEffect#damage_prevented?` (used by `DealDamage`, `DealCombatDamage`), which resolves an ability source to its permanent. "Can't be regenerated" is not modelled.
 
+## Opening-hand step (Leylines)
+
+`begins_on_battlefield` in a card's DSL block marks "If this card is in your opening hand, you may begin the game with it on the battlefield". `Game#start!` draws the opening hands, then `offer_opening_hand_cards!` adds a `Choice::BeginOnBattlefield` (a `Choice::May`: `game.resolve_choice!` accepts, `game.skip_choice!` declines) per such card, players in turn order. No mulligans are modelled. In specs, override `p1_library` so the card is among the first seven (`LeylineOfTheVoid` spec). Also: `Player#activate_ability` now checks activation requirements before the block pays costs.
+
 ## Impending (Overlords)
 
 `impending 4, Costs::Mana.new(...)` on a card class adds `impending_count`/`impending_cost`. Cast it with `player.cast_as(:impending, card:)` (`Actions::Cast::Impending`, offered by `LegalActions`): the permanent enters with that many time counters (`counters:` on `Permanent.resolve_spell`), `Permanent#impending?` is true, and `impending_now?` (any time counter left) removes Creature from its types in `ContinuousEffects#calculate_types`. `TriggeredAbility::ImpendingCounterRemoval` (added in `dispatch_event_handlers`) takes a counter at the beginning of its controller's end step. `Cards::Overlord` is the base for the five Overlords: `enters_or_attacks { ... }` defines both triggers from one block.
