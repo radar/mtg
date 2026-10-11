@@ -413,6 +413,9 @@ module Magic
       []
     end
 
+    # How many times X appears in the mana cost: 2 for {X}{X}. The mana to pay is X times this.
+    def x_multiplier = 1
+
     # Harmonize granted by an effect until end of turn, its cost being the card's mana cost
     # (Songcrafter Mage). A card with its own `harmonize` macro overrides `harmonize_cost`.
     def grant_harmonize_until_end_of_turn!
