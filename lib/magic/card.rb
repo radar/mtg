@@ -77,6 +77,12 @@ module Magic
         const_set(:BLITZ_COST, cost)
       end
 
+      # "Ninjutsu {cost}": from your hand, pay it and return an unblocked attacker you control to hand to put this card
+      # onto the battlefield tapped and attacking (`Actions::Ninjutsu`, `player.ninjutsu(card:, attacker:)`).
+      def ninjutsu(cost)
+        define_method(:ninjutsu_cost) { cost }
+      end
+
       # "If this card is in your opening hand, you may begin the game with it on the battlefield" (Leylines):
       # `Game#start!` offers it to its owner once the opening hands are drawn.
       def begins_on_battlefield

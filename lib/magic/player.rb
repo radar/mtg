@@ -81,6 +81,12 @@ module Magic
       game.take_action(action)
     end
 
+    # Ninjutsu: pays the cost and returns the unblocked +attacker+ to put +card+ (in hand) onto the battlefield attacking.
+    def ninjutsu(card:, attacker:, **args, &block)
+      action = prepare_action(Magic::Actions::Ninjutsu, card: card, attacker: attacker, **args, &block)
+      game.take_action(action)
+    end
+
     # Pays a face-down creature card's mana cost to turn it face up.
     def turn_face_up(permanent:, **args, &block)
       action = prepare_action(Magic::Actions::TurnFaceUp, permanent: permanent, **args, &block)

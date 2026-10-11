@@ -23,7 +23,7 @@ module Magic
     end
 
     def call
-      [*castable_spells, *playable_lands, *cyclable_cards, *unlockable_doors, *turnable_face_up, *activatable_abilities, *activatable_loyalty_abilities,
+      [*castable_spells, *playable_lands, *cyclable_cards, *unlockable_doors, *turnable_face_up, *ninjutsu_activations, *activatable_abilities, *activatable_loyalty_abilities,
        *declarable_attackers, *declarable_blockers, nil]
     end
 
@@ -70,6 +70,14 @@ module Magic
       player.permanents.select(&:room?).flat_map do |room|
         room.card.locked_doors.filter_map { |door| keep(Actions::UnlockDoor.new(game: game, player: player, permanent: room, door: door)) }
       end
+    end
+
+    def ninjutsu_activations
+      return [] unless game.current_turn.step?(:declare_blockers)
+
+      ninjas = player.hand.cards.select { _1.respond_to?(:ninjutsu_cost) }
+      attackers = game.current_turn.attacks.map(&:attacker).select { _1.controller == player }
+      ninjas.product(attackers).filter_map { |card, attacker| keep(Actions::Ninjutsu.new(game: game, player: player, card: card, attacker: attacker)) }
     end
 
     def turnable_face_up
