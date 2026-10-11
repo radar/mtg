@@ -2,7 +2,6 @@
 
 Cards skipped because they need an engine feature that doesn't exist yet.
 
-- Waltz of Rage: needs a player-level delayed triggered ability ("until end of turn, whenever a creature you control dies"); the engine only has per-permanent turn triggers (`Permanent#add_turn_trigger`), nothing registered on the game with no source permanent.
 - Toby, Beastie Befriender: the Beast token "can't attack or block alone" needs a check on the whole declared attacker/blocker set; combat declares attackers one at a time (`can_attack?` only sees the single creature), so there is no hook for a group-level restriction.
 - Valgavoth, Terror Eater: ward-sacrifice-three-nonland-permanents has no non-mana ward cost, and "you may play cards exiled with Valgavoth" paying life instead of the mana cost needs a linked-exile cast permission with an alternative cost.
 - Kaito, Bane of Nightmares: needs ninjutsu (unblocked-attacker return cost, put onto the battlefield attacking), a planeswalker that is also a creature during your turn only, and a Ninja emblem; the engine has none of these.
