@@ -28,7 +28,7 @@ module Magic
 
         def call
           actor.trigger_once_this_turn!(self.class)
-          Permanent.resolve(game:, owner: controller, card: event.permanent.copiable_card, token: true, copy: true, cast: false)
+          Permanent.token_copy(game:, owner: controller, card: event.permanent.copiable_card)
         end
       end
 

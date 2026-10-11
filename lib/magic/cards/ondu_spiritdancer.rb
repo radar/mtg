@@ -28,11 +28,10 @@ module Magic
         end
 
         def call
-          Permanent.resolve(
+          Permanent.token_copy(
             game: game,
             owner: controller,
             card: event.permanent.card,
-            token: true,
           )
         end
       end

@@ -47,7 +47,7 @@ module Magic
 
         # "...put target creature card from a graveyard onto the battlefield under your control. It gains haste."
         def resolve!(target:)
-          permanent = Permanent.resolve(game:, card: target, from_zone: target.zone, cast: false, controller:)
+          permanent = Permanent.put_onto_battlefield(game:, card: target, from_zone: target.zone, controller:)
           permanent.grant_haste!
         end
       end

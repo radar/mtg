@@ -29,7 +29,7 @@ RSpec.describe Magic::Cards::ArchfiendsVessel do
   it "is exiled for a 5/5 flying Demon when it enters from your graveyard" do
     card = Card("Archfiend's Vessel", owner: p1)
     p1.graveyard.add(card)
-    Magic::Permanent.resolve(game:, card:, from_zone: card.zone, cast: false)
+    Magic::Permanent.put_onto_battlefield(game:, card:, from_zone: card.zone)
     game.settle!
 
     demon = p1.creatures.by_name("Demon").first

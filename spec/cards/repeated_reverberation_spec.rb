@@ -79,7 +79,7 @@ RSpec.describe Magic::Cards::RepeatedReverberation do
   it "copies a loyalty ability activated this turn" do
     cast_repeated_reverberation
 
-    planeswalker = Magic::Permanent.resolve(game: game, owner: p1, card: Card("Ob Nixilis Reignited", owner: p1))
+    planeswalker = Magic::Permanent.resolve_spell(game: game, owner: p1, card: Card("Ob Nixilis Reignited", owner: p1))
     ability = planeswalker.loyalty_abilities.first
 
     starting_hand_size = p1.hand.count

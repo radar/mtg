@@ -19,7 +19,7 @@ module Magic
       def resolve!(target:)
         card = target.card
         trigger_effect(:exile, target: target)
-        Permanent.resolve(game: game, card: card, owner: card.owner, cast: false)
+        Permanent.put_onto_battlefield(game: game, card: card, owner: card.owner)
         trigger_effect(:create_token, token_class: ShapeshifterToken)
       end
     end

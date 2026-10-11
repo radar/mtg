@@ -64,20 +64,27 @@ module Magic
     # The number of the turn during which the current controller gained control of this permanent.
     attr_accessor :controlled_since_turn
 
-    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false, value_for_x: nil)
+    # A spell resolving into a permanent: the card was cast, so it knows how (kicked, evoked, what mana was spent,
+    # the X it was cast with).
+    def self.resolve_spell(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil)
+      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: true, kicked:, evoked:, mana_spent:, value_for_x:)
+    end
+
+    # A card put onto the battlefield by an effect rather than cast (a flicker or reanimation, a token being created).
+    def self.put_onto_battlefield(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil)
+      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: false)
+    end
+
+    # A token that is a copy of `card`. The card itself stays where it is.
+    def self.token_copy(game:, card:, owner: card.owner, controller: owner, enters_tapped: card.enters_tapped?)
+      enter(game:, card:, owner:, controller:, from_zone: nil, enters_tapped:, attach_to: nil, token: true, copy: true, cast: false)
+    end
+
+    def self.enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token:, copy:, cast:, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil)
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:, controller:)
       card_zone = card.zone unless token || copy
 
-      permanent = Magic::Permanent.new(
-        game: game,
-        owner: owner,
-        controller: controller,
-        card: card,
-        kicked: kicked,
-        cast: cast,
-        token: token,
-        copy: copy,
-      )
+      permanent = Magic::Permanent.new(game:, owner:, controller:, card:, kicked:, cast:, token:, copy:)
       permanent.mana_spent = mana_spent
       permanent.x_value = value_for_x
       permanent.copy_choice_pending = card.enters_as_copy?
@@ -86,17 +93,22 @@ module Magic
       permanent.entered_from_zone = card_zone
       permanent.tap! if enters_tapped
       permanent.attach_to!(attach_to) if attach_to
-      card.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
-      # "enters with X +1/+1 counters" (Jacked Rabbit's ravenous): the X it was cast with.
-      card.entering_counters_for_x(value_for_x.to_i).each { |counter_type, amount| permanent.add_counter(counter_type, amount:) } if value_for_x
-      if cast && card_zone&.hand?
-        card.entering_counters_if_cast_from_hand.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
-      end
+      add_entering_counters(permanent:, card:, value_for_x:, cast_from_hand: cast && card_zone&.hand?)
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       add_additional_counters_for_entering(game:, permanent:) if card.creature?
       move_card_to_battlefield(game:, card:, permanent:, from: card_zone)
       permanent
     end
+    private_class_method :enter
+
+    def self.add_entering_counters(permanent:, card:, value_for_x:, cast_from_hand:)
+      counters = card.entering_counters.to_a
+      # "enters with X +1/+1 counters" (Jacked Rabbit's ravenous): the X it was cast with.
+      counters += card.entering_counters_for_x(value_for_x.to_i).to_a if value_for_x
+      counters += card.entering_counters_if_cast_from_hand.to_a if cast_from_hand
+      counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
+    end
+    private_class_method :add_entering_counters
 
     # The card leaves the zone it was in (exile, graveyard, hand, ...) along with the
     # permanent entering, unless something else already moved it: a replaced entry
@@ -757,7 +769,7 @@ module Magic
     def return_cards_exiled_until_leaves!
       cards, @cards_exiled_until_leaves = cards_exiled_until_leaves, []
       cards.select { _1.zone&.exile? }.each do |card|
-        Permanent.resolve(game:, card:, owner: card.owner, from_zone: card.zone, cast: false)
+        Permanent.put_onto_battlefield(game:, card:, owner: card.owner, from_zone: card.zone)
       end
     end
 

@@ -15,13 +15,10 @@ module Magic
         end
 
         def call
-          copy = Permanent.resolve(
+          copy = Permanent.token_copy(
             game: game,
             owner: controller,
             card: actor.attached_to.copiable_card,
-            token: true,
-            copy: true,
-            cast: false,
           )
           copy.remove_types(T::Super::Legendary, until_eot: false)
           copy.grant_keyword(Keywords::HASTE, until_eot: false)

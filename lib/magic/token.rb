@@ -72,7 +72,7 @@ module Magic
     end
 
     def resolve!(**args)
-      Permanent.resolve(game: game, card: self, **args)
+      Permanent.put_onto_battlefield(game: game, card: self, **args)
     end
 
     def colors

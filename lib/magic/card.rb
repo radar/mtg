@@ -83,7 +83,7 @@ module Magic
         const_set(:EVOKE_COST, cost)
       end
 
-      # "You may have this enter as a copy of a creature": Permanent.resolve then holds off state-based
+      # "You may have this enter as a copy of a creature": Permanent.enter then holds off state-based
       # actions until the card's enters trigger clears `copy_choice_pending`.
       def enters_as_copy
         define_method(:enters_as_copy?) { true }
@@ -177,7 +177,7 @@ module Magic
 
       # "~ enters with two +1/+1 counters on it."
       # "~ enters with a divinity counter on it if you cast it from your hand." (`if_cast_from_hand: true`:
-      # Permanent.resolve adds it only for a spell cast from the hand.)
+      # Permanent.enter adds it only for a spell cast from the hand.)
       def enters_with_counters(counter_type, amount, if_cast_from_hand: false)
         define_method(if_cast_from_hand ? :entering_counters_if_cast_from_hand : :entering_counters) { { counter_type => amount } }
       end
@@ -337,7 +337,7 @@ module Magic
 
     def resolve!(enters_tapped: enters_tapped?, kicked: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false, value_for_x: nil)
       if permanent?
-        permanent = Magic::Permanent.resolve(
+        permanent = Magic::Permanent.resolve_spell(
           game: game,
           owner: owner,
           controller: controller,
@@ -350,7 +350,7 @@ module Magic
           evoked: evoked,
           value_for_x: value_for_x,
         )
-        # A card resolving from the stack has no zone, so Permanent.resolve can't move it.
+        # A card resolving from the stack has no zone, so Permanent.resolve_spell can't move it.
         move_zone!(to: battlefield) unless zone&.battlefield?
         permanent
       end

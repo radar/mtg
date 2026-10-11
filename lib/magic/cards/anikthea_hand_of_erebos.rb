@@ -34,13 +34,12 @@ module Magic
         def resolve!(target: nil)
           return unless target
 
-          # A token's card is never removed from its zone by Permanent.resolve, so exile it here.
+          # A token's card is never removed from its zone by Permanent.token_copy, so exile it here.
           target.exile!
-          token = Permanent.resolve(
+          token = Permanent.token_copy(
             game: game,
             owner: controller,
             card: target,
-            token: true,
           )
           token.add_types(T::Creature, T::Creatures["Zombie"], until_eot: false)
           token.modify_base_power(3, until_eot: false)

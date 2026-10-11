@@ -7,10 +7,10 @@ module Magic
         @controller = controller
       end
 
-      # Permanent.resolve moves the card out of the graveyard too, and records the
+      # Permanent.put_onto_battlefield moves the card out of the graveyard too, and records the
       # graveyard as where the permanent came from (Events::EnteredTheBattlefield#from).
       def resolve!
-        Permanent.resolve(card: target, game: game, from_zone: target.zone, cast: false, controller: @controller || target.owner)
+        Permanent.put_onto_battlefield(card: target, game: game, from_zone: target.zone, controller: @controller || target.owner)
       end
     end
   end

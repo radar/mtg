@@ -5,7 +5,7 @@ RSpec.describe Magic::Cards::BasriKet do
   before { go_to_main_phase! }
 
   let(:card) { Card("Basri Ket") }
-  subject(:planeswalker) { Magic::Permanent.resolve(game: game, owner: p1, card: card) }
+  subject(:planeswalker) { Magic::Permanent.resolve_spell(game: game, owner: p1, card: card) }
 
   context "+1 triggered ability" do
     let(:ability) { planeswalker.loyalty_abilities.first }

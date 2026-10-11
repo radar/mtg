@@ -25,12 +25,10 @@ module Magic
         end
 
         def resolve!(target:)
-          token = Permanent.resolve(
+          token = Permanent.token_copy(
             game: game,
             owner: controller,
             card: target.card,
-            token: true,
-            copy: true,
           )
           token.grant_haste!
           token.register_turn_trigger(Events::CreatureDied, Blitz::DeathDrawTrigger)

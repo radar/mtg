@@ -26,7 +26,7 @@ module Magic
           owner = target.owner
           creature_card = target.card
           target.exile!
-          Permanent.resolve(game: game, card: creature_card, owner: owner, cast: false)
+          Permanent.put_onto_battlefield(game: game, card: creature_card, owner: owner)
         end
       end
 

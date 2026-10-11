@@ -11,7 +11,7 @@ module Magic
       end
 
       def resolve!(target:)
-        Permanent.resolve(game: game, owner: controller, card: target.copiable_card, token: true, copy: true, cast: false)
+        Permanent.token_copy(game: game, owner: controller, card: target.copiable_card)
       end
     end
   end

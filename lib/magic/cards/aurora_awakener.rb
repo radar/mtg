@@ -27,7 +27,7 @@ module Magic
           raise ArgumentError, "not a revealed permanent card" unless (cards - permanent_cards).empty?
 
           cards.each do |card|
-            Permanent.resolve(card: card, game: game, from_zone: card.zone, cast: false, controller: controller)
+            Permanent.put_onto_battlefield(card: card, game: game, from_zone: card.zone, controller: controller)
           end
 
           (revealed - cards).shuffle.each do |card|

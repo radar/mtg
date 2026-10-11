@@ -16,7 +16,7 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          creature = Permanent.resolve(game: game, card: target, owner: controller, from_zone: target.zone, cast: false)
+          creature = Permanent.put_onto_battlefield(game: game, card: target, owner: controller, from_zone: target.zone)
           creature.grant_haste!
           creature.register_turn_trigger(Events::BeginningOfEndStep, Blitz::EndStepSacrificeTrigger)
         end

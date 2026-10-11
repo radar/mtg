@@ -41,7 +41,7 @@ RSpec.describe Magic::Cards::MyojinOfNightsReach do
   it "enters without a counter when it didn't come from your hand" do
     card = Card("Myojin Of Nights Reach", owner: p1)
     p1.graveyard.add(card)
-    myojin = Magic::Permanent.resolve(game:, card:, cast: false)
+    myojin = Magic::Permanent.put_onto_battlefield(game:, card:)
     game.tick!
 
     expect(divinity(myojin)).to eq(0)

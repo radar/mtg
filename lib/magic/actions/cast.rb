@@ -597,7 +597,7 @@ module Magic
       # choose new targets.
       def copy_for_conspire
         if card.permanent?
-          Permanent.resolve(game:, owner: player, card:, token: true, copy: true, cast: false, from_zone: nil)
+          Permanent.token_copy(game:, owner: player, card:)
         else
           Magic::CopyEffect.resolve_with_choice!(actor: card, receiver: card, targets:, copies: 1)
         end

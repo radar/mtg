@@ -4,7 +4,7 @@ module Magic
   class CardParser
     module Rules
       # "Creatures your opponents control enter tapped." (Authority of the Consuls): a static ability
-      # answering `forces_creature_to_enter_tapped?(card, player)`, which `Permanent.resolve` checks.
+      # answering `forces_creature_to_enter_tapped?(card, player)`, which `Permanent.enter` checks.
       class OpponentsCreaturesEnterTapped < Data.define
         include Rule
 

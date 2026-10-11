@@ -18,7 +18,7 @@ RSpec.describe Magic::Permanent do
       bears = Card("Grizzly Bears", owner: p1)
       p1.exile.add(bears)
 
-      permanent = described_class.resolve(game: game, card: bears, cast: false)
+      permanent = described_class.put_onto_battlefield(game: game, card: bears)
 
       expect(permanent.zone).to be_battlefield
       expect(bears.zone).to be_battlefield
@@ -29,7 +29,7 @@ RSpec.describe Magic::Permanent do
       bears = Card("Grizzly Bears", owner: p1)
       p1.graveyard.add(bears)
 
-      described_class.resolve(game: game, card: bears, token: true, cast: false)
+      described_class.token_copy(game: game, card: bears)
 
       expect(bears.zone).to be_graveyard
       expect(p1.graveyard.map(&:name)).to include("Grizzly Bears")
@@ -74,7 +74,7 @@ RSpec.describe Magic::Permanent do
 
     it "leaves the card it copies alone" do
       bears = ResolvePermanent("Grizzly Bears", owner: p1)
-      copy = described_class.resolve(game: game, card: bears.card, token: true, cast: false)
+      copy = described_class.token_copy(game: game, card: bears.card)
       copy.sacrifice!
 
       expect(p1.graveyard.cards).not_to include(bears.card)

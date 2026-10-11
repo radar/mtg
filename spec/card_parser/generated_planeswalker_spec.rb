@@ -21,7 +21,7 @@ RSpec.describe "CardParser planeswalkers" do
     go_to_main_phase!
   end
 
-  subject(:walker) { Magic::Permanent.resolve(game: game, owner: p1, card: Card("Parsed Walker", owner: p1)) }
+  subject(:walker) { Magic::Permanent.resolve_spell(game: game, owner: p1, card: Card("Parsed Walker", owner: p1)) }
 
   it "generates a Planeswalker subclass with its loyalty and abilities" do
     source = generate(text)

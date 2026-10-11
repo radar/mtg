@@ -18,9 +18,18 @@ module CardHelper
   # settle: false opts out of the auto-settle below -- needed when a spec is mid-way
   # through building up other pending stack items/choices it wants to stay pending
   # (settling would resolve them out from under it).
-  def ResolvePermanent(name, summoning_sick: false, settle: true, **args)
+  # A spell resolving by default; `cast: false` puts the card onto the battlefield as an effect would, and
+  # `token: true` or `copy: true` makes a token copy of it.
+  def ResolvePermanent(name, summoning_sick: false, settle: true, cast: true, token: false, copy: false, **args)
     card = Card(name, owner: args.fetch(:owner, p1))
-    permanent = Magic::Permanent.resolve(game: game, card: card, **args)
+    permanent =
+      if token || copy
+        Magic::Permanent.token_copy(game: game, card: card, **args)
+      elsif cast
+        Magic::Permanent.resolve_spell(game: game, card: card, **args)
+      else
+        Magic::Permanent.put_onto_battlefield(game: game, card: card, **args)
+      end
     permanent.controlled_since_turn = 0 unless summoning_sick
     # Skip auto-settling for Auras: fixtures often build one unattached and call
     # #attach_to! as a separate step, and settling in between would kill it to SBA

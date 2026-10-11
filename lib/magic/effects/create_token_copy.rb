@@ -12,7 +12,7 @@ module Magic
 
       def resolve!
         amount.times.map do
-          token = Permanent.resolve(game: game, owner: controller, card: card, token: true, copy: true, cast: false)
+          token = Permanent.token_copy(game: game, owner: controller, card: card)
           token.modify_base_power(base_power, until_eot: false) if base_power
           token.modify_base_toughness(base_toughness, until_eot: false) if base_toughness
           token

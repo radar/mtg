@@ -20,7 +20,7 @@ module Magic
         def call
           return unless actor.zone&.graveyard?
 
-          Permanent.resolve(game:, card: actor, from_zone: actor.zone, cast: false, enters_tapped: true, controller: actor.owner)
+          Permanent.put_onto_battlefield(game:, card: actor, from_zone: actor.zone, enters_tapped: true, controller: actor.owner)
         end
       end
 
