@@ -70,6 +70,11 @@ module Magic
       game.take_action(action)
     end
 
+    # The Rooms this player controls, and their unlocked doors (a Room's door is a half-card, so two Rooms of the same
+    # name each have their own).
+    def rooms = permanents.select(&:room?)
+    def unlocked_doors = rooms.flat_map { _1.card.unlocked_doors }
+
     # Pays a locked door's cost to unlock it (`door:` is `:left`, `:right` or one of the Room's doors).
     def unlock_door(permanent:, door:, **args, &block)
       action = prepare_action(Magic::Actions::UnlockDoor, permanent: permanent, door: door, **args, &block)
