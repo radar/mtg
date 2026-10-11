@@ -391,6 +391,15 @@ module Magic
       latest_turn.nil? || @controlled_since_turn >= latest_turn
     end
 
+    # "Until your next turn" for an effect that began when this permanent came under its controller's control (Kardur):
+    # true until the controller begins another turn.
+    def before_controllers_next_turn?
+      return false unless @controlled_since_turn
+
+      latest_turn = game.latest_turn_number_of(controller)
+      latest_turn.nil? || @controlled_since_turn >= latest_turn
+    end
+
     def opponents
       game.opponents(controller)
     end
