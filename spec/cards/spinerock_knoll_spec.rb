@@ -31,7 +31,7 @@ RSpec.describe Magic::Cards::SpinerockKnoll do
     expect(knoll.exiled_cards).to include(chosen)
     expect(p1.library.count).to eq(size - 1)
     # The three that were not chosen are now at the bottom (compared by identity: they are all Forests).
-    expect(p1.library.first(3).none? { |card| top.first(3).any? { _1.equal?(card) } }).to be(true)
+    expect(p1.library.last(3).map(&:object_id)).to match_array(top.first(3).map(&:object_id))
   end
 
   describe "the payoff" do
