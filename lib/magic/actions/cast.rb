@@ -165,6 +165,7 @@ module Magic
         return false if already_on_stack?
         return false if player.life < life_payment
         return false unless castable_from_current_zone?
+        return false if !@by_effect && card.cast_prohibited_reason(player)
         return false unless modes_satisfiable?
         return true if mana_cost.zero?
 
@@ -179,6 +180,7 @@ module Magic
           return "#{card.name} is already on the stack" if already_on_stack?
           return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
           return cost_mode_illegal_reason if cost_mode_illegal_reason
+          return card.cast_prohibited_reason(player) if card.cast_prohibited_reason(player)
 
           if !instant_speed? && (reason = sorcery_speed_reason)
             return "#{card.name} can only be cast at sorcery speed, but #{reason}"

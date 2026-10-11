@@ -453,6 +453,10 @@ module Magic
 
     def begins_on_battlefield? = false
 
+    # "You can't cast this unless ..." (Rakdos, Lord of Riots): why +player+ can't cast this card right now, or nil.
+    # `by_effect` casts skip it.
+    def cast_prohibited_reason(_player) = nil
+
     # In exile with time counters, waiting to be cast (suspend).
     def suspended? = !!zone&.exile? && time_counters.to_i.positive?
 

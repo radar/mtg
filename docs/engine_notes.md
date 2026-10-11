@@ -122,6 +122,10 @@ A card or token answers `cant_attack_alone?` / `cant_block_alone?` (default fals
 
 The `PERSIST` keyword constant is only a marker. The behaviour is `def death_triggers = [DeathReturn::Undying]` (or `Persist`) in the card class: a `TriggeredAbility::Death` that returns the card with a +1/+1 (or -1/-1) counter unless the dead permanent had one of the opposite kind (`counters:` on `Permanent.put_onto_battlefield`). It waits for the card to reach the graveyard when the trigger runs first. Examples: `GleefulArsonist`, `PersistentConstrictor`.
 
+## "You can't cast this unless ..." and life lost this turn
+
+A card answers `cast_prohibited_reason(player)` (default nil; a string says why). `Actions::Cast` checks it in `can_perform?` and `illegal_reason`, but not for `by_effect` casts. `Player#life_lost_this_turn` and `#opponents_life_lost_this_turn` sum this turn's `LifeLoss` events (damage included). A cost reduction that depends on game state overrides `adjustment` on a `ManaCostAdjustment` subclass (a method, so it is read each time). Example: `RakdosLordOfRiots`.
+
 ## "Copy it. You may cast the copy"
 
 For a card that isn't on the stack (exiled by an effect), add `Magic::Choice::MayCastCopy.new(actor:, card:)` per card: `game.resolve_choice!` accepts (then `resolve_choice!(target:)` if the copy has a target), `game.skip_choice!` declines. The copy resolves directly without paying its cost (`CopyEffect.resolve!`). Example: `TheTaleOfTamiyo` chapter IV (`ArcaneBombardment` has the same logic inline).

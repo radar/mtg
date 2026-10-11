@@ -241,6 +241,16 @@ module Magic
       )
     end
 
+    # The total life this player has lost so far this turn (damage included).
+    def life_lost_this_turn
+      game.current_turn.events.select { _1.is_a?(Events::LifeLoss) && _1.player == self }.sum(&:life)
+    end
+
+    # The total life this player's opponents have lost so far this turn.
+    def opponents_life_lost_this_turn
+      game.opponents(self).sum(&:life_lost_this_turn)
+    end
+
     def take_damage(damage)
       lose_life(damage)
     end
