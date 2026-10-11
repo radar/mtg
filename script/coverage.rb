@@ -15,7 +15,9 @@
 #
 # Adventure/split/transform cards are looked up by either face's name (Scryfall's combined
 # "Front // Back" name is split), so a double-faced card counts once its front (or back) face
-# class exists. A planning aid, not a parser, same caveat as parser_gaps.rb.
+# class exists. A Room is one class named for both halves ("Bottomless Pool // Locker Room" is
+# `BottomlessPoolLockerRoom`), so the combined name counts too. A planning aid, not a parser,
+# same caveat as parser_gaps.rb.
 
 require "bundler/setup"
 require_relative "../lib/magic"
@@ -27,7 +29,9 @@ show_cards = ARGV.include?("--cards")
 
 by_card = card_faces_for(set_code).group_by { _1[:card] }
 
-implemented, unimplemented = by_card.keys.partition { |name| name.split(" // ").any? { |face| Magic::Cards.const_defined?(Magic::CardGenerator.const_name(face)) } }
+implemented, unimplemented = by_card.keys.partition do |name|
+  [name, *name.split(" // ")].any? { |face| Magic::Cards.const_defined?(Magic::CardGenerator.const_name(face)) }
+end
 
 puts "#{set_code}: #{by_card.size} cards; #{implemented.size} implemented, #{unimplemented.size} are not"
 puts

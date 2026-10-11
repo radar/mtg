@@ -55,6 +55,8 @@ Copy effects (Balloon Man, Niko, Tale of Tamiyo), game-level delayed trigger (Wa
 
 Status (2026-10-12): **done**. Game-level delayed triggers (`Game#add_delayed_trigger`, Waltz of Rage), can't-attack/block-alone (Toby), ward with a sacrifice cost and playing cards exiled with Valgavoth, the token copy with overrides (The Jolly Balloon Man, no engine change), become-a-copy until end step (Niko, Light of Hope + Shard token), `Choice::MayCastCopy` (The Tale of Tamiyo) and ninjutsu (Kaito, Bane of Nightmares). `docs/dsk_blockers.md` is empty.
 
+Coverage (2026-10-12): `script/coverage.rb dsk` reports 267 of 268 DSK cards implemented. The one left is `A-Leyline of Resonance`, the digital-only rebalanced card (the paper one is done). The 11 Rooms that had never been recorded as blockers (Mirror Room, Moldering Gym, Painter's Studio, Restricted Office, Roaring Furnace, Smoky Lounge, Surgical Suite, Ticket Booth, Underwater Tunnel, Unholy Annex, Walk-In Closet) are done too, and the coverage script now counts a Room by its combined name.
+
 ## Workflow
 
 - Each engine feature: own commit, integration spec, note in `docs/engine_notes.md`.
