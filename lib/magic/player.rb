@@ -70,6 +70,12 @@ module Magic
       game.take_action(action)
     end
 
+    # Pays a locked door's cost to unlock it (`door:` is `:left`, `:right` or one of the Room's doors).
+    def unlock_door(permanent:, door:, **args, &block)
+      action = prepare_action(Magic::Actions::UnlockDoor, permanent: permanent, door: door, **args, &block)
+      game.take_action(action)
+    end
+
     def prepare_activate_ability(ability:, **args, &block)
       prepare_action(Magic::Actions::ActivateAbility, ability: ability, **args)
     end

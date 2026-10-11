@@ -20,9 +20,10 @@ module Magic
       #   (see #harmonize_tap) and exiles the spell after it resolves
       # @param pay_life [Boolean] When true, pays life equal to the card's mana value rather than its mana cost, if a
       #   static ability allows that for this card (`may_pay_life_for?`: Demon of Fate's Design)
-      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, evoked: false, adventure: false, alternative: false, by_effect: false, harmonize: false, pay_life: false, **args)
+      def initialize(card:, value_for_x: nil, controller: card.controller, flashback: false, blitz: false, evoked: false, adventure: false, alternative: false, by_effect: false, harmonize: false, pay_life: false, door: nil, **args)
         super(**args)
         @card = card
+        @door = door && card.door(door)
         @pay_life = pay_life
         @stack_size_at_start = game.stack.count
         @targets = []
@@ -82,6 +83,8 @@ module Magic
             cost = card.evoke_cost
           elsif @adventure
             cost = card.adventure_cost
+          elsif @door
+            cost = @door.cost
           elsif @alternative
             cost = card.alternative_cost
           elsif free_from_exile? || pays_life_instead?
@@ -126,7 +129,7 @@ module Magic
       # "You may pay life equal to a spell's mana value rather than pay its mana cost" (Bolas's Citadel), for a spell
       # cast from the top of the library. Static abilities answer `pays_life_for?(card, player)`.
       def pays_life_instead?
-        return false if @flashback || @harmonize || @blitz || @evoked || @adventure || @alternative
+        return false if @flashback || @harmonize || @blitz || @evoked || @adventure || @alternative || @door
         return true if @pay_life && static_ability_allows?(:may_pay_life_for?)
         return true if card.zone&.exile? && game.play_permissions.pay_life?(card, player)
 
@@ -153,6 +156,9 @@ module Magic
       end
 
       def illegal_reason
+        return "#{card.name} is a Room, so it is cast as one of its doors" if card.is_a?(Cards::Room) && !@door
+        return "#{card.name} is not a Room" if @door && !card.is_a?(Cards::Room)
+
         unless @by_effect
           return "#{card.name} is a land, and lands are played, not cast" if card.land? && !@adventure
           return "#{card.name} is already on the stack" if already_on_stack?
@@ -484,6 +490,7 @@ module Magic
 
         # Casting a card you don't own (from an opponent's exile) makes you its controller.
         card.controller = player
+        card.cast_door = @door if @door
 
         # Settled before the life is paid: "once each turn" permissions stop applying afterwards.
         mana_cost

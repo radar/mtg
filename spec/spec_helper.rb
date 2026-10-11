@@ -18,8 +18,10 @@ module CardHelper
   # settle: false opts out of the auto-settle below -- needed when a spec is mid-way
   # through building up other pending stack items/choices it wants to stay pending
   # (settling would resolve them out from under it).
-  def ResolvePermanent(name, summoning_sick: false, settle: true, **args)
+  # `doors: [:left]` puts a Room onto the battlefield with those doors unlocked.
+  def ResolvePermanent(name, summoning_sick: false, settle: true, doors: nil, **args)
     card = Card(name, owner: args.fetch(:owner, p1))
+    card.preunlock!(*doors) if doors
     permanent = Magic::Permanent.resolve(game: game, card: card, **args)
     permanent.controlled_since_turn = 0 unless summoning_sick
     # Skip auto-settling for Auras: fixtures often build one unattached and call

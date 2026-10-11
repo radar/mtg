@@ -23,7 +23,7 @@ module Magic
     end
 
     def call
-      [*castable_spells, *playable_lands, *cyclable_cards, *activatable_abilities, *activatable_loyalty_abilities,
+      [*castable_spells, *playable_lands, *cyclable_cards, *unlockable_doors, *activatable_abilities, *activatable_loyalty_abilities,
        *declarable_attackers, *declarable_blockers, nil]
     end
 
@@ -33,6 +33,9 @@ module Magic
 
     def castable_spells
       cast_candidate_cards.flat_map do |card|
+        # A Room is cast as one of its two doors.
+        next Cards::Room::SIDES.keys.map { |side| keep(Actions::Cast.new(game: game, player: player, card: card, door: side)) } if card.is_a?(Cards::Room)
+
         candidates = [keep(Actions::Cast.new(game: game, player: player, card: card))]
         candidates << keep(Actions::Cast.new(game: game, player: player, card: card, flashback: true)) if card.zone&.graveyard? && card.flashback_cost_now
         candidates << keep(Actions::Cast.new(game: game, player: player, card: card, harmonize: true)) if card.zone&.graveyard? && card.harmonize_cost
@@ -60,6 +63,12 @@ module Magic
     def cyclable_cards
       player.hand.cards.select { |card| card.respond_to?(:cycling_cost) && card.cycling_cost }
         .filter_map { |card| keep(Actions::Cycle.new(game: game, player: player, card: card)) }
+    end
+
+    def unlockable_doors
+      player.permanents.select(&:room?).flat_map do |room|
+        room.card.locked_doors.filter_map { |door| keep(Actions::UnlockDoor.new(game: game, player: player, permanent: room, door: door)) }
+      end
     end
 
     def activatable_abilities

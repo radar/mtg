@@ -67,6 +67,7 @@ module Magic
     def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false, value_for_x: nil)
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:, controller:)
       card_zone = card.zone unless token || copy
+      card.begin_entering! if card.is_a?(Cards::Room)
 
       permanent = Magic::Permanent.new(
         game: game,
@@ -98,6 +99,7 @@ module Magic
       permanent.move_zone!(from: from_zone, to: game.battlefield)
       add_additional_counters_for_entering(game:, permanent:) if card.creature?
       move_card_to_battlefield(game:, card:, permanent:, from: card_zone)
+      permanent.announce_unlocked_doors! if card.is_a?(Cards::Room)
       permanent
     end
 
@@ -253,6 +255,32 @@ module Magic
       @activated_abilities = card.activated_abilities.map { |ability| ability.new(source: self) }
       apply_continuous_effects!
       self
+    end
+
+    def room? = card.is_a?(Cards::Room)
+
+    # A Room enters with a door unlocked, which "when you unlock this door" abilities see.
+    def announce_unlocked_doors!
+      card.unlocked_doors.each { |door| game.notify!(Events::DoorUnlocked.new(permanent: self, door: door)) }
+    end
+
+    # Unlocks a locked door of this Room. Fires `Events::DoorUnlocked`, and `Events::RoomFullyUnlocked` when that was the
+    # last locked door. Returns whether anything was unlocked.
+    def unlock_door!(door)
+      return false unless room? && card.unlock!(door)
+
+      refresh_room_abilities!
+      game.notify!(Events::DoorUnlocked.new(permanent: self, door: card.door(door)))
+      game.notify!(Events::RoomFullyUnlocked.new(permanent: self)) if card.fully_unlocked?
+      true
+    end
+
+    # Locks an unlocked door (the abilities of a locked door are lost).
+    def lock_door!(door)
+      return false unless room? && card.lock!(door)
+
+      refresh_room_abilities!
+      true
     end
 
     def keyword_grant_modifiers
@@ -905,6 +933,12 @@ module Magic
       when Events::CreatureDied           then face.death_triggers + (has_keyword?(Keywords::PERSIST) ? [TriggeredAbility::Persist] : [])
       else []
       end
+    end
+
+    def refresh_room_abilities!
+      @activated_abilities = card.activated_abilities
+      @state_triggered_abilities = nil
+      apply_continuous_effects!
     end
 
     def dispatch_event_handlers(event)

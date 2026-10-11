@@ -105,3 +105,14 @@ This does **not** yet let a player respond to a trigger with an instant — that
 ## Indestructible, Regeneration, Protection from Damage
 
 `Permanent#destroy!` is the replacement point: indestructible returns false, then a regeneration shield (`regenerate!` adds one; `regenerated!` spends it: tap, clear damage and `@marked_for_death`, `CombatPhase#remove_from_combat`, fire `Events::Regenerated`) returns false too. Both also cover SBA lethal damage/deathtouch since it calls `destroy!`. Shields reset in `Permanent#cleanup!`. `put_into_graveyard!`/`sacrifice!` bypass both. Protection prevents damage in `TargetedEffect#damage_prevented?` (used by `DealDamage`, `DealCombatDamage`), which resolves an ability source to its permanent. "Can't be regenerated" is not modelled.
+
+## Rooms (doors)
+
+A Room is `Cards::Room` with two `Room::Door` half-cards (`doors LeftDoor, RightDoor` names it "A // B"; see `spec/game/room_spec.rb` for a full example). Spec constant lookup strips non-letters, so `Card("Test Parlor Test Cellar")` finds it. Each door is an ordinary card class: own `card_name`, `cost`, `static_abilities`, `activated_abilities`, `event_handlers`, etc. The Room delegates those lists to its *unlocked* doors, so a locked door has no abilities.
+
+- **Cast**: `player.cast(card: room, door: :left) { |a| a.pay_mana(...) }`. A Room cast without `door:` is illegal. `Cast` pays the door's cost; `card.cast_door` is set in `perform`. `LegalActions` offers one `Cast` per door.
+- **Door state lives on the Room card** (`unlocked_doors`, `cast_door`), not the permanent. `Permanent.resolve` calls `card.begin_entering!` (cast door becomes the only unlocked door), then `announce_unlocked_doors!` fires `Events::DoorUnlocked` for it. `Card#zone=` clears the state when the card leaves the battlefield. In specs, `ResolvePermanent("Name", doors: [:left])` puts a Room onto the battlefield with those doors unlocked (`Room#preunlock!`).
+- **Characteristics**: name, mana value and colours come from `characteristic_doors`: the unlocked doors on the battlefield, the cast door on the stack, both doors anywhere else.
+- **Unlock**: `player.unlock_door(permanent:, door: :right) { |a| a.pay_mana(...) }` runs `Actions::UnlockDoor` (a special action: sorcery speed, no stack). `Permanent#unlock_door!` fires `Events::DoorUnlocked` and, when it was the last locked door, `Events::RoomFullyUnlocked` (Eerie). `lock_door!` is the reverse.
+- **"When you unlock this door"**: list `Room::UnlockTrigger` subclasses in the door's `unlock_triggers`. A trigger fires only for its own door's `DoorUnlocked`, including the door the Room was cast as.
+- A Room that enters without being cast has no unlocked doors. Not yet handled: unlock cost reductions (Inquisitive Glimmer), "target Room" filters, counting unlocked doors across Rooms.
