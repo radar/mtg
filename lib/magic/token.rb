@@ -61,6 +61,8 @@ module Magic
     def enters_as_copy? = false
     def must_be_blocked? = false
     def must_attack? = false
+    def cant_attack_alone? = false
+    def cant_block_alone? = false
     # How many attackers this creature can block at once; override for "can block an additional creature".
     def maximum_attackers_blocked = 1
     def can_activate_ability?(_) = true

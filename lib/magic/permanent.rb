@@ -819,6 +819,10 @@ module Magic
       !lost_all_abilities? && face.must_be_blocked?
     end
 
+    # "This creature can't attack alone." / "...can't block alone." Checked against the whole declared set in combat.
+    def cant_attack_alone? = !lost_all_abilities? && face.cant_attack_alone?
+    def cant_block_alone? = !lost_all_abilities? && face.cant_block_alone?
+
     # "Attacks each combat if able."
     def must_attack?
       (!lost_all_abilities? && face.must_attack?) || goaded? || @must_attack_turn == game.current_turn.number || attachments.any? { _1.card.forces_enchanted_to_attack? } ||

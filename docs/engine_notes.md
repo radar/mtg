@@ -106,6 +106,10 @@ This does **not** yet let a player respond to a trigger with an instant — that
 
 `Permanent#destroy!` is the replacement point: indestructible returns false, then a regeneration shield (`regenerate!` adds one; `regenerated!` spends it: tap, clear damage and `@marked_for_death`, `CombatPhase#remove_from_combat`, fire `Events::Regenerated`) returns false too. Both also cover SBA lethal damage/deathtouch since it calls `destroy!`. Shields reset in `Permanent#cleanup!`. `put_into_graveyard!`/`sacrifice!` bypass both. Protection prevents damage in `TargetedEffect#damage_prevented?` (used by `DealDamage`, `DealCombatDamage`), which resolves an ability source to its permanent. "Can't be regenerated" is not modelled.
 
+## "Can't attack alone" / "can't block alone"
+
+A card or token answers `cant_attack_alone?` / `cant_block_alone?` (default false; `Permanent` delegates to its face unless it lost all abilities). Combat checks them against the whole declared set: `CombatPhase#validate_attackers!` raises `IllegalAttack` when the only attacker can't attack alone, and `validate_blocks!` (run on the way to combat damage) raises `IllegalBlock` when a player's only blocker can't block alone. Example: the Beast token of `TobyBeastieBefriender`.
+
 ## Delayed triggers (no permanent)
 
 "Until end of turn, whenever a creature you control dies, ...": `game.add_delayed_trigger(source: spell_card, event_class: Events::CreatureDied, trigger_class: MyTrigger)` registers a `Magic::DelayedTrigger` as an event listener. It builds `trigger_class.new(actor: source, event:)` for each event (so `controller` is the source's controller) and stops at the end of the turn it was made in. Use `permanent.register_turn_trigger` instead when the trigger belongs to a permanent. Example: `WaltzOfRage`.

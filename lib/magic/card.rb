@@ -638,6 +638,9 @@ module Magic
     def must_be_blocked? = false
     # "This creature attacks each combat if able."
     def must_attack? = false
+    # "Can't attack alone" / "can't block alone" (Toby's Beast): illegal unless another creature attacks/blocks too.
+    def cant_attack_alone? = false
+    def cant_block_alone? = false
     # An Aura that goads the creature it enchants (Ghoulish Impetus).
     def goads_enchanted? = false
     # An Aura that makes the creature it enchants attack each combat if able (Furor of the Bitten).
