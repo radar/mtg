@@ -106,6 +106,10 @@ This does **not** yet let a player respond to a trigger with an instant — that
 
 `Permanent#destroy!` is the replacement point: indestructible returns false, then a regeneration shield (`regenerate!` adds one; `regenerated!` spends it: tap, clear damage and `@marked_for_death`, `CombatPhase#remove_from_combat`, fire `Events::Regenerated`) returns false too. Both also cover SBA lethal damage/deathtouch since it calls `destroy!`. Shields reset in `Permanent#cleanup!`. `put_into_graveyard!`/`sacrifice!` bypass both. Protection prevents damage in `TargetedEffect#damage_prevented?` (used by `DealDamage`, `DealCombatDamage`), which resolves an ability source to its permanent. "Can't be regenerated" is not modelled.
 
+## Finality counters
+
+"Return it to the battlefield with a finality counter on it": `Permanent.put_onto_battlefield(game:, card:, from_zone:, counters: { "finality" => 1 })` (any `counters:` hash works the same way, added before the permanent enters). `Permanent#finality_replacements` makes a creature with a finality counter exiled instead of dying (a `MovePermanentZone` replacement with `ExileInsteadOfDying`), even if it lost all abilities. Delirium graveyard abilities check `controller.graveyard.delirium?` (see `ResurrectedCultist`). "Each player sacrifices X creatures": `Choice::SacrificeCreatures.each_player(actor:, amount:)`.
+
 ## Face-down permanents (manifest, manifest dread)
 
 A face-down permanent is a normal `Permanent` whose `face` is a `Cards::FaceDownCreature` (a 2/2 colourless creature with no name, cost, abilities or subtypes) while `card` stays the real card, so it goes to the graveyard as itself. Everything that reads characteristics or abilities through `face`/`copiable_card` (types, keywords, triggers, static and replacement abilities, `can_attack?`) sees the blank 2/2.
