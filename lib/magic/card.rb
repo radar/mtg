@@ -60,7 +60,7 @@ module Magic
       end
 
       # "Harmonize {cost}": castable from the graveyard for this cost (a Costs::Mana), exiled after.
-      # `Actions::Cast.new(card:, harmonize: true)`; `Cast#harmonize_tap` taps a creature to reduce it.
+      # `Actions::Cast::Harmonize.new(card:)`; `Cast#harmonize_tap` taps a creature to reduce it.
       def harmonize(cost)
         define_method(:harmonize_cost) do
           cost
@@ -78,7 +78,7 @@ module Magic
       end
 
       # "Evoke {cost}": an alternative cost; the permanent is sacrificed when it enters (cast with
-      # `evoked: true`, see `Permanent#evoked?`).
+      # `Actions::Cast::Evoked`, see `Permanent#evoked?`).
       def evoke(cost)
         const_set(:EVOKE_COST, cost)
       end

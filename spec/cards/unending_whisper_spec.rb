@@ -19,7 +19,7 @@ RSpec.describe Magic::Cards::UnendingWhisper do
     p1.graveyard.add(card)
     p1.add_mana(blue: 6)
 
-    expect { p1.cast(card: card, harmonize: true) { |a| a.pay_mana(generic: { blue: 5 }, blue: 1) }; game.stack.resolve! }
+    expect { p1.cast_as(:harmonize,card: card) { |a| a.pay_mana(generic: { blue: 5 }, blue: 1) }; game.stack.resolve! }
       .to change { p1.hand.cards.size }.by(1)
     expect(card.zone).to be_exile
   end

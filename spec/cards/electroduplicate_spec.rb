@@ -13,7 +13,7 @@ RSpec.describe Magic::Cards::Electroduplicate do
     p1.hand.add(card) unless flashback
     p1.add_mana(red: 4)
     if flashback
-      p1.cast(card:, flashback: true) { |a| a.pay_mana(generic: { red: 2 }, red: 2).targeting(target) }
+      p1.cast_as(:flashback,card:) { |a| a.pay_mana(generic: { red: 2 }, red: 2).targeting(target) }
     else
       p1.cast(card:) { |a| a.pay_mana(generic: { red: 2 }, red: 1).targeting(target) }
     end

@@ -25,7 +25,7 @@ RSpec.describe Magic::Cards::WildRide do
     p1.graveyard.add(card)
     p1.add_mana(red: 3)
 
-    p1.cast(card: card, harmonize: true) do |a|
+    p1.cast_as(:harmonize,card: card) do |a|
       a.harmonize_tap(other)
       a.pay_mana(generic: { red: 2 }, red: 1).targeting(bear)
     end

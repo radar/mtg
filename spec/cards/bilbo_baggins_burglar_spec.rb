@@ -28,7 +28,7 @@ RSpec.describe Magic::Cards::BilboBagginsBurglar do
 
     it "scries 2, then exiles on an adventure" do
       p1.add_mana(blue: 1)
-      p1.cast(card:, adventure: true) { _1.pay_mana(blue: 1) }
+      p1.cast_as(:adventure,card:) { _1.pay_mana(blue: 1) }
       game.stack.resolve!
 
       scry = game.choices.first
@@ -40,7 +40,7 @@ RSpec.describe Magic::Cards::BilboBagginsBurglar do
 
     it "can then be cast as the creature from exile" do
       p1.add_mana(blue: 1)
-      p1.cast(card:, adventure: true) { _1.pay_mana(blue: 1) }
+      p1.cast_as(:adventure,card:) { _1.pay_mana(blue: 1) }
       game.stack.resolve!
       game.skip_choice! if game.choices.any?
       p1.add_mana(blue: 3)

@@ -35,18 +35,18 @@ RSpec.describe Magic::Cards::KindleTheInnerFlame do
     before { kindle.move_to_graveyard!(p1) }
 
     it "costs {1}{R}" do
-      action = cast_action(player: p1, card: kindle, flashback: true)
+      action = cast_action_as(:flashback,player: p1, card: kindle)
       expect(action.mana_cost).to eq(Magic::Costs::Mana.new(generic: 1, red: 1))
     end
 
     it "is illegal without three Elementals to behold" do
-      action = cast_action(player: p1, card: kindle, flashback: true)
+      action = cast_action_as(:flashback,player: p1, card: kindle)
       expect(action.illegal_reason).to match(/flashback requirements/)
     end
 
     it "is legal when you control three Elementals" do
       2.times { ResolvePermanent("Shinestriker", owner: p1) }
-      action = cast_action(player: p1, card: kindle, flashback: true)
+      action = cast_action_as(:flashback,player: p1, card: kindle)
       expect(action.illegal_reason).to be_nil
     end
 
@@ -54,7 +54,7 @@ RSpec.describe Magic::Cards::KindleTheInnerFlame do
       p1.hand.add(Card("Shinestriker", owner: p1))
       p1.hand.add(Card("Shinestriker", owner: p1))
       p1.add_mana(red: 2)
-      p1.cast(card: kindle, flashback: true) do |action|
+      p1.cast_as(:flashback,card: kindle) do |action|
         action.pay_mana(red: 1, generic: { red: 1 })
         action.targeting(target)
       end

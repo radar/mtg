@@ -8,10 +8,10 @@ RSpec.describe Magic::Cards::Vibrance do
 
   let(:card) { Card("Vibrance", owner: p1) }
 
-  def cast(mana, payment, **options)
+  def cast(mana, payment, mode = :normal)
     p1.hand.add(card)
     p1.add_mana(mana)
-    p1.cast(card:, **options) { _1.pay_mana(payment) }
+    p1.cast_as(mode, card:) { _1.pay_mana(payment) }
     game.stack.resolve!
     game.settle!
   end
@@ -58,7 +58,7 @@ RSpec.describe Magic::Cards::Vibrance do
   end
 
   it "is sacrificed when evoked" do
-    cast({ red: 2 }, { red: 2 }, evoked: true)
+    cast({ red: 2 }, { red: 2 }, :evoked)
     game.resolve_choice!(target: p2)
 
     expect(p1.creatures).to be_empty

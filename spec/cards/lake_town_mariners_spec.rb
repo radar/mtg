@@ -27,7 +27,7 @@ RSpec.describe Magic::Cards::LakeTownMariners do
     it "blinks two creatures and/or lands you control and exiles the card" do
       bear.add_counter("+1/+1")
       land.tap!
-      p1.cast(card:, adventure: true) { |a| a.targeting(bear, land).pay_mana(generic: { blue: 3 }, blue: 1) }
+      p1.cast_as(:adventure,card:) { |a| a.targeting(bear, land).pay_mana(generic: { blue: 3 }, blue: 1) }
       game.stack.resolve!
       new_bear = p1.permanents.by_name("Large Bear").first
       new_land = p1.permanents.by_name("Forest").first
@@ -38,17 +38,17 @@ RSpec.describe Magic::Cards::LakeTownMariners do
     end
 
     it "needs two different targets" do
-      expect { p1.cast(card:, adventure: true) { |a| a.targeting(bear, bear) } }.to raise_error(StandardError)
+      expect { p1.cast_as(:adventure,card:) { |a| a.targeting(bear, bear) } }.to raise_error(StandardError)
     end
 
     it "cannot target an opponent's permanent" do
       theirs = ResolvePermanent("Large Bear", owner: p2)
-      expect { p1.cast(card:, adventure: true) { |a| a.targeting(bear, theirs) } }.to raise_error(StandardError)
+      expect { p1.cast_as(:adventure,card:) { |a| a.targeting(bear, theirs) } }.to raise_error(StandardError)
     end
 
     it "can be cast at instant speed" do
       current_turn.beginning_of_combat!
-      expect { p1.cast(card:, adventure: true) { |a| a.targeting(bear, land).pay_mana(generic: { blue: 3 }, blue: 1) } }.not_to raise_error
+      expect { p1.cast_as(:adventure,card:) { |a| a.targeting(bear, land).pay_mana(generic: { blue: 3 }, blue: 1) } }.not_to raise_error
     end
   end
 end

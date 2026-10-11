@@ -37,7 +37,7 @@ RSpec.describe Magic::Cards::TheArkenstone do
       legend = Card("Radha, Heart Of Keld", owner: p1)
       p1.library.add(legend)
       p1.add_mana(white: 3)
-      p1.cast(card:, adventure: true) { _1.pay_mana(generic: { white: 2 }, white: 1) }
+      p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { white: 2 }, white: 1) }
       game.stack.resolve!
 
       choice = game.choices.last
@@ -51,7 +51,7 @@ RSpec.describe Magic::Cards::TheArkenstone do
 
     it "can then be cast as the artifact from exile" do
       p1.add_mana(white: 3)
-      p1.cast(card:, adventure: true) { _1.pay_mana(generic: { white: 2 }, white: 1) }
+      p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { white: 2 }, white: 1) }
       game.stack.resolve!
       game.skip_choice!
       p1.add_mana(colorless: 5)

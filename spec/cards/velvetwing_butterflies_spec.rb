@@ -19,7 +19,7 @@ RSpec.describe Magic::Cards::VelvetwingButterflies do
   it "casts Gaze in Wonder to tap one target creature, then exiles on an adventure" do
     bears = ResolvePermanent("Grizzly Bears", owner: p2)
     p1.add_mana(white: 2)
-    p1.cast(card:, adventure: true) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(bears) }
+    p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(bears) }
     game.stack.resolve!
 
     expect(bears).to be_tapped
@@ -31,7 +31,7 @@ RSpec.describe Magic::Cards::VelvetwingButterflies do
     one = ResolvePermanent("Grizzly Bears", owner: p2)
     two = ResolvePermanent("Grizzly Bears", owner: p2)
     p1.add_mana(white: 2)
-    p1.cast(card:, adventure: true) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(one, two) }
+    p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(one, two) }
     game.stack.resolve!
 
     expect([one, two]).to all(be_tapped)
@@ -42,13 +42,13 @@ RSpec.describe Magic::Cards::VelvetwingButterflies do
     bears = ResolvePermanent("Grizzly Bears", owner: p2)
     p1.add_mana(white: 2)
 
-    expect { p1.cast(card:, adventure: true) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(bears) } }.not_to raise_error
+    expect { p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(bears) } }.not_to raise_error
   end
 
   it "can then be cast as the creature from exile" do
     bears = ResolvePermanent("Grizzly Bears", owner: p2)
     p1.add_mana(white: 2)
-    p1.cast(card:, adventure: true) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(bears) }
+    p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { white: 1 }, white: 1).targeting(bears) }
     game.stack.resolve!
     go_to_main_phase!
     p1.add_mana(white: 3)

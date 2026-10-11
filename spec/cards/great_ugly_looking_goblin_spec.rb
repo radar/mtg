@@ -31,7 +31,7 @@ RSpec.describe Magic::Cards::GreatUglyLookingGoblin do
     it "amasses Goblins 2 and exiles the card" do
       p1.hand.add(card)
       p1.add_mana(black: 2)
-      p1.cast(card:, adventure: true) { |a| a.pay_mana(generic: { black: 1 }, black: 1) }
+      p1.cast_as(:adventure,card:) { |a| a.pay_mana(generic: { black: 1 }, black: 1) }
       game.stack.resolve!
       army = p1.creatures.find { _1.types.include?("Army") }
       expect(army.power).to eq(2)

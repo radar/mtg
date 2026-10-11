@@ -71,7 +71,7 @@ RSpec.describe Magic::Cards::GlamdringFoeHammer do
       [opt, miscast, *five_bears].each { |c| p1.library.add(c) }
       p1.add_mana(blue: 4)
 
-      p1.cast(card:, adventure: true) { _1.pay_mana(generic: { blue: 3 }, blue: 1) }
+      p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { blue: 3 }, blue: 1) }
       game.stack.resolve!
       game.settle!
 

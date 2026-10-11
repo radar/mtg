@@ -30,7 +30,7 @@ RSpec.describe Magic::Cards::RoamersRoutine do
     p1.graveyard.add(card)
     p1.add_mana(green: 3)
 
-    p1.cast(card: card, harmonize: true) do |a|
+    p1.cast_as(:harmonize,card: card) do |a|
       a.harmonize_tap(bear)
       a.pay_mana(generic: { green: 2 }, green: 1)
     end

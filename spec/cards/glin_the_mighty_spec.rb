@@ -34,7 +34,7 @@ RSpec.describe Magic::Cards::GlinTheMighty do
       go_to_main_phase!
       p1.hand.add(card)
       p1.add_mana(red: 3)
-      p1.cast(card:, adventure: true) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
+      p1.cast_as(:adventure,card:) { |a| a.pay_mana(generic: { red: 2 }, red: 1) }
       game.stack.resolve!
       game.settle!
     end

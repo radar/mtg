@@ -10,10 +10,10 @@ RSpec.describe Magic::Cards::RevengeOfTheRats do
 
   def rats(player = p1) = player.creatures.select { _1.name == "Rat" }
 
-  def cast(flashback: false)
-    p1.hand.add(card) unless flashback
+  def cast(mode = :normal)
+    p1.hand.add(card) unless mode == :flashback
     p1.add_mana(black: 4)
-    p1.cast(card:, flashback:) { |a| a.pay_mana(generic: { black: 2 }, black: 2) }
+    p1.cast_as(mode, card:) { |a| a.pay_mana(generic: { black: 2 }, black: 2) }
     game.stack.resolve!
     game.settle!
   end
@@ -50,7 +50,7 @@ RSpec.describe Magic::Cards::RevengeOfTheRats do
     expect(rats.size).to eq(1)
 
     p1.graveyard.add(Card("Grizzly Bears", owner: p1))
-    cast(flashback: true)
+    cast(:flashback)
 
     expect(rats.size).to eq(1 + 2)
     expect(card.zone).to be_a(Magic::Zones::Exile).or be_nil

@@ -42,7 +42,7 @@ RSpec.describe Magic::Cards::AnUnexpectedParty do
 
     it "creates X 2/2 red Dwarf tokens, then exiles on an adventure" do
       p1.add_mana(white: 1, red: 5)
-      p1.cast(card:, adventure: true, value_for_x: 3) do |a|
+      p1.cast_as(:adventure,card:, value_for_x: 3) do |a|
         a.pay_mana(white: 1, generic: { red: 2 }, x: { red: 3 })
       end
       game.stack.resolve!
@@ -56,7 +56,7 @@ RSpec.describe Magic::Cards::AnUnexpectedParty do
 
     it "creates nothing for X = 0" do
       p1.add_mana(white: 1, red: 2)
-      p1.cast(card:, adventure: true, value_for_x: 0) { |a| a.pay_mana(white: 1, generic: { red: 2 }) }
+      p1.cast_as(:adventure,card:, value_for_x: 0) { |a| a.pay_mana(white: 1, generic: { red: 2 }) }
       game.stack.resolve!
       game.settle!
 

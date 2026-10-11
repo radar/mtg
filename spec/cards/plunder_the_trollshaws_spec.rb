@@ -26,7 +26,7 @@ RSpec.describe Magic::Cards::PlunderTheTrollshaws do
 
     p1.add_mana(blue: 4)
     hand = p1.hand.count
-    p1.cast(card: plunder, flashback: true) { |a| a.pay_mana(generic: { blue: 3 }, blue: 1) }
+    p1.cast_as(:flashback,card: plunder) { |a| a.pay_mana(generic: { blue: 3 }, blue: 1) }
     game.stack.resolve!
 
     expect(p1.hand.count).to eq(hand + 2)

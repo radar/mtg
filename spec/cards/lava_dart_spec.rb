@@ -22,7 +22,7 @@ RSpec.describe Magic::Cards::LavaDart do
       lava_dart = Card("Lava Dart", owner: p1)
       p1.graveyard.add(lava_dart)
 
-      action = cast_action(player: p1, card: lava_dart, flashback: true)
+      action = cast_action_as(:flashback,player: p1, card: lava_dart)
       action.pay_mana(mountain)
       action.targeting(p2)
       action.perform
@@ -37,7 +37,7 @@ RSpec.describe Magic::Cards::LavaDart do
       lava_dart = Card("Lava Dart", owner: p1)
       p1.graveyard.add(lava_dart)
 
-      action = cast_action(player: p1, card: lava_dart, flashback: true)
+      action = cast_action_as(:flashback,player: p1, card: lava_dart)
       expect(action.can_perform?).to eq(false)
     end
   end

@@ -33,7 +33,7 @@ RSpec.describe Magic::Cards::SmaugTheGreatCalamity do
 
     def spew_flame(target)
       p1.add_mana(red: 5)
-      p1.cast(card: smaug, adventure: true) do |a|
+      p1.cast_as(:adventure,card: smaug) do |a|
         a.pay_mana(generic: { red: 4 }, red: 1)
         a.targeting(target)
       end

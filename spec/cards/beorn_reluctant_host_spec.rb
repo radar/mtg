@@ -22,7 +22,7 @@ RSpec.describe Magic::Cards::BeornReluctantHost do
 
     it "lets you play an additional land this turn, then exiles on an adventure" do
       p1.add_mana(green: 2)
-      p1.cast(card:, adventure: true) { _1.pay_mana(generic: { green: 1 }, green: 1) }
+      p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { green: 1 }, green: 1) }
       game.stack.resolve!
 
       p1.play_land(land: Card("Forest", owner: p1))
@@ -39,7 +39,7 @@ RSpec.describe Magic::Cards::BeornReluctantHost do
 
     it "can then be cast as the creature from exile" do
       p1.add_mana(green: 2)
-      p1.cast(card:, adventure: true) { _1.pay_mana(generic: { green: 1 }, green: 1) }
+      p1.cast_as(:adventure,card:) { _1.pay_mana(generic: { green: 1 }, green: 1) }
       game.stack.resolve!
       p1.add_mana(green: 5)
       p1.cast(card:) { _1.pay_mana(generic: { green: 4 }, green: 1) }

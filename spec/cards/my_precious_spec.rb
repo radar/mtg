@@ -58,7 +58,7 @@ RSpec.describe Magic::Cards::MyPrecious do
       hand_before = p1.hand.count
       library_before = p1.library.count
 
-      p1.cast(card:, adventure: true) do |a|
+      p1.cast_as(:adventure,card:) do |a|
         a.pay_mana(generic: { black: 1 }, black: 1)
         a.pay_sacrifice(bears)
       end
@@ -76,7 +76,7 @@ RSpec.describe Magic::Cards::MyPrecious do
       p1.add_mana(black: 2)
 
       expect {
-        p1.cast(card:, adventure: true) do |a|
+        p1.cast_as(:adventure,card:) do |a|
           a.pay_mana(generic: { black: 1 }, black: 1)
           a.pay_sacrifice(bears)
         end

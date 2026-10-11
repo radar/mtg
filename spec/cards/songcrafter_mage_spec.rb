@@ -25,7 +25,7 @@ RSpec.describe Magic::Cards::SongcrafterMage do
 
     it "lets the chosen instant or sorcery be cast from the graveyard for its mana cost, then exiled" do
       p1.add_mana(blue: 1)
-      p1.cast(card: opt, harmonize: true) { |a| a.pay_mana(blue: 1) }
+      p1.cast_as(:harmonize,card: opt) { |a| a.pay_mana(blue: 1) }
       game.stack.resolve!
 
       expect(opt.zone).to be_exile
@@ -33,7 +33,7 @@ RSpec.describe Magic::Cards::SongcrafterMage do
 
     it "can be paid for with a tapped creature, like any harmonize cost" do
       bear = ResolvePermanent("Grizzly Bears", owner: p1)
-      action = Magic::Actions::Cast.new(game: game, player: p1, card: opt, harmonize: true)
+      action = Magic::Actions::Cast::Harmonize.new(game: game, player: p1, card: opt)
       action.harmonize_tap(bear)
 
       expect(action.mana_cost.cost).to eq(blue: 1)
@@ -55,6 +55,6 @@ RSpec.describe Magic::Cards::SongcrafterMage do
     p1.graveyard.add(opt)
     p1.add_mana(blue: 1)
 
-    expect { p1.cast(card: opt, harmonize: true) { |a| a.pay_mana(blue: 1) } }.to raise_error(Magic::IllegalAction)
+    expect { p1.cast_as(:harmonize,card: opt) { |a| a.pay_mana(blue: 1) } }.to raise_error(Magic::IllegalAction)
   end
 end

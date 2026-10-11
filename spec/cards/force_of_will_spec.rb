@@ -48,7 +48,7 @@ RSpec.describe Magic::Cards::ForceOfWill do
     it "exiles a blue card from hand and pays 1 life instead of mana" do
       spell = game.stack.spells.first
 
-      action = cast_action(card: force, player: p1, alternative: true)
+      action = cast_action_as(:alternative,card: force, player: p1)
       expect(action.can_perform?).to eq(true)
       action.pay_cost(blue_card)
       action.targeting(spell)
@@ -63,7 +63,7 @@ RSpec.describe Magic::Cards::ForceOfWill do
     it "cannot be paid without another blue card in hand" do
       p1.hand.remove(blue_card)
 
-      action = Magic::Actions::Cast.new(card: force, player: p1, game: game, alternative: true)
+      action = Magic::Actions::Cast::Alternative.new(card: force, player: p1, game: game)
       expect(action.can_perform?).to eq(false)
     end
 
@@ -71,7 +71,7 @@ RSpec.describe Magic::Cards::ForceOfWill do
       red_card = Card("Lightning Bolt", owner: p1)
       p1.hand.add(red_card)
 
-      action = Magic::Actions::Cast.new(card: force, player: p1, game: game, alternative: true)
+      action = Magic::Actions::Cast::Alternative.new(card: force, player: p1, game: game)
       expect { action.pay_cost(red_card) }.to raise_error(RuntimeError, /Invalid card/)
     end
   end
