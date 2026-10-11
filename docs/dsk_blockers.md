@@ -43,7 +43,6 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Charred Foyer // Warped Space: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Dazzling Theater // Prop Room: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Defiled Crypt // Cadaver Lab: Room cards are split enchantments with two lockable doors; the engine has no Room support.
-- Dollmaker's Shop // Porcelain Gallery: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Greenhouse // Rickety Gazebo: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Leyline of Hope: "begin the game with it on the battlefield" needs a pregame opening-hand step; the engine has none (same gap as Leyline of the Void).
 - Leyline of Mutation: needs the opening-hand step (same gap as Leyline of the Void) and a free-form alternative cost for every spell you cast.
