@@ -143,8 +143,10 @@ RSpec.shared_context "two player game" do
   end
 
   # The two things that set off Eerie for p1: an enchantment entering, and fully unlocking a Room.
-  def eerie_enchantment_enters!
-    ResolvePermanent("Sanctum Of Calm Waters", owner: p1)
+  # Sanctum of Calm Waters is legendary: a second one makes the legend rule ask a question, so pass another enchantment
+  # ("Elderfang Venom") to enter two in one spec.
+  def eerie_enchantment_enters!(name = "Sanctum Of Calm Waters")
+    ResolvePermanent(name, owner: p1)
     game.settle!
   end
 
