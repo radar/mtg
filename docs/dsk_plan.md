@@ -37,6 +37,8 @@ Status (2026-10-11): **done**, except Creeping Peeper (needs Phase 2 too). Engin
 4. Implement Manifest Dread plus one card of each shape, then the rest.
 5. Finish Creeping Peeper once Phases 1 and 2 land.
 
+Status (2026-10-11): **done**, except Abhorrent Oculus (its additional cost is a Phase 3 exile-as-cost item). Engine: `Cards::FaceDownCreature`, `Permanent` face-down state, `Game#manifest!`, `Choice::ManifestDread` (+ `ManifestDreadAndAttach`), `Actions::TurnFaceUp`, `Events::TurnedFaceUp`/`ManifestedDread`, `{X}{X}` costs (`Card#x_multiplier`), mana restrictions for turn-face-up and door unlocks; see "Face-down permanents" in `docs/engine_notes.md`. 24 cards implemented.
+
 ## Phase 3: Small shared engine pieces (independent commits)
 
 - Impending: alternative cost with time counters, not a creature while it has counters, counter removal at end step (5 Overlords). Hauntwoods also needs an "Everywhere" token with all basic land types.
