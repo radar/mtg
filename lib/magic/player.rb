@@ -97,8 +97,10 @@ module Magic
       else
         action = prepare_activate_ability(ability: ability, **args, &block)
       end
-      yield action if block_given?
+      # Activation restrictions are checked before any cost is paid, including those paid in the block (rule 602.5b):
+      # exiling the source from the graveyard, say, must not make the ability fail its own "in your graveyard" check.
       action.verify_requirements! if action.respond_to?(:verify_requirements!)
+      yield action if block_given?
       action.pay_self_tap if action.has_cost?(Magic::Costs::SelfTap) && auto_tap
       action.pay_self_sacrifice if action.has_cost?(Magic::Costs::SelfSacrifice)
       action.pay_self_exile if action.has_cost?(Magic::Costs::SelfExile)
