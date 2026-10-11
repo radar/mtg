@@ -47,6 +47,8 @@ Status (2026-10-11): **done**, except Abhorrent Oculus (its additional cost is a
 - Exile-as-cost: `Costs::ExileFromGraveyard`, `Costs::ExileCreature`, `pay_*` helpers. Fear of Abduction also needs a hook handing paid-cost cards to the resolved permanent.
 - "Up to N" target lists in `Cast`, then Cathartic Parting and The Rollercrusher Ride.
 
+Status (2026-10-12): **done**. Finality counters (`counters:` on `put_onto_battlefield`, `Permanent#finality_replacements`), impending (`Cast::Impending`, `Cards::Overlord`), the opening-hand step (`Choice::BeginOnBattlefield`), exile-as-cost (`Costs::ExileFromGraveyard`/`ExileCreature`), up-to-N targets (one pool per slot), static alternative costs (`pay_static_alternative:`) and outside-the-battlefield type grants. 18 cards: Resurrected Cultist, Balustrade Wurm, Meathook Massacre II, Rite of the Moth, the five Overlords, Abhorrent Oculus, Fear of Abduction, Say Its Name, Cathartic Parting, The Rollercrusher Ride and the five Leylines. Notes are in `docs/engine_notes.md`.
+
 ## Phase 4: Leftovers
 
 Copy effects (Balloon Man, Niko, Tale of Tamiyo), game-level delayed trigger (Waltz of Rage), group attack restriction (Toby), Valgavoth. Kaito last or dropped (ninjutsu is a large feature for one card).

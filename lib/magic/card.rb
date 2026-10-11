@@ -490,9 +490,21 @@ module Magic
     # every creature type in every zone, not just on the battlefield. (Abilities::Static::Changeling
     # does the same for a source that is all creature types without the keyword.)
     def types
-      return @types unless changeling? || static_abilities.include?(Abilities::Static::Changeling)
+      base = changeling? || static_abilities.include?(Abilities::Static::Changeling) ? (@types + Types::Creatures.values).uniq : @types
 
-      (@types + Types::Creatures.values).uniq
+      extra = types_granted_outside_battlefield
+      extra.empty? ? base : (base + extra).uniq
+    end
+
+    # "Creature spells you control and creature cards you own that aren't on the battlefield are the chosen type in addition
+    # to their other types" (Leyline of Transformation): battlefield static abilities answering
+    # `outside_battlefield_type_grants(card)`. A permanent's own types are worked out by ContinuousEffects instead.
+    def types_granted_outside_battlefield
+      return [] unless @types.include?(Types::Creature) && game && !zone&.battlefield?
+
+      game.battlefield.static_abilities.flat_map do |ability|
+        ability.respond_to?(:outside_battlefield_type_grants) ? ability.outside_battlefield_type_grants(self) : []
+      end
     end
 
     def graveyard_static_abilities
