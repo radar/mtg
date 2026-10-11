@@ -11,4 +11,3 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - The Tale of Tamiyo: chapter IV exiles cards from the graveyard, copies them as spells and casts the copies, and the mill-and-repeat chapters need shared-type checks on milled cards; the engine has no copy-a-card-and-cast-the-copy support.
 - Leyline of Mutation: a free-form alternative cost ({W}{U}{B}{R}{G}) for every spell you cast (the opening-hand step exists now).
 - Leyline of Transformation: a chosen creature type added to creatures, spells and cards outside the battlefield (the opening-hand step exists now).
-- Leyline of Resonance: copying a spell that targets only one creature you control (the opening-hand step exists now).
