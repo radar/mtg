@@ -171,6 +171,8 @@ module Magic
         types -= modifiers_by_type(Modifications::RemoveTypes).flat_map(&:removed_types)
         # Reconfigure (702.151): "While attached, this isn't a creature."
         types -= [T::Creature] if permanent.attached_to && copiable_card.respond_to?(:reconfigure?) && copiable_card.reconfigure?
+        # Impending: "isn't a creature until the last is removed."
+        types -= [T::Creature] if permanent.impending_now?
         types
       end
 

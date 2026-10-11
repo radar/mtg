@@ -55,6 +55,8 @@ module Magic
     # The X a permanent spell was cast with (nil when it had none).
     attr_accessor :x_value
     attr_accessor :evoked
+    # Cast for its impending cost (Overlords): not a creature while it has a time counter.
+    attr_accessor :impending
     # "You may have this enter as a copy of ...": a not-yet-copied 0/0 mustn't die to state-based
     # actions while its enters trigger is still asking (cleared once that's answered).
     attr_writer :copy_choice_pending
@@ -66,8 +68,9 @@ module Magic
 
     # A spell resolving into a permanent: the card was cast, so it knows how (kicked, evoked, what mana was spent,
     # the X it was cast with).
-    def self.resolve_spell(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil)
-      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: true, kicked:, evoked:, mana_spent:, value_for_x:)
+    def self.resolve_spell(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil, impending: false)
+      counters = impending ? { "time" => card.impending_count } : {}
+      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: true, kicked:, evoked:, mana_spent:, value_for_x:, counters:, impending:)
     end
 
     # A card put onto the battlefield by an effect rather than cast (a flicker or reanimation, a token being created).
@@ -82,7 +85,7 @@ module Magic
       enter(game:, card:, owner:, controller:, from_zone: nil, enters_tapped:, attach_to: nil, token: true, copy: true, cast: false)
     end
 
-    def self.enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token:, copy:, cast:, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil, face_down: false, counters: {})
+    def self.enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token:, copy:, cast:, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil, face_down: false, counters: {}, impending: false)
       enters_tapped = false if face_down
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:, controller:)
       card_zone = card.zone unless token || copy
@@ -93,6 +96,7 @@ module Magic
       permanent.x_value = value_for_x
       permanent.copy_choice_pending = card.enters_as_copy? && !face_down
       permanent.evoked = evoked
+      permanent.impending = impending
 
       # A face-down permanent has no abilities, so none of the card's "enters with counters" apply.
       entering = permanent.face
@@ -238,6 +242,11 @@ module Magic
 
     def mana_spent = @mana_spent || {}
     def evoked? = !!@evoked
+
+    def impending? = !!@impending
+
+    # Impending: a creature again once the last time counter is gone.
+    def impending_now? = impending? && counters.of_type(Counters::Time).any?
     def copy_choice_pending? = !!@copy_choice_pending
 
     # "If {W}{W} was spent to cast it": at least `amount` mana of `color` went into casting this.
@@ -1012,6 +1021,8 @@ module Magic
     end
 
     def dispatch_event_handlers(event)
+      # Impending's counter removal is a rule of the cast, not an ability of the card.
+      perform_trigger!(TriggeredAbility::ImpendingCounterRemoval, event) if impending? && event.is_a?(Events::BeginningOfEndStep)
       return if lost_all_abilities?
 
       Array(face.event_handlers[event.class]).each do |handler_class|

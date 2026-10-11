@@ -10,7 +10,7 @@ module Magic
       attr_reader :card, :targets, :value_for_x, :controller, :modes, :additional_costs
 
       # The class that casts a spell in a given way (`:flashback`, `:harmonize`, `:blitz`, `:evoked`, `:adventure`,
-      # `:alternative`, `:door` for a Room), or a plain `Cast` for `:normal`. See `Player#cast_as`.
+      # `:alternative`, `:impending`, `:door` for a Room), or a plain `Cast` for `:normal`. See `Player#cast_as`.
       def self.for_mode(mode)
         {
           normal: Cast,
@@ -21,6 +21,7 @@ module Magic
           adventure: Adventure,
           alternative: Alternative,
           door: Door,
+          impending: Impending,
         }.fetch(mode) { raise ArgumentError, "unknown way to cast a spell: #{mode.inspect}" }
       end
 
@@ -48,6 +49,7 @@ module Magic
       def flashback? = false
       def harmonize? = false
       def evoked? = false
+      def impending? = false
       def adventure? = false
 
       def inspect
@@ -591,6 +593,7 @@ module Magic
             kicked: kicker_cost.paid?,
             mana_spent: mana_cost.is_a?(Costs::Mana) ? mana_cost.mana_spent : {},
             evoked: evoked?,
+            impending: impending?,
             flashback: flashback?,
             value_for_x: mana_cost.x && mana_cost.x / card.x_multiplier,
             controller: player,

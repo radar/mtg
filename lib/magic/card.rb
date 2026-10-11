@@ -77,6 +77,15 @@ module Magic
         const_set(:BLITZ_COST, cost)
       end
 
+      # "Impending N--{cost}": an alternative cost (`Actions::Cast::Impending`); the permanent enters with N time
+      # counters and isn't a creature while it has any, losing one at the beginning of its controller's end step.
+      #
+      #   impending 4, Costs::Mana.new(generic: 2, white: 2)
+      def impending(count, cost)
+        define_method(:impending_count) { count }
+        define_method(:impending_cost) { cost }
+      end
+
       # "Evoke {cost}": an alternative cost; the permanent is sacrificed when it enters (cast with
       # `Actions::Cast::Evoked`, see `Permanent#evoked?`).
       def evoke(cost)
@@ -335,7 +344,7 @@ module Magic
       game.add_choice(choice) if choice.choices.any?
     end
 
-    def resolve!(enters_tapped: enters_tapped?, kicked: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false, value_for_x: nil)
+    def resolve!(enters_tapped: enters_tapped?, kicked: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false, value_for_x: nil, impending: false)
       if permanent?
         permanent = Magic::Permanent.resolve_spell(
           game: game,
@@ -349,6 +358,7 @@ module Magic
           mana_spent: mana_spent,
           evoked: evoked,
           value_for_x: value_for_x,
+          impending: impending,
         )
         # A card resolving from the stack has no zone, so Permanent.resolve_spell can't move it.
         move_zone!(to: battlefield) unless zone&.battlefield?

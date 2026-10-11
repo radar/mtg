@@ -37,6 +37,7 @@ module Magic
         next Cards::Room::SIDES.keys.map { |side| keep(Actions::Cast::Door.new(game: game, player: player, card: card, door: side)) } if card.is_a?(Cards::Room)
 
         candidates = [keep(Actions::Cast.new(game: game, player: player, card: card))]
+        candidates << keep(Actions::Cast::Impending.new(game: game, player: player, card: card)) if card.respond_to?(:impending_cost)
         candidates << keep(Actions::Cast::Flashback.new(game: game, player: player, card: card)) if card.zone&.graveyard? && card.flashback_cost_now
         candidates << keep(Actions::Cast::Harmonize.new(game: game, player: player, card: card)) if card.zone&.graveyard? && card.harmonize_cost
         candidates
