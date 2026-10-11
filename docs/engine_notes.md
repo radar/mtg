@@ -118,6 +118,10 @@ A card or token answers `cant_attack_alone?` / `cant_block_alone?` (default fals
 
 `suspend 3, generic: 1, black: 1` in a card class; `player.suspend(card:) { |a| a.pay_mana(...) }` runs `Actions::Suspend`, a special action that exiles the card from hand and sets `card.time_counters`. The class gets `Suspend::UpkeepTrigger` as a `BeginningOfUpkeep` handler; it works from exile (`works_from_exile?`), ignores other players' upkeeps, removes a counter, and on the last casts the card for free (`Suspend.cast_free`). A spell that needs a target gets a `Suspend::TargetChoice` first. A spell that exiles itself with counters as it resolves (Suspended Sentence) sets `exile_with_time_counters = n`; `Cast#move_after_resolving` then exiles it and sets `time_counters`. `Card#suspended?` is true while it waits in exile. Leaving exile clears the counters.
 
+## Undying and persist
+
+The `PERSIST` keyword constant is only a marker. The behaviour is `def death_triggers = [DeathReturn::Undying]` (or `Persist`) in the card class: a `TriggeredAbility::Death` that returns the card with a +1/+1 (or -1/-1) counter unless the dead permanent had one of the opposite kind (`counters:` on `Permanent.put_onto_battlefield`). It waits for the card to reach the graveyard when the trigger runs first. Examples: `GleefulArsonist`, `PersistentConstrictor`.
+
 ## "Copy it. You may cast the copy"
 
 For a card that isn't on the stack (exiled by an effect), add `Magic::Choice::MayCastCopy.new(actor:, card:)` per card: `game.resolve_choice!` accepts (then `resolve_choice!(target:)` if the copy has a target), `game.skip_choice!` declines. The copy resolves directly without paying its cost (`CopyEffect.resolve!`). Example: `TheTaleOfTamiyo` chapter IV (`ArcaneBombardment` has the same logic inline).
