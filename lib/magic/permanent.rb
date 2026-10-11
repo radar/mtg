@@ -559,6 +559,16 @@ module Magic
       untap!
     end
 
+    # An untap that happens in another player's untap step (Prop Room). A stun counter is removed instead.
+    def untap_during_other_players_untap_step
+      if @counters.of_type(Counters::Stun).any?
+        @counters.remove_first(Counters::Stun)
+        return
+      end
+
+      untap!
+    end
+
     def untap!
       return if untapped?
       return if attachments.any? { _1.card.prevents_untapping? }

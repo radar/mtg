@@ -22,6 +22,7 @@ module Magic
         after_transition to: :untap do |turn|
           turn.battlefield.phased_out.permanents.controlled_by(turn.active_player).each(&:phase_in!)
           turn.battlefield.permanents.controlled_by(turn.active_player).each(&:untap_during_untap_step)
+          turn.untap_during_other_players_untap_step!
         end
 
         after_transition to: :upkeep do |turn|
@@ -207,6 +208,17 @@ module Magic
           game.receive_priority!(active_player)
         else
           game.settle!
+        end
+      end
+
+      # "Untap each creature you control during each other player's untap step" (Prop Room): static abilities answering
+      # `untaps_during_untap_step_of?(permanent, active_player)` untap permanents that belong to someone else's turn.
+      def untap_during_other_players_untap_step!
+        abilities = battlefield.static_abilities.select { _1.respond_to?(:untaps_during_untap_step_of?) }
+        return if abilities.empty?
+
+        battlefield.permanents.not_controlled_by(active_player).each do |permanent|
+          permanent.untap_during_other_players_untap_step if abilities.any? { _1.untaps_during_untap_step_of?(permanent, active_player) }
         end
       end
 

@@ -40,7 +40,6 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Under the Skin: manifest dread needs face-down 2/2 permanents; the engine has no face-down permanent support (same gap as Manifest Dread).
 - Unwilling Vessel: Eerie needs the "you fully unlock a Room" event; the engine has no Room (split enchantment, door unlocking) support.
 - Central Elevator // Promising Stairs: Room cards are split enchantments with two lockable doors; the engine has no Room support.
-- Dazzling Theater // Prop Room: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Defiled Crypt // Cadaver Lab: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Greenhouse // Rickety Gazebo: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Leyline of Hope: "begin the game with it on the battlefield" needs a pregame opening-hand step; the engine has none (same gap as Leyline of the Void).
