@@ -44,7 +44,6 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Charred Foyer // Warped Space: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Dazzling Theater // Prop Room: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Defiled Crypt // Cadaver Lab: Room cards are split enchantments with two lockable doors; the engine has no Room support.
-- Derelict Attic // Widow's Walk: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Dollmaker's Shop // Porcelain Gallery: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Funeral Room // Awakening Hall: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Glassworks // Shattered Yard: Room cards are split enchantments with two lockable doors; the engine has no Room support.
