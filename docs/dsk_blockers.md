@@ -46,7 +46,6 @@ Cards skipped because they need an engine feature that doesn't exist yet.
 - Defiled Crypt // Cadaver Lab: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Dollmaker's Shop // Porcelain Gallery: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Funeral Room // Awakening Hall: Room cards are split enchantments with two lockable doors; the engine has no Room support.
-- Glassworks // Shattered Yard: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Greenhouse // Rickety Gazebo: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Meat Locker // Drowned Diner: Room cards are split enchantments with two lockable doors; the engine has no Room support.
 - Leyline of Hope: "begin the game with it on the battlefield" needs a pregame opening-hand step; the engine has none (same gap as Leyline of the Void).
