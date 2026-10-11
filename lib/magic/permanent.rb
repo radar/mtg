@@ -261,7 +261,7 @@ module Magic
 
     # A Room enters with a door unlocked, which "when you unlock this door" abilities see.
     def announce_unlocked_doors!
-      card.unlocked_doors.each { |door| game.notify!(Events::DoorUnlocked.new(permanent: self, door: door)) }
+      card.entered_unlocked_doors.each { |door| game.notify!(Events::DoorUnlocked.new(permanent: self, door: door)) }
     end
 
     # Unlocks a locked door of this Room. Fires `Events::DoorUnlocked`, and `Events::RoomFullyUnlocked` when that was the

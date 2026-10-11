@@ -88,11 +88,15 @@ module Magic
 
       # Permanent.resolve calls this just before the Room enters: only the door it was cast as is unlocked.
       def begin_entering!
-        @unlocked_doors = [@cast_door] if @cast_door
+        @entered_unlocked = [@cast_door].compact
+        @unlocked_doors = @entered_unlocked if @cast_door
         @cast_door = nil
       end
 
-      # Specs: a Room that is put onto the battlefield with these doors unlocked.
+      # The doors that were unlocked as the Room entered (what `Events::DoorUnlocked` is fired for on entering).
+      def entered_unlocked_doors = @entered_unlocked || []
+
+      # Specs: a Room that is put onto the battlefield with these doors already unlocked, which fires no unlock events.
       def preunlock!(*sides)
         @unlocked_doors = sides.map { door(_1) }
       end
@@ -119,6 +123,7 @@ module Magic
         return if zone&.battlefield?
 
         @unlocked_doors = nil
+        @entered_unlocked = nil
         @cast_door = nil
       end
 
