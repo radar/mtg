@@ -10,7 +10,7 @@ module Magic
       attr_reader :card, :targets, :value_for_x, :controller, :modes, :additional_costs
 
       # The class that casts a spell in a given way (`:flashback`, `:harmonize`, `:blitz`, `:evoked`, `:adventure`,
-      # `:alternative`, `:impending`, `:door` for a Room), or a plain `Cast` for `:normal`. See `Player#cast_as`.
+      # `:alternative`, `:impending`, `:spectacle`, `:door` for a Room), or a plain `Cast` for `:normal`. See `Player#cast_as`.
       def self.for_mode(mode)
         {
           normal: Cast,
@@ -22,6 +22,7 @@ module Magic
           alternative: Alternative,
           door: Door,
           impending: Impending,
+          spectacle: Spectacle,
         }.fetch(mode) { raise ArgumentError, "unknown way to cast a spell: #{mode.inspect}" }
       end
 

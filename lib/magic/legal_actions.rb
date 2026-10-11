@@ -38,6 +38,7 @@ module Magic
 
         candidates = [keep(Actions::Cast.new(game: game, player: player, card: card))]
         candidates << keep(Actions::Cast::Impending.new(game: game, player: player, card: card)) if card.respond_to?(:impending_cost)
+        candidates << keep(Actions::Cast::Spectacle.new(game: game, player: player, card: card)) if card.respond_to?(:spectacle_cost)
         candidates << keep(Actions::Cast::Flashback.new(game: game, player: player, card: card)) if card.zone&.graveyard? && card.flashback_cost_now
         candidates << keep(Actions::Cast::Harmonize.new(game: game, player: player, card: card)) if card.zone&.graveyard? && card.harmonize_cost
         candidates

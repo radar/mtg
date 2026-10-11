@@ -112,6 +112,14 @@ module Magic
         define_method(:impending_cost) { cost }
       end
 
+      # "Spectacle {cost}": an alternative cost, castable only if an opponent lost life this turn
+      # (`Actions::Cast::Spectacle`).
+      #
+      #   spectacle red: 1
+      def spectacle(**cost)
+        define_method(:spectacle_cost) { Costs::Mana.new(cost.dup) }
+      end
+
       # "Evoke {cost}": an alternative cost; the permanent is sacrificed when it enters (cast with
       # `Actions::Cast::Evoked`, see `Permanent#evoked?`).
       def evoke(cost)
