@@ -33,7 +33,8 @@ module Magic
       end
 
       def perform
-        permanent = card.resolve!
+        # A land played from an opponent's exile (Valgavoth) comes under the control of whoever plays it.
+        permanent = card.resolve!(controller: player)
         permanent.transform! if back_face? && permanent.respond_to?(:transform!)
         permanent
       end

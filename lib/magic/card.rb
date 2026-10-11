@@ -205,10 +205,10 @@ module Magic
 
       # "Whenever this becomes the target of a spell or ability an opponent controls, counter it
       # unless that player pays the ward cost." One trigger for spells, one for abilities.
-      def ward(life: nil, generic: nil, discard: false)
+      def ward(life: nil, generic: nil, discard: false, sacrifice_nonland: nil)
         ward_call = lambda do |trigger, spell: nil, ability: nil|
           trigger.game.choices.add(
-            Choice::Ward.new(actor: trigger.actor, payer: trigger.event.player, spell: spell, ability: ability, generic: generic, life: life, discard: discard)
+            Choice::Ward.new(actor: trigger.actor, payer: trigger.event.player, spell: spell, ability: ability, generic: generic, life: life, discard: discard, sacrifice_nonland: sacrifice_nonland)
           )
         end
 
