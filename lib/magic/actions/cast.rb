@@ -194,6 +194,9 @@ module Magic
 
       def can_target?(target, index = nil)
         choices = index ? target_choices[index] : target_choices
+        # More targets than the spell has slots for ("up to four target cards": a fifth is one too many).
+        return false if choices.nil?
+
         # "target creature with mana value X" (Stolen by the Fae): the card says whether a target fits the X it is cast with.
         return false if card.respond_to?(:target_fits_x?) && !card.target_fits_x?(target, value_for_x || mana_cost.x || 0)
 
