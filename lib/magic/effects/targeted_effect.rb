@@ -12,6 +12,8 @@ module Magic
 
       # Protection: damage from a source the target is protected from is prevented.
       def damage_prevented?
+        return false if game.battlefield.static_abilities.any? { _1.respond_to?(:damage_cant_be_prevented?) && _1.damage_cant_be_prevented? }
+
         return true if target.respond_to?(:prevents_damage?) && target.prevents_damage?
         return false unless target.respond_to?(:protected_from?)
 
