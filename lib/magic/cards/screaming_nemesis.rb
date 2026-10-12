@@ -24,7 +24,7 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, damage: @damage, target: target)
+          deal_damage(@damage, to: target)
           target.cant_gain_life! if target.is_a?(Magic::Player)
         end
       end

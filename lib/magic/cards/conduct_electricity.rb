@@ -12,8 +12,8 @@ module Magic
 
       # Conduct Electricity deals 6 damage to target creature and 2 damage to up to one target creature token.
       def resolve!(targets:)
-        trigger_effect(:deal_damage, target: targets[0], damage: 6)
-        trigger_effect(:deal_damage, target: targets[1], damage: 2) if targets[1]
+        deal_damage(6, to: targets[0])
+        deal_damage(2, to: targets[1]) if targets[1]
       end
     end
   end

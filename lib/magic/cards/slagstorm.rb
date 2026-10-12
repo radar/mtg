@@ -7,13 +7,13 @@ module Magic
     class Slagstorm < Sorcery
       class Mode1 < Mode
         def resolve!
-          battlefield.creatures.each { trigger_effect(:deal_damage, target: _1, damage: 3) }
+          battlefield.creatures.each { deal_damage(3, to: _1) }
         end
       end
 
       class Mode2 < Mode
         def resolve!
-          game.players.each { trigger_effect(:deal_damage, target: _1, damage: 3) }
+          game.players.each { deal_damage(3, to: _1) }
         end
       end
 

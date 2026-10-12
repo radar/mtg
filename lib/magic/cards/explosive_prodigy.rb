@@ -17,7 +17,7 @@ module Magic
 
         # Vivid -- X is the number of colors among permanents you control.
         def resolve!(target:)
-          trigger_effect(:deal_damage, damage: controller.colors_among_permanents, target: target)
+          deal_damage(controller.colors_among_permanents, to: target)
         end
       end
 

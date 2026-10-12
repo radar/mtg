@@ -29,7 +29,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:deal_damage, damage: @damage, target: target)
+            deal_damage(@damage, to: target)
           end
         end
 

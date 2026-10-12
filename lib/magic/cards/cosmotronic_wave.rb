@@ -7,7 +7,7 @@ module Magic
     class CosmotronicWave < Sorcery
       def resolve!
         game.battlefield.creatures.not_controlled_by(controller).each do |creature|
-          trigger_effect(:deal_damage, damage: 1, target: creature)
+          deal_damage(1, to: creature)
           creature.prevent_blocking!
         end
       end

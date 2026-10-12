@@ -11,7 +11,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, target: target, damage: 4)
+          deal_damage(4, to: target)
         end
       end
 

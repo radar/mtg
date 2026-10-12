@@ -15,7 +15,7 @@ module Magic
       def target_choices = battlefield.creatures
 
       def adventure_resolve!(target:)
-        trigger_effect(:deal_damage, target: target, damage: 5)
+        deal_damage(5, to: target)
       end
     end
   end

@@ -11,7 +11,7 @@ module Magic
 
         def resolve!(distribution:)
           distribution.each do |target, damage|
-            trigger_effect(:deal_damage, target: target, damage: damage)
+            deal_damage(damage, to: target)
           end
         end
       end

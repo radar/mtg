@@ -6,7 +6,7 @@ module Magic
 
     class Boltwave < Sorcery
       def resolve!
-        game.opponents(controller).each { trigger_effect(:deal_damage, target: _1, damage: 3) }
+        game.opponents(controller).each { deal_damage(3, to: _1) }
       end
     end
   end

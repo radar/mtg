@@ -10,7 +10,7 @@ module Magic
       # "Soul Sear deals 5 damage to target creature or planeswalker. That permanent loses indestructible
       # until end of turn."
       def resolve!(target:)
-        trigger_effect(:deal_damage, target:, damage: 5)
+        deal_damage(5, to: target)
         target.lose_keyword!(Keywords::INDESTRUCTIBLE)
       end
     end

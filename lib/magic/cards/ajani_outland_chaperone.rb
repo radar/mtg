@@ -33,7 +33,7 @@ module Magic
         def target_choices = battlefield.creatures.select(&:tapped?)
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, target:, damage: 4)
+          deal_damage(4, to: target)
         end
       end
 

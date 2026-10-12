@@ -17,7 +17,7 @@ module Magic
 
       # "Magnificent End deals 5 damage to target creature."
       def resolve!(target:)
-        trigger_effect(:deal_damage, target:, damage: 5)
+        deal_damage(5, to: target)
       end
     end
   end

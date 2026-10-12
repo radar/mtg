@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:deal_damage, damage: 1, target: target)
+        deal_damage(1, to: target)
         create_token(token: Tokens::Treasure)
         trigger_effect(:draw_card)
       end

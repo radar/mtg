@@ -26,7 +26,7 @@ module Magic
 
         def call
           trigger_effect(:modify_power_toughness, target: actor, power: 1, toughness: 1, until_eot: true)
-          opponents.each { |opponent| trigger_effect(:deal_damage, target: opponent, damage: 1) }
+          opponents.each { |opponent| deal_damage(1, to: opponent) }
         end
       end
 

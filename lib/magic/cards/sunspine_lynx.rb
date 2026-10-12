@@ -25,7 +25,7 @@ module Magic
         def call
           game.players.each do |player|
             count = player.lands.reject(&:basic_land?).count
-            trigger_effect(:deal_damage, target: player, damage: count) if count.positive?
+            deal_damage(count, to: player) if count.positive?
           end
         end
       end

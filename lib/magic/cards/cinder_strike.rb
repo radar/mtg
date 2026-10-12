@@ -13,7 +13,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:deal_damage, target: target, damage: kicker_cost.paid? ? 4 : 2)
+        deal_damage(kicker_cost.paid? ? 4 : 2, to: target)
       end
     end
   end

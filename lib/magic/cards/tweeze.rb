@@ -30,7 +30,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:deal_damage, target: target, damage: 3)
+        deal_damage(3, to: target)
         game.choices.add(MayChoice.new(actor: self))
       end
     end

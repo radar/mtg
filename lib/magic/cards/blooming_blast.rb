@@ -10,8 +10,8 @@ module Magic
       # Blooming Blast deals 2 damage to target creature. If the gift was promised, it also deals
       # 3 damage to that creature's controller.
       def resolve!(target:)
-        trigger_effect(:deal_damage, target: target, damage: 2)
-        trigger_effect(:deal_damage, target: target.controller, damage: 3) if gift_promised?
+        deal_damage(2, to: target)
+        deal_damage(3, to: target.controller) if gift_promised?
       end
     end
   end

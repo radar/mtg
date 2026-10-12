@@ -6,7 +6,7 @@ module Magic
 
     class SeismicRupture < Sorcery
       def resolve!
-        battlefield.creatures.reject(&:flying?).each { trigger_effect(:deal_damage, target: _1, damage: 2) }
+        battlefield.creatures.reject(&:flying?).each { deal_damage(2, to: _1) }
       end
     end
   end

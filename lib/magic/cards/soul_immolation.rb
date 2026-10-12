@@ -15,8 +15,8 @@ module Magic
         return if x.zero?
 
         game.opponents(controller).each do |opponent|
-          trigger_effect(:deal_damage, target: opponent, damage: x)
-          opponent.creatures.each { trigger_effect(:deal_damage, target: _1, damage: x) }
+          deal_damage(x, to: opponent)
+          opponent.creatures.each { deal_damage(x, to: _1) }
         end
       end
     end

@@ -12,9 +12,9 @@ module Magic
 
       def resolve!(target:)
         if kicker_cost.paid?
-          trigger_effect(:deal_damage, target: target, damage: 4)
+          deal_damage(4, to: target)
         else
-          trigger_effect(:deal_damage, target: target, damage: 2)
+          deal_damage(2, to: target)
         end
       end
     end

@@ -31,7 +31,7 @@ module Magic
         end
 
         def resolve!(target:)
-          actor.trigger_effect(:deal_damage, target: target, damage: 3)
+          actor.deal_damage(3, to: target)
         end
       end
 

@@ -9,7 +9,7 @@ module Magic
       end
 
       def resolve!
-        creatures.each { |creature| trigger_effect(:deal_damage, target: creature, damage: 13) }
+        creatures.each { |creature| deal_damage(13, to: creature) }
       end
     end
   end

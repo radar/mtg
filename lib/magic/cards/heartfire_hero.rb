@@ -18,7 +18,7 @@ module Magic
 
       class DiesTrigger < TriggeredAbility::Death
         def call
-          opponents.each { |opponent| trigger_effect(:deal_damage, target: opponent, damage: actor.power) }
+          opponents.each { |opponent| deal_damage(actor.power, to: opponent) }
         end
       end
 

@@ -31,7 +31,7 @@ module Magic
         def single_target? = true
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, target:, damage: 2)
+          deal_damage(2, to: target)
         end
       end
 

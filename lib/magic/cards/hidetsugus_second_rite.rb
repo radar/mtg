@@ -10,7 +10,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:deal_damage, target: target, damage: 10) if target.life == 10
+        deal_damage(10, to: target) if target.life == 10
       end
     end
   end

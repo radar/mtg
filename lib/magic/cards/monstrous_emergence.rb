@@ -21,7 +21,7 @@ module Magic
       def resolve!(target:)
         chosen = behold_cost.beheld
         power = chosen.is_a?(Magic::Permanent) ? chosen.power : chosen.base_power
-        trigger_effect(:deal_damage, target: target, damage: power)
+        deal_damage(power, to: target)
       end
     end
   end

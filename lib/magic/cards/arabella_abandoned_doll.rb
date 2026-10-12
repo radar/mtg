@@ -19,7 +19,7 @@ module Magic
           x = controller.creatures.count { _1.power <= 2 }
           return if x.zero?
 
-          opponents.each { trigger_effect(:deal_damage, target: _1, damage: x) }
+          opponents.each { deal_damage(x, to: _1) }
           gain_life(x)
         end
       end

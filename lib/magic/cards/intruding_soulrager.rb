@@ -14,7 +14,7 @@ module Magic
         costs "{T}, Sacrifice a Room"
 
         def resolve!(sacrificed:)
-          game.opponents(controller).each { trigger_effect(:deal_damage, damage: 2, target: _1) }
+          game.opponents(controller).each { deal_damage(2, to: _1) }
           trigger_effect(:draw_card)
         end
       end

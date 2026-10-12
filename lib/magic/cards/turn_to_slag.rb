@@ -11,7 +11,7 @@ module Magic
       # creature." The Equipment is found before the damage, since the creature may die from it.
       def resolve!(target:)
         equipment = target.attachments.select { |attachment| attachment.type?("Equipment") }
-        trigger_effect(:deal_damage, target:, damage: 5)
+        deal_damage(5, to: target)
         equipment.each(&:destroy!)
       end
     end

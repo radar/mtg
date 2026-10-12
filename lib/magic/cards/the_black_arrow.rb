@@ -27,7 +27,7 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, target: target, damage: 1)
+          deal_damage(1, to: target)
           return unless target.is_a?(Magic::Permanent) && target.type?("Dragon")
 
           trigger_effect(:destroy_target, target: target)

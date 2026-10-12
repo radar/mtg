@@ -28,7 +28,7 @@ module Magic
         def target_choices = game.any_target
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, damage: 2, target: target)
+          deal_damage(2, to: target)
         end
       end
 

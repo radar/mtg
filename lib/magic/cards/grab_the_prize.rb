@@ -29,7 +29,7 @@ module Magic
         return if discarded.nil? || discarded.land?
 
         game.opponents(controller).each do |opponent|
-          trigger_effect(:deal_damage, target: opponent, damage: 2)
+          deal_damage(2, to: opponent)
         end
       end
     end

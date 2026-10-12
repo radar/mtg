@@ -13,7 +13,7 @@ module Magic
         costs "{T}"
 
         def resolve!
-          game.opponents(controller).each { |opponent| trigger_effect(:deal_damage, damage: 2, target: opponent) }
+          game.opponents(controller).each { |opponent| deal_damage(2, to: opponent) }
         end
       end
 

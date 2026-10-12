@@ -9,7 +9,7 @@ module Magic
       end
 
       def resolve!(target:, value_for_x:)
-        trigger_effect(:deal_damage, target: target, damage: value_for_x)
+        deal_damage(value_for_x, to: target)
         lands = (controller.hand.lands + controller.graveyard.lands).first(value_for_x)
         lands.each { |land| land.resolve!(enters_tapped: true) }
       end

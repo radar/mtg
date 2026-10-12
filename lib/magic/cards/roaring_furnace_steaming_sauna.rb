@@ -11,7 +11,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:deal_damage, damage: controller.hand.cards.count, target: target)
+            deal_damage(controller.hand.cards.count, to: target)
           end
         end
 

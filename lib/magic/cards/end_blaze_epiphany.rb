@@ -40,7 +40,7 @@ module Magic
         end
         target.register_turn_trigger(Events::CreatureDied, dies_trigger)
 
-        trigger_effect(:deal_damage, target:, damage: value_for_x) if value_for_x.positive?
+        deal_damage(value_for_x, to: target) if value_for_x.positive?
       end
 
       def exile_from_top(player:, amount:)

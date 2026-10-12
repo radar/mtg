@@ -20,7 +20,7 @@ module Magic
           return unless Magic::Storied.enduring_story?(controller)
 
           game.opponents(controller).each do |opponent|
-            trigger_effect(:deal_damage, target: opponent, damage: discarded.count)
+            deal_damage(discarded.count, to: opponent)
           end
         end
       end

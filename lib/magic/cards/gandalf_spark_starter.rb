@@ -21,7 +21,7 @@ module Magic
             raise ArgumentError, "at most three targets" if distribution.size > 3
 
             distribution.each do |target, damage|
-              trigger_effect(:deal_damage, target: target, damage: damage)
+              deal_damage(damage, to: target)
             end
           end
         end

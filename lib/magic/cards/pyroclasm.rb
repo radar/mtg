@@ -6,7 +6,7 @@ module Magic
 
     class Pyroclasm < Sorcery
       def resolve!
-        battlefield.creatures.each { trigger_effect(:deal_damage, target: _1, damage: 2) }
+        battlefield.creatures.each { deal_damage(2, to: _1) }
       end
     end
   end

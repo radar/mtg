@@ -28,7 +28,7 @@ module Magic
         def choice_amount = already_chosen.empty? ? 1 : 0..1
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, target:, damage:)
+          deal_damage(damage, to: target)
           return if remaining.zero?
 
           follow_up = DamageChoice.new(actor:, damage: 3, already_chosen: [*already_chosen, target], remaining: remaining - 1)

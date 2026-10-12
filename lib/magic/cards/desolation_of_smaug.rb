@@ -24,7 +24,7 @@ module Magic
       # "Desolation of Smaug deals 3 damage to each non-Dragon creature."
       def resolve!
         game.battlefield.creatures.reject { _1.type?("Dragon") }.each do |creature|
-          trigger_effect(:deal_damage, target: creature, damage: 3)
+          deal_damage(3, to: creature)
         end
         game.choices.add(ManaChoice.new(actor: self))
       end

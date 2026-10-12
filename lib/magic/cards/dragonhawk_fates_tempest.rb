@@ -27,7 +27,7 @@ module Magic
           return if remaining.zero?
 
           @game.opponents(@player).each do |opponent|
-            @source.trigger_effect(:deal_damage, target: opponent, damage: 2 * remaining)
+            @source.deal_damage(2 * remaining, to: opponent)
           end
         end
       end

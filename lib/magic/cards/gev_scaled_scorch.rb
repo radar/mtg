@@ -26,7 +26,7 @@ module Magic
         def should_perform? = event.player == controller && spell.type?("Lizard")
 
         def call
-          opponents.each { |opponent| trigger_effect(:deal_damage, target: opponent, damage: 1) }
+          opponents.each { |opponent| deal_damage(1, to: opponent) }
         end
       end
 

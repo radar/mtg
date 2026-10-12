@@ -21,7 +21,7 @@ module Magic
         def single_target? = true
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, target:, damage: controller.permanents.by_any_type("Shrine").count)
+          deal_damage(controller.permanents.by_any_type("Shrine").count, to: target)
         end
       end
 

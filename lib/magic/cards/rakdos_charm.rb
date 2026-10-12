@@ -27,7 +27,7 @@ module Magic
       class DamageEachCreature < Mode
         def resolve!
           game.battlefield.creatures.each do |creature|
-            trigger_effect(:deal_damage, target: creature.controller, damage: 1)
+            deal_damage(1, to: creature.controller)
           end
         end
       end

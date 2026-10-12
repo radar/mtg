@@ -32,7 +32,7 @@ module Magic
             card.move_to_graveyard!(card.owner)
           end
 
-          opponents.each { |opponent| actor.trigger_effect(:deal_damage, damage: count, target: opponent) }
+          opponents.each { |opponent| actor.deal_damage(count, to: opponent) }
         end
       end
 

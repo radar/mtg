@@ -11,7 +11,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:deal_damage, target: event.attack.target, damage: 1)
+          deal_damage(1, to: event.attack.target)
         end
       end
 

@@ -16,7 +16,7 @@ module Magic
 
       # "Volcanic Salvo deals 6 damage to each of up to two target creatures and/or planeswalkers."
       def resolve!(targets:)
-        targets.first(2).each { |target| trigger_effect(:deal_damage, target:, damage: 6) }
+        targets.first(2).each { |target| deal_damage(6, to: target) }
       end
     end
   end

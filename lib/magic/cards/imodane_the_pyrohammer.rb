@@ -17,7 +17,7 @@ module Magic
         end
 
         def call
-          opponents.each { |opponent| actor.trigger_effect(:deal_damage, damage: event.damage, target: opponent) }
+          opponents.each { |opponent| actor.deal_damage(event.damage, to: opponent) }
         end
       end
 

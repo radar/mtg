@@ -41,7 +41,7 @@ module Magic
 
         def resolve!
           power = source.state[:last_sacrificed]&.power.to_i
-          game.opponents(controller).each { |opponent| trigger_effect(:deal_damage, target: opponent, damage: power) }
+          game.opponents(controller).each { |opponent| deal_damage(power, to: opponent) }
           draw_cards(power) if power.positive?
         end
       end

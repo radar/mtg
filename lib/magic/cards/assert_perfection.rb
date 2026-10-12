@@ -16,7 +16,7 @@ module Magic
         creature, victim = targets
         trigger_effect(:modify_power_toughness, target: creature, power: 1, toughness: 0)
         game.tick! # so the +1/+0 counts towards the damage
-        trigger_effect(:deal_damage, target: victim, damage: creature.power) if victim
+        deal_damage(creature.power, to: victim) if victim
       end
     end
   end

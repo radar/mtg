@@ -22,7 +22,7 @@ module Magic
       # Take Out the Trash deals 3 damage to target creature or planeswalker. If you control a Raccoon, you
       # may discard a card. If you do, draw a card.
       def resolve!(target:)
-        trigger_effect(:deal_damage, target: target, damage: 3)
+        deal_damage(3, to: target)
         game.choices.add(MayChoice.new(actor: self)) if battlefield.controlled_by(controller).creatures.any? { _1.type?("Raccoon") }
       end
     end

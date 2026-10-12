@@ -32,7 +32,7 @@ module Magic
         def resolve!(targets:)
           raise ArgumentError, "at most #{@amount} creatures may be chosen" if targets.size > @amount
 
-          targets.each { |target| trigger_effect(:deal_damage, damage: @amount, target: target) }
+          targets.each { |target| deal_damage(@amount, to: target) }
         end
       end
 

@@ -9,7 +9,7 @@ module Magic
 
       # "Volcanic Geyser deals X damage to any target."
       def resolve!(target:, value_for_x: 0)
-        trigger_effect(:deal_damage, target:, damage: value_for_x)
+        deal_damage(value_for_x, to: target)
       end
     end
   end

@@ -10,7 +10,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:deal_damage, target: target, damage: 2)
+        deal_damage(2, to: target)
         gain_life(2)
       end
     end

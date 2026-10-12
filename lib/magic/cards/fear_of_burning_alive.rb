@@ -11,7 +11,7 @@ module Magic
       # "When this creature enters, it deals 4 damage to each opponent."
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          opponents.each { trigger_effect(:deal_damage, target: _1, damage: 4) }
+          opponents.each { deal_damage(4, to: _1) }
         end
       end
 
@@ -35,7 +35,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:deal_damage, target: target, damage: @damage)
+            deal_damage(@damage, to: target)
           end
         end
 

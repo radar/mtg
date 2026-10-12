@@ -9,7 +9,7 @@ module Magic
       # "deals 6 damage to each untapped creature." Convoked creatures are tapped by then, so they are spared.
       def resolve!
         battlefield.creatures.reject(&:tapped?).each do |creature|
-          trigger_effect(:deal_damage, damage: 6, target: creature)
+          deal_damage(6, to: creature)
         end
       end
     end

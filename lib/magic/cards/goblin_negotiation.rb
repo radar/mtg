@@ -19,7 +19,7 @@ module Magic
       def resolve!(target:, value_for_x: 0)
         lethal = [target.toughness - target.damage, 0].max
         marked = target.damage
-        trigger_effect(:deal_damage, target: target, damage: value_for_x)
+        deal_damage(value_for_x, to: target)
         excess = [(target.damage - marked) - lethal, 0].max
         trigger_effect(:create_token, token_class: GoblinToken, amount: excess)
       end

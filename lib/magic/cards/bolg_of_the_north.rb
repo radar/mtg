@@ -29,7 +29,7 @@ module Magic
         def resolve!(target:)
           lethal = [target.toughness - target.damage, 0].max
           excess = [damage - lethal, 0].max
-          trigger_effect(:deal_damage, target: target, damage: damage)
+          deal_damage(damage, to: target)
           Amass.call(source: actor, controller: controller, amount: excess) if excess.positive?
         end
       end

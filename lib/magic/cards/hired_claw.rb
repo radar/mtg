@@ -13,7 +13,7 @@ module Magic
         def should_perform? = super && attackers.any? { _1.type?("Lizard") }
 
         def call
-          opponents.each { |opponent| trigger_effect(:deal_damage, target: opponent, damage: 1) }
+          opponents.each { |opponent| deal_damage(1, to: opponent) }
         end
       end
 

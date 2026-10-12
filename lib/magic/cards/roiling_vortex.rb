@@ -7,7 +7,7 @@ module Magic
     class RoilingVortex < Enchantment
       class UpkeepTrigger < TriggeredAbility
         def call
-          actor.trigger_effect(:deal_damage, damage: 1, target: event.player)
+          actor.deal_damage(1, to: event.player)
         end
       end
 
@@ -17,7 +17,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:deal_damage, damage: 5, target: event.player)
+          actor.deal_damage(5, to: event.player)
         end
       end
 

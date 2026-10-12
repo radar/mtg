@@ -14,7 +14,7 @@ module Magic
         def threshold = 4
 
         def call
-          opponents.each { |opponent| trigger_effect(:deal_damage, target: opponent, damage: 2) }
+          opponents.each { |opponent| deal_damage(2, to: opponent) }
         end
       end
 

@@ -12,7 +12,7 @@ module Magic
       # Delirium — If there are four or more card types among cards in your graveyard, exile the top card of your
       # library. You may play it until the end of your next turn."
       def resolve!(target:)
-        trigger_effect(:deal_damage, damage: 6, target:)
+        deal_damage(6, to: target)
         return unless controller.graveyard.delirium?
 
         top = controller.library.first or return

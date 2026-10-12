@@ -33,7 +33,7 @@ module Magic
           dogs = creatures_you_control.by_type("Dog")
           cats = creatures_you_control.by_type("Cat")
 
-          trigger_effect(:deal_damage, damage: dogs.count, target: target)
+          deal_damage(dogs.count, to: target)
           trigger_effect(:gain_life, life: cats.count, target: controller)
         end
       end

@@ -11,7 +11,7 @@ module Magic
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
           actor.opponents.each do |opponent|
-            actor.trigger_effect(:deal_damage, damage: 2, target: opponent)
+            actor.deal_damage(2, to: opponent)
           end
         end
       end

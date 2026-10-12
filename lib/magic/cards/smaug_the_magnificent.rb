@@ -22,7 +22,7 @@ module Magic
 
           def resolve!(target:)
             treasures = controller.permanents.count { _1.type?("Treasure") }
-            trigger_effect(:deal_damage, target: target, damage: treasures) if treasures.positive?
+            deal_damage(treasures, to: target) if treasures.positive?
           end
         end
 

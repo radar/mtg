@@ -24,7 +24,7 @@ module Magic
         def resolve!(target:)
           raise ArgumentError, "Choose one of the targeted creatures." unless creatures.include?(target)
 
-          trigger_effect(:deal_damage, target:, damage: 5)
+          deal_damage(5, to: target)
           (creatures - [target]).each(&:prevent_blocking!)
         end
       end

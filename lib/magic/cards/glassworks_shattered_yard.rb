@@ -13,7 +13,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:deal_damage, damage: 4, target: target)
+            deal_damage(4, to: target)
           end
         end
 
@@ -39,7 +39,7 @@ module Magic
           end
 
           def call
-            game.opponents(controller).each { trigger_effect(:deal_damage, damage: 1, target: _1) }
+            game.opponents(controller).each { deal_damage(1, to: _1) }
           end
         end
 

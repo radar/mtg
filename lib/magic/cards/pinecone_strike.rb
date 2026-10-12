@@ -9,7 +9,7 @@ module Magic
         def target_choices = battlefield.creatures
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, target: target, damage: 3)
+          deal_damage(3, to: target)
           target.register_turn_replacement(Magic::Effects::MovePermanentZone, Magic::ReplacementEffect::ExileInsteadOfDying)
         end
       end

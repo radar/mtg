@@ -20,7 +20,7 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, target: target, damage: @damage)
+          deal_damage(@damage, to: target)
         end
       end
 
@@ -40,8 +40,8 @@ module Magic
         end
 
         def resolve!(target:)
-          source.trigger_effect(:deal_damage, target: target, damage: source.power)
-          target.trigger_effect(:deal_damage, target: source, damage: target.power)
+          source.deal_damage(source.power, to: target)
+          target.deal_damage(target.power, to: source)
         end
       end
 

@@ -19,7 +19,7 @@ module Magic
       # Target creature you control deals damage equal to twice its power to target creature you don't control.
       def resolve!(targets:)
         mine, theirs = targets
-        trigger_effect(:deal_damage, target: theirs, damage: mine.power * 2)
+        deal_damage(mine.power * 2, to: theirs)
       end
     end
   end

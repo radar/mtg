@@ -20,7 +20,7 @@ module Magic
       # When this creature dies, it deals damage equal to its power to each opponent.
       class DiesTrigger < TriggeredAbility::Death
         def call
-          opponents.each { |opponent| trigger_effect(:deal_damage, target: opponent, damage: actor.power) }
+          opponents.each { |opponent| deal_damage(actor.power, to: opponent) }
         end
       end
 

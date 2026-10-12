@@ -12,7 +12,7 @@ module Magic
       # Sonar Strike deals 4 damage to target attacking, blocking, or tapped creature. You gain 3 life if
       # you control a Bat.
       def resolve!(target:)
-        trigger_effect(:deal_damage, target: target, damage: 4)
+        deal_damage(4, to: target)
         gain_life(3) if battlefield.controlled_by(controller).creatures.any? { _1.type?("Bat") }
       end
     end

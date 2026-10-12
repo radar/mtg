@@ -15,8 +15,8 @@ module Magic
 
       def resolve!(targets:)
         first, second = targets
-        trigger_effect(:deal_damage, target: first, damage: 2)
-        trigger_effect(:deal_damage, target: second, damage: 1)
+        deal_damage(2, to: first)
+        deal_damage(1, to: second)
       end
     end
   end

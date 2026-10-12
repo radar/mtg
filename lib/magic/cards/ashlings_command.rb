@@ -22,7 +22,7 @@ module Magic
         def target_choices = game.players
 
         def resolve!(target:)
-          target.creatures.to_a.each { trigger_effect(:deal_damage, target: _1, damage: 2) }
+          target.creatures.to_a.each { deal_damage(2, to: _1) }
         end
       end
 

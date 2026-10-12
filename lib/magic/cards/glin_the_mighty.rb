@@ -14,7 +14,7 @@ module Magic
 
       def adventure_resolve!(**)
         battlefield.not_controlled_by(controller).creatures.each do |creature|
-          trigger_effect(:deal_damage, target: creature, damage: 1)
+          deal_damage(1, to: creature)
         end
       end
 

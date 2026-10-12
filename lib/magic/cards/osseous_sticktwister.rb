@@ -40,7 +40,7 @@ module Magic
         end
 
         def decline!
-          trigger_effect(:deal_damage, damage: actor.power, target: player)
+          deal_damage(actor.power, to: player)
         end
       end
 
