@@ -9,7 +9,9 @@ module Magic
     end
 
     def find_card(name)
-      card = @oracle_data.find { |card| card["name"].casecmp(name).zero? }
+      matches = @oracle_data.select { |card| card["name"].casecmp(name).zero? }
+      # A token can share its name with a card (Intrepid Rabbit): the card wins.
+      card = matches.find { |match| match["layout"] != "token" } || matches.first
       raise CardNotFound if card.nil?
 
       # keep only relevant keys
