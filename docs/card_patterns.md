@@ -20,6 +20,9 @@ one large catalog. See `.claude/skills/implement-card/SKILL.md` for how this is 
 - `docs/patterns/mechanics.md` — whole named mechanics spanning trigger+cost+static
   (Monarch, the Ring tempts you, Blitz, Adventure, additional combat, engine gotchas).
 
+- `docs/patterns/bloomburrow.md` — Bloomburrow's named mechanics (valiant, expend, gift,
+  forage, Class enchantments, Seasons, threshold, finality) and the engine pieces added for them.
+
 Grep across all of them at once with `rg -i "<keyword>" docs/patterns/` when unsure
 which file covers a given ability shape.
 
