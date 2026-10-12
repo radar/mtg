@@ -163,7 +163,17 @@ module Magic
           raise InvalidTarget, "Invalid target for #{card.name}: #{target}" unless can_target?(target)
         end
         @targets = targets
+        reprice_for_targets!
         self
+      end
+
+      # "This spell costs {1} less to cast if it targets ...": a card answering `targets_chosen(targets)`
+      # learns its targets, and a cost nothing has been paid toward yet is rebuilt to reflect them.
+      def reprice_for_targets!
+        return unless card.respond_to?(:targets_chosen)
+
+        card.targets_chosen(targets)
+        @mana_cost = nil if @mana_cost && @mana_cost.balance == @mana_cost.cost
       end
 
       def multi_target(*targets)

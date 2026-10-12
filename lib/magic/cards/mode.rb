@@ -17,6 +17,10 @@ module Magic
         card
       end
 
+      def name
+        card.name
+      end
+
       def battlefield
         game.battlefield
       end
