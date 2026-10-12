@@ -270,7 +270,16 @@ module Magic
         count -= spend_restricted_mana(color, count, for_use) if for_use
         @mana_pool[color] -= count
       end
+
+      record_mana_spent(mana.values.sum)
     end
+
+    def record_mana_spent(amount)
+      return unless game && amount.positive?
+
+      game.notify!(Events::ManaSpent.new(player: self, amount: amount, previous_total: game.current_turn.mana_spent_by_player(self)))
+    end
+    private :record_mana_spent
 
     def spend_restricted_mana(color, count, use)
       spent = 0

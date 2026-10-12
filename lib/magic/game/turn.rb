@@ -301,6 +301,14 @@ module Magic
         events.select { |event| event.is_a?(Events::LifeGain) && event.player == player }.sum(&:life)
       end
 
+      def life_lost_by_player(player)
+        events.select { |event| event.is_a?(Events::LifeLoss) && event.player == player }.sum(&:life)
+      end
+
+      def mana_spent_by_player(player)
+        events.select { |event| event.is_a?(Events::ManaSpent) && event.player == player }.sum(&:amount)
+      end
+
       private
 
       attr_reader :game
