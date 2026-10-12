@@ -346,6 +346,17 @@ module Magic
         self
       end
 
+      # "Forage [or pay {M}]" as an additional cost: `payment` is three graveyard cards, a Food, or (for
+      # "or pay") a mana payment hash.
+      def pay_forage(payment)
+        cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::Forage) || additional_cost.is_a?(Costs::ForageOrMana) }
+        raise "Unknown additional forage cost" unless cost
+
+        cost.pay(player:, payment:)
+        @paid_additional_costs << cost
+        self
+      end
+
       # "Behold a <type> [and exile it] [or pay {M}]" as an additional cost: `payment` is the
       # permanent or card to behold, or a mana payment hash for the "or pay" alternative.
       def pay_behold(payment)

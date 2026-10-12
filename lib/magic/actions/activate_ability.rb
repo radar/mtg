@@ -100,6 +100,11 @@ module Magic
         pay(:blight, creature)
       end
 
+      # `payment`: three graveyard cards to exile, or a Food to sacrifice.
+      def pay_forage(payment)
+        pay(:forage, payment)
+      end
+
       def perform
         record_activation!
         game.stack.add(self)
@@ -121,6 +126,8 @@ module Magic
           Costs::Discard
         when :blight
           Costs::Blight
+        when :forage
+          Costs::Forage
         when :sacrifice
           Costs::Sacrifice
         when :self_sacrifice

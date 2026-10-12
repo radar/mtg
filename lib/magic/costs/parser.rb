@@ -38,6 +38,8 @@ module Magic
             SelfExile.new(source)
           when /Discard a card/
             Discard.new(source.controller)
+          when "Forage"
+            Forage.new(source)
           else
             raise "Unknown cost: #{cost}"
           end

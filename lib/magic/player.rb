@@ -441,6 +441,30 @@ module Magic
       permanents.planeswalkers
     end
 
+    def foods
+      permanents.select { _1.type?("Food") }
+    end
+
+    # Forage (Bloomburrow): exile three cards from your graveyard or sacrifice a Food.
+    def can_forage?
+      graveyard.count >= 3 || foods.any?
+    end
+
+    # `payment`: an Array of three cards in your graveyard (exiled), or a Food you control (sacrificed).
+    def forage!(payment)
+      if payment.is_a?(Magic::Permanent)
+        raise "#{payment.name} isn't a Food #{inspect} controls" unless foods.include?(payment)
+
+        payment.sacrifice!
+      else
+        cards = Array(payment)
+        raise "Forage needs three cards from the graveyard" unless cards.size == 3 && cards.all? { graveyard.cards.include?(_1) }
+
+        cards.each(&:exile!)
+      end
+      game.notify!(Events::Forage.new(player: self))
+    end
+
     def event_targets_self?(event)
       (event.respond_to?(:player) && event.player == self) ||
         (event.respond_to?(:target) && event.target == self)
