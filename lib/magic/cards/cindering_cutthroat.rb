@@ -18,7 +18,7 @@ module Magic
         costs "{1}{B/R}"
 
         def resolve!
-          trigger_effect(:grant_keyword, target: source, keyword: :menace)
+          give_keyword(source, :menace)
         end
       end
 

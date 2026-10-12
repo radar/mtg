@@ -14,7 +14,7 @@ module Magic
         # "... attach it to target creature you control. That creature gains wither until end of turn."
         def resolve!(target:)
           actor.attach_to!(target)
-          trigger_effect(:grant_keyword, target:, keyword: :wither)
+          give_keyword(target, :wither)
         end
       end
 

@@ -22,8 +22,8 @@ module Magic
 
         def resolve!(target:)
           add_counter("+1/+1", to: target)
-          trigger_effect(:grant_keyword, target: target, keyword: :trample)
-          trigger_effect(:grant_keyword, target: target, keyword: :hexproof)
+          give_keyword(target, :trample)
+          give_keyword(target, :hexproof)
         end
       end
 

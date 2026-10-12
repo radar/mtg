@@ -8,7 +8,7 @@ module Magic
       def resolve!
         battlefield.controlled_by(controller).creatures.each do |creature|
           pump(creature, 1, 0)
-          trigger_effect(:grant_keyword, target: creature, keyword: :indestructible)
+          give_keyword(creature, :indestructible)
         end
       end
     end

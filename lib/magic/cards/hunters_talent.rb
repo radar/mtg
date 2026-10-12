@@ -56,7 +56,7 @@ module Magic
 
           def resolve!(target:)
             pump(target, 1, 0)
-            trigger_effect(:grant_keyword, target: target, keyword: :trample)
+            give_keyword(target, :trample)
           end
         end
 

@@ -14,7 +14,7 @@ module Magic
         def target_choices = battlefield.creatures
 
         def resolve!(target:)
-          trigger_effect(:grant_keyword, target: target, keyword: :cant_be_blocked)
+          give_keyword(target, :cant_be_blocked)
         end
       end
 

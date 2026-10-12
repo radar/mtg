@@ -17,7 +17,7 @@ module Magic
       def resolve!
         3.times { trigger_effect(:create_token, token_class: GremlinToken) }
         controller.creatures.select { _1.type?("Gremlin") }.each do |gremlin|
-          %i[menace lifelink haste].each { |keyword| trigger_effect(:grant_keyword, target: gremlin, keyword: keyword) }
+          %i[menace lifelink haste].each { |keyword| give_keyword(gremlin, keyword) }
         end
 
         super

@@ -15,8 +15,8 @@ module Magic
         def resolve!(creature_type:)
           others = controller.permanents.select { |permanent| permanent != actor && permanent.type?(creature_type) }
           others.each do |permanent|
-            trigger_effect(:grant_keyword, target: permanent, keyword: :hexproof)
-            trigger_effect(:grant_keyword, target: permanent, keyword: :indestructible)
+            give_keyword(permanent, :hexproof)
+            give_keyword(permanent, :indestructible)
           end
         end
       end

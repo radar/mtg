@@ -30,7 +30,7 @@ module Magic
 
         def resolve!(target:)
           pump(target, 1, 0)
-          trigger_effect(:grant_keyword, target: target, keyword: :haste)
+          give_keyword(target, :haste)
         end
       end
 

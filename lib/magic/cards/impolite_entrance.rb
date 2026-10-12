@@ -10,8 +10,8 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:grant_keyword, target: target, keyword: :trample)
-        trigger_effect(:grant_keyword, target: target, keyword: :haste)
+        give_keyword(target, :trample)
+        give_keyword(target, :haste)
         trigger_effect(:draw_card)
       end
     end

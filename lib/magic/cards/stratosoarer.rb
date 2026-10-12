@@ -15,7 +15,7 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          trigger_effect(:grant_keyword, target:, keyword: :flying)
+          give_keyword(target, :flying)
         end
       end
 

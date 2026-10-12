@@ -17,7 +17,7 @@ module Magic
 
         def call
           pump(actor, 2, 0)
-          trigger_effect(:grant_keyword, target: actor, keyword: :menace)
+          give_keyword(actor, :menace)
         end
       end
 

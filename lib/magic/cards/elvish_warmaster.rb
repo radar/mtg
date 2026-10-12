@@ -43,7 +43,7 @@ module Magic
         def resolve!
           controller.creatures.by_any_type("Elf").each do |elf|
             pump(elf, 2, 2)
-            trigger_effect(:grant_keyword, keyword: :deathtouch, target: elf)
+            give_keyword(elf, :deathtouch)
           end
         end
       end

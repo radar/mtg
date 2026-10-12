@@ -10,8 +10,8 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:grant_keyword, target: target, keyword: :deathtouch)
-        trigger_effect(:grant_keyword, target: target, keyword: :indestructible)
+        give_keyword(target, :deathtouch)
+        give_keyword(target, :indestructible)
       end
     end
   end

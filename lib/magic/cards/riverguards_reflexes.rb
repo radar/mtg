@@ -11,7 +11,7 @@ module Magic
 
       def resolve!(target:)
         pump(target, 2, 2)
-        trigger_effect(:grant_keyword, target: target, keyword: :first_strike)
+        give_keyword(target, :first_strike)
         target.untap!
       end
     end

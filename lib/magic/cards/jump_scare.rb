@@ -12,7 +12,7 @@ module Magic
       # addition to its other types."
       def resolve!(target:)
         pump(target, 2, 2)
-        trigger_effect(:grant_keyword, target: target, keyword: :flying)
+        give_keyword(target, :flying)
         target.add_types("Horror", "Enchantment")
       end
     end

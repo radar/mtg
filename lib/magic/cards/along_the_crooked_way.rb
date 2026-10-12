@@ -48,7 +48,7 @@ module Magic
 
         def resolve!
           controller.creatures.select { _1.type?("Goblin") || _1.type?("Orc") }.each do |creature|
-            trigger_effect(:grant_keyword, target: creature, keyword: :menace)
+            give_keyword(creature, :menace)
           end
         end
       end

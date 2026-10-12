@@ -18,7 +18,7 @@ module Magic
 
           def resolve!(target:)
             x = choices.count
-            trigger_effect(:grant_keyword, target: target, keyword: :vigilance)
+            give_keyword(target, :vigilance)
             pump(target, x, x)
           end
         end

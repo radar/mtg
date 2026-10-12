@@ -31,7 +31,7 @@ module Magic
 
         def resolve!
           add_counter("+1/+1", to: source, amount: 3)
-          trigger_effect(:grant_keyword, target: source, keyword: :trample)
+          give_keyword(source, :trample)
         end
       end
 

@@ -9,7 +9,7 @@ module Magic
       # Target creature gains trample until end of turn. It also gets +1/+0 until end of turn if you control a
       # Mouse. Draw a card.
       def resolve!(target:)
-        trigger_effect(:grant_keyword, target: target, keyword: :trample)
+        give_keyword(target, :trample)
         if battlefield.controlled_by(controller).creatures.any? { _1.type?("Mouse") }
           pump(target, 1, 0)
         end

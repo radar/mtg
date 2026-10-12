@@ -15,7 +15,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:grant_keyword, target: source, keyword: :indestructible)
+          give_keyword(source, :indestructible)
         end
       end
 

@@ -12,8 +12,8 @@ module Magic
 
         def resolve!(target:)
           add_counter("+1/+1", to: target)
-          trigger_effect(:grant_keyword, target: target, keyword: :vigilance)
-          trigger_effect(:grant_keyword, target: target, keyword: :trample)
+          give_keyword(target, :vigilance)
+          give_keyword(target, :trample)
         end
       end
 

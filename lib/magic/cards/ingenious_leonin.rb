@@ -18,7 +18,7 @@ module Magic
         def resolve!(target:)
           add_counter("+1/+1", to: target)
           if target.type?("Cat")
-            trigger_effect(:grant_keyword, target: target, keyword: :first_strike)
+            give_keyword(target, :first_strike)
           end
         end
       end

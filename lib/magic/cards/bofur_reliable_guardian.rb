@@ -20,8 +20,8 @@ module Magic
       end
 
       def adventure_resolve!(target:, **)
-        trigger_effect(:grant_keyword, target: target, keyword: :hexproof)
-        trigger_effect(:grant_keyword, target: target, keyword: :indestructible)
+        give_keyword(target, :hexproof)
+        give_keyword(target, :indestructible)
       end
     end
   end

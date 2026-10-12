@@ -11,7 +11,7 @@ module Magic
 
       def resolve!(target:)
         pump(target, 0, 3)
-        trigger_effect(:grant_keyword, target: target, keyword: :hexproof)
+        give_keyword(target, :hexproof)
       end
     end
   end

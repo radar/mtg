@@ -15,7 +15,7 @@ module Magic
 
         def resolve!(target:)
           target.tap!
-          trigger_effect(:grant_keyword, target: actor, keyword: :cant_be_blocked)
+          give_keyword(actor, :cant_be_blocked)
         end
       end
 

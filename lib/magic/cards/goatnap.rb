@@ -12,7 +12,7 @@ module Magic
       def resolve!(target:)
         target.gain_control_until_eot!(controller)
         target.untap!
-        trigger_effect(:grant_keyword, target: target, keyword: :haste)
+        give_keyword(target, :haste)
         if target.type?("Goat")
           pump(target, 3, 0)
         end

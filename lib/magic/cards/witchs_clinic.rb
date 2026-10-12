@@ -17,7 +17,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:grant_keyword, target: target, keyword: :lifelink)
+          give_keyword(target, :lifelink)
         end
       end
 

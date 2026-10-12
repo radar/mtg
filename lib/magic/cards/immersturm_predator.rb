@@ -13,7 +13,7 @@ module Magic
         costs "Sacrifice another creature"
 
         def resolve!
-          trigger_effect(:grant_keyword, target: source, keyword: :indestructible)
+          give_keyword(source, :indestructible)
           trigger_effect(:tap, target: source)
         end
       end

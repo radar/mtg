@@ -23,8 +23,8 @@ module Magic
         end
 
         def call
-          trigger_effect(:grant_keyword, target: actor, keyword: :menace)
-          trigger_effect(:grant_keyword, target: actor, keyword: :deathtouch)
+          give_keyword(actor, :menace)
+          give_keyword(actor, :deathtouch)
         end
       end
 

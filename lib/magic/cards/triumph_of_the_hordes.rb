@@ -8,8 +8,8 @@ module Magic
       def resolve!
         battlefield.controlled_by(controller).creatures.each do |creature|
           pump(creature, 1, 1)
-          trigger_effect(:grant_keyword, target: creature, keyword: :trample)
-          trigger_effect(:grant_keyword, target: creature, keyword: :infect)
+          give_keyword(creature, :trample)
+          give_keyword(creature, :infect)
         end
       end
     end

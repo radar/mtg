@@ -11,7 +11,7 @@ module Magic
 
       def resolve!(target:)
         pump(target, 2, 2)
-        trigger_effect(:grant_keyword, target: target, keyword: :indestructible)
+        give_keyword(target, :indestructible)
       end
     end
   end

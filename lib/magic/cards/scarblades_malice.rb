@@ -25,8 +25,8 @@ module Magic
       # "Target creature you control gains deathtouch and lifelink until end of turn. When that
       # creature dies this turn, create a 2/2 black and green Elf creature token."
       def resolve!(target:)
-        trigger_effect(:grant_keyword, target:, keyword: :deathtouch)
-        trigger_effect(:grant_keyword, target:, keyword: :lifelink)
+        give_keyword(target, :deathtouch)
+        give_keyword(target, :lifelink)
         target.register_turn_trigger(Events::CreatureDied, DiesTrigger)
       end
     end

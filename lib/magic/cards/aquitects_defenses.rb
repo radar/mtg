@@ -21,7 +21,7 @@ module Magic
 
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:grant_keyword, target: actor.attached_to, keyword: :hexproof)
+          give_keyword(actor.attached_to, :hexproof)
         end
       end
 

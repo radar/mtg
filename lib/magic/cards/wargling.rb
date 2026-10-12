@@ -17,7 +17,7 @@ module Magic
 
         def call
           pump(actor, 1, 0)
-          controller.creatures.each { |creature| trigger_effect(:grant_keyword, target: creature, keyword: :trample) }
+          controller.creatures.each { |creature| give_keyword(creature, :trample) }
         end
       end
 

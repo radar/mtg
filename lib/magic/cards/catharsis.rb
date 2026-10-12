@@ -33,7 +33,7 @@ module Magic
         def call
           controller.creatures.each do |creature|
             pump(creature, 1, 1)
-            trigger_effect(:grant_keyword, target: creature, keyword: :haste)
+            give_keyword(creature, :haste)
           end
         end
       end

@@ -19,7 +19,7 @@ module Magic
 
         def resolve!(target:)
           pump(target, 1, 1)
-          trigger_effect(:grant_keyword, target: target, keyword: :vigilance)
+          give_keyword(target, :vigilance)
         end
       end
 

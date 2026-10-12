@@ -11,7 +11,7 @@ module Magic
 
       def resolve!(target:)
         pump(target, 1, 3)
-        trigger_effect(:grant_keyword, target: target, keyword: :reach)
+        give_keyword(target, :reach)
         target.untap!
       end
     end

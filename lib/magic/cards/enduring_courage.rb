@@ -16,7 +16,7 @@ module Magic
 
         def call
           pump(event.permanent, 2, 0)
-          trigger_effect(:grant_keyword, target: event.permanent, keyword: :haste)
+          give_keyword(event.permanent, :haste)
         end
       end
 

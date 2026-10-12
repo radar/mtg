@@ -34,7 +34,7 @@ module Magic
 
       class Chapter3 < Saga::ChapterAbility
         def resolve!
-          battlefield.controlled_by(controller).creatures.each { |creature| trigger_effect(:grant_keyword, target: creature, keyword: :deathtouch) }
+          battlefield.controlled_by(controller).creatures.each { |creature| give_keyword(creature, :deathtouch) }
         end
       end
 

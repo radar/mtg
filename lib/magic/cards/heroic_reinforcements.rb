@@ -16,7 +16,7 @@ module Magic
         trigger_effect(:create_token, token_class: SoldierToken, amount: 2)
         battlefield.controlled_by(controller).creatures.each do |creature|
           pump(creature, 1, 1)
-          trigger_effect(:grant_keyword, target: creature, keyword: :haste)
+          give_keyword(creature, :haste)
         end
       end
     end

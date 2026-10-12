@@ -11,7 +11,7 @@ module Magic
     class TerrorOfMountVelus < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          battlefield.controlled_by(controller).creatures.each { |creature| trigger_effect(:grant_keyword, target: creature, keyword: :double_strike) }
+          battlefield.controlled_by(controller).creatures.each { |creature| give_keyword(creature, :double_strike) }
         end
       end
 

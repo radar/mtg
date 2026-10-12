@@ -25,7 +25,7 @@ module Magic
           def resolve!(keyword:)
             raise ArgumentError, "choose double_strike or trample" unless choices.include?(keyword)
 
-            trigger_effect(:grant_keyword, target: @mouse, keyword: keyword)
+            give_keyword(@mouse, keyword)
           end
         end
 

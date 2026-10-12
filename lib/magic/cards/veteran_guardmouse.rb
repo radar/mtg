@@ -12,7 +12,7 @@ module Magic
       class ValiantTrigger < TriggeredAbility::Valiant
         def call
           pump(actor, 1, 0)
-          trigger_effect(:grant_keyword, target: actor, keyword: :first_strike)
+          give_keyword(actor, :first_strike)
           game.choices.add(Magic::Choice::Scry.new(actor: actor, amount: 1))
         end
       end

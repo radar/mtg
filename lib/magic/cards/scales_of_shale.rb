@@ -16,8 +16,8 @@ module Magic
 
       def resolve!(target:)
         pump(target, 2, 0)
-        trigger_effect(:grant_keyword, target: target, keyword: :lifelink)
-        trigger_effect(:grant_keyword, target: target, keyword: :indestructible)
+        give_keyword(target, :lifelink)
+        give_keyword(target, :indestructible)
       end
     end
   end

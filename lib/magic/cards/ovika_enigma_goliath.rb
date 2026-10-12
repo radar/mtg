@@ -23,7 +23,7 @@ module Magic
         end
 
         def call
-          Array(trigger_effect(:create_token, token_class: PhyrexianGoblinToken, amount: event.spell.mana_value)).each { |token| trigger_effect(:grant_keyword, target: token, keyword: :haste) }
+          Array(trigger_effect(:create_token, token_class: PhyrexianGoblinToken, amount: event.spell.mana_value)).each { |token| give_keyword(token, :haste) }
         end
       end
 

@@ -14,8 +14,8 @@ module Magic
         def target_choices = controller.creatures.except(source)
 
         def resolve!(target:)
-          trigger_effect(:grant_keyword, target:, keyword: :flying)
-          trigger_effect(:grant_keyword, target:, keyword: :lifelink)
+          give_keyword(target, :flying)
+          give_keyword(target, :lifelink)
         end
       end
 

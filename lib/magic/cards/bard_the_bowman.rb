@@ -23,7 +23,7 @@ module Magic
 
           def resolve!(target:)
             add_counter("+1/+1", to: target)
-            trigger_effect(:grant_keyword, target: target, keyword: :lifelink)
+            give_keyword(target, :lifelink)
           end
         end
 

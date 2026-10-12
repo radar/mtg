@@ -11,7 +11,7 @@ module Magic
       # creature also gains indestructible until end of turn.
       def resolve!(target:)
         pump(target, 2, 2)
-        trigger_effect(:grant_keyword, target: target, keyword: :indestructible) if gift_promised?
+        give_keyword(target, :indestructible) if gift_promised?
       end
     end
   end

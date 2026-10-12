@@ -11,8 +11,8 @@ module Magic
 
       def resolve!(target:)
         pump(target, 3, 0)
-        trigger_effect(:grant_keyword, target: target, keyword: :reach)
-        trigger_effect(:grant_keyword, target: target, keyword: :first_strike)
+        give_keyword(target, :reach)
+        give_keyword(target, :first_strike)
       end
     end
   end

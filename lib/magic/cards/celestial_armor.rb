@@ -29,8 +29,8 @@ module Magic
 
           def resolve!(target:)
             actor.attach_to!(target)
-            trigger_effect(:grant_keyword, target: target, keyword: :hexproof)
-            trigger_effect(:grant_keyword, target: target, keyword: :indestructible)
+            give_keyword(target, :hexproof)
+            give_keyword(target, :indestructible)
           end
         end
 

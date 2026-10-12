@@ -31,7 +31,7 @@ module Magic
         def call
           add_counter("+1/+1", to: actor)
           actor.add_types(T::Creatures["Dragon"])
-          trigger_effect(:grant_keyword, target: actor, keyword: :flying)
+          give_keyword(actor, :flying)
         end
       end
 

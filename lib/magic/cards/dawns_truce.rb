@@ -10,8 +10,8 @@ module Magic
       def resolve!
         controller.gain_hexproof_until_end_of_turn!
         battlefield.controlled_by(controller).each do |permanent|
-          trigger_effect(:grant_keyword, target: permanent, keyword: :hexproof)
-          trigger_effect(:grant_keyword, target: permanent, keyword: :indestructible) if gift_promised?
+          give_keyword(permanent, :hexproof)
+          give_keyword(permanent, :indestructible) if gift_promised?
         end
       end
     end

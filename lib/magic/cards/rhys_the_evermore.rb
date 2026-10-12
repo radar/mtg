@@ -14,7 +14,7 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          trigger_effect(:grant_keyword, target:, keyword: :persist)
+          give_keyword(target, :persist)
         end
       end
 

@@ -13,7 +13,7 @@ module Magic
           Permanent.token_copy(game: game, owner: controller, card: target.copiable_card)
         end
         tokens = battlefield.controlled_by(controller).select(&:token?)
-        tokens.each { trigger_effect(:grant_keyword, target: _1, keyword: :indestructible) }
+        tokens.each { give_keyword(_1, :indestructible) }
         gain_life(tokens.count)
       end
     end

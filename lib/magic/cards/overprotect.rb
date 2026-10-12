@@ -11,9 +11,9 @@ module Magic
 
       def resolve!(target:)
         pump(target, 3, 3)
-        trigger_effect(:grant_keyword, target: target, keyword: :trample)
-        trigger_effect(:grant_keyword, target: target, keyword: :hexproof)
-        trigger_effect(:grant_keyword, target: target, keyword: :indestructible)
+        give_keyword(target, :trample)
+        give_keyword(target, :hexproof)
+        give_keyword(target, :indestructible)
       end
     end
   end

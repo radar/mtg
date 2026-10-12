@@ -19,7 +19,7 @@ module Magic
 
         def resolve!(target:)
           target.add_types(T::Artifact)
-          trigger_effect(:grant_keyword, target: target, keyword: :indestructible)
+          give_keyword(target, :indestructible)
         end
       end
 

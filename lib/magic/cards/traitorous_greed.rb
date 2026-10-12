@@ -29,7 +29,7 @@ module Magic
       def resolve!(target:)
         target.gain_control_until_eot!(controller)
         target.untap!
-        trigger_effect(:grant_keyword, target:, keyword: :haste)
+        give_keyword(target, :haste)
         game.add_choice(ManaChoice.new(actor: self))
       end
     end

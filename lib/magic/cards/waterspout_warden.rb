@@ -22,7 +22,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:grant_keyword, target: actor, keyword: :flying)
+          give_keyword(actor, :flying)
         end
       end
 

@@ -27,7 +27,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:grant_keyword, target: target, keyword: :trample)
+          give_keyword(target, :trample)
           source.trigger_once_this_turn!(self.class)
           controller.add_mana(red: 4) if source.triggered_once_keys_this_turn.count(self.class) == 3
         end

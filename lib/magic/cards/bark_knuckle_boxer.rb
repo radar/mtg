@@ -13,7 +13,7 @@ module Magic
         def threshold = 4
 
         def call
-          trigger_effect(:grant_keyword, target: actor, keyword: :indestructible)
+          give_keyword(actor, :indestructible)
         end
       end
 

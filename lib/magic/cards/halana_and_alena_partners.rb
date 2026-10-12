@@ -23,7 +23,7 @@ module Magic
 
           def resolve!(target:)
             add_counter("+1/+1", to: target, amount: actor.power)
-            trigger_effect(:grant_keyword, target: target, keyword: :haste)
+            give_keyword(target, :haste)
           end
         end
 

@@ -21,7 +21,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:grant_keyword, target: target, keyword: :first_strike)
+            give_keyword(target, :first_strike)
           end
         end
 

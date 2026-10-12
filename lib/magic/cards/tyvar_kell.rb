@@ -43,7 +43,7 @@ module Magic
 
           add_counter("+1/+1", to: target)
           target.untap!
-          trigger_effect(:grant_keyword, target: target, keyword: :deathtouch)
+          give_keyword(target, :deathtouch)
         end
       end
 

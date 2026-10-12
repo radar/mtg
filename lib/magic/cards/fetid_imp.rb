@@ -13,7 +13,7 @@ module Magic
         costs "{B}"
 
         def resolve!
-          trigger_effect(:grant_keyword, target: source, keyword: :deathtouch)
+          give_keyword(source, :deathtouch)
         end
       end
 

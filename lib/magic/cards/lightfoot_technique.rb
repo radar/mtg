@@ -11,8 +11,8 @@ module Magic
 
       def resolve!(target:)
         add_counter("+1/+1", to: target)
-        trigger_effect(:grant_keyword, target: target, keyword: :flying)
-        trigger_effect(:grant_keyword, target: target, keyword: :indestructible)
+        give_keyword(target, :flying)
+        give_keyword(target, :indestructible)
       end
     end
   end

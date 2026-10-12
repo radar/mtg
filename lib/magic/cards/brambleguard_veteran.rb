@@ -15,7 +15,7 @@ module Magic
         def call
           battlefield.controlled_by(controller).creatures.select { _1.type?("Raccoon") }.each do |raccoon|
             pump(raccoon, 1, 1)
-            trigger_effect(:grant_keyword, target: raccoon, keyword: :vigilance)
+            give_keyword(raccoon, :vigilance)
           end
         end
       end

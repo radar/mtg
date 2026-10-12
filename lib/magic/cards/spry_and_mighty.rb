@@ -22,7 +22,7 @@ module Magic
           draw_cards(x) if x.positive?
           targets.each do |creature|
             pump(creature, x, x)
-            trigger_effect(:grant_keyword, target: creature, keyword: :trample)
+            give_keyword(creature, :trample)
           end
         end
       end

@@ -13,7 +13,7 @@ module Magic
 
         def resolve!
           pump(source, 1, 0)
-          trigger_effect(:grant_keyword, target: source, keyword: :menace)
+          give_keyword(source, :menace)
         end
       end
 

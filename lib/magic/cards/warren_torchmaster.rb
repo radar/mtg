@@ -23,7 +23,7 @@ module Magic
               def choice_amount = 1
 
               def resolve!(target:)
-                trigger_effect(:grant_keyword, target: target, keyword: :haste)
+                give_keyword(target, :haste)
               end
             end
 

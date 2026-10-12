@@ -21,8 +21,8 @@ module Magic
 
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:grant_keyword, target: actor.attached_to, keyword: :trample)
-          trigger_effect(:grant_keyword, target: actor.attached_to, keyword: :indestructible)
+          give_keyword(actor.attached_to, :trample)
+          give_keyword(actor.attached_to, :indestructible)
         end
       end
 

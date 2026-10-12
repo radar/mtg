@@ -18,7 +18,7 @@ module Magic
         battlefield.controlled_by(controller).creatures.each do |creature|
           pump(creature, 2, 0)
         end
-        trigger_effect(:grant_keyword, target: targets.first, keyword: :first_strike) if gift_promised? && targets.first
+        give_keyword(targets.first, :first_strike) if gift_promised? && targets.first
       end
     end
   end

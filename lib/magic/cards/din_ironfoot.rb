@@ -47,7 +47,7 @@ module Magic
           battlefield.controlled_by(controller).attacking.each do |creature|
             next unless creature.attachments.any? { _1.type?("Equipment") }
 
-            trigger_effect(:grant_keyword, target: creature, keyword: :double_strike)
+            give_keyword(creature, :double_strike)
           end
         end
       end
