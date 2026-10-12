@@ -15,10 +15,13 @@ module Magic
       end
 
       def call(effect)
-        effect.dup.tap { |doubled| doubled.instance_variable_set(:@damage, effect.damage * 2) }
+        effect.dup.tap { |doubled| doubled.instance_variable_set(:@damage, new_damage(effect.damage)) }
       end
 
       private
+
+      # Subclasses that add a fixed amount instead of doubling override this (DamageIncreaser).
+      def new_damage(damage) = damage * 2
 
       def source_applies?(_origin) = true
 

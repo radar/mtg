@@ -177,6 +177,14 @@ module Magic
     # Free-form per-permanent state for cards that level up or remember something (Figure of Fable).
     def state = (@state ||= {})
 
+    # A Class enchantment's level (it enters at level 1).
+    def level = state.fetch(:level, 1)
+
+    def level_up!
+      state[:level] = level + 1
+      game.notify!(Events::ClassLevelGained.new(permanent: self, level: level))
+    end
+
     def mana_spent = @mana_spent || {}
     def evoked? = !!@evoked
     def copy_choice_pending? = !!@copy_choice_pending
@@ -336,7 +344,7 @@ module Magic
     def replacement_effect_for(context)
       return nil if lost_all_abilities?
 
-      (card.replacement_effects.to_a + @turn_replacements).each do |matcher, replacement_effect|
+      (card.replacement_effects.to_a + @turn_replacements + counter_replacements).each do |matcher, replacement_effect|
         next unless replacement_matcher_applies?(matcher, context.effect)
 
         replacement_key = [object_id, replacement_effect]
@@ -347,6 +355,13 @@ module Magic
       end
 
       nil
+    end
+
+    # A finality counter: "If a creature with a finality counter on it would die, exile it instead."
+    def counter_replacements
+      return [] unless @counters.of_type(Counters["finality"]).any?
+
+      [[Effects::MovePermanentZone, ReplacementEffect::ExileInsteadOfDying]]
     end
 
     def replacement_matcher_applies?(matcher, effect)
@@ -627,7 +642,18 @@ module Magic
       attachments.any? { _1.card.assigns_toughness_damage?(self) } ? toughness : power
     end
 
+    # "Target creature can't be blocked this turn."
+    def cant_be_blocked_this_turn!
+      @unblockable_on_turn = game.current_turn.number
+    end
+
+    def unblockable_this_turn?
+      !@unblockable_on_turn.nil? && @unblockable_on_turn == game.current_turn.number
+    end
+
     def can_be_blocked?(blocker)
+      return false if unblockable_this_turn?
+
       lost_all_abilities? || face.can_be_blocked?(blocker)
     end
 
