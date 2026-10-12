@@ -86,6 +86,7 @@ module Magic
       permanent.tap! if enters_tapped
       permanent.attach_to!(attach_to) if attach_to
       card.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
+      card.extra_entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) } if card.respond_to?(:extra_entering_counters)
       if cast && card_zone&.hand?
         card.entering_counters_if_cast_from_hand.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       end
@@ -557,6 +558,12 @@ module Magic
     # Abilities other effects grant it still apply.
     def lose_all_abilities!
       @lost_all_abilities = true
+      apply_continuous_effects!
+    end
+
+    # The end of a "loses all abilities until ..." effect.
+    def restore_abilities!
+      @lost_all_abilities = false
       apply_continuous_effects!
     end
 

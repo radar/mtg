@@ -168,6 +168,12 @@ module Magic
         define_method(:modes_to_choose) { count }
       end
 
+      # "Choose up to five {P} worth of modes. You may choose the same mode more than once." (Seasons): each Mode
+      # declares its `points`, and `Actions::Cast#choose_mode` allows repeats until the budget is spent.
+      def modes_budget(points)
+        define_method(:modes_budget) { points }
+      end
+
       def enters_the_battlefield(&block)
         etb = Class.new(TriggeredAbility::EnterTheBattlefield)
         etb.define_method(:call, &block)
@@ -397,6 +403,17 @@ module Magic
     # Counters the permanent enters with ({ "+1/+1" => 2 }).
     def entering_counters
       {}
+    end
+
+    # Counters granted for this turn only to the next permanent this card becomes ("If you cast a spell this
+    # way, that creature enters with a finality counter on it": Osteomancer Adept).
+    def enter_with_counters_this_turn!(counters)
+      @extra_entering = [game.current_turn.number, counters]
+    end
+
+    def extra_entering_counters
+      turn, counters = @extra_entering
+      turn == game.current_turn.number ? counters : {}
     end
 
     # Counters it enters with only when cast from the hand (Myojin of Night's Reach).

@@ -16,6 +16,7 @@ module Magic
       when "time" then Time
       when "quest" then Quest
       when "flying" then Flying
+      when "indestructible" then Indestructible
       when "first strike" then FirstStrike
       when "lifelink" then Lifelink
       when "reach" then Reach

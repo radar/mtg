@@ -68,6 +68,21 @@ module Magic
         self
       end
 
+      # "For each mana in this ability's activation cost, you may tap an untapped creature you control rather than
+      # pay that mana" (Heirloom Epic): taps `creature` to pay {1} of the generic cost. Call it before paying mana.
+      def convoke(creature)
+        raise "#{ability.source.name}'s ability can't be paid by tapping creatures" unless ability.respond_to?(:convoke?) && ability.convoke?
+        raise "#{creature.name} is tapped" if creature.tapped?
+        raise "#{player.inspect} does not control #{creature.name}" unless creature.controller == player
+
+        mana = costs.find { _1.is_a?(Costs::Mana) }
+        raise "no generic mana left to pay with #{creature.name}" unless mana&.balance&.[](:generic).to_i.positive?
+
+        mana.adjusted_by(generic: -1)
+        creature.tap!
+        self
+      end
+
       def pay_self_tap
         pay(:self_tap)
       end

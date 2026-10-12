@@ -337,6 +337,19 @@ module Magic
         self
       end
 
+      # "You may sacrifice any number of nonland permanents ... costs {1} less for each": sacrifices `permanents`
+      # and reduces the generic part of the cost, so call it before paying mana.
+      def pay_sacrifice_any(permanents)
+        cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::SacrificeAny) }
+        raise "Unknown additional sacrifice cost" unless cost
+
+        cost.pay(player:, payment: permanents)
+        reduction = [cost.sacrificed.size, mana_cost.balance[:generic].to_i].min
+        mana_cost.adjusted_by(generic: -reduction) if reduction.positive?
+        @paid_additional_costs << cost
+        self
+      end
+
       def pay_sacrifice(target)
         cost = additional_costs.find { |additional_cost| additional_cost.is_a?(Costs::Sacrifice) }
         raise "Unknown additional sacrifice cost" unless cost
@@ -409,6 +422,13 @@ module Magic
       def perform
         validate_modes!
 
+        # Additional costs with nothing to choose (Festival of Embers' 1 life) are paid on their own.
+        (additional_costs - @paid_additional_costs).each do |cost|
+          next unless cost.respond_to?(:auto_pay!)
+
+          cost.auto_pay!(player)
+          @paid_additional_costs << cost
+        end
         missing_costs = additional_costs - @paid_additional_costs
         raise "Additional costs have not been paid" unless missing_costs.empty?
 
@@ -449,7 +469,13 @@ module Magic
 
       def choose_mode(mode_class, &)
         raise InvalidModes, "#{mode_class} is not a mode of #{card.name}" unless card.modes.include?(mode_class)
-        raise InvalidModes, "#{mode_class} was already chosen" if @modes.any? { |mode| mode.mode.instance_of?(mode_class) }
+        if card.respond_to?(:modes_budget)
+          # "Choose up to five {P} worth of modes. You may choose the same mode more than once." (Seasons)
+          spent = @modes.sum { |mode| mode.mode.points }
+          raise InvalidModes, "#{card.name} allows #{card.modes_budget} worth of modes" if spent + mode_class.points > card.modes_budget
+        else
+          raise InvalidModes, "#{mode_class} was already chosen" if @modes.any? { |mode| mode.mode.instance_of?(mode_class) }
+        end
         raise InvalidModes, "#{card.name} allows at most #{max_modes} modes" if max_modes && @modes.size >= max_modes
 
         mode = Mode.new(mode_class.new(game: game, card: card), source: card, controller: player)

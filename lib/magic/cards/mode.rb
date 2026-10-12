@@ -4,6 +4,15 @@ module Magic
       include Shared::Events
 
       attr_reader :game, :card
+
+      # The {P} a mode of a Season costs (`points 2`); 1 by default.
+      def self.points(count = nil)
+        @points = count if count
+        @points || 1
+      end
+
+      def points = self.class.points
+
       def initialize(game:, card:)
         @game = game
         @card = card
