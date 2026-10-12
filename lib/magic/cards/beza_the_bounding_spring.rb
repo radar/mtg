@@ -13,10 +13,10 @@ module Magic
       # creatures than you. Draw a card if an opponent has more cards in hand than you.
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:create_token, token_class: Tokens::Treasure) if opponents.any? { _1.lands.count > controller.lands.count }
-          trigger_effect(:gain_life, life: 4) if opponents.any? { _1.life > controller.life }
-          trigger_effect(:create_token, token_class: Tokens::Fish, amount: 2) if opponents.any? { _1.creatures.count > controller.creatures.count }
-          trigger_effect(:draw_cards, number_to_draw: 1) if opponents.any? { _1.hand.count > controller.hand.count }
+          if_an_opponent_has_more(:lands) { create_token Tokens::Treasure }
+          if_an_opponent_has_more(:life) { trigger_effect(:gain_life, life: 4) }
+          if_an_opponent_has_more(:creatures) { create_token Tokens::Fish, amount: 2 }
+          if_an_opponent_has_more(:hand) { draw_cards }
         end
       end
 

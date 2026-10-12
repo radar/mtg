@@ -45,6 +45,29 @@ RSpec.describe Magic::Player do
     end
   end
 
+  describe "#behind_an_opponent_in?" do
+    it "is true only when an opponent has strictly more of the stat" do
+      expect(p1.behind_an_opponent_in?(:lands)).to be false
+
+      ResolvePermanent("Forest", owner: p2)
+      expect(p1.behind_an_opponent_in?(:lands)).to be true
+
+      ResolvePermanent("Forest", owner: p1)
+      expect(p1.behind_an_opponent_in?(:lands)).to be false
+    end
+
+    it "compares life" do
+      p1.lose_life(5)
+
+      expect(p1.behind_an_opponent_in?(:life)).to be true
+      expect(p2.behind_an_opponent_in?(:life)).to be false
+    end
+
+    it "raises for a stat it doesn't know" do
+      expect { p1.behind_an_opponent_in?(:mana) }.to raise_error(ArgumentError, /Unknown stat :mana/)
+    end
+  end
+
   describe "#mill" do
     it "mills as many cards as the library holds, without failing, when it has fewer than asked" do
       p1.library.cards.clear

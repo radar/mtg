@@ -46,6 +46,21 @@ module Magic
       game.opponents(controller)
     end
 
+    # "Create a Treasure token", "draw a card": shortcuts for the most common `trigger_effect`s.
+    def create_token(token_class, **args)
+      trigger_effect(:create_token, token_class:, **args)
+    end
+
+    def draw_cards(number = 1)
+      trigger_effect(:draw_cards, number_to_draw: number)
+    end
+
+    # "<Do this> if an opponent controls more lands than you" (Beza, the Bounding Spring): runs the block when
+    # `controller.behind_an_opponent_in?(stat)`.
+    def if_an_opponent_has_more(stat, &block)
+      instance_exec(&block) if controller.behind_an_opponent_in?(stat)
+    end
+
     def this?
       actor == event.permanent
     end

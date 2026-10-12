@@ -25,7 +25,7 @@ module Magic
       # Plains card, put it onto the battlefield tapped, then shuffle."
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def should_perform?
-          opponents.any? { |opponent| opponent.lands.count > controller.lands.count }
+          controller.behind_an_opponent_in?(:lands)
         end
 
         def call

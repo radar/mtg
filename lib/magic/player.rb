@@ -501,6 +501,22 @@ module Magic
       permanents.lands
     end
 
+    # What "an opponent controls/has more <stat> than you" compares (Beza, the Bounding Spring).
+    COMPARABLE_STATS = {
+      lands: ->(player) { player.lands.count },
+      creatures: ->(player) { player.creatures.count },
+      life: ->(player) { player.life },
+      hand: ->(player) { player.hand.count },
+      graveyard: ->(player) { player.graveyard.count },
+    }.freeze
+
+    # "If an opponent controls more lands than you" is `behind_an_opponent_in?(:lands)`; `stat` is a key of
+    # COMPARABLE_STATS.
+    def behind_an_opponent_in?(stat)
+      measure = COMPARABLE_STATS.fetch(stat) { raise ArgumentError, "Unknown stat #{stat.inspect}, expected one of #{COMPARABLE_STATS.keys.join(', ')}" }
+      game.opponents(self).any? { measure.call(_1) > measure.call(self) }
+    end
+
     def artifacts
       permanents.artifacts
     end
