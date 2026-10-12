@@ -427,8 +427,17 @@ module Magic
           flashback: @flashback,
           targets: targets,
         ))
+        announce_targets
 
         copy_for_conspire if @conspired
+      end
+
+      # Every permanent this spell targets (including through its modes) became a target.
+      def announce_targets
+        all_targets = [*targets, *modes.flat_map { |mode| mode.respond_to?(:targets) ? mode.targets : [] }]
+        all_targets.grep(Permanent).uniq.each do |target|
+          game.notify!(Events::BecameTarget.new(permanent: target, controller: player, source: card))
+        end
       end
 
       # "Whenever you cast an Elf spell, it gains haste until end of turn" (Tyvar Kell's emblem): the

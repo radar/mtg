@@ -28,21 +28,18 @@ module Magic
           end
         end
 
-        def targeted_creatures
-          event.targets.select { _1.is_a?(Permanent) && _1.creature? && _1.controller == controller }
+        def should_perform?
+          creature = event.permanent
+          opponents.include?(event.controller) && creature.creature? && creature.controller == controller
         end
 
-        def should_perform? = opponents.include?(event.player) && targeted_creatures.any?
-
         def call
-          targeted_creatures.each do |creature|
-            choice = CounterChoice.new(actor: actor, excluded: creature)
-            game.add_choice(choice) if choice.choices.any?
-          end
+          choice = CounterChoice.new(actor: actor, excluded: event.permanent)
+          game.add_choice(choice) if choice.choices.any?
         end
       end
 
-      def event_handlers = super.merge(Events::SpellCast => TargetedTrigger, Events::AbilityActivated => TargetedTrigger)
+      def event_handlers = super.merge(Events::BecameTarget => TargetedTrigger)
     end
   end
 end

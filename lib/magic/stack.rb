@@ -144,8 +144,21 @@ module Magic
       choice.decline! if choice.respond_to?(:decline!)
     end
 
+    # A triggered ability's target is chosen here: announce it like a cast or activation does.
+    def announce_targets(choice, args)
+      return unless game && choice.is_a?(Magic::Choice::Targeted) && choice.actor.respond_to?(:controller)
+
+      Array(args[:target]).each do |target|
+        next unless target.is_a?(Magic::Permanent)
+
+        game.notify!(Events::BecameTarget.new(permanent: target, controller: choice.actor.controller, source: choice.actor))
+      end
+    end
+    private :announce_targets
+
     def resolve_choice!(**args)
       choice = choices.shift
+      announce_targets(choice, args)
       choice.resolve!(**args)
       game&.state_based_actions_checkpoint!
     end

@@ -93,6 +93,38 @@ RSpec.describe "Valiant creatures" do
 
       expect(mentor.power).to eq(3 + 4 + 1)
     end
+
+    it "also triggers when a triggered ability you control targets it" do
+      ResolvePermanent("Grizzly Bears", owner: p1)
+      ResolvePermanent("Pileated Provisioner", owner: p1)
+      game.resolve_choice!(target: mentor)
+      game.settle!
+      game.tick!
+
+      # +1/+1 counter from the Provisioner, and another from valiant.
+      expect(mentor.power).to eq(3 + 1 + 1)
+    end
+
+    it "doesn't trigger when an opponent's ability targets it" do
+      ResolvePermanent("Pileated Provisioner", owner: p2)
+      game.resolve_choice!(target: ResolvePermanent("Grizzly Bears", owner: p2)) if game.choices.any?
+      game.settle!
+      game.tick!
+
+      expect(mentor.power).to eq(3)
+    end
+
+    it "triggers only the first time each turn" do
+      ResolvePermanent("Grizzly Bears", owner: p1)
+      2.times do
+        ResolvePermanent("Pileated Provisioner", owner: p1)
+        game.resolve_choice!(target: mentor)
+        game.settle!
+      end
+      game.tick!
+
+      expect(mentor.power).to eq(3 + 2 + 1)
+    end
   end
 
   describe "Veteran Guardmouse" do

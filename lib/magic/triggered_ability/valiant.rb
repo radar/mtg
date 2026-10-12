@@ -1,12 +1,12 @@
 module Magic
   class TriggeredAbility
-    # Valiant: "Whenever this creature becomes the target of a spell or ability you control for
-    # the first time each turn, ...". Wire it with `ValiantTrigger.handlers` from `event_handlers`
-    # (it listens to both spells being cast and abilities being activated). Targets chosen by a
-    # triggered ability's `Choice::Targeted` are not seen, since no event announces them.
+    # Valiant: "Whenever this creature becomes the target of a spell or ability you control for the first time
+    # each turn, ...". Wire it with `ValiantTrigger.handlers` from `event_handlers`. It listens for
+    # Events::BecameTarget, which covers cast spells, activated abilities and the targets chosen for
+    # triggered abilities.
     class Valiant < TriggeredAbility
       def self.handlers
-        { Events::SpellCast => self, Events::AbilityActivated => self }
+        { Events::BecameTarget => self }
       end
 
       def trigger!
@@ -17,7 +17,7 @@ module Magic
       end
 
       def should_perform?
-        event.player == controller && event.targets.include?(actor) && !actor.triggered_once_this_turn?(self.class)
+        event.permanent == actor && event.controller == controller && !actor.triggered_once_this_turn?(self.class)
       end
     end
   end

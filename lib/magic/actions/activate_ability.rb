@@ -110,6 +110,9 @@ module Magic
         game.stack.add(self)
 
         game.notify!(Events::AbilityActivated.new(ability: ability, player: player, targets: targets))
+        targets.grep(Permanent).uniq.each do |target|
+          game.notify!(Events::BecameTarget.new(permanent: target, controller: player, source: ability.source))
+        end
       end
 
       def pay(cost_type, payment = nil)
