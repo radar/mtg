@@ -17,6 +17,7 @@ module Magic
 
       class LoyaltyAbility1 < LoyaltyAbility
         def loyalty_change = 1
+        def description = "Add {R}{R}{R}. Spend this mana only to cast instant or sorcery spells."
 
         def resolve!
           # "Spend this mana only to cast instant or sorcery spells" is not
@@ -28,6 +29,7 @@ module Magic
 
       class LoyaltyAbility2 < LoyaltyAbility
         def loyalty_change = 1
+        def description = "Discard up to three cards, then draw that many cards."
 
         def resolve!
           game.choices.add(DiscardDrawChoice.new(actor: source))
@@ -41,6 +43,7 @@ module Magic
 
       class LoyaltyAbility3 < LoyaltyAbility
         def loyalty_change = -8
+        def description = "You get an emblem with \"You may cast instant and sorcery spells from your graveyard. If a spell cast this way would be put into your graveyard, exile it instead.\""
 
         def resolve!
           game.add_emblem(Emblem.new(game: game, owner: controller))

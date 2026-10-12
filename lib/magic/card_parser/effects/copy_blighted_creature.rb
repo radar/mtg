@@ -21,7 +21,7 @@ module Magic
 
         def resolve_call
           <<~RUBY.chomp
-            token = Permanent.resolve(game: game, owner: controller, card: args[:target].copiable_card, token: true, copy: true, cast: false, enters_tapped: true)
+            token = Permanent.token_copy(game: game, owner: controller, card: args[:target].copiable_card, enters_tapped: true)
             token.register_turn_trigger(Events::BeginningOfEndStep, SacrificeTokenTrigger)
             game.current_turn.combat.declare_attacker(token, target: game.current_turn.attacks.find { _1.attacker == actor }&.target)
           RUBY

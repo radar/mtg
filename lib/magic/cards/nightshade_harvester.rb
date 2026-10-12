@@ -1,0 +1,24 @@
+module Magic
+  module Cards
+    NightshadeHarvester = Creature("Nightshade Harvester") do
+      cost generic: 3, black: 1
+      creature_type "Elf Shaman"
+      power 2
+      toughness 2
+    end
+
+    class NightshadeHarvester < Creature
+      # "Whenever a land an opponent controls enters, that player loses 1 life. Put a +1/+1 counter on this creature."
+      class LandfallTrigger < TriggeredAbility::Landfall
+        def should_perform? = opponents.include?(event.player)
+
+        def call
+          actor.trigger_effect(:lose_life, target: event.player, life: 1)
+          actor.trigger_effect(:add_counter, source: actor, counter_type: "+1/+1", target: actor)
+        end
+      end
+
+      def event_handlers = { Events::Landfall => LandfallTrigger }
+    end
+  end
+end

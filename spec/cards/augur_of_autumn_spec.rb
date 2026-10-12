@@ -4,6 +4,13 @@ RSpec.describe Magic::Cards::AugurOfAutumn do
   include_context "two player game"
   before { go_to_main_phase! }
 
+  it "is a 2/3 and gives no extra land drop" do
+    augur = ResolvePermanent("Augur of Autumn", owner: p1)
+
+    expect([augur.power, augur.toughness]).to eq([2, 3])
+    expect(p1.max_lands_per_turn).to eq(1)
+  end
+
   it "reveals the top card and allows a top land to be played" do
     ResolvePermanent("Augur of Autumn", owner: p1)
     top_land = p1.library.first

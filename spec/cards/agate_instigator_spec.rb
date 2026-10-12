@@ -66,6 +66,21 @@ RSpec.describe Magic::Cards::AgateInstigator do
       expect(p2.life).to eq(19)
     end
 
+    it "creates two 1/1 token copies with Anointed Procession" do
+      ResolvePermanent("Anointed Procession", owner: p1)
+      p1.add_mana(red: 4)
+      p1.cast(card: card) do |action|
+        action.pay_mana(generic: { red: 1 }, red: 1)
+        action.pay_offspring(generic: { red: 1 }, red: 1)
+      end
+      game.settle!
+
+      tokens = agates.select(&:token?)
+      expect(agates.count).to eq(3)
+      expect(tokens.map(&:power)).to all(eq(1))
+      expect(tokens.map(&:toughness)).to all(eq(1))
+    end
+
     it "can't pay offspring twice without a second offspring cost" do
       p1.add_mana(red: 6)
       action = Magic::Actions::Cast.new(game: game, player: p1, card: card)
@@ -116,6 +131,27 @@ RSpec.describe Magic::Cards::AgateInstigator do
         game.settle!
 
         expect(agates.select(&:token?).count).to eq(1)
+      end
+
+      it "can pay only Zinnia's granted offspring cost, skipping the card's own" do
+        p1.add_mana(red: 4)
+        p1.cast(card: card) do |action|
+          action.pay_mana(generic: { red: 1 }, red: 1)
+          action.pay_offspring({ generic: { red: 2 } }, action.offspring_costs.last)
+        end
+        game.settle!
+
+        expect(agates.select(&:token?).count).to eq(1)
+        expect(p1.mana_pool.values.sum).to eq(0)
+      end
+
+      it "can't pay the same offspring cost twice" do
+        p1.add_mana(red: 8)
+        action = Magic::Actions::Cast.new(game: game, player: p1, card: card)
+        granted = action.offspring_costs.last
+        action.pay_offspring({ generic: { red: 2 } }, granted)
+
+        expect { action.pay_offspring({ generic: { red: 2 } }, granted) }.to raise_error(/not available/)
       end
     end
   end

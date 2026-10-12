@@ -10,11 +10,12 @@ module Magic
 
       def initialize(actor:, cards:, filter:)
         @cards = cards.to_a
-        @filter = filter
+        # Applied now, not kept: a lambda can't be copied with Marshal, which arena does to games.
+        @choices = @cards.select(&filter)
         super(actor: actor)
       end
 
-      def choices = cards.select(&@filter)
+      attr_reader :choices
 
       def resolve!(targets: [])
         targets = Array(targets).uniq

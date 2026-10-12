@@ -23,7 +23,7 @@ module Magic
       # What can be discarded or sacrificed to avoid the penalty.
       def choices
         return hand.cards.to_a if discard
-        return controller.permanents.select { _1.type?(sacrifice_type) } if sacrifice_type
+        return chooser.permanents.select { _1.type?(sacrifice_type) } if sacrifice_type
 
         []
       end
@@ -42,22 +42,22 @@ module Magic
 
       def pay_mana(payment)
         cost = Costs::Mana.new(mana)
-        return false unless cost.can_pay?(controller)
+        return false unless cost.can_pay?(chooser)
 
         if payment
-          cost.pay!(player: controller, payment: payment)
+          cost.pay!(player: chooser, payment: payment)
         else
-          cost.auto_pay(player: controller)
-          cost.finalize!(controller)
+          cost.auto_pay(player: chooser)
+          cost.finalize!(chooser)
         end
         true
       end
 
       # A player can't pay more life than they have.
       def pay_life
-        return false if controller.life < life
+        return false if chooser.life < life
 
-        trigger_effect(:lose_life, target: controller, life: life)
+        trigger_effect(:lose_life, target: chooser, life: life)
         true
       end
 

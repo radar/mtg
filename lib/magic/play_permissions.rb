@@ -8,17 +8,24 @@ module Magic
     # `this_turn` permissions ("you may cast the exiled cards this turn") end with the turn
     # they were granted on instead.
     # `graveyard`: the card is castable from the graveyard (Zul Ashur) rather than from exile.
-    # `indefinite`: lasts as long as the card stays where it is ("for as long as it remains exiled").
+    # `forever`: lasts for as long as the card stays in exile (Thranduil's Decree).
     # `any_mana`: mana of any type can be spent to cast it.
-    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard, :indefinite, :any_mana) do
-      def initialize(graveyard: false, indefinite: false, any_mana: false, **args) = super
+    # `pay_life`: casting it pays life equal to its mana value rather than its mana cost (Inside Information).
+    # `requires_type`: only while the player controls a permanent of that type (Flameshape: "if you control a Wizard").
+    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard, :forever, :any_mana, :pay_life, :requires_type) do
+      def initialize(graveyard: false, forever: false, any_mana: false, pay_life: false, requires_type: nil, **args) = super
 
       def permits?(game, card, player)
-        card.equal?(self.card) && player == self.player && (graveyard ? card.zone&.graveyard? : card.zone&.exile?) && !expired?(game)
+        card.equal?(self.card) && player == self.player && (graveyard ? card.zone&.graveyard? : card.zone&.exile?) &&
+          !expired?(game) && requirement_met?(game)
+      end
+
+      def requirement_met?(game)
+        requires_type.nil? || game.battlefield.controlled_by(player).any? { _1.type?(requires_type) }
       end
 
       def expired?(game)
-        return false if indefinite
+        return false if forever
         return game.current_turn.number > granted_on_turn if this_turn
 
         game.turns.any? do |turn|
@@ -36,6 +43,16 @@ module Magic
       @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false)
     end
 
+    # "You may cast that card without paying its mana cost for as long as it remains exiled."
+    def grant_free_while_exiled(card:, player:)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: true, forever: true)
+    end
+
+    # "For as long as it remains exiled, you may play it if you control a <type>" (Flameshape).
+    def grant_while_exiled_if_controlling(card:, player:, type:)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false, forever: true, requires_type: type)
+    end
+
     # `free: true`: "you may cast it without paying its mana cost" (Dream Harvest).
     # `from_graveyard: true`: "you may cast target Zombie card from your graveyard this turn" (Zul Ashur).
     def grant_until_end_of_turn(card:, player:, free: false, from_graveyard: false)
@@ -44,7 +61,7 @@ module Magic
 
     # "You may cast that card for as long as it remains exiled, and mana of any type can be spent to cast it."
     def grant_while_exiled(card:, player:, any_mana: false)
-      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false, indefinite: true, any_mana:)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false, forever: true, any_mana:)
     end
 
     # Whether a permission lets `player` spend mana of any type to cast `card`.
@@ -60,6 +77,18 @@ module Magic
       else
         grant_until_end_of_next_turn(card:, player:)
       end
+    end
+
+    # "You may play those cards this turn. If you cast a spell this way, pay life equal to its mana value rather
+    # than pay its mana cost."
+    def grant_until_end_of_turn_paying_life(card:, player:)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: true, free: false, pay_life: true)
+    end
+
+    # Whether casting `card` under a permission pays life instead of mana.
+    def pay_life?(card, player)
+      @permissions.reject! { _1.expired?(@game) }
+      @permissions.any? { _1.pay_life && _1.permits?(@game, card, player) }
     end
 
     # Whether a permission lets `player` cast `card` without paying its mana cost.

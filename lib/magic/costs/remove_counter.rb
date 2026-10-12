@@ -10,7 +10,7 @@ module Magic
       end
 
       def can_pay?
-        source.counters.count(counter_type) >= amount
+        source.counters.of_type(Magic::Counters[counter_type]).count >= amount
       end
 
       def finalize!(_player)

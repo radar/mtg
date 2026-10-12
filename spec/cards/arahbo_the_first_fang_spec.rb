@@ -49,7 +49,7 @@ RSpec.describe Magic::Cards::ArahboTheFirstFang do
     expect do
       ResolvePermanent("Grizzly Bears", owner: p1)
       ResolvePermanent("Savannah Lions", owner: p2)
-      Magic::Permanent.resolve(game:, owner: p1, card: lions.copiable_card, token: true, copy: true, cast: false)
+      Magic::Permanent.token_copy(game:, owner: p1, card: lions.copiable_card)
       game.settle!
     end.not_to(change { cat_tokens.size })
   end

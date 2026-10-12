@@ -31,7 +31,7 @@ module Magic
           end
 
           def resolve!
-            Permanent.resolve(card: @land, game: game, from_zone: @land.zone, cast: false, controller: controller, enters_tapped: true)
+            Permanent.put_onto_battlefield(card: @land, game: game, from_zone: @land.zone, controller: controller, enters_tapped: true)
           end
 
           def decline!

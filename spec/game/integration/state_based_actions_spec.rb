@@ -195,7 +195,7 @@ RSpec.describe "State-based actions (rule 704)" do
 
       choice = game.choices.first
       expect(choice).to be_a(Magic::Choice::LegendRule)
-      expect(choice.controller).to eq(p1)
+      expect(choice.chooser).to eq(p1)
       expect(choice.choices).to contain_exactly(first, second)
 
       game.resolve_choice!(target: second)

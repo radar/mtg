@@ -10,7 +10,7 @@ module Magic
       # until your next turn. You gain 1 life for each token you control.
       def resolve!(target:, value_for_x:)
         value_for_x.times do
-          Permanent.resolve(game: game, owner: controller, card: target.copiable_card, token: true, copy: true, cast: false)
+          Permanent.token_copy(game: game, owner: controller, card: target.copiable_card)
         end
         tokens = battlefield.controlled_by(controller).select(&:token?)
         tokens.each { trigger_effect(:grant_keyword, target: _1, keyword: :indestructible) }

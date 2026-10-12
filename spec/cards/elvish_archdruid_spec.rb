@@ -28,5 +28,11 @@ RSpec.describe Magic::Cards::ElvishArchdruid do
       # 1 mana from the Archdruid, 1 from Lathril
       expect(p1.mana_pool[:green]).to eq(2)
     end
+
+    it "counts an Elf that is not a creature" do
+      ResolvePermanent("Prowess Of The Fair", owner: p1)
+      activate_ability
+      expect(p1.mana_pool[:green]).to eq(3)
+    end
   end
 end

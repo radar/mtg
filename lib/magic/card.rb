@@ -24,6 +24,9 @@ module Magic
     attr_accessor :dream_counter, :exile_with_dream_counter
     # Gift: true while this spell resolves (or is a permanent entering) after its caster promised the gift.
     attr_writer :gift_promised
+    # Suspend (and "exile it with three time counters on it"): the time counters on a card in exile, and how many a spell
+    # puts on itself as it resolves. See `suspend` and `Actions::Suspend`.
+    attr_accessor :time_counters, :exile_with_time_counters
 
     COST = {}
     GIFT = nil
@@ -63,7 +66,7 @@ module Magic
       end
 
       # "Harmonize {cost}": castable from the graveyard for this cost (a Costs::Mana), exiled after.
-      # `Actions::Cast.new(card:, harmonize: true)`; `Cast#harmonize_tap` taps a creature to reduce it.
+      # `Actions::Cast::Harmonize.new(card:)`; `Cast#harmonize_tap` taps a creature to reduce it.
       def harmonize(cost)
         define_method(:harmonize_cost) do
           cost
@@ -80,13 +83,53 @@ module Magic
         const_set(:BLITZ_COST, cost)
       end
 
+      # "Suspend N--{cost}": from your hand, pay it to exile this card with N time counters (`player.suspend(card:)`). At the
+      # beginning of its owner's upkeep a counter comes off; when the last does, its owner may cast it without paying its
+      # mana cost. A card with `suspend` also handles the upkeep from exile (`Suspend::UpkeepTrigger`).
+      def suspend(count, cost)
+        define_method(:suspend_count) { count }
+        define_method(:suspend_cost) { cost }
+        define_method(:event_handlers) do
+          super().merge(Events::BeginningOfUpkeep => Suspend::UpkeepTrigger) { |_, old, new| [*old, *new] }
+        end
+      end
+
+      # "Ninjutsu {cost}": from your hand, pay it and return an unblocked attacker you control to hand to put this card
+      # onto the battlefield tapped and attacking (`Actions::Ninjutsu`, `player.ninjutsu(card:, attacker:)`).
+      def ninjutsu(cost)
+        define_method(:ninjutsu_cost) { cost }
+      end
+
+      # "If this card is in your opening hand, you may begin the game with it on the battlefield" (Leylines):
+      # `Game#start!` offers it to its owner once the opening hands are drawn.
+      def begins_on_battlefield
+        define_method(:begins_on_battlefield?) { true }
+      end
+
+      # "Impending N--{cost}": an alternative cost (`Actions::Cast::Impending`); the permanent enters with N time
+      # counters and isn't a creature while it has any, losing one at the beginning of its controller's end step.
+      #
+      #   impending 4, Costs::Mana.new(generic: 2, white: 2)
+      def impending(count, cost)
+        define_method(:impending_count) { count }
+        define_method(:impending_cost) { cost }
+      end
+
+      # "Spectacle {cost}": an alternative cost, castable only if an opponent lost life this turn
+      # (`Actions::Cast::Spectacle`).
+      #
+      #   spectacle red: 1
+      def spectacle(**cost)
+        define_method(:spectacle_cost) { Costs::Mana.new(cost.dup) }
+      end
+
       # "Evoke {cost}": an alternative cost; the permanent is sacrificed when it enters (cast with
-      # `evoked: true`, see `Permanent#evoked?`).
+      # `Actions::Cast::Evoked`, see `Permanent#evoked?`).
       def evoke(cost)
         const_set(:EVOKE_COST, cost)
       end
 
-      # "You may have this enter as a copy of a creature": Permanent.resolve then holds off state-based
+      # "You may have this enter as a copy of a creature": Permanent.enter then holds off state-based
       # actions until the card's enters trigger clears `copy_choice_pending`.
       def enters_as_copy
         define_method(:enters_as_copy?) { true }
@@ -193,7 +236,7 @@ module Magic
 
       # "~ enters with two +1/+1 counters on it."
       # "~ enters with a divinity counter on it if you cast it from your hand." (`if_cast_from_hand: true`:
-      # Permanent.resolve adds it only for a spell cast from the hand.)
+      # Permanent.enter adds it only for a spell cast from the hand.)
       def enters_with_counters(counter_type, amount, if_cast_from_hand: false)
         define_method(if_cast_from_hand ? :entering_counters_if_cast_from_hand : :entering_counters) { { counter_type => amount } }
       end
@@ -206,20 +249,21 @@ module Magic
 
       # "Whenever this becomes the target of a spell or ability an opponent controls, counter it
       # unless that player pays the ward cost." One trigger for spells, one for abilities.
-      # `discard: true` is "Ward--Discard a card"; `sacrifice: "Food"` is "Ward--Sacrifice a Food".
-      def ward(life: nil, generic: nil, discard: false, sacrifice: nil)
+      # `discard: true` is "Ward--Discard a card"; `sacrifice: "Food"` is "Ward--Sacrifice a Food";
+      # `sacrifice_nonland: 3` is "Ward--Sacrifice three nonland permanents".
+      def ward(life: nil, generic: nil, discard: false, sacrifice: nil, sacrifice_nonland: nil)
         ward_call = lambda do |trigger, spell: nil, ability: nil|
           trigger.game.choices.add(
-            Choice::Ward.new(actor: trigger.actor, payer: trigger.event.player, spell: spell, ability: ability, generic: generic, life: life, discard: discard, sacrifice: sacrifice)
+            Choice::Ward.new(actor: trigger.actor, payer: trigger.event.player, spell: spell, ability: ability, generic: generic, life: life, discard: discard, sacrifice: sacrifice, sacrifice_nonland: sacrifice_nonland)
           )
         end
 
         spell_trigger = Class.new(TriggeredAbility::SpellCast) do
-          define_method(:should_perform?) { opponents.include?(event.player) && event.targets.include?(actor) }
+          define_method(:should_perform?) { opponents.include?(event.player) && event.targets.include?(actor) && !actor.ward_suppressed? }
           define_method(:call) { ward_call.call(self, spell: event.spell) }
         end
         ability_trigger = Class.new(TriggeredAbility) do
-          define_method(:should_perform?) { opponents.include?(event.player) && event.targets.include?(actor) }
+          define_method(:should_perform?) { opponents.include?(event.player) && event.targets.include?(actor) && !actor.ward_suppressed? }
           define_method(:call) { ward_call.call(self, ability: event.ability) }
         end
         const_set(:WARD_TRIGGER, spell_trigger)
@@ -323,6 +367,8 @@ module Magic
       @on_adventure = false unless zone&.exile?
       @dream_counter = false unless zone&.exile?
       @exile_with_dream_counter = false
+      @time_counters = nil unless zone&.exile?
+      @exile_with_time_counters = nil
       # Only a spell (or a permanent's card) can be controlled by someone other than its owner.
       @controller = owner unless zone&.battlefield?
       @zone = zone
@@ -347,9 +393,18 @@ module Magic
       controller.hand
     end
 
-    def resolve!(enters_tapped: enters_tapped?, kicked: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false)
+    # Puts the card onto the battlefield without casting it (back from exile, say), under its owner's control. An Aura
+    # needs something to enchant, so its owner is asked (see Choice::AttachReturningAura); with nothing legal it stays put.
+    def return_to_battlefield!
+      return resolve! unless is_a?(Cards::Aura)
+
+      choice = Choice::AttachReturningAura.new(actor: self)
+      game.add_choice(choice) if choice.choices.any?
+    end
+
+    def resolve!(enters_tapped: enters_tapped?, kicked: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false, value_for_x: nil, impending: false)
       if permanent?
-        permanent = Magic::Permanent.resolve(
+        permanent = Magic::Permanent.resolve_spell(
           game: game,
           owner: owner,
           controller: controller,
@@ -360,8 +415,10 @@ module Magic
           attach_to: attach_to,
           mana_spent: mana_spent,
           evoked: evoked,
+          value_for_x: value_for_x,
+          impending: impending,
         )
-        # A card resolving from the stack has no zone, so Permanent.resolve can't move it.
+        # A card resolving from the stack has no zone, so Permanent.resolve_spell can't move it.
         move_zone!(to: battlefield) unless zone&.battlefield?
         permanent
       end
@@ -416,14 +473,36 @@ module Magic
       turn == game.current_turn.number ? counters : {}
     end
 
+    # Counters it enters with because of the X it was cast with (Jacked Rabbit: X +1/+1 counters).
+    def entering_counters_for_x(_x)
+      {}
+    end
+
     # Counters it enters with only when cast from the hand (Myojin of Night's Reach).
     def entering_counters_if_cast_from_hand
+      {}
+    end
+
+    # Counters it enters with only when cast from the graveyard (Undead Sprinter).
+    def entering_counters_if_cast_from_graveyard
       {}
     end
 
     def activated_abilities
       []
     end
+
+    def begins_on_battlefield? = false
+
+    # "You can't cast this unless ..." (Rakdos, Lord of Riots): why +player+ can't cast this card right now, or nil.
+    # `by_effect` casts skip it.
+    def cast_prohibited_reason(_player) = nil
+
+    # In exile with time counters, waiting to be cast (suspend).
+    def suspended? = !!zone&.exile? && time_counters.to_i.positive?
+
+    # How many times X appears in the mana cost: 2 for {X}{X}. The mana to pay is X times this.
+    def x_multiplier = [self.class::COST[:x].to_i, 1].max
 
     # Harmonize granted by an effect until end of turn, its cost being the card's mana cost
     # (Songcrafter Mage). A card with its own `harmonize` macro overrides `harmonize_cost`.
@@ -455,6 +534,12 @@ module Magic
       []
     end
 
+    # Abilities a card activates from its owner's hand (Channel, "{1}{G}, Discard this card: ..."), as instances:
+    # `[ChannelAbility.new(source: self)]`.
+    def hand_abilities
+      []
+    end
+
     def etb_triggers
       []
     end
@@ -475,9 +560,21 @@ module Magic
     # every creature type in every zone, not just on the battlefield. (Abilities::Static::Changeling
     # does the same for a source that is all creature types without the keyword.)
     def types
-      return @types unless changeling? || static_abilities.include?(Abilities::Static::Changeling)
+      base = changeling? || static_abilities.include?(Abilities::Static::Changeling) ? (@types + Types::Creatures.values).uniq : @types
 
-      (@types + Types::Creatures.values).uniq
+      extra = types_granted_outside_battlefield
+      extra.empty? ? base : (base + extra).uniq
+    end
+
+    # "Creature spells you control and creature cards you own that aren't on the battlefield are the chosen type in addition
+    # to their other types" (Leyline of Transformation): battlefield static abilities answering
+    # `outside_battlefield_type_grants(card)`. A permanent's own types are worked out by ContinuousEffects instead.
+    def types_granted_outside_battlefield
+      return [] unless @types.include?(Types::Creature) && game && !zone&.battlefield?
+
+      game.battlefield.static_abilities.flat_map do |ability|
+        ability.respond_to?(:outside_battlefield_type_grants) ? ability.outside_battlefield_type_grants(self) : []
+      end
     end
 
     def graveyard_static_abilities
@@ -539,6 +636,13 @@ module Magic
     end
     # X paid for a "blight X" additional cost (Costs::BlightX).
     attr_accessor :x_blighted
+    # True once mana from a Treasure was spent to cast this card (set by ManaRestriction::FromTreasure, reset when the
+    # cost is paid). Read by "if mana from a Treasure was spent to cast it".
+    attr_accessor :treasure_mana_spent
+    def treasure_mana_spent? = !!treasure_mana_spent
+    # Set on an instant or sorcery cast by an effect that says "if that spell would be put into your graveyard, exile
+    # it instead" (Bilbo, Thief in the Night). Actions::Cast exiles the card as it resolves or is countered, then clears it.
+    attr_accessor :exile_instead_of_graveyard
 
     def evoke_cost
       self.class.const_defined?(:EVOKE_COST, false) ? Costs::Mana.new(self.class::EVOKE_COST.dup) : nil
@@ -570,6 +674,20 @@ module Magic
       !!cycling_cost
     end
 
+    # What cycling does once the card is discarded: draw a card, or search for a land (landcycling). A card whose
+    # discard-from-hand ability does something else (Waker of Waves) overrides it.
+    def cycling_effect!
+      if cycling_search
+        game.search_library(self, find: cycling_search, to: :hand, reveal: true)
+      else
+        trigger_effect(:draw_cards, number_to_draw: 1)
+      end
+    end
+
+    # "You may cast this card from your graveyard" (Demonic Embrace): castable from its owner's graveyard, with whatever
+    # additional costs the card asks for (`additional_costs`).
+    def may_cast_from_graveyard? = false
+
     def buyback?
       false
     end
@@ -597,9 +715,22 @@ module Magic
     def must_be_blocked? = false
     # "This creature attacks each combat if able."
     def must_attack? = false
+    # "Can't attack alone" / "can't block alone" (Toby's Beast): illegal unless another creature attacks/blocks too.
+    def cant_attack_alone? = false
+    def cant_block_alone? = false
+    # An Aura that goads the creature it enchants (Ghoulish Impetus).
+    def goads_enchanted? = false
+    # An Aura that makes the creature it enchants attack each combat if able (Furor of the Bitten).
+    def forces_enchanted_to_attack? = false
     # How many attackers this creature can block at once; override for "can block an additional creature".
     def maximum_attackers_blocked = 1
     def can_activate_ability?(_) = true
+    # "You have no maximum hand size."
+    def no_maximum_hand_size? = false
+    # "You don't lose the game for having 0 or less life." (Marina Vendrell's Grimoire)
+    def prevents_losing_at_zero_life? = false
+    # "Each opponent's maximum hand size is reduced by N." (Locust Miser)
+    def opponents_maximum_hand_size_reduction = 0
 
     def add_choice(choice, **args)
       case choice

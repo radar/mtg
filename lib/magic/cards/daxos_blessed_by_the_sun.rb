@@ -1,7 +1,7 @@
 module Magic
   module Cards
     class DaxosBlessedByTheSun < Creature
-      card_name "Daxos, Blessed By The Sun"
+      card_name "Daxos, Blessed by the Sun"
       type T::Legendary, T::Enchantment, T::Creature, T::Creatures["Demigod"]
 
       cost white: 2
@@ -13,7 +13,7 @@ module Magic
 
       class LifeGain < TriggeredAbility::EnterTheBattlefield
         def should_perform?
-          another_creature?
+          another_creature? && you?
         end
 
         def call

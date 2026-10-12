@@ -40,11 +40,10 @@ module Magic
         end
 
         def resolve!(target:)
-          Permanent.resolve(
+          Permanent.token_copy(
             game: game,
             owner: controller,
             card: target.card,
-            token: true,
           )
         end
       end

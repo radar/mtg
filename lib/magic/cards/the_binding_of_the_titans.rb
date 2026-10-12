@@ -20,6 +20,10 @@ module Magic
             super
           end
 
+          def prompt
+            "The Binding of the Titans: Exile up to two cards from graveyards. You gain 1 life for each creature card exiled this way."
+          end
+
           def resolve!(targets:)
             targets.first(2).each do |target|
               target.exile!
@@ -40,6 +44,10 @@ module Magic
           def initialize(actor:)
             @choices = actor.controller.graveyard.cards.by_any_type(T::Creature, T::Land)
             super
+          end
+
+          def prompt
+            "The Binding of the Titans: Return a creature or land card from your graveyard to your hand."
           end
 
           def resolve!(target:)

@@ -13,7 +13,12 @@ module Magic
 
       # "You may discard up to two cards. If you do, draw that many cards."
       class DiscardUpToTwo < Magic::Choice::May
+        def prompt = "Discard up to two cards. You draw that many cards."
+
         def choices = hand.cards.to_a
+
+        # How many cards may be picked (a UI reads it).
+        def upto = 2
 
         def resolve!(cards:)
           cards = Array(cards)

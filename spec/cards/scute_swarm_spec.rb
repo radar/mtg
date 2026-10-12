@@ -10,6 +10,14 @@ RSpec.describe Magic::Cards::ScuteSwarm do
     p1.hand.add(forest)
   end
 
+  context "casting" do
+    let(:card) { Card("Scute Swarm", owner: p1) }
+
+    it "costs {2}{G}" do
+      expect(card.cost.cost).to eq(generic: 2, green: 1)
+    end
+  end
+
   context "landfall" do
     context "when controller controls less than 6 lands" do
       it "creates an insect" do

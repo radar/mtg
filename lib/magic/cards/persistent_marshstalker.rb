@@ -29,7 +29,7 @@ module Magic
             card = actor
             return unless card.zone&.graveyard?
 
-            permanent = Permanent.resolve(card: card, game: game, from_zone: card.zone, cast: false, controller: controller, enters_tapped: true)
+            permanent = Permanent.put_onto_battlefield(card: card, game: game, from_zone: card.zone, controller: controller, enters_tapped: true)
             game.current_turn.declare_attacker(permanent, target: game.opponents(controller).first) if permanent
           end
         end

@@ -9,6 +9,11 @@ module Magic
 
     class NumaJoragaChieftain < Creature
       class DistributeCountersChoice < Magic::Choice
+        # How many counters there are to distribute.
+        attr_reader :amount
+
+        def prompt = "Numa: distribute #{amount} +1/+1 counter#{'s' unless amount == 1} among Elves."
+
         def initialize(actor:, amount:)
           @amount = amount
           super(actor: actor)
@@ -26,6 +31,9 @@ module Magic
       end
 
       class MayPayChoice < Magic::Choice::May
+        # "Pay {X}{X}": what a UI pays on the player's behalf for a given X.
+        def payment_cost(x) = { generic: 2 * x }
+
         def resolve!(x:, payment: {})
           return if x <= 0
 

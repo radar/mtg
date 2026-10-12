@@ -3,7 +3,7 @@ module Magic
     ComposerOfSpring = Creature("Composer of Spring") do
       cost "{1}{G}"
       creature_type "Satyr Bard"
-      power 2
+      power 1
       toughness 3
     end
 
@@ -15,7 +15,7 @@ module Magic
 
 
         def call
-          choice = if battlefield.controlled_by(controller).enchantments.count > 6
+          choice = if battlefield.controlled_by(controller).enchantments.count >= 6
             LandOrCreatureChoice
           else
             LandChoice
@@ -26,6 +26,8 @@ module Magic
       end
 
       class LandChoice < Magic::Choice::May
+        def prompt = "Put a land card from your hand onto the battlefield tapped?"
+
         def choices
           hand.lands
         end
@@ -36,6 +38,8 @@ module Magic
       end
 
       class LandOrCreatureChoice < Magic::Choice::May
+        def prompt = "Put a land or creature card from your hand onto the battlefield tapped?"
+
         def choices
           hand.lands + hand.creatures
         end

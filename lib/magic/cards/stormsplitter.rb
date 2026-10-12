@@ -15,7 +15,7 @@ module Magic
         def should_perform? = event.player == controller && (spell.instant? || spell.sorcery?)
 
         def call
-          copy = Permanent.resolve(game: game, owner: controller, card: actor.copiable_card, token: true, copy: true, cast: false)
+          copy = Permanent.token_copy(game: game, owner: controller, card: actor.copiable_card)
           return unless copy
 
           copy.register_turn_trigger(Events::BeginningOfEndStep, ExileAtEnd)

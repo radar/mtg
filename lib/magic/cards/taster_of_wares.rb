@@ -16,7 +16,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            amount = battlefield.controlled_by(controller).creatures.by_type("Goblin").count
+            amount = battlefield.controlled_by(controller).count { _1.type?("Goblin") }
             reveal = RevealChoice.new(actor:, player: target, amount:)
             if reveal.choices.count <= amount
               reveal.resolve!(cards: reveal.choices.to_a)
@@ -35,6 +35,8 @@ module Magic
       # The opponent chooses which X cards of their hand to reveal.
       class RevealChoice < Magic::Choice
         attr_reader :player, :amount
+
+        def chooser = player
 
         def initialize(actor:, player:, amount:)
           super(actor:)

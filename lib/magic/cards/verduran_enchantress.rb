@@ -1,7 +1,7 @@
 module Magic
   module Cards
     VerduranEnchantress = Creature("Verduran Enchantress") do
-      cost green: 2, white: 1
+      cost generic: 1, green: 2
       power 0
       toughness 2
       creature_type "Human Druid"
@@ -9,6 +9,8 @@ module Magic
 
     class VerduranEnchantress < Creature
       class Choice < Magic::Choice::May
+        def prompt = "Draw a card?"
+
         def resolve!
           controller.draw!
         end

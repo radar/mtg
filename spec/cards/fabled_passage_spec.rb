@@ -16,7 +16,7 @@ RSpec.describe Magic::Cards::FabledPassage do
 
     choice = game.choices.last
     expect(choice).to be_a(Magic::Cards::FabledPassage::Choice)
-    game.resolve_choice!(target: choice.choices.first)
+    game.resolve_choice!(targets: [choice.choices.first])
     expect(subject.zone).to be_nil
     expect(p1.graveyard.by_name(subject.name).count).to eq(1)
   end

@@ -8,7 +8,8 @@ module Magic
     class RockyTarPit < Card
       class Choice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, to_zone: :battlefield, filter: ->(card) { card.any_type?("Swamp", "Mountain") })
+          super(actor: actor, to_zone: :battlefield, filter: ->(card) { card.any_type?("Swamp", "Mountain") },
+                prompt: "Search your library for a Swamp or Mountain card. It enters the battlefield.")
         end
       end
 

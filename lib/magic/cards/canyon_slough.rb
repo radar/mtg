@@ -3,6 +3,7 @@ module Magic
     CanyonSlough = Card("Canyon Slough") do
       type T::Land, T::Lands::Swamp, T::Lands::Mountain
       enters_tapped
+      cycling generic: 2
     end
 
     class CanyonSlough < Card
@@ -10,15 +11,7 @@ module Magic
         choices :black, :red
       end
 
-      class CyclingAbility < Magic::ActivatedAbility
-        costs "{2}"
-
-        def resolve!
-          source.controller.draw!
-        end
-      end
-
-      def activated_abilities = [ManaAbility, CyclingAbility]
+      def activated_abilities = [ManaAbility]
     end
   end
 end

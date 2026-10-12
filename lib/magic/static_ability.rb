@@ -19,7 +19,8 @@ module Magic
     # comes from a Card, which has no timestamp of its own -- falls back to 0
     # ("oldest"), a simplification since only one card in the repo uses that path.
     def timestamp
-      source.respond_to?(:timestamp) ? source.timestamp : 0
+      # Some abilities (Tyvar Kell's emblem grant) are built without a source.
+      respond_to?(:source) && source.respond_to?(:timestamp) ? source.timestamp : 0
     end
 
     def self.conditions(&block)

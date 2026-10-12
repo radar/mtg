@@ -17,6 +17,8 @@ module Magic
 
       def controller = @player || super
 
+      def chooser = controller
+
       def choices = hand.cards.to_a
 
       def resolve!(cards:)

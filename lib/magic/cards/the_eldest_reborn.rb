@@ -7,6 +7,13 @@ module Magic
     class TheEldestReborn < Saga
       class Chapter1 < Saga::ChapterAbility
         class SacrificeChoice < Magic::Choice::Targeted
+          # The opponent who sacrifices makes this choice, not the saga's controller.
+          attr_reader :player
+
+          def chooser = player
+
+          def prompt = "Sacrifice a creature or planeswalker."
+
           def initialize(actor:, player:)
             @player = player
             super(actor: actor)
@@ -17,6 +24,9 @@ module Magic
           end
 
           def choice_amount = 1
+
+          # The opponent picks which of their own creatures or planeswalkers to sacrifice; nothing is targeted.
+          def targets? = false
 
           def resolve!(target:)
             target.sacrifice!
@@ -39,6 +49,8 @@ module Magic
 
       class Chapter3 < Saga::ChapterAbility
         class TargetChoice < Magic::Choice::Targeted
+          def prompt = "Put target creature or planeswalker card from a graveyard onto the battlefield under your control."
+
           def choices
             game.graveyard_cards.by_any_type("Creature", "Planeswalker")
           end

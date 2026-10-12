@@ -8,6 +8,8 @@ module Magic
       class LandEntryChoice < Magic::Choice
         attr_reader :choices
 
+        def prompt = "Put a land card from your hand onto the battlefield. If it's a Cave, you gain 4 life."
+
         def initialize(actor:)
           super
           @choices =hand.lands

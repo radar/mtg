@@ -1,7 +1,7 @@
 module Magic
   module Actions
     class ActivateAbility < Action
-      attr_reader :ability, :costs, :targets
+      attr_reader :ability, :costs, :targets, :sacrificed, :tapped
 
       def initialize(ability:, **args)
         @ability = ability
@@ -50,7 +50,25 @@ module Magic
       def targeting(*targets)
         raise "Invalid target specified for #{ability}: #{targets}" unless valid_targets?(*targets)
         @targets = targets
+        apply_target_cost_reductions!
         self
+      end
+
+      # "Equip abilities you activate that target this creature cost {2} less to activate" (Dwarven Mauler): a
+      # battlefield static ability answering `activation_cost_reduction_for_targets(ability, targets, player)` with
+      # the generic mana to take off. Only known once the targets are, so call `targeting` before paying.
+      def apply_target_cost_reductions!
+        mana = costs.find { |cost| cost.is_a?(Costs::Mana) }
+        return unless mana
+
+        reduction = game.battlefield.static_abilities
+          .select { |static| static.respond_to?(:activation_cost_reduction_for_targets) }
+          .sum { |static| static.activation_cost_reduction_for_targets(ability, targets, player) }
+        change = reduction - (@target_cost_reduction || 0)
+        return if change.zero?
+
+        mana.adjusted_by(generic: -change)
+        @target_cost_reduction = reduction
       end
 
       # For "activate only once each turn".
@@ -91,12 +109,21 @@ module Magic
         pay(:tap, target)
       end
 
+      # What was tapped is passed to `resolve!(tapped:)` for abilities that care about it (Station counts its power).
       def pay_multi_tap(targets)
         pay(:multi_tap, targets)
+        @tapped = Array(targets)
+        self
       end
 
+      # What was sacrificed is passed to `resolve!(sacrificed:)` for abilities that care about it (Demon of Fate's Design).
       def pay_sacrifice(targets)
         pay(:sacrifice, targets)
+        @sacrificed = Array(targets)
+      end
+
+      def pay_return_lands(lands)
+        pay(:return_lands, lands)
       end
 
       def pay_self_sacrifice
@@ -105,6 +132,10 @@ module Magic
 
       def pay_self_exile
         pay(:self_exile)
+      end
+
+      def pay_self_discard
+        pay(:self_discard)
       end
 
       def pay_discard(targets)
@@ -118,6 +149,11 @@ module Magic
       # `payment`: three graveyard cards to exile, or a Food to sacrifice.
       def pay_forage(payment)
         pay(:forage, payment)
+      end
+
+      # The cards to exile from the graveyard ("Exile this card and two other cards named ..."), source included if it is one.
+      def pay_exile_from_graveyard(cards)
+        pay(:exile_from_graveyard, cards)
       end
 
       def perform
@@ -148,10 +184,16 @@ module Magic
           Costs::Forage
         when :sacrifice
           Costs::Sacrifice
+        when :return_lands
+          Costs::ReturnLands
         when :self_sacrifice
           Costs::SelfSacrifice
         when :self_exile
           Costs::SelfExile
+        when :self_discard
+          Costs::SelfDiscard
+        when :exile_from_graveyard
+          Costs::ExileFromGraveyard
         else
           raise "unknown cost type: #{cost_type}"
         end
@@ -195,7 +237,7 @@ module Magic
       end
 
       def resolve!
-        resolve_with_args(ability, target: targets.first, targets: targets)
+        resolve_with_args(ability, target: targets.first, targets: targets, sacrificed: sacrificed, tapped: tapped)
       end
     end
   end

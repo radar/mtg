@@ -12,13 +12,14 @@ module Magic
             actor: actor,
             to_zone: :battlefield,
             enters_tapped: true,
-            filter: Filter[:basic_lands]
+            filter: Filter[:basic_lands],
+            prompt: "Search your library for a basic land card. It enters the battlefield tapped."
           )
         end
       end
 
       class ActivatedAbility < Magic::ActivatedAbility
-        costs "{G}, Sacrifice {this}"
+        costs "{1}{G}, Sacrifice {this}"
 
         def resolve!
           game.choices.add(Choice.new(actor: source))

@@ -17,7 +17,7 @@ module Magic
         # has 'At the beginning of the end step, sacrifice this token.'"
         def resolve!(target:)
           super
-          token = Permanent.resolve(game:, owner: controller, card: target.copiable_card, token: true, copy: true, cast: false, enters_tapped: true)
+          token = Permanent.token_copy(game:, owner: controller, card: target.copiable_card, enters_tapped: true)
           token.register_turn_trigger(Events::BeginningOfEndStep, SacrificeTrigger)
           game.current_turn.combat.declare_attacker(token, target: game.current_turn.attacks.find { _1.attacker == actor }&.target)
         end

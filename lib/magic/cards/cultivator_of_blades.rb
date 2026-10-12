@@ -19,6 +19,15 @@ module Magic
         COUNTERS = :counters
         TOKENS = :tokens
 
+        def modes
+          {
+            COUNTERS => "Put two +1/+1 counters on it",
+            TOKENS => "Create two 1/1 colorless Servo artifact creature tokens"
+          }
+        end
+
+        def prompt = "Fabricate 2: choose one."
+
         def resolve!(mode:)
           case mode
           when COUNTERS

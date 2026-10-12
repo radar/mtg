@@ -24,6 +24,12 @@ module Magic
         end
       end
 
+      # Creature and enchantment spells you control can't be countered.
+      class PreventCountering < StaticAbility
+        def prevents_countering?(card) = card.controller == controller && (card.creature? || card.enchantment?)
+      end
+
+      def static_abilities = [PreventCountering]
       def activated_abilities = [AnimateLandAbility]
     end
   end

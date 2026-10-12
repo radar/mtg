@@ -8,6 +8,8 @@ module Magic
       class ReturnCreatureChoice < Magic::Choice
         attr_reader :choices
 
+        def prompt = "You may return a creature card from your graveyard to your hand."
+
         def initialize(actor:)
           @choices = actor.controller.graveyard.cards.by_any_type(T::Creature)
           super

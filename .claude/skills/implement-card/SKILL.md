@@ -14,6 +14,41 @@ needs (step 2 below) — no need to load all six for a simple card. This skill i
 step-by-step process for turning a card name into a merged commit; those files are the
 reference for _how_ to express any given ability once you know what it needs to do.
 
+## Quick path (read this; open the longer docs only when a step says to)
+
+For most cards this summary is enough. Do not read `docs/card_parser.md` (348 lines) unless
+you are changing `lib/magic/card_parser/`, and read only the one `docs/patterns/*.md`
+topic file that matches an ability you cannot already model from a similar card.
+
+1. **Oracle text.** `printf 'Card One\nCard Two\n' | bundle exec rake find_cards` (several
+   cards) or `bundle exec rake 'find_card[Name]'` (escape commas: `Name\, Title`). Treat
+   every `\n`-separated line as its own behavior. Never read `data/*.jsonl` directly.
+2. **Try the generator first.** `printf 'Name {cost}\nType — Sub\nrules\nP/T\n' | bundle exec rake parse_card`
+   writes `lib/magic/cards/<snake_name>.rb` when the parser supports every line. If it
+   fails, hand-write the card. `bundle exec ruby script/coverage.rb <set> --cards` lists
+   what is still missing, with the blocking mechanic for each card.
+3. **Crib, don't invent.** `rg -l "<keyword or effect>" lib/magic/cards/` and copy the
+   closest card. Static effect: `Abilities::Static::*` in `static_abilities`. Trigger:
+   a `TriggeredAbility::*` base class (`EnterTheBattlefield`, `Death`, ...). Targets,
+   "may", modes: `Magic::Choice::*`. Never put a card name into a shared layer.
+4. **Card file shape.** `lib/magic/cards/<snake_name>.rb`, no frozen_string_literal. The
+   DSL block holds only type, cost, subtype, P/T and keywords. Triggers, choices and
+   `event_handlers` go in a `class CardName < Creature` reopening, because a `class` inside
+   the DSL block leaks into `Magic::Cards`. Adventure/double-faced: implement both faces.
+5. **Spec shape.** `spec/cards/<snake_name>_spec.rb`, with `# frozen_string_literal: true`,
+   `require "spec_helper"`, `include_context "two player game"`. One `it` per Oracle line.
+   `ResolvePermanent("Title Case Every Word", owner: p1)`; sorcery-speed casts need
+   `go_to_main_phase!`; call `game.tick!` after granting statics; `game.settle!` after raw
+   mutations; use `p1.cast(card:) { |a| a.pay_mana(...) }` for spell-cast triggers.
+6. **Run only your spec**: `bundle exec rspec spec/cards/<snake_name>_spec.rb`. The full
+   suite is for a single-agent session. In a parallel run, skip it and name any unrelated
+   failures in your report.
+7. **Commit one card**: the card file, its spec and any docs you touched, staged by explicit
+   path (never `git add -A`). Subject `Implement <Card Name>`, then one or two plain
+   sentences. Commit to the current branch unless asked to branch.
+
+The numbered sections below are the full detail for each step.
+
 ## 1. Get the FULL Oracle text — every line
 
 Never guess or half-remember a card's text. Look it up, and read all of it. Expand `oracle.rb` with whatever additional information you need.

@@ -20,6 +20,7 @@ module Magic
       # +1: Create a 1/1 blue and red Otter creature token with prowess.
       class LoyaltyAbility1 < LoyaltyAbility
         def loyalty_change = 1
+        def description = "Create a 1/1 blue and red Otter creature token with prowess."
 
         def resolve!
           trigger_effect(:create_token, token_class: Tokens::Otter)
@@ -39,6 +40,7 @@ module Magic
         end
 
         def loyalty_change = -3
+        def description = "Draw three cards, then discard two cards."
 
         def resolve!
           trigger_effect(:draw_cards, number_to_draw: 3)
@@ -60,6 +62,7 @@ module Magic
 
       class LoyaltyAbility3 < LoyaltyAbility
         def loyalty_change = -10
+        def description = "Draw three cards. You get an emblem with \"Instant and sorcery spells you cast have storm.\""
 
         def resolve!
           trigger_effect(:draw_cards, number_to_draw: 3)

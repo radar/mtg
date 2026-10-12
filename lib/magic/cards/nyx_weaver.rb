@@ -16,7 +16,7 @@ module Magic
       end
 
       class ReturnCardAbility < Magic::ActivatedAbility
-        costs "{1}{B}{G}"
+        costs "{1}{B}{G}, Exile {this}"
 
         def target_choices
           controller.graveyard.cards
@@ -24,7 +24,6 @@ module Magic
 
         def resolve!(target:)
           target.move_to_hand!
-          trigger_effect(:exile, target: source)
         end
       end
 

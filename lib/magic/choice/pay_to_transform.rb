@@ -13,13 +13,13 @@ module Magic
 
       def resolve!(payment: nil)
         cost = Costs::Mana.new(mana)
-        return unless cost.can_pay?(controller)
+        return unless cost.can_pay?(chooser)
 
         if payment
-          cost.pay!(player: controller, payment: payment)
+          cost.pay!(player: chooser, payment: payment)
         else
-          cost.auto_pay(player: controller)
-          cost.finalize!(controller)
+          cost.auto_pay(player: chooser)
+          cost.finalize!(chooser)
         end
         actor.transform!
       end

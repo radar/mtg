@@ -277,6 +277,12 @@ module Magic
 
           raise IllegalAttack, "#{creature.name} attacks each combat if able"
         end
+
+        # Rule 508.1c: "can't attack alone" is checked against everything declared as an attacker.
+        attackers = @attacks.map(&:attacker)
+        if attackers.one? && attackers.first.cant_attack_alone?
+          raise IllegalAttack, "#{attackers.first.name} can't attack alone"
+        end
       end
 
       # Rule 509.1c: checked once all blockers are declared.
@@ -287,6 +293,13 @@ module Magic
           end
           if attack.attacker.menace? && attack.blockers.count == 1
             raise IllegalBlock, "#{attack.attacker.name} has menace and can't be blocked except by two or more creatures"
+          end
+        end
+
+        # Rule 509.1c: "can't block alone" is checked against everything a player declared as a blocker.
+        @attacks.flat_map(&:blockers).uniq.group_by(&:controller).each_value do |blockers|
+          if blockers.one? && blockers.first.cant_block_alone?
+            raise IllegalBlock, "#{blockers.first.name} can't block alone"
           end
         end
       end

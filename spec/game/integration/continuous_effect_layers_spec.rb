@@ -67,6 +67,23 @@ RSpec.describe "Continuous effect layers (rule 613)" do
     end
   end
 
+  describe "layers 3 and 6 together (613.7: timestamp order)" do
+    it "removes an ability granted before 'loses all abilities' and keeps one granted after it" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      bears.grant_keyword(Magic::Cards::Keywords::FLYING)
+      game.tick!
+      expect(bears).to be_flying
+
+      enchant_with_kenriths_transformation(bears)
+      expect(bears).not_to be_flying
+
+      bears.grant_keyword(Magic::Cards::Keywords::REACH)
+      game.tick!
+      expect(bears).to be_reach
+      expect(bears).not_to be_flying
+    end
+  end
+
   describe "layer 4 (type-changing)" do
     it "a modifier-granted type and the card's own types both apply" do
       bears = ResolvePermanent("Grizzly Bears", owner: p1)

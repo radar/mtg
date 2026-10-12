@@ -14,7 +14,7 @@ module Magic
       end
 
       def call(effect)
-        effect.dup.tap { |doubled| doubled.instance_variable_set(:@damage, effect.damage * 2) }
+        effect.with_damage(effect.damage * 2)
       end
 
       private

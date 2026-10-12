@@ -6,7 +6,8 @@ module Magic
 
       class Choice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, to_zone: :battlefield, filter: ->(card) { card.any_type?("Forest") })
+          super(actor: actor, to_zone: :battlefield, filter: ->(card) { card.any_type?("Forest") },
+                prompt: "Search your library for a Forest card. It enters the battlefield.")
         end
       end
 

@@ -11,7 +11,8 @@ module Magic
 
       class Chapter1 < Saga::ChapterAbility
         def resolve!
-          actor.card.define_singleton_method(:additional_lands_per_turn) { 1 }
+          # "You may play an additional land this turn."
+          actor.controller.grant_additional_land_this_turn!
         end
       end
 

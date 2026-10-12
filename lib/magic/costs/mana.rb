@@ -69,6 +69,14 @@ module Magic
         self
       end
 
+      # A cost increase found after some of the cost was already paid (a tax that depends on the spell's targets): the
+      # amount is added to what is owed, keeping the payments so far (unlike `adjusted_by`, which starts the balance over).
+      def increase_generic!(amount)
+        @cost[:generic] = (@cost[:generic] || 0) + amount
+        @balance[:generic] = (@balance[:generic] || 0) + amount
+        self
+      end
+
       def zero?
         @cost.values.all?(&:zero?)
       end
@@ -109,6 +117,7 @@ module Magic
         raise Overpayment.new(cost, balance) if overpaid?
         raise CannotPay.new(cost, player) unless can_pay?(player)
 
+        for_use.treasure_mana_spent = false if for_use.respond_to?(:treasure_mana_spent=)
         player.pay_mana(@payments[:generic], for_use: for_use) if @payments[:generic].any?
         if @any_color
           player.pay_mana(@actual_color_payments, for_use: for_use) if @actual_color_payments.any?
@@ -263,6 +272,16 @@ module Magic
       def color_costs
         cost.slice(*Magic::Mana::COLORS)
       end
+
+      public
+
+      # Mana symbols of +color+ in this cost for devotion: hybrid symbols count towards each of their colours.
+      def devotion(color)
+        color = color.to_sym
+        cost.sum { |key, amount| key == color || (hybrid_key?(key) && hybrid_colors_for(key).include?(color)) ? amount : 0 }
+      end
+
+      private
 
       def hybrid_key?(key)
         key.is_a?(Symbol) && key.to_s.include?("_or_")

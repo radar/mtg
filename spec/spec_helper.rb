@@ -18,9 +18,20 @@ module CardHelper
   # settle: false opts out of the auto-settle below -- needed when a spec is mid-way
   # through building up other pending stack items/choices it wants to stay pending
   # (settling would resolve them out from under it).
-  def ResolvePermanent(name, summoning_sick: false, settle: true, **args)
+  # A spell resolving by default; `cast: false` puts the card onto the battlefield as an effect would, and
+  # `token: true` or `copy: true` makes a token copy of it. `doors: [:left]` puts a Room onto the battlefield with those
+  # doors unlocked.
+  def ResolvePermanent(name, summoning_sick: false, settle: true, cast: true, token: false, copy: false, doors: nil, **args)
     card = Card(name, owner: args.fetch(:owner, p1))
-    permanent = Magic::Permanent.resolve(game: game, card: card, **args)
+    card.preunlock!(*doors) if doors
+    permanent =
+      if token || copy
+        Magic::Permanent.token_copy(game: game, card: card, **args)
+      elsif cast
+        Magic::Permanent.resolve_spell(game: game, card: card, **args)
+      else
+        Magic::Permanent.put_onto_battlefield(game: game, card: card, **args)
+      end
     permanent.controlled_since_turn = 0 unless summoning_sick
     # Skip auto-settling for Auras: fixtures often build one unattached and call
     # #attach_to! as a separate step, and settling in between would kill it to SBA
@@ -41,8 +52,12 @@ module CardHelper
     card
   end
 
-  def cast_action(card:, player: card.owner, targeting: nil, flashback: false, alternative: false, &block)
-    action = Magic::Actions::Cast.new(card: card, player: player, game: game, flashback: flashback, alternative: alternative)
+  def cast_action(card:, player: card.owner, targeting: nil, &block)
+    cast_action_as(:normal, card:, player:, targeting:, &block)
+  end
+
+  def cast_action_as(mode, card:, player: card.owner, targeting: nil, &block)
+    action = Magic::Actions::Cast.for_mode(mode).new(card: card, player: player, game: game)
     action.targeting(targeting) if targeting
     yield action if block_given?
     action
@@ -138,6 +153,27 @@ RSpec.shared_context "two player game" do
   def add_to_battlefield(permanent)
     game.battlefield.add(permanent)
     game.tick!
+  end
+
+  # The two things that set off Eerie for p1: an enchantment entering, and fully unlocking a Room.
+  # Sanctum of Calm Waters is legendary: a second one makes the legend rule ask a question, so pass another enchantment
+  # ("Elderfang Venom") to enter two in one spec.
+  def eerie_enchantment_enters!(name = "Sanctum Of Calm Waters")
+    ResolvePermanent(name, owner: p1)
+    game.settle!
+  end
+
+  # A Room that is a permanent already, so that entering is not what sets Eerie off while a spec measures the unlock.
+  def eerie_room
+    go_to_main_phase!
+    ResolvePermanent("Funeral Room Awakening Hall", owner: p1, doors: [:right])
+  end
+
+  def eerie_fully_unlock_room!(room = eerie_room)
+    go_to_main_phase!
+    p1.add_mana(black: 3)
+    p1.unlock_door(permanent: room, door: :left) { |a| a.pay_mana(generic: { black: 2 }, black: 1) }
+    game.settle!
   end
 
   before do

@@ -22,7 +22,10 @@ module Magic
       end
 
       class ActivatedAbility < Magic::ActivatedAbility
-        costs "{1}{G}, Sacrifice a creature"
+        # {1}{G}, Sacrifice another enchantment: This creature gains indestructible until end of turn.
+        def costs
+          [Costs::Mana.new("{1}{G}"), Costs::Sacrifice.new(source, controller.permanents.enchantments.reject { _1 == source })]
+        end
 
         def resolve!
           source.grant_indestructible!

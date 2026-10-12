@@ -1,0 +1,18 @@
+module Magic
+  module Cards
+    RazortrapGorge = Card("Razortrap Gorge") do
+      type "Land"
+    end
+
+    class RazortrapGorge < Card
+      # "This land enters tapped unless a player has 13 or less life."
+      def enters_tapped? = game.players.none? { |player| player.life <= 13 }
+
+      class ManaAbility < Magic::TapManaAbility
+        choices :black, :red
+      end
+
+      def activated_abilities = [ManaAbility]
+    end
+  end
+end

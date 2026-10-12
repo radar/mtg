@@ -5,7 +5,7 @@ module Magic
 
       attr_reader :active_player, :number, :events, :combat, :actions
 
-      def_delegators :@game, :logger, :battlefield, :emblems, :players, :settle!
+      def_delegators :@game, :logger, :battlefield, :emblems, :players, :settle!, :add_effect
       def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :illegal_block_reason,
         :assign_combat_damage, :attacks, :attacking?, :blocking?
 
@@ -22,6 +22,7 @@ module Magic
         after_transition to: :untap do |turn|
           turn.battlefield.phased_out.permanents.controlled_by(turn.active_player).each(&:phase_in!)
           turn.battlefield.permanents.controlled_by(turn.active_player).each(&:untap_during_untap_step)
+          turn.untap_during_other_players_untap_step!
         end
 
         after_transition to: :upkeep do |turn|
@@ -35,7 +36,8 @@ module Magic
           turn.notify!(
             Events::DrawStep.new(player: turn.active_player)
           )
-          turn.active_player.draw!
+          # An effect, so that replacement effects ("if you would draw a card", Abundance) see the turn's draw too.
+          turn.add_effect(Effects::DrawCards.new(source: turn.active_player, player: turn.active_player))
           turn.checkpoint!
         end
 
@@ -161,7 +163,21 @@ module Magic
         @events = EventLog.new
         @additional_combats = 0
         @combat = CombatPhase.new(game: game)
+        @combat_damage_exceptions = nil
         super()
+      end
+
+      # "Prevent all combat damage that would be dealt this turn by non-Spider creatures" (Arachnogenesis): creatures
+      # without one of +creature_types+ deal no combat damage for the rest of this turn. (Stored as plain data: games are
+      # copied with Marshal, which can't copy a block.)
+      def prevent_combat_damage_except_from(*creature_types)
+        @combat_damage_exceptions = ((@combat_damage_exceptions || []) + creature_types).uniq
+      end
+
+      def combat_damage_prevented_from?(source)
+        return false unless @combat_damage_exceptions
+
+        @combat_damage_exceptions.none? { |creature_type| source.type?(creature_type) }
       end
 
       # Rules 502.4, 514.3: nobody receives priority in the untap step, and normally not in cleanup.
@@ -192,6 +208,17 @@ module Magic
           game.receive_priority!(active_player)
         else
           game.settle!
+        end
+      end
+
+      # "Untap each creature you control during each other player's untap step" (Prop Room): static abilities answering
+      # `untaps_during_untap_step_of?(permanent, active_player)` untap permanents that belong to someone else's turn.
+      def untap_during_other_players_untap_step!
+        abilities = battlefield.static_abilities.select { _1.respond_to?(:untaps_during_untap_step_of?) }
+        return if abilities.empty?
+
+        battlefield.permanents.not_controlled_by(active_player).each do |permanent|
+          permanent.untap_during_other_players_untap_step if abilities.any? { _1.untaps_during_untap_step_of?(permanent, active_player) }
         end
       end
 

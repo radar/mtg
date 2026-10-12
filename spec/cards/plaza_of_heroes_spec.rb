@@ -16,10 +16,21 @@ RSpec.describe Magic::Cards::PlazaOfHeroes do
   end
 
   context "{T}: Add one mana of any color, to cast a legendary spell" do
-    it "adds one mana of the chosen color" do
+    it "adds one mana of the chosen color, restricted rather than in the plain pool" do
       p1.activate_ability(ability: plaza.activated_abilities[1]) { |a| a.choose(:white) }
 
-      expect(p1.mana_pool[:white]).to eq(1)
+      expect(p1.mana_pool[:white]).to eq(0)
+      expect(p1.restricted_mana.map(&:color)).to eq([:white])
+    end
+
+    it "can only be spent on a legendary spell" do
+      p1.activate_ability(ability: plaza.activated_abilities[1]) { |a| a.choose(:green) }
+      legendary = Card("Rhys The Exiled", owner: p1)
+      ordinary = Card("Grizzly Bears", owner: p1)
+
+      expect(p1.restricted_mana_for(legendary)).to eq({ green: 1 })
+      expect(p1.restricted_mana_for(ordinary)).to eq({})
+      expect(p1.restricted_mana_for(plaza)).to eq({}) # nor an ability
     end
   end
 

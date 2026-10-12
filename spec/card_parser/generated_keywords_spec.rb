@@ -242,7 +242,7 @@ RSpec.describe "CardParser generated keywords with values, in play" do
     go_to_main_phase!
 
     p1.add_mana(red: 4)
-    action = cast_action(player: p1, card: lesson, flashback: true)
+    action = cast_action_as(:flashback,player: p1, card: lesson)
     expect(action.mana_cost).to eq(Magic::Costs::Mana.new(generic: 3, red: 1))
     action.pay_mana(generic: { red: 3 }, red: 1).targeting(p2)
     game.take_action(action)
@@ -262,7 +262,7 @@ RSpec.describe "CardParser generated keywords with values, in play" do
 
     it "casts from the graveyard for its harmonize cost, then exiles the spell" do
       p1.add_mana(red: 5)
-      p1.cast(card: chant, harmonize: true) { |a| a.pay_mana(generic: { red: 4 }, red: 1).targeting(p2) }
+      p1.cast_as(:harmonize,card: chant) { |a| a.pay_mana(generic: { red: 4 }, red: 1).targeting(p2) }
       game.stack.resolve!
 
       expect(p2.life).to eq(18)
@@ -272,7 +272,7 @@ RSpec.describe "CardParser generated keywords with values, in play" do
     it "taps an untapped creature to reduce the cost by its power" do
       bear = ResolvePermanent("Grizzly Bears", owner: p1) # 2/2
       p1.add_mana(red: 3)
-      p1.cast(card: chant, harmonize: true) do |a|
+      p1.cast_as(:harmonize,card: chant) do |a|
         a.harmonize_tap(bear)
         expect(a.mana_cost.cost).to eq(generic: 2, red: 1)
         a.pay_mana(generic: { red: 2 }, red: 1).targeting(p2)
@@ -286,7 +286,7 @@ RSpec.describe "CardParser generated keywords with values, in play" do
 
     it "can't reduce the cost below its colored mana, and can't tap a tapped creature" do
       giant = ResolvePermanent("Shinestriker", owner: p1) # 3/3
-      action = Magic::Actions::Cast.new(game: game, player: p1, card: chant, harmonize: true)
+      action = Magic::Actions::Cast::Harmonize.new(game: game, player: p1, card: chant)
       action.harmonize_tap(giant)
       expect(action.mana_cost.cost).to eq(generic: 1, red: 1)
       expect { action.harmonize_tap(giant) }.to raise_error(/is tapped/)

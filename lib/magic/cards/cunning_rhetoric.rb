@@ -28,8 +28,8 @@ module Magic
       # You may play that card for as long as it remains exiled, and you may spend mana
       # as though it were mana of any color to cast it.
       class PlayPermission < Abilities::Static::AnyColorForAnyCost
-        def permits_casting_from_exile?(card)
-          @source.exiled_cards.include?(card)
+        def permits_casting_from_exile?(card, player)
+          player == controller && @source.exiled_cards.include?(card)
         end
 
         def any_color_for?(card)

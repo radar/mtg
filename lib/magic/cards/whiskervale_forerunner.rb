@@ -18,7 +18,7 @@ module Magic
               raise ArgumentError, "#{target.name} is not a valid choice" unless choices.include?(target)
 
               trigger_effect(:reveal_cards, target: [target])
-              Permanent.resolve(card: target, game: game, from_zone: target.zone, cast: false, controller: controller)
+              Permanent.put_onto_battlefield(card: target, game: game, from_zone: target.zone, controller: controller)
               (looked_at - [target]).shuffle.each do |card|
                 controller.library.remove(card)
                 controller.library.push(card)

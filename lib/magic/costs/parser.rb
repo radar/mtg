@@ -19,8 +19,12 @@ module Magic
             SelfTap.new(source)
           when /\A(?:\{[^}]+\})+\z/
             Mana.new(Costs::Parsers::Mana.parse(cost))
+          when /\ASacrifice (?<amount>ten) nonland permanents\z/
+            SacrificeNonlandPermanents.new(source, amount: 10)
           when /Sacrifice a creature with defender/
             Sacrifice.new(source, source.controller.creatures.select(&:defender?))
+          when /\ASacrifice another creature or enchantment\z/
+            SacrificeAnother.new(source, source.controller.permanents.select { (_1.creature? || _1.enchantment?) && _1 != source })
           when /Sacrifice another creature/
             SacrificeAnother.new(source, source.controller.creatures.reject { _1 == source })
           when /Sacrifice a Snail/
@@ -30,6 +34,20 @@ module Magic
           when /Sacrifice a creature/
             # TODO: Make this target only creatures controlled by player
             Sacrifice.new(source, source.controller.creatures)
+          when /\ASacrifice a land\z/
+            Sacrifice.new(source, source.controller.lands)
+          when /\AReturn two lands you control to their owner's hand\z/
+            ReturnLands.new(source, 2)
+          when /\ASacrifice a Treasure\z/
+            Sacrifice.new(source, source.controller.permanents.select { _1.type?("Treasure") })
+          when /\ASacrifice a Room\z/
+            Sacrifice.new(source, source.controller.rooms)
+          when /\ASacrifice another (?<type>[A-Z][\w-]*)\z/
+            # "Sacrifice another Goblin": a creature of that type other than the source.
+            SacrificeAnother.new(source, source.controller.creatures.by_type($~[:type]).reject { _1 == source })
+          when /\ASacrifice an? (?<type>[A-Z][\w-]*)\z/
+            # "Sacrifice an Elf": a creature of that type, which may be the source itself.
+            Sacrifice.new(source, source.controller.creatures.by_type($~[:type]))
           when /\ARemove (?<amount>\d+) (?<type>[\w+\/-]+) counters? from {this}\z/
             RemoveCounter.new(source, Counters[$~[:type].downcase], amount: $~[:amount].to_i)
           when /\ABlight (?<amount>\d+)\z/
@@ -40,6 +58,10 @@ module Magic
             SelfSacrifice.new(source)
           when /Exile {this}/
             SelfExile.new(source)
+          when /\ADiscard {this}\z/
+            SelfDiscard.new(source)
+          when /\ADiscard your hand\z/
+            DiscardHand.new(source)
           when /Discard a card/
             Discard.new(source.controller)
           when "Forage"

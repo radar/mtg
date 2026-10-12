@@ -6,6 +6,8 @@ module Magic
 
     class VanquishersBanner < Artifact
       class CreatureTypeChoice < Magic::Choice::CreatureType
+        def prompt = "Choose a creature type. Creatures you control of that type get +1/+1, and you draw a card when you cast one."
+
         def resolve!(creature_type:)
           actor.chosen_creature_type = creature_type
         end

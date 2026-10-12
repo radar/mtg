@@ -83,7 +83,7 @@ RSpec.describe "Bloomburrow assorted permanents" do
       card = Card("Otterball Antics", owner: p1)
       p1.graveyard.add(card)
       p1.add_mana(blue: 4)
-      p1.cast(card: card, flashback: true) { _1.auto_pay_mana }
+      p1.cast_as(:flashback, card: card) { _1.auto_pay_mana }
       game.stack.resolve!
       otter = p1.creatures.find { _1.name == "Otter" }
 

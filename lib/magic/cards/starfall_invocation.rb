@@ -1,36 +1,46 @@
 module Magic
   module Cards
-    class StarfallInvocation < Sorcery
-      card_name "Starfall Invocation"
+    StarfallInvocation = Sorcery("Starfall Invocation") do
       cost generic: 3, white: 2
-      gift :card
+    end
 
-      # Return a creature card put into your graveyard this way to the battlefield under your control.
+    class StarfallInvocation < Sorcery
+      # "Gift a card": promised as the spell is cast (see Costs::Gift).
+      def kicker_cost
+        @gift ||= Costs::Gift.new(self)
+      end
+
+      # "return a creature card put into your graveyard this way to the battlefield under your control."
       class ReturnChoice < Magic::Choice::Targeted
-        def initialize(actor:, cards:)
-          @cards = cards
+        attr_reader :choices
+
+        def prompt = "Return a creature card destroyed this way to the battlefield under your control."
+
+        def initialize(actor:, choices:)
+          @choices = choices
           super(actor: actor)
         end
 
-        def choices = @cards
-
+        def targets? = false
         def choice_amount = 1
 
         def resolve!(target:)
-          trigger_effect(:return_target_from_graveyard_to_battlefield, target: target, controller: controller)
+          target.resolve!(controller: controller)
         end
       end
 
-      # Destroy all creatures. If the gift was promised, return a creature card put into your
-      # graveyard this way to the battlefield under your control.
-      def resolve!
-        before = controller.graveyard.creatures.to_a
-        battlefield.creatures.each { trigger_effect(:destroy_target, target: _1) }
-        game.settle!
-        return unless gift_promised?
+      def resolve!(controller: self.controller)
+        gift = kicker_cost.paid?
+        # "they draw a card before its other effects."
+        game.opponents(controller).first.draw! if gift
 
-        choice = ReturnChoice.new(actor: self, cards: controller.graveyard.creatures.to_a - before)
-        game.add_choice(choice) if choice.choices.any?
+        destroyed = battlefield.creatures.to_a.filter_map do |creature|
+          creature.card if creature.destroy! && !creature.token? && creature.owner == controller
+        end
+
+        return unless gift && destroyed.any?
+
+        game.add_choice(ReturnChoice.new(actor: self, choices: destroyed))
       end
     end
   end

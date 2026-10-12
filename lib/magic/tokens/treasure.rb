@@ -12,6 +12,8 @@ module Magic
     Treasure.const_set(:ManaAbility, Class.new(ManaAbility) do
       costs "{T}, Sacrifice {this}"
       choices :all
+
+      def mana_restriction = ManaRestriction::FromTreasure.new
     end)
   end
 end

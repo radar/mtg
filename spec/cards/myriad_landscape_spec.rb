@@ -50,6 +50,16 @@ RSpec.describe Magic::Cards::MyriadLandscape do
     expect { game.resolve_choice!(targets: mixed) }.to raise_error(ArgumentError, /share a land type/)
   end
 
+  it "keeps the search to be answered again after rejecting two lands" do
+    choice = search!
+    mixed = [choice.choices.find { _1.name == "Swamp" }, choice.choices.find { _1.name == "Island" }]
+    expect { game.resolve_choice!(targets: mixed) }.to raise_error(ArgumentError)
+
+    expect(game.choices.last).to equal(choice)
+    game.resolve_choice!(targets: [choice.choices.first])
+    expect(game.choices).to be_empty
+  end
+
   it "may find just one land" do
     choice = search!
     game.resolve_choice!(targets: [choice.choices.first])

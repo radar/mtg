@@ -22,7 +22,8 @@ RSpec.describe "CardParser generated Treasure/Food/Clue, sacrifice, life gain, d
 
     p1.activate_ability(ability: treasure.activated_abilities.first) { _1.choose(:blue) }
     game.settle!
-    expect(p1.mana_pool[:blue]).to eq(1)
+    # Treasure mana is tagged (ManaRestriction::FromTreasure, for Smaug, Wicked Worm), so it sits in the restricted list.
+    expect(p1.restricted_mana.map(&:color)).to eq([:blue])
     expect(treasure.zone).to be_nil
     expect(p1.permanents.by_name("Treasure")).to be_empty
     expect(p2.life).to eq(19)

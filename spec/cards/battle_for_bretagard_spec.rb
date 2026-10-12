@@ -64,6 +64,7 @@ RSpec.describe Magic::Cards::BattleForBretagard do
 
         choice = game.choices.last
         expect(choice).to be_a(Magic::Choice::CopyTokens)
+        expect(choice.actor).to eq(battle_for_bretagard)
         expect(choice.choices).to contain_exactly(human_warrior, elf_warrior)
 
         game.resolve_choice!(targets: [human_warrior, elf_warrior])

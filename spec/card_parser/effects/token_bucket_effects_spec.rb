@@ -71,7 +71,7 @@ RSpec.describe "CardParser effects from the FDN token bucket (sacrifice choice, 
     victim = ResolvePermanent("Aegis Turtle", owner: p1)
     expect { victim.destroy!; game.settle! }.to change { p1.hand.count }.by(1).and change { p1.life }.by(-1)
 
-    copy = Magic::Permanent.resolve(game:, owner: p1, card: victim.copiable_card, token: true, copy: true, cast: false)
+    copy = Magic::Permanent.token_copy(game:, owner: p1, card: victim.copiable_card)
     expect { copy.destroy!; game.settle! }.not_to(change { p1.hand.count })
     expect(p1.life).to eq(19)
   end
@@ -227,7 +227,7 @@ RSpec.describe "CardParser effects from the FDN token bucket (sacrifice choice, 
     expect(tokens(p1, "Cat").size).to eq(1)
     ResolvePermanent("Parsed Leader", owner: p1)
     expect(tokens(p1, "Cat").size).to eq(3)
-    p1.permanents.by_name("Cat").first.then { |t| Magic::Permanent.resolve(game:, owner: p1, card: t.copiable_card, token: true, copy: true, cast: false) }
+    p1.permanents.by_name("Cat").first.then { |t| Magic::Permanent.token_copy(game:, owner: p1, card: t.copiable_card) }
     game.settle!
     expect(tokens(p1, "Cat").size).to eq(4)
   end

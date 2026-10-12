@@ -9,6 +9,20 @@ RSpec.describe Magic::Cards::AzusasManyJourneys do
     expect(saga.counters.of_type(Magic::Counters::Lore).count).to eq(1)
   end
 
+  it "chapter I allows one additional land this turn only" do
+    ResolvePermanent("Azusa's Many Journeys", owner: p1)
+
+    expect(p1.max_lands_per_turn).to eq(2)
+    game.next_turn
+    expect(p1.max_lands_per_turn).to eq(1)
+  end
+
+  it "can be Marshal-copied after chapter I" do
+    ResolvePermanent("Azusa's Many Journeys", owner: p1)
+
+    expect { Marshal.dump(game) }.not_to raise_error
+  end
+
   it "has Likeness of the Seeker as its transformed face" do
     expect(Magic::Cards::LikenessOfTheSeeker::NAME).to eq("Likeness of the Seeker")
   end

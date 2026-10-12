@@ -3,8 +3,8 @@ module Magic
     AniktheaHandOfErebos = Creature("Anikthea, Hand of Erebos") do
       type T::Super::Legendary, T::Enchantment, T::Creature, T::Creatures["Demigod"]
       cost generic: 2, white: 1, black: 1, green: 1
-      power 3
-      toughness 3
+      power 4
+      toughness 4
       keywords :menace
     end
 
@@ -17,8 +17,13 @@ module Magic
         end
       end
 
-      class GraveyardChoice < Magic::Choice
+      # "Exile up to one target non-Aura enchantment card from your graveyard. Create a token that's a copy of that
+      # card, except it's a 3/3 black Zombie creature in addition to its other types." The card itself becomes the
+      # token (so it leaves the graveyard), and taking none is allowed.
+      class GraveyardChoice < Magic::Choice::May
         attr_reader :choices
+
+        def prompt = "Exile up to one non-Aura enchantment card from your graveyard to create a 3/3 black Zombie token copy of it."
 
         def initialize(actor:)
           @choices = actor.controller.graveyard.cards.enchantments
@@ -26,16 +31,20 @@ module Magic
           super
         end
 
-        def resolve!(target:)
-          token = Permanent.resolve(
+        def resolve!(target: nil)
+          return unless target
+
+          # A token's card is never removed from its zone by Permanent.token_copy, so exile it here.
+          target.exile!
+          token = Permanent.token_copy(
             game: game,
             owner: controller,
             card: target,
-            token: true,
           )
-          token.add_types(T::Creature, T::Creatures["Zombie"])
-          token.modify_base_power(3)
-          token.modify_base_toughness(3)
+          token.add_types(T::Creature, T::Creatures["Zombie"], until_eot: false)
+          token.modify_base_power(3, until_eot: false)
+          token.modify_base_toughness(3, until_eot: false)
+          token.change_colors!([:black], until_eot: false)
           game.tick!
         end
       end

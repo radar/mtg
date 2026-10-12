@@ -36,8 +36,11 @@ module Magic
     # Set by ContinuousEffects from Abilities::Static::CharacteristicSetting.
     attr_accessor :color_override, :lost_all_abilities_by_effect
 
-    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :additional_lands_per_turn, :power_modification, :toughness_modification, :type_grants
+    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :toughness_modification, :type_grants
     def_delegators :@game, :logger
+
+    # What this permanent adds to the creature it's attached to. Each hone counter on an Equipment grants +1/+0.
+    def power_modification = @card.power_modification + counters.of_type(Counters::Hone).count
 
     class Protections < SimpleDelegator
       def player
@@ -49,7 +52,11 @@ module Magic
     # The mana it was cast with, as { color => amount } ("if {W}{W} was spent to cast it"), and whether
     # it was cast for its evoke cost (sacrificed when it enters).
     attr_writer :mana_spent
+    # The X a permanent spell was cast with (nil when it had none).
+    attr_accessor :x_value
     attr_accessor :evoked
+    # Cast for its impending cost (Overlords): not a creature while it has a time counter.
+    attr_accessor :impending
     # "You may have this enter as a copy of ...": a not-yet-copied 0/0 mustn't die to state-based
     # actions while its enters trigger is still asking (cleared once that's answered).
     attr_writer :copy_choice_pending
@@ -63,38 +70,65 @@ module Magic
 
     def gift_promised? = !!@gift_promised
 
-    def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false)
+    # A spell resolving into a permanent: the card was cast, so it knows how (kicked, evoked, what mana was spent,
+    # the X it was cast with).
+    def self.resolve_spell(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil, impending: false)
+      counters = impending ? { "time" => card.impending_count } : {}
+      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: true, kicked:, evoked:, mana_spent:, value_for_x:, counters:, impending:)
+    end
+
+    # A card put onto the battlefield by an effect rather than cast (a flicker or reanimation, a token being created).
+    # `face_down: true` is manifesting it (see `Game#manifest!`): a blank 2/2 creature that enters untapped.
+    # `counters: { "finality" => 1 }` is "return it to the battlefield with a finality counter on it".
+    def self.put_onto_battlefield(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil, face_down: false, counters: {})
+      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: false, face_down:, counters:)
+    end
+
+    # A token that is a copy of `card`. The card itself stays where it is.
+    def self.token_copy(game:, card:, owner: card.owner, controller: owner, enters_tapped: card.enters_tapped?)
+      enter(game:, card:, owner:, controller:, from_zone: nil, enters_tapped:, attach_to: nil, token: true, copy: true, cast: false)
+    end
+
+    def self.enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token:, copy:, cast:, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil, face_down: false, counters: {}, impending: false)
+      enters_tapped = false if face_down
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:, controller:)
       card_zone = card.zone unless token || copy
+      card.begin_entering! if card.is_a?(Cards::Room)
 
-      permanent = Magic::Permanent.new(
-        game: game,
-        owner: owner,
-        controller: controller,
-        card: card,
-        kicked: kicked,
-        cast: cast,
-        token: token,
-        copy: copy,
-      )
+      permanent = Magic::Permanent.new(game:, owner:, controller:, card:, kicked:, cast:, token:, copy:, face_down:)
       permanent.mana_spent = mana_spent
       permanent.gift_promised = card.gift_promised? if card.respond_to?(:gift_promised?)
-      permanent.copy_choice_pending = card.enters_as_copy?
+      permanent.x_value = value_for_x
+      permanent.copy_choice_pending = card.enters_as_copy? && !face_down
       permanent.evoked = evoked
+      permanent.impending = impending
 
+      # A face-down permanent has no abilities, so none of the card's "enters with counters" apply.
+      entering = permanent.face
       permanent.entered_from_zone = card_zone
       permanent.tap! if enters_tapped
       permanent.attach_to!(attach_to) if attach_to
-      card.entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
+      add_entering_counters(permanent:, card: entering, value_for_x:, cast_from_hand: cast && card_zone&.hand?, cast_from_graveyard: cast && card_zone&.graveyard?)
       card.extra_entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) } if card.respond_to?(:extra_entering_counters)
-      if cast && card_zone&.hand?
-        card.entering_counters_if_cast_from_hand.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
-      end
+      counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       permanent.move_zone!(from: from_zone, to: game.battlefield)
-      add_additional_counters_for_entering(game:, permanent:) if card.creature?
+      add_additional_counters_for_entering(game:, permanent:) if entering.creature?
       move_card_to_battlefield(game:, card:, permanent:, from: card_zone)
+      permanent.announce_unlocked_doors! if card.is_a?(Cards::Room)
       permanent
     end
+    private_class_method :enter
+
+    # `card` is the permanent's face: a face-down permanent has no abilities, so none of the card's "enters with counters".
+    def self.add_entering_counters(permanent:, card:, value_for_x:, cast_from_hand:, cast_from_graveyard:)
+      counters = card.entering_counters.to_a
+      # "enters with X +1/+1 counters" (Jacked Rabbit's ravenous): the X it was cast with.
+      counters += card.entering_counters_for_x(value_for_x.to_i).to_a if value_for_x
+      counters += card.entering_counters_if_cast_from_hand.to_a if cast_from_hand
+      counters += card.entering_counters_if_cast_from_graveyard.to_a if cast_from_graveyard
+      counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
+    end
+    private_class_method :add_entering_counters
 
     # The card leaves the zone it was in (exile, graveyard, hand, ...) along with the
     # permanent entering, unless something else already moved it: a replaced entry
@@ -132,7 +166,7 @@ module Magic
 
     def self.static_abilities(game, type) = game.battlefield.static_abilities.of_type(type)
 
-    def initialize(game:, owner:, card:, controller: owner, token: false, cast: true, kicked: false, copy: false, timestamp: Permanents::ContinuousEffect.next_timestamp)
+    def initialize(game:, owner:, card:, controller: owner, token: false, cast: true, kicked: false, copy: false, face_down: false, timestamp: Permanents::ContinuousEffect.next_timestamp)
       @game = game
       @owner = owner
       @controller = controller
@@ -141,20 +175,22 @@ module Magic
       @cast = cast
       @kicked = kicked
       @copy = copy
-      @base_types = card.types
+      @face_down = face_down
+      @entered_face_down = face_down
+      @base_types = face.types
       @attachments = []
       @turn_triggers = {}
       @turn_replacements = []
       @modifiers = []
       @tapped = false
-      @types = card.types
-      @keyword_grants = card.keyword_grants
-      @keywords = card.keywords.dup
-      @activated_abilities = card.activated_abilities
+      @types = face.types
+      @keyword_grants = face.keyword_grants
+      @keywords = face.keywords.dup
+      @activated_abilities = face.activated_abilities
       @counters = Counters::Collection.new([])
       @damage = 0
       @regeneration_shields = 0
-      @protections = Protections.new(card.protections.dup)
+      @protections = Protections.new(face.protections.dup)
       @exiled_cards = Magic::CardList.new([])
       @pending_mana_ability_uses = 0
       @phased_out = false
@@ -168,12 +204,44 @@ module Magic
     end
 
     # The face of a double-faced card that's currently up (the card itself when it isn't
-    # double-faced or hasn't transformed). Its characteristics and abilities are the permanent's.
+    # double-faced or hasn't transformed). Its characteristics and abilities are the permanent's. A face-down permanent
+    # (manifest dread) is a bare 2/2 creature: its face is a `Cards::FaceDownCreature`, whatever the card is.
     def face
+      return face_down_card if face_down?
+
       @transformed ? card.back_face : card
     end
 
     def transformed? = @transformed || false
+
+    def face_down? = @face_down || false
+
+    # Whether it entered the battlefield face down (still true after it is turned face up).
+    def entered_face_down? = @entered_face_down || false
+
+    def face_down_card
+      @face_down_card ||= Cards::FaceDownCreature.new(game: game, owner: owner)
+    end
+
+    # Rule 701.40f / 708.8: the permanent's controller may turn it face up at any time they have priority, for its mana
+    # cost if it's a creature card. `Actions::TurnFaceUp` does that; this is the turning itself. A static ability
+    # answering `prevents_turning_face_up?(permanent)` (Unable to Scream) stops it. Fires `Events::TurnedFaceUp`.
+    def turn_face_up!
+      return false unless can_be_turned_face_up?
+
+      @face_down = false
+      @base_types = face.types
+      @keyword_grants = face.keyword_grants
+      @activated_abilities = face.activated_abilities
+      @state_triggered_abilities = nil
+      apply_continuous_effects!
+      game.notify!(Events::TurnedFaceUp.new(permanent: self))
+      true
+    end
+
+    def can_be_turned_face_up?
+      face_down? && game.battlefield.static_abilities.none? { _1.respond_to?(:prevents_turning_face_up?) && _1.prevents_turning_face_up?(self) }
+    end
 
     # Free-form per-permanent state for cards that level up or remember something (Figure of Fable).
     def state = (@state ||= {})
@@ -188,6 +256,11 @@ module Magic
 
     def mana_spent = @mana_spent || {}
     def evoked? = !!@evoked
+
+    def impending? = !!@impending
+
+    # Impending: a creature again once the last time counter is gone.
+    def impending_now? = impending? && counters.of_type(Counters::Time).any?
     def copy_choice_pending? = !!@copy_choice_pending
 
     # "If {W}{W} was spent to cast it": at least `amount` mana of `color` went into casting this.
@@ -198,8 +271,9 @@ module Magic
     end
 
     def name = copiable_card.name
-    def cmc = copiable_card.cmc
-    def mana_value = copiable_card.mana_value
+    # A token has no mana cost, so its mana value is 0.
+    def cmc = copiable_card.respond_to?(:cmc) ? copiable_card.cmc : 0
+    def mana_value = copiable_card.respond_to?(:mana_value) ? copiable_card.mana_value : 0
     # A color set by continuous effects (layer 5 -- ContinuousEffects resolves any competing
     # Modifications::Color/CharacteristicSetting#set_colors by timestamp), else the card's colors.
     def colors
@@ -257,6 +331,32 @@ module Magic
       self
     end
 
+    def room? = card.is_a?(Cards::Room)
+
+    # A Room enters with a door unlocked, which "when you unlock this door" abilities see.
+    def announce_unlocked_doors!
+      card.entered_unlocked_doors.each { |door| game.notify!(Events::DoorUnlocked.new(permanent: self, door: door)) }
+    end
+
+    # Unlocks a locked door of this Room. Fires `Events::DoorUnlocked`, and `Events::RoomFullyUnlocked` when that was the
+    # last locked door. Returns whether anything was unlocked.
+    def unlock_door!(door)
+      return false unless room? && card.unlock!(door)
+
+      refresh_room_abilities!
+      game.notify!(Events::DoorUnlocked.new(permanent: self, door: card.door(door)))
+      game.notify!(Events::RoomFullyUnlocked.new(permanent: self)) if card.fully_unlocked?
+      true
+    end
+
+    # Locks an unlocked door (the abilities of a locked door are lost).
+    def lock_door!(door)
+      return false unless room? && card.lock!(door)
+
+      refresh_room_abilities!
+      true
+    end
+
     def keyword_grant_modifiers
       modifiers.select { |modifier| modifier.is_a?(Permanents::Modifications::KeywordGrant) }
     end
@@ -266,7 +366,7 @@ module Magic
     end
 
     def state_triggered_abilities
-      @state_triggered_abilities ||= card.state_triggered_abilities.map { |ability| ability.new(source: self) }
+      @state_triggered_abilities ||= face.state_triggered_abilities.map { |ability| ability.new(source: self) }
     end
 
     alias_method :to_s, :inspect
@@ -299,6 +399,15 @@ module Magic
     def summoning_sick?
       return false unless creature?
       return false if haste?
+      return false unless @controlled_since_turn
+
+      latest_turn = game.latest_turn_number_of(controller)
+      latest_turn.nil? || @controlled_since_turn >= latest_turn
+    end
+
+    # "Until your next turn" for an effect that began when this permanent came under its controller's control (Kardur):
+    # true until the controller begins another turn.
+    def before_controllers_next_turn?
       return false unless @controlled_since_turn
 
       latest_turn = game.latest_turn_number_of(controller)
@@ -343,9 +452,11 @@ module Magic
     end
 
     def replacement_effect_for(context)
-      return nil if lost_all_abilities?
+      # A finality counter is not an ability, so it works even on a permanent that lost all abilities.
+      candidates = finality_replacements
+      candidates += face.replacement_effects.to_a + @turn_replacements unless lost_all_abilities?
 
-      (card.replacement_effects.to_a + @turn_replacements + counter_replacements).each do |matcher, replacement_effect|
+      candidates.each do |matcher, replacement_effect|
         next unless replacement_matcher_applies?(matcher, context.effect)
 
         replacement_key = [object_id, replacement_effect]
@@ -356,13 +467,6 @@ module Magic
       end
 
       nil
-    end
-
-    # A finality counter: "If a creature with a finality counter on it would die, exile it instead."
-    def counter_replacements
-      return [] unless @counters.of_type(Counters["finality"]).any?
-
-      [[Effects::MovePermanentZone, ReplacementEffect::ExileInsteadOfDying]]
     end
 
     def replacement_matcher_applies?(matcher, effect)
@@ -381,6 +485,13 @@ module Magic
       dispatch_lifecycle_triggers(event)
       dispatch_event_handlers(event)
       dispatch_turn_triggers(event)
+    end
+
+    # "If a creature with a finality counter on it would die, exile it instead."
+    def finality_replacements
+      return [] unless counters.of_type(Counters::Finality).any? && creature?
+
+      [[Effects::MovePermanentZone, ReplacementEffect::ExileInsteadOfDying]]
     end
 
     # A replacement effect that lasts until end of turn ("if it would die this turn, exile it instead").
@@ -411,6 +522,12 @@ module Magic
       modify_power(power, until_eot: false)
       modifiers.last.until_turn_of = player
       modify_toughness(toughness, until_eot: false)
+      modifiers.last.until_turn_of = player
+    end
+
+    # "Loses flying until your next turn."
+    def lose_keyword_until_turn_of!(keyword, player)
+      lose_keyword!(keyword, until_eot: false)
       modifiers.last.until_turn_of = player
     end
 
@@ -457,6 +574,19 @@ module Magic
       @modes_chosen_this_turn ||= []
     end
 
+    # For "choose one that hasn't been chosen" with no turn limit (the choice is remembered while the permanent stays).
+    def mode_chosen?(mode)
+      modes_chosen.include?(mode)
+    end
+
+    def choose_mode!(mode)
+      modes_chosen << mode
+    end
+
+    def modes_chosen
+      @modes_chosen ||= []
+    end
+
     def triggered_once_this_turn?(key)
       triggered_once_keys_this_turn.include?(key)
     end
@@ -467,6 +597,19 @@ module Magic
 
     def triggered_once_keys_this_turn
       @triggered_once_keys_this_turn ||= []
+    end
+
+    # "This ability triggers only once." Unlike the per-turn pair above, never reset.
+    def triggered_ever?(key)
+      triggered_ever_keys.include?(key)
+    end
+
+    def trigger_ever!(key)
+      triggered_ever_keys << key
+    end
+
+    def triggered_ever_keys
+      @triggered_ever_keys ||= []
     end
 
     # For "activate only once each turn": the ability classes activated this turn.
@@ -503,6 +646,17 @@ module Magic
       end
 
       return if attachments.any?(&:does_not_untap_during_untap_step?)
+      return if card.respond_to?(:skips_untap_step?) && card.skips_untap_step?(self)
+
+      untap!
+    end
+
+    # An untap that happens in another player's untap step (Prop Room). A stun counter is removed instead.
+    def untap_during_other_players_untap_step
+      if @counters.of_type(Counters::Stun).any?
+        @counters.remove_first(Counters::Stun)
+        return
+      end
 
       untap!
     end
@@ -550,7 +704,28 @@ module Magic
     def static_abilities
       return [] if lost_all_abilities?
 
-      face.static_abilities.map { |ability| ability.new(source: self) }
+      (face.static_abilities + station_static_abilities).map { |ability| ability.new(source: self) }
+    end
+
+    def charge_counters = counters.of_type(Counters::Charge).size
+
+    # The "N+ |" lines of a Spacecraft (see Cards::Spacecraft) that its charge counters have reached.
+    def station_levels_reached
+      return [] unless card.respond_to?(:station_levels)
+
+      card.station_levels.select { |level| charge_counters >= level.threshold }
+    end
+
+    def additional_lands_per_turn
+      card.additional_lands_per_turn + station_levels_reached.sum(&:additional_lands)
+    end
+
+    def station_static_abilities
+      return [] unless card.respond_to?(:station_levels)
+
+      creature_at = card.station_creature_threshold
+      creature = creature_at && charge_counters >= creature_at ? [Abilities::Static::StationCreature] : []
+      station_levels_reached.flat_map(&:static_abilities) + creature
     end
 
     # "It loses all abilities": its own keywords, activated, triggered, static and
@@ -577,10 +752,11 @@ module Magic
     end
 
     # Rule 701.7: indestructible permanents can't be destroyed. Returns whether it was destroyed.
-    def destroy!
+    # `regenerate: false` is "it can't be regenerated" (Rapid Hybridization): a regeneration shield is not used.
+    def destroy!(regenerate: true)
       return false if indestructible?
 
-      if regeneration_shield?
+      if regenerate && regeneration_shield?
         regenerated!
         return false
       end
@@ -613,11 +789,12 @@ module Magic
 
     def return_to_hand
       move_zone!(to: owner.hand)
-      card.move_zone!(to: owner.hand)
+      # A token (or a copy) has no card of its own to put in the hand: it ceases to exist.
+      card.move_zone!(to: owner.hand) unless copy? || token?
     end
 
     def can_activate_ability?(ability)
-      card.can_activate_ability?(ability) && attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
+      face.can_activate_ability?(ability) && attachments.all? { |attachment| attachment.can_activate_ability?(ability) }
     end
 
     # Can `source` (a card, permanent or token) target this permanent when `controller` is the
@@ -628,14 +805,24 @@ module Magic
       return false if shroud?
 
       opposing = opponents.include?(controller)
-      return false if opposing && hexproof?
+      return false if opposing && hexproof? && !hexproof_ignored?
       return false if opposing && source.colors.any? { hexproof_from?(_1) }
 
       !protected_from?(source)
     end
 
+    # Nowhere to Run: "can be the targets of spells and abilities as though they didn't have hexproof".
+    def hexproof_ignored?
+      game.battlefield.static_abilities.of_type(Abilities::Static::IgnoreHexproof).any? { _1.ignores_hexproof_of?(self) }
+    end
+
+    # Nowhere to Run: "Ward abilities of those creatures don't trigger."
+    def ward_suppressed?
+      game.battlefield.static_abilities.of_type(Abilities::Static::IgnoreHexproof).any? { _1.suppresses_ward_of?(self) }
+    end
+
     def can_attack?
-      (lost_all_abilities? || card.can_attack?) && attachments.all?(&:can_attack?)
+      (lost_all_abilities? || face.can_attack?) && attachments.all?(&:can_attack?)
     end
 
     def can_block?(permanent)
@@ -672,9 +859,25 @@ module Magic
       !lost_all_abilities? && face.must_be_blocked?
     end
 
+    # "This creature can't attack alone." / "...can't block alone." Checked against the whole declared set in combat.
+    def cant_attack_alone? = !lost_all_abilities? && face.cant_attack_alone?
+    def cant_block_alone? = !lost_all_abilities? && face.cant_block_alone?
+
     # "Attacks each combat if able."
     def must_attack?
-      !lost_all_abilities? && face.must_attack?
+      (!lost_all_abilities? && face.must_attack?) || goaded? || @must_attack_turn == game.current_turn.number || attachments.any? { _1.card.forces_enchanted_to_attack? } ||
+        game.battlefield.static_abilities.of_type(Abilities::Static::MustAttack).any? { _1.applies_to?(self) }
+    end
+
+    # "...attacks that opponent this turn if able" (Encore). With one opponent, which player it attacks changes nothing.
+    def must_attack_this_turn!
+      @must_attack_turn = game.current_turn.number
+    end
+
+    # Goaded by an Aura ("Enchanted creature ... is goaded"): attacks each combat if able. With one opponent, "attacks a
+    # player other than you if able" changes nothing, so goad is modelled as that.
+    def goaded?
+      attachments.any? { _1.card.goads_enchanted? }
     end
 
     def maximum_attackers_blocked
@@ -682,7 +885,10 @@ module Magic
     end
 
 
+    # Rule 514.2: damage wears off, and "until end of turn" effects end, as the cleanup step begins.
     def cleanup!
+      @damage = 0
+      @marked_for_death = false
       @turn_triggers = {}
       @turn_replacements = []
       @regeneration_shields = 0
@@ -747,7 +953,7 @@ module Magic
     def return_cards_exiled_until_leaves!
       cards, @cards_exiled_until_leaves = cards_exiled_until_leaves, []
       cards.select { _1.zone&.exile? }.each do |card|
-        Permanent.resolve(game:, card:, owner: card.owner, from_zone: card.zone, cast: false)
+        Permanent.put_onto_battlefield(game:, card:, owner: card.owner, from_zone: card.zone)
       end
     end
 
@@ -768,7 +974,7 @@ module Magic
     end
 
     def remove_from_exile(card)
-      @exiled_cards -= [card]
+      @exiled_cards = Magic::CardList.new(@exiled_cards.to_a - [card])
       game.exile.remove(card)
     end
 
@@ -776,8 +982,8 @@ module Magic
       card.trigger_effect(effect, source: source, **args)
     end
 
-    def create_token(token_class:, amount: 1, controller: self.controller)
-      trigger_effect(:create_token, token_class: token_class, amount: amount, controller: controller)
+    def create_token(token_class:, amount: 1, controller: self.controller, **args)
+      trigger_effect(:create_token, token_class: token_class, amount: amount, controller: controller, **args)
     end
 
     def add_choice(choice, **args)
@@ -809,17 +1015,18 @@ module Magic
     end
 
     def devotion(color)
-      card.cost.send(color) || 0
+      card.cost.devotion(color)
     end
 
     # Fires +trigger_class+ for this permanent (queued or run at once), counting
     # trigger doublers. Public for triggers the engine adds itself (offspring).
     def perform_trigger!(trigger_class, event)
-      additional_triggers = game.battlefield.static_abilities
+      doublers = game.battlefield.static_abilities
         .of_type(Abilities::Static::TriggeredAbilityDoubler)
-        .count { |doubler| doubler.doubles_trigger_for?(self, event) }
+        .select { |doubler| doubler.doubles_trigger_for?(self, event) }
+      doublers.each { |doubler| game.notify!(Events::TriggerDoubled.new(source: doubler.source, permanent: self)) }
 
-      (1 + additional_triggers).times do
+      (1 + doublers.size).times do
         ability = trigger_class.new(actor: self, event: event)
         next unless ability.trigger!
 
@@ -851,7 +1058,15 @@ module Magic
       end
     end
 
+    def refresh_room_abilities!
+      @activated_abilities = card.activated_abilities
+      @state_triggered_abilities = nil
+      apply_continuous_effects!
+    end
+
     def dispatch_event_handlers(event)
+      # Impending's counter removal is a rule of the cast, not an ability of the card.
+      perform_trigger!(TriggeredAbility::ImpendingCounterRemoval, event) if impending? && event.is_a?(Events::BeginningOfEndStep)
       return if lost_all_abilities?
 
       Array(face.event_handlers[event.class]).each do |handler_class|

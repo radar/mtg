@@ -1,6 +1,7 @@
 module Magic
   module Cards
     ScuteSwarm = Creature("Scute Swarm") do
+      cost generic: 2, green: 1
       creature_type "Insect"
       power 1
       toughness 1
@@ -23,11 +24,10 @@ module Magic
           if lands < 6
             trigger_effect(:create_token, token_class: InsectToken)
           else
-            Permanent.resolve(
+            Permanent.token_copy(
               game: game,
               owner: actor.controller,
               card: actor.card,
-              token: true,
             )
           end
         end

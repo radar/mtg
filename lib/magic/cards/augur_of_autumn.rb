@@ -3,14 +3,17 @@ module Magic
     AugurOfAutumn = Creature("Augur of Autumn") do
       cost generic: 1, green: 2
       creature_type "Human Druid"
-      power 3
+      power 2
       toughness 3
     end
 
     class AugurOfAutumn < Creature
-      def additional_lands_per_turn = 1
-
       class TopLibraryPermission < StaticAbility
+        # "Play with the top card of your library revealed."
+        def reveals_top_card?(player)
+          player == controller
+        end
+
         def permits_casting_from_top?(card)
           return false unless card == controller.library.first
           return true if card.land?

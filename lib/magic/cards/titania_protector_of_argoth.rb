@@ -18,6 +18,8 @@ module Magic
       class LandChoice < Magic::Choice
         attr_reader :choices
 
+        def prompt = "Return a land card from your graveyard to the battlefield."
+
         def initialize(actor:)
           @choices = actor.controller.graveyard.cards.lands
           super
@@ -29,6 +31,10 @@ module Magic
       end
 
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
+        def should_perform?
+          event.permanent == actor
+        end
+
         def call
           choice = LandChoice.new(actor: actor)
           game.add_choice(choice) if choice.choices.any?

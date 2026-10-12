@@ -12,6 +12,8 @@ module Magic
       class SacrificeChoice < Magic::Choice
         attr_reader :choices
 
+        def prompt = "Sacrifice any number of other permanents. You draw a card for each one sacrificed."
+
         def initialize(actor:)
           @choices = actor.controller.permanents.except(actor)
           super

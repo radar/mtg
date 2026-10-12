@@ -8,12 +8,15 @@ module Magic
       class Choice < Magic::Choice::SearchLibrary
         def initialize(actor:)
           super(actor: actor, to_zone: :battlefield, enters_tapped: true, filter: Filter[:basic_lands],
-                upto: actor.controller.creatures.tapped.count)
+                upto: actor.controller.creatures.tapped.count,
+                prompt: "Search your library for up to X basic land cards, where X is the number of tapped creatures you control. They enter the battlefield tapped.")
         end
       end
 
       def resolve!
-        game.choices.add(Choice.new(actor: self))
+        choice = Choice.new(actor: self)
+        # With no tapped creatures X is 0: there is nothing to search for, so nothing to ask.
+        game.choices.add(choice) if choice.upto.positive?
         super
       end
     end

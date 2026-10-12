@@ -8,6 +8,7 @@ module Magic
 
       class LoyaltyAbility1 < LoyaltyAbility
         def loyalty_change = 1
+        def description = "You draw a card and you lose 1 life."
 
         def resolve!
           trigger_effect(:draw_cards)
@@ -17,6 +18,7 @@ module Magic
 
       class LoyaltyAbility2 < LoyaltyAbility
         def loyalty_change = -3
+        def description = "Destroy target creature."
 
         def single_target?
           true
@@ -42,6 +44,7 @@ module Magic
 
       class LoyaltyAbility3 < LoyaltyAbility
         def loyalty_change = -8
+        def description = "Target opponent gets an emblem with \"Whenever a player draws a card, you lose 2 life.\""
 
         def single_target?
           true

@@ -6,7 +6,7 @@ module Magic
         super(actor: player)
       end
 
-      def controller = @player
+      def chooser = @player
       def choices = @player.creatures
       def choice_amount = 1
 

@@ -33,6 +33,75 @@ module Magic
       end
     end
 
+    # "Spend this mana only to cast an instant or sorcery spell" (Vodalian Arcanist). Only spells, not abilities.
+    class InstantOrSorcerySpell < ManaRestriction
+      def permits?(use)
+        use.is_a?(Magic::Card) && (use.instant? || use.sorcery?)
+      end
+    end
+
+    # "Spend this mana only to cast instant, sorcery, Demon, and Spirit spells" (Séance Board). Only spells, not abilities.
+    class InstantSorceryDemonOrSpirit < ManaRestriction
+      def permits?(use)
+        use.is_a?(Magic::Card) && (use.instant? || use.sorcery? || use.type?("Demon") || use.type?("Spirit"))
+      end
+    end
+
+    # "Spend this mana only to cast a legendary spell" (Plaza of Heroes). Only spells, not abilities.
+    class LegendarySpell < ManaRestriction
+      def permits?(use)
+        use.is_a?(Magic::Card) && use.legendary?
+      end
+    end
+
+    # "Spend this mana only to turn permanents face up" (Overgrown Zealot).
+    class TurnFaceUp < ManaRestriction
+      def permits?(use) = use.is_a?(Magic::Actions::TurnFaceUp::Use)
+    end
+
+    # "Spend this mana only to cast an enchantment spell, unlock a door, or turn a permanent face up" (Creeping Peeper).
+    class EnchantmentDoorOrFaceUp < ManaRestriction
+      def permits?(use)
+        (use.is_a?(Magic::Card) && use.enchantment?) || use.is_a?(Magic::Actions::UnlockDoor::Use) || use.is_a?(Magic::Actions::TurnFaceUp::Use)
+      end
+    end
+
+    # "Spend this mana only to cast Room spells and unlock doors" (Smoky Lounge).
+    class RoomSpellOrUnlock < ManaRestriction
+      def permits?(use)
+        (use.is_a?(Magic::Card) && use.is_a?(Magic::Cards::Room)) || use.is_a?(Magic::Actions::UnlockDoor::Use)
+      end
+    end
+
+    # Path of Ancestry: "When that mana is spent to cast a creature spell that shares a creature type with your
+    # commander, scry 1." Not a restriction at all (any spend is allowed), but riding on the mana lets `spent_on` see what
+    # it was spent on.
+    class ScryForCommanderType < ManaRestriction
+      def initialize(source:)
+        @source = source
+      end
+
+      def permits?(_use) = true
+
+      def spent_on(use, player)
+        commander = player.commander
+        return unless commander && use.is_a?(Magic::Card) && use.creature?
+
+        shared = (use.types & commander.types).any? { |type| Magic::Types::Creatures.values.include?(type) }
+        player.game.choices.add(Magic::Choice::Scry.new(actor: @source)) if shared
+      end
+    end
+
+    # Mana from a Treasure. Not a restriction (any spend is allowed); it rides on the mana so that spending it can mark
+    # the spell as paid for with Treasure mana ("if mana from a Treasure was spent to cast it", Smaug, Wicked Worm).
+    class FromTreasure < ManaRestriction
+      def permits?(_use) = true
+
+      def spent_on(use, _player)
+        use.treasure_mana_spent = true if use.respond_to?(:treasure_mana_spent=)
+      end
+    end
+
     # "Spend this mana only to cast Elemental spells or activate abilities of Elemental sources."
     class OfType < ManaRestriction
       def initialize(type:)

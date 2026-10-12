@@ -10,7 +10,7 @@ module Magic
       class TypeChoice < Magic::Choice::CreatureType
         def resolve!(creature_type:)
           controller.graveyard.select { |card| card.creature? && card.type?(creature_type) }.each do |card|
-            Permanent.resolve(card: card, game: game, from_zone: card.zone, cast: false, controller: controller)
+            Permanent.put_onto_battlefield(card: card, game: game, from_zone: card.zone, controller: controller)
           end
         end
       end

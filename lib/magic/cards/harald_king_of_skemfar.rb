@@ -11,7 +11,8 @@ module Magic
     class HaraldKingOfSkemfar < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          game.choices.add(Magic::Choice::LookAtTopCards.new(actor: actor, amount: 5, filter: ->(card) { card.any_type?("Elf", "Warrior", "Tyvar") }))
+          game.choices.add(Magic::Choice::LookAtTopCards.new(actor: actor, amount: 5, filter: ->(card) { card.any_type?("Elf", "Warrior", "Tyvar") },
+                                                                 prompt: "Reveal an Elf, Warrior or Tyvar card from the top five cards of your library and put it into your hand. The rest go on the bottom."))
         end
       end
 

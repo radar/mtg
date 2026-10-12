@@ -3,13 +3,15 @@ module Magic
     NessianWanderer = Creature("Nessian Wanderer") do
       cost generic: 1, green: 1
       creature_type "Satyr Scout"
-      power 2
+      power 1
       toughness 3
     end
 
     class NessianWanderer < Creature
       class LandChoice < Magic::Choice
         attr_reader :choices
+
+        def prompt = "Reveal a land card from the top three cards of your library and put it into your hand. The rest go on the bottom."
 
         def initialize(actor:, cards:)
           @cards = cards

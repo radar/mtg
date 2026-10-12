@@ -33,7 +33,7 @@ module Magic
 
       class Chapter3 < Saga::ChapterAbility
         def resolve!
-          game.add_choice(Magic::Choice::CopyTokens.new(actor: self))
+          game.add_choice(Magic::Choice::CopyTokens.new(actor: actor))
         end
       end
 

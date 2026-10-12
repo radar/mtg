@@ -31,6 +31,14 @@ RSpec.describe Magic::Cards::CunningRhetoric do
       expect(game.exile.map(&:name)).to include("Grizzly Bears")
     end
 
+    it "does not let the opponent cast that card" do
+      attack(p2, attacker, p1)
+      bears = rhetoric.exiled_cards.first
+
+      expect(cast_action(player: p1, card: bears).send(:in_permitted_zone?, bears)).to be(true)
+      expect(cast_action(player: p2, card: bears).send(:in_permitted_zone?, bears)).to be(false)
+    end
+
     it "lets you cast that card, spending mana as though it were any color" do
       attack(p2, attacker, p1)
       bears = rhetoric.exiled_cards.first

@@ -34,6 +34,16 @@ RSpec.describe Magic::Costs::MultiTap do
     expect { cost.pay(player: p1, payment: [source, bears.last, bears.last]) }.to raise_error(/Tap exactly 3/)
   end
 
+  it "can be copied with Marshal, as games are, keeping its count but no candidates" do
+    cost = described_class.new(3) { p1.creatures.untapped }
+    bears
+
+    copy = Marshal.load(Marshal.dump(cost))
+
+    expect(copy.count).to eq(3)
+    expect(copy.candidates).to be_empty
+  end
+
   it "only counts creatures of the named type" do
     cost = described_class.new(2) { p1.creatures.by_type("Elf").untapped }
     source

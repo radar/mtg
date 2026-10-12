@@ -5,13 +5,15 @@ module Magic
       enters_tapped
 
       enters_the_battlefield do
-        game.add_choice(Choice.new(actor: actor))
+        game.add_choice(BojukaBog::Choice.new(actor: actor))
       end
     end
 
     class BojukaBog < Card
       class Choice < Magic::Choice
         attr_reader :choices
+
+        def prompt = "Exile all cards from target player's graveyard."
 
         def initialize(actor:)
           @choices = actor.game.players

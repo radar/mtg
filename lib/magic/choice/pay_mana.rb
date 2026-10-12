@@ -13,15 +13,15 @@ module Magic
         super(actor: actor)
       end
 
-      def can_pay? = Costs::Mana.new(mana).can_pay?(controller)
+      def can_pay? = Costs::Mana.new(mana).can_pay?(chooser)
 
       def resolve!(payment: nil)
         cost = Costs::Mana.new(mana)
         if payment
-          cost.pay!(player: controller, payment: payment)
+          cost.pay!(player: chooser, payment: payment)
         else
-          cost.auto_pay(player: controller)
-          cost.finalize!(controller)
+          cost.auto_pay(player: chooser)
+          cost.finalize!(chooser)
         end
       end
     end

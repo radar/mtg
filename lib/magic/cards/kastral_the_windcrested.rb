@@ -21,7 +21,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            permanent = Permanent.resolve(card: target, game: game, from_zone: target.zone, cast: false, controller: controller)
+            permanent = Permanent.put_onto_battlefield(card: target, game: game, from_zone: target.zone, controller: controller)
             permanent&.add_counter("finality")
           end
         end

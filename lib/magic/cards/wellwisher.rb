@@ -1,6 +1,7 @@
 module Magic
   module Cards
     Wellwisher = Creature("Wellwisher") do
+      cost generic: 1, green: 1
       creature_type "Elf"
       power 1
       toughness 1

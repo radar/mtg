@@ -54,7 +54,7 @@ RSpec.describe Magic::Cards::FaithlessLooting do
 
     it "can be cast from graveyard with flashback cost and exiled after" do
       p1.add_mana(red: 3)
-      action = cast_action(player: p1, card: faithless_looting, flashback: true)
+      action = cast_action_as(:flashback,player: p1, card: faithless_looting)
       expect(action.mana_cost).to eq(Magic::Costs::Mana.new(generic: 2, red: 1))
 
       game.stack.add(action)

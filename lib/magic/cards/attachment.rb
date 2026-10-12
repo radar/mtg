@@ -3,8 +3,11 @@ module Magic
     class Attachment < Card
       # Rule 303.4f: an Aura resolving enters attached to its target, so its enters
       # triggers already see what it enchants.
-      def resolve!(target:)
-        permanent = super(attach_to: target)
+      def resolve!(target: nil, **args)
+        # Equipment returned to the battlefield (Grasp of Fate) enters unattached: it has nothing it must attach to.
+        return super(**args) if target.nil?
+
+        permanent = super(attach_to: target, **args)
         permanent.attach_to!(target) unless permanent.attached_to == target
         permanent
       end

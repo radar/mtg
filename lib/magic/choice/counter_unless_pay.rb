@@ -15,6 +15,8 @@ module Magic
 
       def controller = @payer
 
+      def chooser = @payer
+
       def can_pay? = Costs::Mana.new(mana).can_pay?(payer)
 
       def resolve!(payment: nil)

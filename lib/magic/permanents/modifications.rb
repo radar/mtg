@@ -8,6 +8,17 @@ module Magic
         )
       end
 
+      # "The token isn't legendary": the permanent stops being of these types.
+      def remove_types(*types, until_eot: true)
+        modifiers << RemoveTypes.new(types: types, until_eot:)
+      end
+
+      # "It has '{2}, {T}, Sacrifice this artifact: ...'": adds an activated ability class to this permanent.
+      def grant_activated_ability!(ability_class, until_eot: false)
+        modifiers << GrantActivatedAbility.new(ability_class:, until_eot:)
+        apply_continuous_effects!
+      end
+
       # "~ becomes a Werewolf.": replaces its creature types (see Modifications::SetCreatureTypes).
       def become_creature_type!(*types, until_eot: false)
         modifiers << SetCreatureTypes.new(types: types, until_eot:)
@@ -62,6 +73,11 @@ module Magic
 
       def grant_keyword(keyword, until_eot: true)
         modifiers << KeywordGrant.new(keyword_grant: keyword, until_eot: until_eot)
+      end
+
+      def lose_keyword!(keyword, until_eot: true)
+        modifiers << KeywordRemoval.new(keyword_removal: keyword, until_eot: until_eot)
+        apply_continuous_effects!
       end
 
       def lose_creature_types!(until_eot: true)

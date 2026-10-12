@@ -357,14 +357,7 @@ RSpec.describe "Gift cards" do
       expect(game.battlefield.creatures).to be_empty
     end
 
-    it "returns one of your creatures when the gift was promised" do
-      mine
-      cast("Starfall Invocation", mana: { white: 5 }, gift: true)
-      game.resolve_choice!(target: p1.graveyard.creatures.first) if game.choices.any?
-
-      expect(p1.creatures.map(&:name)).to eq(["Grizzly Bears"])
-      expect(p2.creatures).to be_empty
-    end
+    # The gift paths are in spec/cards/starfall_invocation_spec.rb: it promises the gift through Costs::Gift.
   end
 
   describe "Valley Rally" do

@@ -15,6 +15,37 @@ RSpec.describe Magic::Cards::RhysTheExiled do
     expect(rhys.type?("Elf")).to eq(true)
   end
 
+  describe "{B}, Sacrifice an Elf: Regenerate Rhys" do
+    let(:ability) { rhys.activated_abilities.first }
+
+    it "has costs that can be read: mana and a sacrifice of one of your Elves" do
+      costs = ability.costs
+      expect(costs.map(&:class)).to eq([Magic::Costs::Mana, Magic::Costs::Sacrifice])
+      expect(costs.last.choices).to eq([rhys])
+    end
+
+    it "lets any Elf you control be sacrificed, but not another type of creature" do
+      elf = ResolvePermanent("Elvish Mystic", owner: p1)
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+
+      expect(ability.costs.last.choices).to contain_exactly(rhys, elf)
+      expect(ability.costs.last.choices).not_to include(bears)
+    end
+
+    it "regenerates Rhys" do
+      elf = ResolvePermanent("Elvish Mystic", owner: p1)
+      p1.add_mana(black: 1)
+      p1.activate_ability(ability: ability) do |action|
+        action.pay_mana(black: 1)
+        action.pay_sacrifice(elf)
+      end
+      game.stack.resolve!
+
+      expect(game.battlefield.permanents).not_to include(elf)
+      expect(game.battlefield.permanents).to include(rhys)
+    end
+  end
+
   context "when Rhys attacks" do
     before { skip_to_combat! }
 

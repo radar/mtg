@@ -3,6 +3,7 @@ module Magic
     ZiatorasProvingGround = Card("Ziatora's Proving Ground") do
       type T::Land, T::Lands::Swamp, T::Lands::Mountain, T::Lands::Forest
       enters_tapped
+      cycling generic: 3
     end
 
     class ZiatorasProvingGround < Card
@@ -10,15 +11,7 @@ module Magic
         choices :black, :red, :green
       end
 
-      class CyclingAbility < Magic::ActivatedAbility
-        costs "{3}"
-
-        def resolve!
-          source.controller.draw!
-        end
-      end
-
-      def activated_abilities = [ManaAbility, CyclingAbility]
+      def activated_abilities = [ManaAbility]
     end
   end
 end

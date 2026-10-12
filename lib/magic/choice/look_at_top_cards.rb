@@ -4,16 +4,18 @@ module Magic
     # them and put it into your hand. Put the rest on the bottom of your library in a
     # random order." The cards looked at are fixed when the choice is created.
     class LookAtTopCards < Choice
-      attr_reader :amount, :looked_at
+      attr_reader :amount, :looked_at, :prompt
 
-      def initialize(actor:, amount:, filter:)
+      def initialize(actor:, amount:, filter:, prompt: nil)
+        @prompt = prompt
         @amount = amount
-        @filter = filter
         super(actor: actor)
-        @looked_at = controller.library.first(amount)
+        @looked_at = chooser.library.first(amount)
+        # Applied now, not kept: a lambda can't be copied with Marshal, which arena does to games.
+        @choices = filter ? looked_at.select(&filter) : looked_at
       end
 
-      def choices = looked_at.select(&@filter)
+      attr_reader :choices
 
       # target: the card to reveal and put into hand, or nil to take none.
       def resolve!(target: nil)
@@ -25,8 +27,8 @@ module Magic
         end
 
         (looked_at - [target]).shuffle.each do |card|
-          controller.library.remove(card)
-          controller.library.push(card)
+          chooser.library.remove(card)
+          chooser.library.push(card)
         end
       end
     end

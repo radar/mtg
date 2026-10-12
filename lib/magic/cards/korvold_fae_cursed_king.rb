@@ -10,6 +10,8 @@ module Magic
 
     class KorvoldFaeCursedKing < Creature
       class SacrificeChoice < Magic::Choice::Targeted
+        def prompt = "Sacrifice another permanent."
+
         def choice_amount = 1
 
         def choices

@@ -15,6 +15,9 @@ module Magic
             creatures_you_control
           end
 
+          # So "Equip abilities that target this creature cost {2} less" (Dwarven Mauler) can tell it apart.
+          def equip? = true
+
           def resolve!(target:)
             source.attach_to!(target)
           end

@@ -9,6 +9,8 @@ module Magic
     # default -- nothing outside GameRunner reads it, so every other caller keeps driving
     # the player directly.
     attr_accessor :agent
+    # "You have an enduring story" (Storied, The Hobbit): latched by Magic::Storied, lasts for the rest of the game.
+    attr_accessor :enduring_story
 
     def_delegators :@game, :logger
 
@@ -68,6 +70,35 @@ module Magic
       game.take_action(action)
     end
 
+    # The Rooms this player controls, and their unlocked doors (a Room's door is a half-card, so two Rooms of the same
+    # name each have their own).
+    def rooms = permanents.select(&:room?)
+    def unlocked_doors = rooms.flat_map { _1.card.unlocked_doors }
+
+    # Pays a locked door's cost to unlock it (`door:` is `:left`, `:right` or one of the Room's doors).
+    def unlock_door(permanent:, door:, **args, &block)
+      action = prepare_action(Magic::Actions::UnlockDoor, permanent: permanent, door: door, **args, &block)
+      game.take_action(action)
+    end
+
+    # Ninjutsu: pays the cost and returns the unblocked +attacker+ to put +card+ (in hand) onto the battlefield attacking.
+    def ninjutsu(card:, attacker:, **args, &block)
+      action = prepare_action(Magic::Actions::Ninjutsu, card: card, attacker: attacker, **args, &block)
+      game.take_action(action)
+    end
+
+    # Suspend: pays +card+'s suspend cost to exile it from hand with its time counters.
+    def suspend(card:, **args, &block)
+      action = prepare_action(Magic::Actions::Suspend, card: card, **args, &block)
+      game.take_action(action)
+    end
+
+    # Pays a face-down creature card's mana cost to turn it face up.
+    def turn_face_up(permanent:, **args, &block)
+      action = prepare_action(Magic::Actions::TurnFaceUp, permanent: permanent, **args, &block)
+      game.take_action(action)
+    end
+
     def prepare_activate_ability(ability:, **args, &block)
       prepare_action(Magic::Actions::ActivateAbility, ability: ability, **args)
     end
@@ -78,11 +109,14 @@ module Magic
       else
         action = prepare_activate_ability(ability: ability, **args, &block)
       end
-      yield action if block_given?
+      # Activation restrictions are checked before any cost is paid, including those paid in the block (rule 602.5b):
+      # exiling the source from the graveyard, say, must not make the ability fail its own "in your graveyard" check.
       action.verify_requirements! if action.respond_to?(:verify_requirements!)
+      yield action if block_given?
       action.pay_self_tap if action.has_cost?(Magic::Costs::SelfTap) && auto_tap
       action.pay_self_sacrifice if action.has_cost?(Magic::Costs::SelfSacrifice)
       action.pay_self_exile if action.has_cost?(Magic::Costs::SelfExile)
+      action.pay_self_discard if action.has_cost?(Magic::Costs::SelfDiscard)
       action.finalize_costs!(self)
       game.take_action(action)
     end
@@ -93,14 +127,22 @@ module Magic
       game.take_action(action)
     end
 
-    def prepare_cast(card:, **args)
-      action = prepare_action(Magic::Actions::Cast, card: card, **args)
+    # @param cast_class [Class] `Actions::Cast`, or a subclass such as `Actions::Cast::Flashback`
+    def prepare_cast(cast_class = Magic::Actions::Cast, card:, **args)
+      action = prepare_action(cast_class, card: card, **args)
       yield action if block_given?
       action
     end
 
+    # A Room is cast as one of its doors: `cast(card: room, door: :left)` is `cast_as(:door, card: room, door: :left)`.
     def cast(card:, **args, &block)
-      action = prepare_cast(card: card, **args, &block)
+      cast_as(args.key?(:door) ? :door : :normal, card:, **args, &block)
+    end
+
+    # @param mode [Symbol] How the spell is cast: `:flashback`, `:harmonize`, `:blitz`, `:evoked`, `:adventure`,
+    #   `:alternative`, `:door` (a Room) or `:normal` (see `Actions::Cast.for_mode`)
+    def cast_as(mode, card:, **args, &block)
+      action = prepare_cast(Magic::Actions::Cast.for_mode(mode), card: card, **args, &block)
       game.take_action(action)
       action
     end
@@ -161,7 +203,14 @@ module Magic
     end
 
     # A static ability of a permanent can define `prevents_life_gain?(player)` (Mornsong Aria).
+    # A one-shot effect can also stop a player gaining life for the rest of the game (Screaming Nemesis).
+    def cant_gain_life!
+      @cant_gain_life = true
+    end
+
     def can_gain_life?
+      return false if @cant_gain_life
+
       game.battlefield.static_abilities.none? { |ability| ability.respond_to?(:prevents_life_gain?) && ability.prevents_life_gain?(self) }
     end
 
@@ -192,6 +241,16 @@ module Magic
       )
     end
 
+    # The total life this player has lost so far this turn (damage included).
+    def life_lost_this_turn
+      game.current_turn.events.select { _1.is_a?(Events::LifeLoss) && _1.player == self }.sum(&:life)
+    end
+
+    # The total life this player's opponents have lost so far this turn.
+    def opponents_life_lost_this_turn
+      game.opponents(self).sum(&:life_lost_this_turn)
+    end
+
     def take_damage(damage)
       lose_life(damage)
     end
@@ -201,7 +260,13 @@ module Magic
     end
 
     def max_lands_per_turn
-      1 + permanents.sum(&:additional_lands_per_turn)
+      1 + permanents.sum(&:additional_lands_per_turn) + (@extra_land_drops&.fetch(game.current_turn.number, 0) || 0)
+    end
+
+    # "You may play an additional land this turn." Stored as plain data per turn number so the game can still be Marshal-copied.
+    def grant_additional_land_this_turn!
+      @extra_land_drops ||= Hash.new(0)
+      @extra_land_drops[game.current_turn.number] += 1
     end
 
     def can_play_lands?
@@ -292,14 +357,16 @@ module Magic
     private :record_mana_spent
 
     def spend_restricted_mana(color, count, use)
-      spent = 0
+      used = []
       @restricted_mana.reject! do |unit|
-        next false unless spent < count && unit.color == color && unit.restriction.permits?(use)
+        next false unless used.size < count && unit.color == color && unit.restriction.permits?(use)
 
-        spent += 1
+        used << unit
         true
       end
-      spent
+      # A restriction may react to its mana being spent ("When that mana is spent to cast a creature spell, ...").
+      used.each { |unit| unit.restriction.spent_on(use, self) if unit.restriction.respond_to?(:spent_on) }
+      used.size
     end
     private :spend_restricted_mana
 
@@ -331,8 +398,14 @@ module Magic
       library.shuffle!
     end
 
+    # Rule 705: flip a coin. True if the player wins the flip. Specs stub this for a known result.
+    def flip_coin!
+      [true, false].sample
+    end
+
     def mill(amount)
-      cards = amount.times.map do
+      # Mill as many as the library holds (rule 701.17b); an empty library mills nothing.
+      cards = [amount, library.count].min.times.map do
         card = library.mill
         card.move_to_graveyard!
         game.notify!(
@@ -400,16 +473,23 @@ module Magic
 
     # Rule 402.2: seven, unless a permanent says "You have no maximum hand size" (nil then).
     def maximum_hand_size
-      return if permanents.any? { _1.card.respond_to?(:no_maximum_hand_size?) && _1.card.no_maximum_hand_size? }
+      return if permanents.any? { _1.card.no_maximum_hand_size? }
 
-      STARTING_MAXIMUM_HAND_SIZE
+      [STARTING_MAXIMUM_HAND_SIZE - opponents_maximum_hand_size_reduction, 0].max
+    end
+
+    # "Each opponent's maximum hand size is reduced by N" (Locust Miser): permanents answer
+    # `opponents_maximum_hand_size_reduction`.
+    def opponents_maximum_hand_size_reduction
+      game.opponents(self).flat_map(&:permanents).sum { _1.card.opponents_maximum_hand_size_reduction }
     end
 
     # Rule 514.1: in the cleanup step the active player discards down to their maximum hand size.
     def discard_down_to_maximum_hand_size!
       return unless (maximum = maximum_hand_size)
 
-      [hand.count - maximum, 0].max.times { game.add_choice(Choice::Discard.new(player: self)) }
+      excess = [hand.count - maximum, 0].max
+      game.add_choice(Choice::Discard.new(player: self, amount: excess)) if excess.positive?
     end
 
     # Vivid: the number of colors among permanents this player controls.

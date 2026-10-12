@@ -23,7 +23,7 @@ module Magic
     end
 
     def call
-      [*castable_spells, *playable_lands, *cyclable_cards, *activatable_abilities, *activatable_loyalty_abilities,
+      [*castable_spells, *playable_lands, *cyclable_cards, *unlockable_doors, *turnable_face_up, *ninjutsu_activations, *activatable_abilities, *activatable_loyalty_abilities,
        *declarable_attackers, *declarable_blockers, nil]
     end
 
@@ -33,9 +33,14 @@ module Magic
 
     def castable_spells
       cast_candidate_cards.flat_map do |card|
+        # A Room is cast as one of its two doors.
+        next Cards::Room::SIDES.keys.map { |side| keep(Actions::Cast::Door.new(game: game, player: player, card: card, door: side)) } if card.is_a?(Cards::Room)
+
         candidates = [keep(Actions::Cast.new(game: game, player: player, card: card))]
-        candidates << keep(Actions::Cast.new(game: game, player: player, card: card, flashback: true)) if card.zone&.graveyard? && card.flashback_cost_now
-        candidates << keep(Actions::Cast.new(game: game, player: player, card: card, harmonize: true)) if card.zone&.graveyard? && card.harmonize_cost
+        candidates << keep(Actions::Cast::Impending.new(game: game, player: player, card: card)) if card.respond_to?(:impending_cost)
+        candidates << keep(Actions::Cast::Spectacle.new(game: game, player: player, card: card)) if card.respond_to?(:spectacle_cost)
+        candidates << keep(Actions::Cast::Flashback.new(game: game, player: player, card: card)) if card.zone&.graveyard? && card.flashback_cost_now
+        candidates << keep(Actions::Cast::Harmonize.new(game: game, player: player, card: card)) if card.zone&.graveyard? && card.harmonize_cost
         candidates
       end.compact
     end
@@ -60,6 +65,24 @@ module Magic
     def cyclable_cards
       player.hand.cards.select { |card| card.respond_to?(:cycling_cost) && card.cycling_cost }
         .filter_map { |card| keep(Actions::Cycle.new(game: game, player: player, card: card)) }
+    end
+
+    def unlockable_doors
+      player.permanents.select(&:room?).flat_map do |room|
+        room.card.locked_doors.filter_map { |door| keep(Actions::UnlockDoor.new(game: game, player: player, permanent: room, door: door)) }
+      end
+    end
+
+    def ninjutsu_activations
+      return [] unless game.current_turn.step?(:declare_blockers)
+
+      ninjas = player.hand.cards.select { _1.respond_to?(:ninjutsu_cost) }
+      attackers = game.current_turn.attacks.map(&:attacker).select { _1.controller == player }
+      ninjas.product(attackers).filter_map { |card, attacker| keep(Actions::Ninjutsu.new(game: game, player: player, card: card, attacker: attacker)) }
+    end
+
+    def turnable_face_up
+      player.permanents.select(&:face_down?).filter_map { |permanent| keep(Actions::TurnFaceUp.new(game: game, player: player, permanent: permanent)) }
     end
 
     def activatable_abilities

@@ -10,6 +10,7 @@ module Magic
 
       def resolve!
         return if damage_prevented?
+        return if game.current_turn.combat_damage_prevented_from?(source)
 
         if target.player? && source.has_keyword?(Magic::Keywords::Toxic)
           source.trigger_effect(

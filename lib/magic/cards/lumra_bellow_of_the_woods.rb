@@ -26,7 +26,7 @@ module Magic
         def call
           controller.mill(4)
           [*controller.graveyard.cards].select(&:land?).each do |land|
-            Permanent.resolve(card: land, game: game, from_zone: land.zone, cast: false, controller: controller, enters_tapped: true)
+            Permanent.put_onto_battlefield(card: land, game: game, from_zone: land.zone, controller: controller, enters_tapped: true)
           end
         end
       end

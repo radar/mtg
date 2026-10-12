@@ -26,6 +26,15 @@ module Magic
 
       def finalize!(_player)
       end
+
+      # An ability on the stack keeps its costs, and games are copied with Marshal (arena checks what a player could do on a
+      # copy), which can't copy the block. A copied cost has been paid already, so it has no candidates left.
+      def marshal_dump = [@count]
+
+      def marshal_load(data)
+        @count = data.first
+        @candidates = -> { [] }
+      end
     end
   end
 end

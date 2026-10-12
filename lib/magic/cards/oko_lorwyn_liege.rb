@@ -47,6 +47,7 @@ module Magic
       # "-1: Mill three cards. You may put a permanent card from among them into your hand."
       class MillAbility < Magic::LoyaltyAbility
         def loyalty_change = -1
+        def description = "Mill three cards. You may put a permanent card from among them into your hand."
 
         def resolve!
           milled = controller.mill(3)
@@ -57,6 +58,7 @@ module Magic
       # "-3: Create two 3/3 green Elk creature tokens."
       class ElkAbility < Magic::LoyaltyAbility
         def loyalty_change = -3
+        def description = "Create two 3/3 green Elk creature tokens."
 
         def resolve!
           trigger_effect(:create_token, token_class: ElkToken, amount: 2)
@@ -66,6 +68,7 @@ module Magic
       # "-6: Choose a creature type. You get an emblem with ..."
       class EmblemAbility < Magic::LoyaltyAbility
         def loyalty_change = -6
+        def description = "Choose a creature type. You get an emblem with \"Creatures you control of the chosen type get +3/+3 and have vigilance and hexproof.\""
 
         def resolve!
           game.add_choice(ChooseTypeChoice.new(actor: source))
@@ -93,6 +96,7 @@ module Magic
       # "+2: Up to one target creature gains all creature types. (This effect doesn't end.)"
       class TypesAbility < Magic::LoyaltyAbility
         def loyalty_change = 2
+        def description = "Up to one target creature gains all creature types. (This effect doesn't end.)"
 
         def single_target? = true
 
@@ -106,6 +110,7 @@ module Magic
       # "+1: Target creature gets -2/-0 until your next turn."
       class ShrinkAbility < Magic::LoyaltyAbility
         def loyalty_change = 1
+        def description = "Target creature gets -2/-0 until your next turn."
 
         def single_target? = true
 

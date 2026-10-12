@@ -12,7 +12,8 @@ module Magic
 
       def resolve!
         super
-        target.card.exile!
+        # A token has no card to move: it ceases to exist once it leaves the battlefield.
+        target.card.exile! unless target.token?
       end
     end
   end

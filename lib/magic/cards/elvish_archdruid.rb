@@ -15,7 +15,8 @@ module Magic
 
       class ManaAbility < Magic::TapManaAbility
         def resolve!
-          source.controller.add_mana(green: source.controller.creatures.by_type("Elf").count)
+          # "for each Elf you control": any Elf permanent counts, not only creatures.
+          source.controller.add_mana(green: source.controller.permanents.count { _1.type?("Elf") })
         end
       end
 

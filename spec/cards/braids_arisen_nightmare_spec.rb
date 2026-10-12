@@ -15,6 +15,15 @@ RSpec.describe Magic::Cards::BraidsArisenNightmare do
     expect(braids).to be_creature
   end
 
+  it "does not trigger at an opponent's end step" do
+    ResolvePermanent("Braids, Arisen Nightmare", owner: p1)
+    ResolvePermanent("Grizzly Bears", owner: p1)
+    game.next_turn
+    current_turn.end!
+
+    expect(game.choices).to be_empty
+  end
+
   it "lets an opponent decline and causes life loss and a draw" do
     ResolvePermanent("Braids, Arisen Nightmare", owner: p1)
     ResolvePermanent("Grizzly Bears", owner: p1)

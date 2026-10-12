@@ -61,16 +61,21 @@ module Magic
     def enters_as_copy? = false
     def must_be_blocked? = false
     def must_attack? = false
+    def cant_attack_alone? = false
+    def cant_block_alone? = false
     # How many attackers this creature can block at once; override for "can block an additional creature".
     def maximum_attackers_blocked = 1
     def can_activate_ability?(_) = true
+    def no_maximum_hand_size? = false
+    def prevents_losing_at_zero_life? = false
+    def opponents_maximum_hand_size_reduction = 0
 
     def zone=(zone)
       @zone = zone
     end
 
     def resolve!(**args)
-      Permanent.resolve(game: game, card: self, **args)
+      Permanent.put_onto_battlefield(game: game, card: self, **args)
     end
 
     def colors

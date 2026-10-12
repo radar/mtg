@@ -8,7 +8,8 @@ module Magic
     class MountainValley < Card
       class Choice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, to_zone: :battlefield, filter: ->(card) { card.any_type?("Mountain", "Forest") })
+          super(actor: actor, to_zone: :battlefield, filter: ->(card) { card.any_type?("Mountain", "Forest") },
+                prompt: "Search your library for a Mountain or Forest card. It enters the battlefield.")
         end
       end
 

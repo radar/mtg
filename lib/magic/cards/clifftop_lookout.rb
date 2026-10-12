@@ -24,7 +24,7 @@ module Magic
           end
           trigger_effect(:reveal_cards, target: revealed) if revealed.any?
           if land
-            Permanent.resolve(card: land, game: game, from_zone: land.zone, cast: false, controller: controller, enters_tapped: true)
+            Permanent.put_onto_battlefield(card: land, game: game, from_zone: land.zone, controller: controller, enters_tapped: true)
           end
           (revealed - [land]).shuffle.each do |card|
             controller.library.remove(card)

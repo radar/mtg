@@ -9,7 +9,7 @@ module Magic
         costs "Remove 3 quest counters from {this}, Sacrifice {this}"
 
         def resolve!
-          game.choices.add(Magic::Choice::SearchLibrary.new(actor: source, to_zone: :battlefield, enters_tapped: true, upto: 2, filter: Filter[:basic_lands]))
+          game.search_library(source, find: :basic_lands, to: :battlefield, tapped: true, upto: 2)
         end
       end
 
@@ -21,6 +21,8 @@ module Magic
         end
 
         class MayChoice < Magic::Choice::May
+          def prompt = "Put a quest counter on Khalni Heart Expedition?"
+
           def resolve!
             trigger_effect(:add_counter, counter_type: "quest", target: actor, amount: 1)
           end

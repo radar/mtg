@@ -44,5 +44,27 @@ RSpec.describe Magic::Cards::PrimalGrowth do
       choice = game.choices.last
       expect(choice.upto).to eq(2)
     end
+
+    it "can still be cast when the creature sacrificed sets off a trigger that is now on the stack" do
+      ResolvePermanent("Poison-Tip Archer", owner: p1)
+      creature = ResolvePermanent("Grizzly Bears", owner: p1)
+      spell = Card("Primal Growth", owner: p1)
+      p1.hand.add(spell)
+      p1.add_mana(green: 3)
+
+      expect do
+        p1.cast(card: spell) do |a|
+          a.pay_mana(generic: { green: 2 }, green: 1)
+          a.pay_kicker(creature)
+          game.check_state_based_actions!
+          expect(game.stack.count).to eq(1), "the trigger is on the stack while the spell is being cast"
+        end
+      end.not_to raise_error
+
+      game.settle!
+      game.resolve_choice!(targets: [])
+      game.settle!
+      expect(p2.life).to eq(p2.starting_life - 1)
+    end
   end
 end

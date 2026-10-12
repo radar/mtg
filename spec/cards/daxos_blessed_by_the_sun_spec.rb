@@ -29,6 +29,21 @@ RSpec.describe Magic::Cards::DaxosBlessedByTheSun do
     end
   end
 
+  context "opponent's creature" do
+    let!(:opponent_elves) { ResolvePermanent("Llanowar Elves", owner: p2) }
+
+    it "does not gain controller life when it enters" do
+      expect(p1.life).to eq(20)
+    end
+
+    it "does not gain controller life when it dies" do
+      opponent_elves.sacrifice!
+      game.settle!
+
+      expect(p1.life).to eq(20)
+    end
+  end
+
   context "dies ability" do
     let(:elves) { ResolvePermanent("Llanowar Elves") }
 

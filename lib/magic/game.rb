@@ -154,6 +154,12 @@ module Magic
       @pending_triggers << ability
     end
 
+    # A trigger lasting until end of turn that belongs to no permanent ("Until end of turn, whenever a creature you control
+    # dies, ..."). See `Magic::DelayedTrigger`.
+    def add_delayed_trigger(source:, event_class:, trigger_class:)
+      DelayedTrigger.new(game: self, source: source, event_class: event_class, trigger_class: trigger_class).tap { subscribe(_1) }
+    end
+
     def add_players(*players)
       players.each(&method(:add_player))
     end
@@ -185,6 +191,7 @@ module Magic
       # The opening hands are drawn before the game begins: they aren't "this turn" (Erudite Wizard
       # counts the cards drawn each turn).
       @current_turn.events.clear
+      offer_opening_hand_cards!
       # "beginning" (the state Turn starts in, before its first untap!) is a
       # NO_PRIORITY_STEP like untap/cleanup, but unlike those it isn't a real rules
       # concept -- it only exists so specs can build a game and act (an instant, a mana
@@ -290,6 +297,45 @@ module Magic
       add_choice(Choice::RingBearer.new(player: player)) if player.creatures.any?
     end
 
+    # Rule 103.6: after the opening hands are drawn, each player in turn order may begin the game with their Leylines
+    # ("If this card is in your opening hand, you may begin the game with it on the battlefield") on the battlefield.
+    def offer_opening_hand_cards!
+      players.each do |player|
+        player.hand.cards.select(&:begins_on_battlefield?).each { |card| add_choice(Choice::BeginOnBattlefield.new(card: card)) }
+      end
+    end
+
+    # Rule 701.40: puts +card+ onto the battlefield face down as a 2/2 creature under +controller+'s control. It can be
+    # turned face up for its mana cost if it's a creature card (`Actions::TurnFaceUp`).
+    def manifest!(card, controller: card.owner)
+      Permanent.put_onto_battlefield(game: self, card: card, from_zone: card.zone, controller: controller, face_down: true)
+    end
+
+    # `find` is a card type ("Forest"), a `Filter[...]` name (`:basic_lands`) or a lambda taking a card.
+    def search_library(actor, find:, to:, tapped: false, upto: 1, reveal: false, prompt: nil)
+      noun, filter = case find
+      when String then [find, ->(card) { card.any_type?(find) }]
+      when Symbol then [find.to_s.tr("_", " ").chomp("s"), Filter[find]]
+      else [nil, find]
+      end
+      prompt ||= search_library_prompt(noun, to: to, tapped: tapped, upto: upto) if noun
+
+      add_choice(Choice::SearchLibrary.new(actor: actor, filter: filter, to_zone: to, enters_tapped: tapped, upto: upto, reveal: reveal, prompt: prompt))
+    end
+
+    def search_library_prompt(noun, to:, tapped:, upto:)
+      many = upto > 1
+      cards = many ? "up to #{{ 2 => "two", 3 => "three" }.fetch(upto, upto)} #{noun} cards" : "a #{noun} card"
+      it = many ? "They" : "It"
+      outcome = case to
+      when :battlefield then "#{it} #{many ? "enter" : "enters"} the battlefield#{" tapped" if tapped}."
+      when :hand then "Put #{many ? "them" : "it"} into your hand."
+      when :graveyard then "Put #{many ? "them" : "it"} into your graveyard."
+      when :top then "Put #{many ? "them" : "it"} on top of your library."
+      end
+      "Search your library for #{cards}. #{outcome}"
+    end
+
     def receive_event(event)
       case event
       when Events::CombatDamageDealt
@@ -297,7 +343,8 @@ module Magic
           make_monarch!(event.source.controller)
         end
       when Events::BeginningOfEndStep
-        monarch.draw! if monarch == event.active_player
+        # An effect, so that replacement effects ("if you would draw a card", Abundance) apply to it as well.
+        add_effect(Effects::DrawCards.new(source: monarch, player: monarch)) if monarch == event.active_player
       end
     end
 

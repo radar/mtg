@@ -9,12 +9,10 @@ module Magic
         @counters = counters
       end
 
-      # Permanent.resolve moves the card out of the graveyard too, and records the
+      # Permanent.put_onto_battlefield moves the card out of the graveyard too, and records the
       # graveyard as where the permanent came from (Events::EnteredTheBattlefield#from).
       def resolve!
-        permanent = Permanent.resolve(card: target, game: game, from_zone: target.zone, cast: false, controller: @controller || target.owner)
-        @counters.each { |type, amount| permanent.add_counter(type, amount: amount) } if permanent
-        permanent
+        Permanent.put_onto_battlefield(card: target, game: game, from_zone: target.zone, controller: @controller || target.owner, counters: @counters)
       end
     end
   end

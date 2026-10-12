@@ -12,7 +12,9 @@ module Magic
       end
 
       def call(effect)
-        effect.with_amount(effect.amount * 2)
+        doubled = effect.with_amount(effect.amount * 2)
+        receiver.game.notify!(Events::TokensDoubled.new(source: receiver, amount: doubled.amount))
+        doubled
       end
     end
   end

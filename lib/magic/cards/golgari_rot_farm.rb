@@ -9,6 +9,8 @@ module Magic
       class ReturnLandChoice < Magic::Choice
         attr_reader :choices
 
+        def prompt = "Return a land you control to its owner's hand."
+
         def initialize(actor:)
           @choices = actor.controller.lands
           super

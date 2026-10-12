@@ -7,6 +7,8 @@ module Magic
     class BindingTheOldGods < Saga
       class Chapter1 < Saga::ChapterAbility
         class TargetChoice < Magic::Choice::Targeted
+          def prompt = "Destroy target nonland permanent an opponent controls."
+
           def choices
             battlefield.not_controlled_by(controller).nonland
           end
@@ -26,7 +28,7 @@ module Magic
 
       class Chapter2 < Saga::ChapterAbility
         def resolve!
-          game.choices.add(Magic::Choice::SearchLibrary.new(actor: actor, to_zone: :battlefield, enters_tapped: true, upto: 1, filter: ->(card) { card.any_type?("Forest") }))
+          game.search_library(actor, find: "Forest", to: :battlefield, tapped: true)
         end
       end
 

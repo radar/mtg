@@ -37,7 +37,7 @@ module Magic
       # Rules 704.5a, 704.5b and 704.5c: 0 or less life, drew from an empty library, or 10+ poison counters.
       def make_players_lose
         losers = game.players.reject(&:lost?).select do |player|
-          player.life <= 0 ||
+          (player.life <= 0 && player.permanents.none? { _1.card.prevents_losing_at_zero_life? }) ||
             player.drew_from_empty_library? ||
             player.counters.of_type(Counters::Poison).count >= POISON_COUNTERS_TO_LOSE
         end

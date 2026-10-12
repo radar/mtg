@@ -13,6 +13,8 @@ module Magic
       class LookChoice < Magic::Choice
         attr_reader :looked_at
 
+        def prompt = "Put a land card from the top five cards of your library onto the battlefield tapped. The rest go on the bottom."
+
         def initialize(actor:)
           super
           @looked_at = controller.library.first(5)

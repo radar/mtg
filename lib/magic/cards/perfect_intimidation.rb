@@ -9,6 +9,8 @@ module Magic
       class ExileFromHand < Magic::Choice
         attr_reader :player, :amount
 
+        def chooser = player
+
         def initialize(actor:, player:, amount:)
           @player = player
           @amount = amount

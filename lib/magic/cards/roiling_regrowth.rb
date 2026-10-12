@@ -8,7 +8,8 @@ module Magic
 
       class Choice < Magic::Choice::SearchLibrary
         def initialize(actor:)
-          super(actor: actor, upto: 2, to_zone: :battlefield, enters_tapped: true, filter: Filter[:basic_lands])
+          super(actor: actor, upto: 2, to_zone: :battlefield, enters_tapped: true, filter: Filter[:basic_lands],
+                prompt: "Search your library for up to two basic land cards. They enter the battlefield tapped.")
         end
       end
 

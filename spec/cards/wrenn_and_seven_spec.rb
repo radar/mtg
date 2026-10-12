@@ -5,7 +5,7 @@ RSpec.describe Magic::Cards::WrennAndSeven do
   before { go_to_main_phase! }
 
   let(:card) { Card("Wrenn And Seven") }
-  subject(:planeswalker) { Magic::Permanent.resolve(game: game, owner: p1, card: card) }
+  subject(:planeswalker) { Magic::Permanent.resolve_spell(game: game, owner: p1, card: card) }
 
   it "enters with five loyalty" do
     expect(planeswalker.loyalty).to eq(5)

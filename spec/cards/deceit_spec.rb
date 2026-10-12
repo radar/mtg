@@ -8,10 +8,10 @@ RSpec.describe Magic::Cards::Deceit do
 
   let(:card) { Card("Deceit", owner: p1) }
 
-  def cast(mana, payment, **options)
+  def cast(mana, payment, mode = :normal)
     p1.hand.add(card)
     p1.add_mana(mana)
-    p1.cast(card:, **options) { _1.pay_mana(payment) }
+    p1.cast_as(mode, card:) { _1.pay_mana(payment) }
     game.stack.resolve!
     game.settle!
   end
@@ -66,7 +66,7 @@ RSpec.describe Magic::Cards::Deceit do
 
   describe "evoked" do
     it "is sacrificed when it enters" do
-      cast({ blue: 2 }, { blue: 2 }, evoked: true)
+      cast({ blue: 2 }, { blue: 2 }, :evoked)
 
       expect(p1.creatures.map(&:name)).not_to include("Deceit")
       expect(card.zone).to be_graveyard

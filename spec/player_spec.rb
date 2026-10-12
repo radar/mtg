@@ -44,4 +44,15 @@ RSpec.describe Magic::Player do
       expect(revealed_event.player).to eq(p1)
     end
   end
+
+  describe "#mill" do
+    it "mills as many cards as the library holds, without failing, when it has fewer than asked" do
+      p1.library.cards.clear
+      p1.library.add(Card("Forest", owner: p1))
+
+      expect(p1.mill(3).count).to eq(1)
+      expect(p1.graveyard.count).to eq(1)
+      expect(p1.library.count).to eq(0)
+    end
+  end
 end
