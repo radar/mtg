@@ -8,14 +8,17 @@ module Magic
     # `this_turn` permissions ("you may cast the exiled cards this turn") end with the turn
     # they were granted on instead.
     # `graveyard`: the card is castable from the graveyard (Zul Ashur) rather than from exile.
-    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard) do
-      def initialize(graveyard: false, **args) = super
+    # `indefinite`: lasts as long as the card stays where it is ("for as long as it remains exiled").
+    # `any_mana`: mana of any type can be spent to cast it.
+    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard, :indefinite, :any_mana) do
+      def initialize(graveyard: false, indefinite: false, any_mana: false, **args) = super
 
       def permits?(game, card, player)
         card.equal?(self.card) && player == self.player && (graveyard ? card.zone&.graveyard? : card.zone&.exile?) && !expired?(game)
       end
 
       def expired?(game)
+        return false if indefinite
         return game.current_turn.number > granted_on_turn if this_turn
 
         game.turns.any? do |turn|
@@ -37,6 +40,16 @@ module Magic
     # `from_graveyard: true`: "you may cast target Zombie card from your graveyard this turn" (Zul Ashur).
     def grant_until_end_of_turn(card:, player:, free: false, from_graveyard: false)
       @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: true, free:, graveyard: from_graveyard)
+    end
+
+    # "You may cast that card for as long as it remains exiled, and mana of any type can be spent to cast it."
+    def grant_while_exiled(card:, player:, any_mana: false)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false, indefinite: true, any_mana:)
+    end
+
+    # Whether a permission lets `player` spend mana of any type to cast `card`.
+    def any_mana?(card, player)
+      @permissions.any? { _1.any_mana && _1.permits?(@game, card, player) }
     end
 
     # "Until your next end step, you may play those cards": through this turn when it's your turn

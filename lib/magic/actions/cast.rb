@@ -204,7 +204,7 @@ module Magic
         game.battlefield.static_abilities
           .of_type(Abilities::Static::AnyColorForAnyCost)
           .any? { |ability| ability.controller == player && ability.any_color_for?(card) } ||
-          static_ability_allows?(:any_mana_type_for?)
+          static_ability_allows?(:any_mana_type_for?) || game.play_permissions.any_mana?(card, player)
       end
 
       # "Mana of any type can be spent to cast that spell" / "cast it without paying its
