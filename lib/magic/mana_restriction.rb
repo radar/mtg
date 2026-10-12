@@ -13,6 +13,14 @@ module Magic
       def permits?(use) = use.is_a?(Magic::Card) && use.creature?
     end
 
+    # "Spend this mana only to cast creature spells with mana value 4 or greater or creature spells with {X} in
+    # their mana costs." (Helga, Skittish Seer.)
+    class BigOrXCreatureSpells < ManaRestriction
+      def permits?(use)
+        use.is_a?(Magic::Card) && use.creature? && (use.mana_value >= 4 || use.cost.cost.key?(:x))
+      end
+    end
+
     # "Spend this mana only to cast spells with mana value 4 or greater." Only spells (a card
     # being cast), not abilities of a permanent.
     class MinimumManaValue < ManaRestriction

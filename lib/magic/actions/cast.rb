@@ -99,7 +99,8 @@ module Magic
           fresh_cost = cost.is_a?(Costs::Mana) ? Costs::Mana.new(cost.cost.dup) : cost.dup
           cost = mana_cost_adjustment_abilities.each_with_object(fresh_cost) { |ability, cost| ability.apply(cost) }
           cost.adjusted_by(card.self_mana_cost_adjustment) if cost.is_a?(Costs::Mana) && card.self_mana_cost_adjustment
-          cost.x = value_for_x if value_for_x
+          # {X}{X} (cost `x: 2`) takes twice the chosen X in mana.
+          cost.x = value_for_x * [cost.cost[:x].to_i, 1].max if value_for_x
           cost.for_use = card if cost.is_a?(Costs::Mana)
           cost
         end
@@ -543,7 +544,7 @@ module Magic
             kicked: kicker_cost.paid?,
             mana_spent: mana_cost.is_a?(Costs::Mana) ? mana_cost.mana_spent : {},
             evoked: @evoked,
-            value_for_x: mana_cost.x,
+            value_for_x: value_for_x || mana_cost.x,
             controller: player,
           )
         end

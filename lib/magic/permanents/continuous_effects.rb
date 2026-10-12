@@ -170,13 +170,14 @@ module Magic
       end
 
       def calculate_keywords
-        [
+        keywords = [
           *(permanent.lost_all_abilities? ? [] : copiable_card.keywords),
           *keyword_grant_static_abilities.flat_map { _1.keyword_grants_for(permanent) },
           *modifiers_by_type(Modifications::KeywordGrant).map(&:keyword_grant),
           *permanent.attachments.flat_map(&:keyword_grants),
           *permanent.counters.filter_map { _1.keyword if _1.respond_to?(:keyword) },
         ]
+        keywords - static_abilities_for(permanent).of_type(Abilities::Static::KeywordRemoval).flat_map(&:keyword_removals)
       end
 
       def characteristic_settings
