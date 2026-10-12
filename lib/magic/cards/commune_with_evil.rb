@@ -24,7 +24,7 @@ module Magic
       # You gain 3 life."
       def resolve!
         game.add_choice(LookAtFourChoice.new(actor: self))
-        trigger_effect(:gain_life, target: controller, life: 3)
+        gain_life(3)
       end
     end
   end

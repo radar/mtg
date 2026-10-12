@@ -17,7 +17,7 @@ module Magic
       def resolve!(target:)
         trigger_effect(:deal_damage, target: target, damage: 5)
         if kicker_cost.paid?
-          trigger_effect(:gain_life, target: controller, life: 2)
+          gain_life(2)
         end
       end
     end

@@ -15,7 +15,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:gain_life, target: controller, life: event.attacks.count { _1.attacker.controller == controller })
+          gain_life(event.attacks.count { _1.attacker.controller == controller })
         end
       end
 

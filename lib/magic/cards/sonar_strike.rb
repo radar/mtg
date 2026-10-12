@@ -13,7 +13,7 @@ module Magic
       # you control a Bat.
       def resolve!(target:)
         trigger_effect(:deal_damage, target: target, damage: 4)
-        trigger_effect(:gain_life, life: 3) if battlefield.controlled_by(controller).creatures.any? { _1.type?("Bat") }
+        gain_life(3) if battlefield.controlled_by(controller).creatures.any? { _1.type?("Bat") }
       end
     end
   end

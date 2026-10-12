@@ -11,7 +11,7 @@ module Magic
 
         def resolve!(discarded: [])
           discarded.each(&:discard!)
-          trigger_effect(:draw_cards, number_to_draw: discarded.size) if discarded.any?
+          draw_cards(discarded.size) if discarded.any?
         end
       end
 

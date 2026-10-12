@@ -21,7 +21,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          draw_card
         end
       end
 

@@ -6,7 +6,7 @@ module Magic
 
     class ChartACourse < Sorcery
       def resolve!
-        trigger_effect(:draw_cards, number_to_draw: 2)
+        draw_cards(2)
         unless game.current_turn.events.any? { |e| e.is_a?(Events::CreatureAttacked) && e.attacker.controller == controller }
           game.add_choice(Magic::Choice::Discard.new(player: controller))
         end

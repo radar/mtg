@@ -28,7 +28,7 @@ module Magic
 
         def call
           # A Kindred Enchantment — Elf (Prowess of the Fair) is an Elf with no toughness: it gains nothing.
-          actor.trigger_effect(:gain_life, life: event.permanent.toughness.to_i)
+          actor.gain_life(event.permanent.toughness.to_i)
         end
       end
 

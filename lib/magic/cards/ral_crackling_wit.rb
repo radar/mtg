@@ -43,7 +43,7 @@ module Magic
         def description = "Draw three cards, then discard two cards."
 
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 3)
+          draw_cards(3)
           game.choices.add(DiscardTwo.new(actor: source))
         end
       end
@@ -65,7 +65,7 @@ module Magic
         def description = "Draw three cards. You get an emblem with \"Instant and sorcery spells you cast have storm.\""
 
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 3)
+          draw_cards(3)
           game.add_emblem(StormEmblem.new(game: game, owner: controller))
         end
       end

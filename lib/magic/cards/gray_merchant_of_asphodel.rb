@@ -17,7 +17,7 @@ module Magic
             actor.trigger_effect(:lose_life, target: opponent, life: x)
             x
           end
-          actor.trigger_effect(:gain_life, target: controller, life: lost) if lost.positive?
+          actor.gain_life(lost) if lost.positive?
         end
       end
 

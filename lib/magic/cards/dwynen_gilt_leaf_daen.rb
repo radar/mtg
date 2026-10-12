@@ -21,7 +21,7 @@ module Magic
 
         def call
           attacking_elves = event.attacks.count { |attack| attack.attacker.type?("Elf") && attack.attacker.controller == controller }
-          actor.trigger_effect(:gain_life, life: attacking_elves) if attacking_elves.positive?
+          actor.gain_life(attacking_elves) if attacking_elves.positive?
         end
       end
 

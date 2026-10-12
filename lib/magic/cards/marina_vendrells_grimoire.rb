@@ -17,7 +17,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:draw_cards, number_to_draw: 5)
+          draw_cards(5)
         end
       end
 
@@ -28,7 +28,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:draw_cards, number_to_draw: event.life)
+          draw_cards(event.life)
         end
       end
 

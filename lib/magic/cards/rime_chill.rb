@@ -20,7 +20,7 @@ module Magic
           trigger_effect(:tap, target: target)
           trigger_effect(:add_counter, counter_type: "stun", target: target, amount: 1)
         end
-        trigger_effect(:draw_cards, number_to_draw: 1)
+        draw_card
       end
     end
   end

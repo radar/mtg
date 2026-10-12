@@ -39,7 +39,7 @@ module Magic
 
         def resolve!
           count = game.current_turn.events.count { _1.is_a?(Events::CreatureDied) && _1.controller == controller }
-          trigger_effect(:draw_cards, number_to_draw: count) if count.positive?
+          draw_cards(count) if count.positive?
         end
       end
 

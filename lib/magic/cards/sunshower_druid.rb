@@ -18,7 +18,7 @@ module Magic
 
           def resolve!(target:)
             trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
-            trigger_effect(:gain_life, target: controller, life: 1)
+            gain_life(1)
           end
         end
 

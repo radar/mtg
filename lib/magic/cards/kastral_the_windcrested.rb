@@ -39,7 +39,7 @@ module Magic
                 trigger_effect(:add_counter, counter_type: "+1/+1", target: bird, amount: 1)
               end
             when :draw
-              trigger_effect(:draw_cards, number_to_draw: 1)
+              draw_card
             else
               raise ArgumentError, "choose :put_bird, :counters or :draw"
             end

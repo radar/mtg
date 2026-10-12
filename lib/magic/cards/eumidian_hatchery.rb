@@ -30,7 +30,7 @@ module Magic
 
         def call
           amount = actor.counters.of_type(Counters::Hatchling).count
-          actor.create_token(token_class: InsectToken, amount: amount) if amount.positive?
+          actor.create_token(token:InsectToken, amount: amount) if amount.positive?
         end
       end
 

@@ -15,7 +15,7 @@ module Magic
       class DiesTrigger < TriggeredAbility::Death
         def call
           died = game.current_turn.events.count { |event| event.is_a?(Events::CreatureDied) }
-          trigger_effect(:gain_life, life: died) if died > 0
+          gain_life(died) if died > 0
         end
       end
 

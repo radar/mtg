@@ -41,7 +41,7 @@ module Magic
 
         def call
           game.choices.add(SearchChoice.new(actor:))
-          trigger_effect(:gain_life, target: controller, life: 2)
+          gain_life(2)
         end
       end
 

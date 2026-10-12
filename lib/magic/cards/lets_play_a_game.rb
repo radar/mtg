@@ -31,7 +31,7 @@ module Magic
       class Drain < Mode
         def resolve!
           game.opponents(controller).each { |opponent| trigger_effect(:lose_life, target: opponent, life: 3) }
-          trigger_effect(:gain_life, life: 3)
+          gain_life(3)
         end
       end
 

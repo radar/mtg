@@ -30,7 +30,7 @@ module Magic
           if mode == DRAIN
             game.opponents(controller).each { |opponent| trigger_effect(:lose_life, target: opponent, life: x) }
           else
-            trigger_effect(:gain_life, target: controller, life: x)
+            gain_life(x)
           end
         end
 

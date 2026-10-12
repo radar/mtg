@@ -11,8 +11,8 @@ module Magic
     class Cloudblazer < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:gain_life, target: controller, life: 2)
-          trigger_effect(:draw_cards, number_to_draw: 2)
+          gain_life(2)
+          draw_cards(2)
         end
       end
 

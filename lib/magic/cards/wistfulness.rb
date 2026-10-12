@@ -38,7 +38,7 @@ module Magic
         def should_perform? = super && actor.mana_spent?(:blue, 2)
 
         def call
-          trigger_effect(:draw_cards, number_to_draw: 2)
+          draw_cards(2)
           game.choices.add(Magic::Choice::Discard.new(player: controller, actor:))
         end
       end

@@ -28,7 +28,7 @@ module Magic
       def resolve!(target:)
         from_graveyard = zone&.graveyard?
         game.choices.add(ExileChoice.new(actor: self, player: target)) if target.hand.any?
-        trigger_effect(:draw_cards, number_to_draw: 1) if from_graveyard
+        draw_card if from_graveyard
       end
     end
   end

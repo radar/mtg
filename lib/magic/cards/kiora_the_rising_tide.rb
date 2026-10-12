@@ -10,7 +10,7 @@ module Magic
     class KioraTheRisingTide < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:draw_cards, number_to_draw: 2)
+          draw_cards(2)
           2.times { game.add_choice(Magic::Choice::Discard.new(player: controller)) }
         end
       end

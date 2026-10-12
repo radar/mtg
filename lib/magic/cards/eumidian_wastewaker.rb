@@ -29,7 +29,7 @@ module Magic
         def resolve!(target:)
           land = target.is_a?(Permanent) ? target.card.land? : target.land?
           target.is_a?(Permanent) ? target.sacrifice! : target.discard!
-          trigger_effect(:draw_cards, number_to_draw: 1) if land
+          draw_card if land
         end
       end
 

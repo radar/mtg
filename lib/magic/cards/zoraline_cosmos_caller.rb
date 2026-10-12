@@ -14,7 +14,7 @@ module Magic
         def should_perform? = event.active_player == controller && event.attacks.any? { _1.attacker.type?("Bat") }
 
         def call
-          event.attacks.count { _1.attacker.type?("Bat") }.times { trigger_effect(:gain_life, life: 1) }
+          event.attacks.count { _1.attacker.type?("Bat") }.times { gain_life(1) }
         end
       end
 

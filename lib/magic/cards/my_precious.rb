@@ -18,7 +18,7 @@ module Magic
 
       # "Draw two cards."
       def adventure_resolve!(**)
-        trigger_effect(:draw_cards, number_to_draw: 2)
+        draw_cards(2)
       end
 
       # "Equip--{2}, Pay 2 life." Written out (rather than with the `equip` macro) because a life payment needs the

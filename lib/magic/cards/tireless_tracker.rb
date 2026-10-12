@@ -14,7 +14,7 @@ module Magic
         end
 
         def call
-          actor.create_token(token_class: Tokens::Clue)
+          actor.create_token(token:Tokens::Clue)
         end
       end
 

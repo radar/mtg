@@ -53,7 +53,7 @@ module Magic
         def resolve!
           if source.zone.battlefield?
             source.trigger_effect(:exile, target: source)
-            source.trigger_effect(:gain_life, life: 4)
+            source.gain_life(4)
           end
         end
       end

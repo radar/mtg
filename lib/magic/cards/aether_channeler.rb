@@ -45,7 +45,7 @@ module Magic
 
         def resolve!(mode:)
           case mode
-          when BIRD then actor.create_token(token_class: BirdToken)
+          when BIRD then actor.create_token(token:BirdToken)
           when BOUNCE
             choice = BounceChoice.new(actor: actor)
             game.choices.add(choice) if choice.choices.any?

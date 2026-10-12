@@ -14,7 +14,7 @@ module Magic
         class MayChoice < Magic::Choice::May
           def resolve!
             [*controller.hand.cards].each(&:discard!)
-            trigger_effect(:draw_cards, number_to_draw: 2)
+            draw_cards(2)
           end
         end
 

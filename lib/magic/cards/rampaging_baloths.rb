@@ -22,7 +22,7 @@ module Magic
         end
 
         def call
-          actor.create_token(token_class: BeastToken)
+          actor.create_token(token:BeastToken)
         end
       end
 

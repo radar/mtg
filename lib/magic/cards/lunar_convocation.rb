@@ -30,7 +30,7 @@ module Magic
         costs "{1}{B}, Pay 2 life"
 
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          draw_card
         end
       end
 

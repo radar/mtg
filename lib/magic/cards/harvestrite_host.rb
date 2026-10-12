@@ -21,7 +21,7 @@ module Magic
             resolutions = (actor.state[:resolutions] ||= Hash.new(0))
             turn = game.current_turn.number
             resolutions[turn] += 1
-            trigger_effect(:draw_cards, number_to_draw: 1) if resolutions[turn] == 2
+            draw_card if resolutions[turn] == 2
           end
         end
 

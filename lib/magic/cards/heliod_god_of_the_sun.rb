@@ -20,7 +20,7 @@ module Magic
         def costs = [Costs::Mana.new(generic: 2, white: 2)]
 
         def resolve!
-          source.create_token(token_class: ClericToken)
+          source.create_token(token:ClericToken)
         end
       end
 

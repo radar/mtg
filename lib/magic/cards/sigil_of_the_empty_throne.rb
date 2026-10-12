@@ -19,7 +19,7 @@ module Magic
         end
 
         def call
-          actor.create_token(token_class: AngelToken)
+          actor.create_token(token:AngelToken)
         end
       end
 

@@ -15,7 +15,7 @@ module Magic
 
         def call
           elf_count = controller.creatures.count { |c| c.type?("Elf") }
-          actor.trigger_effect(:gain_life, life: elf_count) if elf_count.positive?
+          actor.gain_life(elf_count) if elf_count.positive?
         end
       end
 

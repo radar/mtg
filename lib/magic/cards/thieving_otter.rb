@@ -13,7 +13,7 @@ module Magic
         def should_perform? = event.source == actor && opponents.include?(event.target)
 
         def call
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          draw_card
         end
       end
 

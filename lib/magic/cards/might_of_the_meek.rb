@@ -13,7 +13,7 @@ module Magic
         if battlefield.controlled_by(controller).creatures.any? { _1.type?("Mouse") }
           trigger_effect(:modify_power_toughness, power: 1, toughness: 0, target: target, until_eot: true)
         end
-        trigger_effect(:draw_cards, number_to_draw: 1)
+        draw_card
       end
     end
   end

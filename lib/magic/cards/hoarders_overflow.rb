@@ -31,7 +31,7 @@ module Magic
         def resolve!
           stash = source.counters.of_type(Counters["stash"]).count
           [*controller.hand.cards].each(&:discard!)
-          trigger_effect(:draw_cards, number_to_draw: stash) if stash.positive?
+          draw_cards(stash) if stash.positive?
         end
       end
 

@@ -1,6 +1,7 @@
 module Magic
   class Choice
     include BattlefieldFilters
+    include EffectShortcuts
 
     attr_reader :actor
     def initialize(actor:)

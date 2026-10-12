@@ -27,7 +27,7 @@ module Magic
 
       def resolve!
         game.choices.add(LandsChoice.new(actor: self))
-        trigger_effect(:gain_life, target: controller, life: 8)
+        gain_life(8)
         super
       end
     end

@@ -16,7 +16,7 @@ module Magic
 
       class PestDiesTrigger < TriggeredAbility::Death
         def call
-          trigger_effect(:gain_life, life: 1)
+          gain_life(1)
         end
       end
 

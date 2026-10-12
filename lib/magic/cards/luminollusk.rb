@@ -12,7 +12,7 @@ module Magic
       # Vivid -- When this creature enters, you gain life equal to the number of colors among permanents you control.
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:gain_life, target: controller, life: controller.colors_among_permanents)
+          gain_life(controller.colors_among_permanents)
         end
       end
 

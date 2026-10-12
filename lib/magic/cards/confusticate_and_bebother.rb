@@ -37,7 +37,7 @@ module Magic
       # "Draw two cards, then discard a card."
       class Loot < Mode
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 2)
+          draw_cards(2)
           game.choices.add(Magic::Choice::Discard.new(player: controller, actor: card)) if controller.hand.any?
         end
       end

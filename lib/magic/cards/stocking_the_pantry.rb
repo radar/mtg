@@ -23,7 +23,7 @@ module Magic
         costs "{2}, Remove 1 supply counter from {this}"
 
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          draw_card
         end
       end
 

@@ -14,7 +14,7 @@ module Magic
         def call
           x = controller.colors_among_permanents
           opponents.each { |opponent| trigger_effect(:lose_life, target: opponent, life: x) }
-          trigger_effect(:gain_life, target: controller, life: x)
+          gain_life(x)
         end
       end
 

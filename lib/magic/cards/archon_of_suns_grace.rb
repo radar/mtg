@@ -24,7 +24,7 @@ module Magic
         end
 
         def call
-          actor.create_token(token_class: PegasusToken)
+          actor.create_token(token:PegasusToken)
         end
       end
 

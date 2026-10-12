@@ -21,7 +21,7 @@ module Magic
         end
 
         def call
-          actor.create_token(token_class: ElementalToken)
+          actor.create_token(token:ElementalToken)
         end
       end
 

@@ -3,6 +3,7 @@ module Magic
     class Saga < Card
       class ChapterAbility
         include BattlefieldFilters
+        include EffectShortcuts
 
         attr_reader :actor
         def initialize(actor:)

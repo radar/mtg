@@ -18,7 +18,7 @@ module Magic
 
           # "You may draw X cards, where X is the amount of mana spent to cast that spell. If you do, discard two cards."
           def resolve!
-            trigger_effect(:draw_cards, number_to_draw: @amount) if @amount.positive?
+            draw_cards(@amount) if @amount.positive?
             2.times { game.choices.add(Magic::Choice::Discard.new(actor: actor, player: controller)) }
           end
         end

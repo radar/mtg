@@ -10,7 +10,7 @@ module Magic
 
         def call
           opponents.each { |opponent| trigger_effect(:lose_life, target: opponent, life: 1) }
-          trigger_effect(:gain_life, life: 1)
+          gain_life(1)
         end
       end
 
@@ -22,7 +22,7 @@ module Magic
         activate_only_as_sorcery
 
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 2)
+          draw_cards(2)
         end
       end
 

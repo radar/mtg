@@ -9,7 +9,7 @@ module Magic
         costs "{1}{B}, Sacrifice a creature"
 
         def resolve!
-          trigger_effect(:gain_life, target: controller, life: 1)
+          gain_life(1)
           trigger_effect(:draw_card)
         end
       end

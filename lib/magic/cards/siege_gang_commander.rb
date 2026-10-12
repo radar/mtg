@@ -17,7 +17,7 @@ module Magic
 
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          actor.create_token(token_class: GoblinToken, amount: 3)
+          actor.create_token(token:GoblinToken, amount: 3)
         end
       end
 

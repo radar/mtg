@@ -22,7 +22,7 @@ module Magic
           def decline! = finish
 
           def finish
-            trigger_effect(:gain_life, target: controller, life: 2)
+            gain_life(2)
           end
         end
 

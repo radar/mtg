@@ -8,7 +8,7 @@ module Magic
       class SurveilChoice < Magic::Choice::Surveil
         def resolve!(**args)
           super(**args)
-          trigger_effect(:draw_cards, number_to_draw: 2)
+          draw_cards(2)
           trigger_effect(:lose_life, target: controller, life: 2)
         end
       end

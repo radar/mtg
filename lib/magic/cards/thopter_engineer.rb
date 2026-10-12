@@ -17,7 +17,7 @@ module Magic
 
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          actor.create_token(token_class: ThopterToken)
+          actor.create_token(token:ThopterToken)
         end
       end
 

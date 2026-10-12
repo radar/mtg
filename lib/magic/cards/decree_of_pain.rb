@@ -10,7 +10,7 @@ module Magic
         creatures = game.battlefield.creatures.to_a
         creatures.each { trigger_effect(:destroy_target, target: _1) }
         destroyed = creatures.count { _1.zone.nil? }
-        trigger_effect(:draw_cards, number_to_draw: destroyed) if destroyed.positive?
+        draw_cards(destroyed) if destroyed.positive?
       end
 
       # "When you cycle this card, all creatures get -2/-2 until end of turn."

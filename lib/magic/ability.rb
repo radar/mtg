@@ -1,6 +1,7 @@
 module Magic
   class Ability
     include BattlefieldFilters
+    include EffectShortcuts
 
     attr_reader :source
 

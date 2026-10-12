@@ -14,7 +14,7 @@ module Magic
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
           greatest_power = controller.creatures.by_type("Giant").map(&:power).max
-          trigger_effect(:gain_life, target: controller, life: greatest_power) if greatest_power.to_i.positive?
+          gain_life(greatest_power) if greatest_power.to_i.positive?
         end
       end
 

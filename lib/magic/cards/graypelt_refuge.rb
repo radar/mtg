@@ -13,7 +13,7 @@ module Magic
 
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:gain_life, target: controller, life: 1)
+          gain_life(1)
         end
       end
 

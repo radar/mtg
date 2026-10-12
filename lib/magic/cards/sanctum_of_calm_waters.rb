@@ -19,7 +19,7 @@ module Magic
       class Choice < Magic::Choice
         def resolve!
           shrines = controller.permanents.by_type("Shrine").count
-          actor.trigger_effect(:draw_cards, number_to_draw: shrines)
+          actor.draw_cards(shrines)
 
           actor.add_choice(:discard)
         end

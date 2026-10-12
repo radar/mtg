@@ -4,7 +4,7 @@ module Magic
       type "Land"
 
       enters_the_battlefield do
-        actor.trigger_effect(:gain_life, life: 1)
+        actor.gain_life(1)
       end
     end
 

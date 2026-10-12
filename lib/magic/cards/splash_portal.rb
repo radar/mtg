@@ -13,7 +13,7 @@ module Magic
         draws = %w[Bird Frog Otter Rat].any? { target.type?(_1) }
         trigger_effect(:exile, target: target)
         card.resolve!(controller: card.owner) if card.zone&.exile?
-        trigger_effect(:draw_cards, number_to_draw: 1) if draws
+        draw_card if draws
       end
     end
   end

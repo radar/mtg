@@ -12,7 +12,7 @@ module Magic
       def resolve!(targets:)
         targets.uniq.each { _1.move_to_hand! }
         game.opponents(controller).each { trigger_effect(:lose_life, target: _1, life: 2) }
-        trigger_effect(:gain_life, target: controller, life: 2)
+        gain_life(2)
       end
     end
   end

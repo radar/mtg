@@ -7,7 +7,7 @@ module Magic
 
         # "When you unlock this door, you draw two cards and you lose 2 life."
         when_unlocked do
-          trigger_effect(:draw_cards, number_to_draw: 2)
+          draw_cards(2)
           trigger_effect(:lose_life, target: controller, life: 2)
         end
       end

@@ -24,7 +24,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:draw_cards, number_to_draw: 2)
+          draw_cards(2)
           source.controller = target
         end
       end

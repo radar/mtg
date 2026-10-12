@@ -16,7 +16,7 @@ module Magic
         def description = "Draw a card, then discard a card."
 
         def resolve!
-          trigger_effect(:draw_cards)
+          draw_card
           add_choice(:discard)
         end
       end

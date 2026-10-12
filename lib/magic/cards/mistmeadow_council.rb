@@ -16,7 +16,7 @@ module Magic
 
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          draw_card
         end
       end
 

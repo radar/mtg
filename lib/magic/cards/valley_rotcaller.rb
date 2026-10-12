@@ -21,7 +21,7 @@ module Magic
           return if x.zero?
 
           opponents.each { |opponent| trigger_effect(:lose_life, target: opponent, life: x) }
-          trigger_effect(:gain_life, life: x)
+          gain_life(x)
         end
       end
 

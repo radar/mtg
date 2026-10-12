@@ -14,7 +14,7 @@ module Magic
         end
         tokens = battlefield.controlled_by(controller).select(&:token?)
         tokens.each { trigger_effect(:grant_keyword, target: _1, keyword: :indestructible) }
-        trigger_effect(:gain_life, life: tokens.count)
+        gain_life(tokens.count)
       end
     end
   end

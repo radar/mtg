@@ -53,7 +53,7 @@ module Magic
 
       class Chapter3 < Saga::ChapterAbility
         def resolve!
-          actor.create_token(token_class: AvacynToken)
+          actor.create_token(token:AvacynToken)
         end
       end
 

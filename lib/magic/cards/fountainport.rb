@@ -14,7 +14,7 @@ module Magic
         costs "{2}, {T}, Sacrifice a token"
 
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          draw_card
         end
       end
 
@@ -32,7 +32,7 @@ module Magic
         costs "{4}, {T}"
 
         def resolve!
-          trigger_effect(:create_token, token_class: Tokens::Treasure)
+          create_token(token: Tokens::Treasure)
         end
       end
 

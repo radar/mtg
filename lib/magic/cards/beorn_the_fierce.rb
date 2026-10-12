@@ -36,7 +36,7 @@ module Magic
         def decline! = draw_if_three_bears
 
         def draw_if_three_bears
-          trigger_effect(:draw_cards, number_to_draw: 2) if controller.creatures.by_type("Bear").count >= 3
+          draw_cards(2) if controller.creatures.by_type("Bear").count >= 3
         end
       end
 

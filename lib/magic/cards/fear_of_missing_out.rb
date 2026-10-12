@@ -21,7 +21,7 @@ module Magic
           if controller.hand.any?
             game.choices.add(DiscardThenDraw.new(player: controller, actor: actor))
           else
-            trigger_effect(:draw_cards, number_to_draw: 1)
+            draw_card
           end
         end
       end

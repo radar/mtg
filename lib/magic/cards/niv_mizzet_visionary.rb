@@ -17,7 +17,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:draw_cards, number_to_draw: event.damage)
+          draw_cards(event.damage)
         end
       end
 

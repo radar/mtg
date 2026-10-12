@@ -22,7 +22,7 @@ module Magic
             trigger_effect(:draw_card)
             if controller.creatures.any? { _1.type?("Demon") }
               opponents.each { trigger_effect(:lose_life, target: _1, life: 2) }
-              trigger_effect(:gain_life, target: controller, life: 2)
+              gain_life(2)
             else
               trigger_effect(:lose_life, target: controller, life: 2)
             end

@@ -6,7 +6,7 @@ module Magic
 
       # "You draw two cards and each opponent discards two cards. Each player loses 2 life."
       def resolve!
-        trigger_effect(:draw_cards, number_to_draw: 2)
+        draw_cards(2)
         game.opponents(controller).each do |opponent|
           game.add_choice(Magic::Choice::Discard.new(player: opponent, amount: 2)) if opponent.hand.any?
         end

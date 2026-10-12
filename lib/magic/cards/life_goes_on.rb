@@ -9,7 +9,7 @@ module Magic
         life_gain = 4
         life_gain += 4 if creature_died
 
-        trigger_effect(:gain_life, life: life_gain)
+        gain_life(life_gain)
       end
     end
   end

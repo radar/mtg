@@ -2,6 +2,7 @@ module Magic
   class TriggeredAbility
     extend Forwardable
     include BattlefieldFilters
+    include EffectShortcuts
     attr_reader :event, :actor
 
     def_delegators :@actor, :trigger_effect
@@ -44,15 +45,6 @@ module Magic
 
     def opponents
       game.opponents(controller)
-    end
-
-    # "Create a Treasure token", "draw a card": shortcuts for the most common `trigger_effect`s.
-    def create_token(token_class, **args)
-      trigger_effect(:create_token, token_class:, **args)
-    end
-
-    def draw_cards(number = 1)
-      trigger_effect(:draw_cards, number_to_draw: number)
     end
 
     # "<Do this> if an opponent controls more lands than you" (Beza, the Bounding Spring): runs the block when

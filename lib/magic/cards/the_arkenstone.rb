@@ -33,7 +33,7 @@ module Magic
         def should_perform? = controllers_end_step?
 
         def call
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          draw_card
         end
       end
 

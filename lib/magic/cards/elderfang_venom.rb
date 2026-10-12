@@ -18,7 +18,7 @@ module Magic
 
         def call
           opponents.each { |opponent| actor.trigger_effect(:lose_life, target: opponent, life: 1) }
-          actor.trigger_effect(:gain_life, target: controller, life: 1)
+          actor.gain_life(1)
         end
       end
 

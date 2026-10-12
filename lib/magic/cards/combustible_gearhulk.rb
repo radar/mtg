@@ -22,7 +22,7 @@ module Magic
         def prompt = "Have #{controller.name} draw three cards? If you don't, they mill three and #{actor.name} deals damage to you equal to those cards' total mana value."
 
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 3)
+          draw_cards(3)
         end
 
         def decline!

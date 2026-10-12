@@ -29,7 +29,7 @@ module Magic
       # "At the beginning of your upkeep, draw a card."
       class UpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         def call
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          draw_card
         end
       end
 

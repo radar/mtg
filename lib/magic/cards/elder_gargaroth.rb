@@ -28,7 +28,7 @@ module Magic
         def resolve!(mode:)
           case mode
           when :token then trigger_effect(:create_token, token_class: BeastToken)
-          when :life then trigger_effect(:gain_life, life: 3)
+          when :life then gain_life(3)
           when :draw then trigger_effect(:draw_card)
           else raise "Invalid mode chosen for Elder Gargaroth: #{mode}"
           end

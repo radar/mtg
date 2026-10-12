@@ -4,7 +4,7 @@ module Magic
       cost generic: 1, green: 1
 
       enters_the_battlefield do
-        actor.trigger_effect(:draw_cards, number_to_draw: 1)
+        actor.draw_card
       end
     end
 

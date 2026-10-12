@@ -19,7 +19,7 @@ module Magic
 
         def call
           actor.state[:treasure_step] = step_key
-          trigger_effect(:create_token, token_class: Tokens::Treasure)
+          create_token(token: Tokens::Treasure)
         end
 
         private

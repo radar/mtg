@@ -35,7 +35,7 @@ module Magic
 
         def call
           count = opponents.count { _1.hand.count <= 1 }
-          trigger_effect(:draw_cards, number_to_draw: count) if count.positive?
+          draw_cards(count) if count.positive?
         end
       end
 

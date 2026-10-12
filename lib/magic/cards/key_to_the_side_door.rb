@@ -32,7 +32,7 @@ module Magic
         def costs = Costs::Parser.parse(source:, costs: "{1}, {T}") + [DiscardLegendaryCost.new(controller)]
 
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 2)
+          draw_cards(2)
         end
       end
 

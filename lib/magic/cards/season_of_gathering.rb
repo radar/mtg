@@ -42,7 +42,7 @@ module Magic
 
         def resolve!
           power = battlefield.controlled_by(controller).creatures.map(&:power).max.to_i
-          trigger_effect(:draw_cards, number_to_draw: power) if power.positive?
+          draw_cards(power) if power.positive?
         end
       end
 

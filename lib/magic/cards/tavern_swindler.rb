@@ -13,7 +13,7 @@ module Magic
         costs "{T}, Pay 3 life"
 
         def resolve!
-          trigger_effect(:gain_life, life: 6) if controller.flip_coin!
+          gain_life(6) if controller.flip_coin!
         end
       end
 

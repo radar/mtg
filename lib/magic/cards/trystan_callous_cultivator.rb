@@ -63,7 +63,7 @@ module Magic
 
         def call
           controller.mill(3)
-          trigger_effect(:gain_life, target: controller, life: 2) if controller.graveyard.cards.any? { _1.type?("Elf") }
+          gain_life(2) if controller.graveyard.cards.any? { _1.type?("Elf") }
         end
       end
 

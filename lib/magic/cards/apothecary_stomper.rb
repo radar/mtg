@@ -31,7 +31,7 @@ module Magic
 
         class Mode2 < TriggeredAbility::EnterTheBattlefield
           def call
-            trigger_effect(:gain_life, target: controller, life: 4)
+            gain_life(4)
           end
         end
 

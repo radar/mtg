@@ -45,7 +45,7 @@ module Magic
         end
 
         def call
-          actor.create_token(token_class: BeastToken, enters_tapped: true)
+          actor.create_token(token:BeastToken, enters_tapped: true)
           actor.untap!
         end
       end

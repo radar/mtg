@@ -11,7 +11,7 @@ module Magic
 
       def resolve!(target:)
         trigger_effect(:return_target_from_graveyard_to_battlefield, target: target, controller: target.owner)
-        trigger_effect(:gain_life, target: controller, life: 3)
+        gain_life(3)
       end
     end
   end

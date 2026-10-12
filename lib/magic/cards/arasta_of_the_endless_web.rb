@@ -25,7 +25,7 @@ module Magic
 
         # ... create a 1/2 green Spider creature token with reach.
         def call
-          actor.create_token(token_class: SpiderToken)
+          actor.create_token(token:SpiderToken)
         end
       end
 

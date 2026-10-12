@@ -14,7 +14,7 @@ module Magic
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
           died = game.current_turn.events.count { |e| e.is_a?(Events::CreatureDied) && e.permanent.controller == controller }
-          trigger_effect(:draw_cards, number_to_draw: died) if died > 0
+          draw_cards(died) if died > 0
         end
       end
 

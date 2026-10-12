@@ -33,7 +33,7 @@ module Magic
 
         # "When you unlock this door, draw three cards, then discard a card."
         when_unlocked do
-          trigger_effect(:draw_cards, number_to_draw: 3)
+          draw_cards(3)
           actor.add_choice(:discard)
         end
       end

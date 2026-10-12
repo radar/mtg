@@ -10,7 +10,7 @@ module Magic
       class TypeChoice < Magic::Choice::CreatureType
         def resolve!(creature_type:)
           count = controller.permanents.count { |permanent| permanent.type?(creature_type) }
-          trigger_effect(:draw_cards, number_to_draw: count)
+          draw_cards(count)
         end
       end
 

@@ -11,7 +11,7 @@ module Magic
 
       def resolve!(target:)
         trigger_effect(:modify_power_toughness, target: target, power: 3, toughness: 2)
-        trigger_effect(:create_token, token_class: Tokens::Treasure)
+        create_token(token: Tokens::Treasure)
       end
     end
   end

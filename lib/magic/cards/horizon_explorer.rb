@@ -44,7 +44,7 @@ module Magic
         end
 
         def call
-          actor.create_token(token_class: LanderToken)
+          actor.create_token(token:LanderToken)
         end
       end
 

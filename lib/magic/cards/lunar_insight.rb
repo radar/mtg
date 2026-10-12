@@ -6,7 +6,7 @@ module Magic
 
     class LunarInsight < Sorcery
       def resolve!
-        trigger_effect(:draw_cards, number_to_draw: controller.permanents.reject(&:land?).map(&:mana_value).uniq.count)
+        draw_cards(controller.permanents.reject(&:land?).map(&:mana_value).uniq.count)
       end
     end
   end

@@ -48,7 +48,7 @@ module Magic
 
         def call
           if times_resolved_this_turn < 2
-            trigger_effect(:create_token, token_class: Tokens::Treasure)
+            create_token(token: Tokens::Treasure)
           else
             game.choices.add(MayPayChoice.new(actor: actor))
           end

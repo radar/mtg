@@ -17,7 +17,7 @@ module Magic
         costs "{2}, {T}"
 
         def resolve!
-          trigger_effect(:gain_life, life: 1)
+          gain_life(1)
         end
       end
 

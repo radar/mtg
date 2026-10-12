@@ -34,7 +34,7 @@ module Magic
         def call
           game.add_choice(AlBhedSalvagers::Choice.new(actor: actor))
 
-          actor.trigger_effect(:gain_life, life: 1)
+          actor.gain_life(1)
         end
       end
 

@@ -29,8 +29,8 @@ module Magic
 
         def call
           case actor.card.record_resolution!(game.current_turn)
-          when 1 then trigger_effect(:gain_life, life: 1)
-          when 2 then trigger_effect(:draw_cards, number_to_draw: 1)
+          when 1 then gain_life(1)
+          when 2 then draw_card
           when 3
             controller.creatures.each do |creature|
               trigger_effect(:add_counter, counter_type: "+1/+1", target: creature, amount: 1)

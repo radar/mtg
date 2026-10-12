@@ -12,7 +12,7 @@ module Magic
       # Vivid -- When this creature enters, draw cards equal to the number of colors among permanents you control.
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:draw_cards, number_to_draw: controller.colors_among_permanents)
+          draw_cards(controller.colors_among_permanents)
         end
       end
 

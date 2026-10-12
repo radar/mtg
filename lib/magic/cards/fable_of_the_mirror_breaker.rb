@@ -7,7 +7,7 @@ module Magic
     class FableOfTheMirrorBreaker < Saga
       class Chapter1 < Saga::ChapterAbility
         def resolve!
-          actor.create_token(token_class: GoblinShamanToken)
+          actor.create_token(token:GoblinShamanToken)
         end
       end
 
@@ -61,7 +61,7 @@ module Magic
           end
 
           def call
-            trigger_effect(:create_token, token_class: Tokens::Treasure)
+            create_token(token: Tokens::Treasure)
           end
         end
       end

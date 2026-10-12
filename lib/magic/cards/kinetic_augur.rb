@@ -28,7 +28,7 @@ module Magic
           raise ArgumentError, "Choose up to two cards to discard." if discarded.size > 2
 
           discarded.each(&:discard!)
-          trigger_effect(:draw_cards, number_to_draw: discarded.size) if discarded.any?
+          draw_cards(discarded.size) if discarded.any?
         end
       end
 

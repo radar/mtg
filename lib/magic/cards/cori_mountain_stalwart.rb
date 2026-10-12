@@ -15,7 +15,7 @@ module Magic
 
         def call
           game.opponents(controller).each { trigger_effect(:deal_damage, target: _1, damage: 2) }
-          trigger_effect(:gain_life, target: controller, life: 2)
+          gain_life(2)
         end
       end
 

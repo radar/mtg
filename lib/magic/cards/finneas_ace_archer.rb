@@ -20,7 +20,7 @@ module Magic
           end
           game.tick!
           total = battlefield.controlled_by(controller).creatures.sum(&:power)
-          trigger_effect(:draw_cards, number_to_draw: 1) if total >= 10
+          draw_card if total >= 10
         end
       end
 

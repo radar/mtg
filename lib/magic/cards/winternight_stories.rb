@@ -7,7 +7,7 @@ module Magic
 
     class WinternightStories < Sorcery
       def resolve!
-        trigger_effect(:draw_cards, number_to_draw: 3)
+        draw_cards(3)
         game.choices.add(Magic::Choice::DiscardUnless.new(actor: self, amount: 2, card_type: "Creature"))
       end
     end

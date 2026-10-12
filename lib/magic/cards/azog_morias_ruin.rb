@@ -24,7 +24,7 @@ module Magic
           power = [target.power, 0].max
           trigger_effect(:destroy_target, target: target)
           Amass.call(source: actor, controller: victim_controller, amount: power)
-          trigger_effect(:draw_cards, number_to_draw: 1) if victim_controller == controller
+          draw_card if victim_controller == controller
         end
       end
 

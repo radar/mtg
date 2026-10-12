@@ -29,7 +29,7 @@ module Magic
 
             trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
           when :treasure
-            trigger_effect(:create_token, token_class: Tokens::Treasure)
+            create_token(token: Tokens::Treasure)
           else raise "Invalid mode chosen for Bejeweled Warg: #{mode}"
           end
         end

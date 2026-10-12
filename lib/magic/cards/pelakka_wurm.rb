@@ -11,7 +11,7 @@ module Magic
     class PelakkaWurm < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:gain_life, target: controller, life: 7)
+          gain_life(7)
         end
       end
 

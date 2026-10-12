@@ -51,7 +51,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:gain_life, target: controller, life: 3)
+          gain_life(3)
         end
       end
 

@@ -25,7 +25,7 @@ module Magic
         def call
           choice = RooftopPercher::ExileChoice.new(actor: actor)
           game.choices.add(choice) if choice.choices.any?
-          actor.trigger_effect(:gain_life, life: 3)
+          actor.gain_life(3)
         end
       end
 

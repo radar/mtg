@@ -14,8 +14,8 @@ module Magic
         def should_perform? = event.player == controller && spell.creature? && spell.mana_value >= 4
 
         def call
-          trigger_effect(:draw_cards, number_to_draw: 1)
-          trigger_effect(:gain_life, life: 1)
+          draw_card
+          gain_life(1)
           add_counter("+1/+1")
         end
       end

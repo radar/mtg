@@ -15,7 +15,7 @@ module Magic
 
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:draw_cards, number_to_draw: actor.power)
+          draw_cards(actor.power)
         end
       end
 

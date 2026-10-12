@@ -14,7 +14,7 @@ module Magic
 
         def resolve!(sacrificed: nil)
           power = Array(sacrificed).first&.power.to_i
-          trigger_effect(:draw_cards, number_to_draw: power) if power.positive?
+          draw_cards(power) if power.positive?
           game.add_choice(Magic::Choice::Discard.new(actor: source, player: controller))
         end
       end

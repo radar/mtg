@@ -12,7 +12,7 @@ module Magic
         class BeholdChoice < Magic::Choice::Behold
           def resolve!(**args)
             super(**args)
-            trigger_effect(:create_token, token_class: Tokens::Treasure)
+            create_token(token: Tokens::Treasure)
           end
         end
 

@@ -24,7 +24,7 @@ module Magic
         def should_perform? = you? && spell.treasure_mana_spent?
 
         def call
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          draw_card
           trigger_effect(:lose_life, target: controller, life: 1)
         end
       end

@@ -25,7 +25,7 @@ module Magic
 
       def resolve!
         discarded = discard_cost.discarded
-        trigger_effect(:draw_cards, number_to_draw: 2)
+        draw_cards(2)
         return if discarded.nil? || discarded.land?
 
         game.opponents(controller).each do |opponent|

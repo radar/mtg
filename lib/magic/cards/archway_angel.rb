@@ -11,7 +11,7 @@ module Magic
     class ArchwayAngel < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:gain_life, target: controller, life: 2 * controller.permanents.by_type("Gate").count)
+          gain_life(2 * controller.permanents.by_type("Gate").count)
         end
       end
 

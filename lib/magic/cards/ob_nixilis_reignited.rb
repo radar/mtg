@@ -11,7 +11,7 @@ module Magic
         def description = "You draw a card and you lose 1 life."
 
         def resolve!
-          trigger_effect(:draw_cards)
+          draw_card
           trigger_effect(:lose_life, target: controller, life: 1)
         end
       end

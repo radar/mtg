@@ -2,6 +2,8 @@ module Magic
   module Cards
     module Shared
       module Events
+        include Magic::EffectShortcuts
+
         def event_handlers
           handlers = @event_handlers ||= {}
           if self.class.const_defined?(:WARD_TRIGGER, false)

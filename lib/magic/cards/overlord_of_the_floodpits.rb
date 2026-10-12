@@ -10,7 +10,7 @@ module Magic
 
       # "Whenever this permanent enters or attacks, draw two cards, then discard a card."
       enters_or_attacks do
-        trigger_effect(:draw_cards, number_to_draw: 2)
+        draw_cards(2)
         actor.add_choice(:discard)
       end
     end

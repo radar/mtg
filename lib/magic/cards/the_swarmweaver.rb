@@ -19,7 +19,7 @@ module Magic
       # "When The Swarmweaver enters, create two 1/1 black and green Insect creature tokens with flying."
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          2.times { actor.create_token(token_class: InsectToken) }
+          2.times { actor.create_token(token:InsectToken) }
         end
       end
 

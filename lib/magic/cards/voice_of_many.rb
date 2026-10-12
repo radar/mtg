@@ -11,7 +11,7 @@ module Magic
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
           cards_to_draw = opponents.count { |opponent| opponent.creatures.count < controller.creatures.count }
-          actor.trigger_effect(:draw_cards, number_to_draw: cards_to_draw) if cards_to_draw.positive?
+          actor.draw_cards(cards_to_draw) if cards_to_draw.positive?
         end
       end
 

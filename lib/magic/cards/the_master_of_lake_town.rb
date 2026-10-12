@@ -26,7 +26,7 @@ module Magic
       class DiesTrigger < TriggeredAbility::Death
         def call
           count = game.players.count { _1.graveyard.count >= 7 }
-          trigger_effect(:draw_cards, number_to_draw: count) if count.positive?
+          draw_cards(count) if count.positive?
         end
       end
 

@@ -11,7 +11,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:gain_life, target: controller, life: 1)
+          actor.gain_life(1)
           actor.trigger_effect(:draw_card, player: controller)
         end
       end

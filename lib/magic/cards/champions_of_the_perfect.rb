@@ -20,7 +20,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:draw_cards)
+          draw_card
         end
       end
 

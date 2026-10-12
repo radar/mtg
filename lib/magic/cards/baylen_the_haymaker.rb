@@ -20,7 +20,7 @@ module Magic
         def costs = [Costs::MultiTap.new(3) { controller.permanents.select(&:token?).reject(&:tapped?) }]
 
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          draw_card
         end
       end
 

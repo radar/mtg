@@ -15,7 +15,7 @@ module Magic
 
         def call
           trigger_effect(:lose_life, target: event.blocker.controller, life: 2)
-          trigger_effect(:gain_life, life: 2)
+          gain_life(2)
         end
       end
 

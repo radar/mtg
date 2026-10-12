@@ -32,7 +32,7 @@ module Magic
 
       class Death < TriggeredAbility::Death
         def call
-          actor.trigger_effect(:gain_life, life: actor.power)
+          actor.gain_life(actor.power)
         end
       end
 

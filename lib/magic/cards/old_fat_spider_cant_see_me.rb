@@ -49,7 +49,7 @@ module Magic
       # III, IV -- Draw a card.
       class Chapter3 < Saga::ChapterAbility
         def resolve!
-          trigger_effect(:draw_cards, number_to_draw: 1)
+          draw_card
         end
       end
 

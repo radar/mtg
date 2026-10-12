@@ -13,7 +13,7 @@ module Magic
         def prompt = "Gain 1 life?"
 
         def resolve!
-          trigger_effect(:gain_life, target: controller, life: 1)
+          gain_life(1)
         end
       end
 

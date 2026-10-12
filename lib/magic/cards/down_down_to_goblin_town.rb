@@ -37,7 +37,7 @@ module Magic
 
           def resolve!(target:)
             target.trigger_effect(:lose_life, source: actor, life: 1)
-            actor.trigger_effect(:gain_life, life: 1)
+            actor.gain_life(1)
           end
         end
 

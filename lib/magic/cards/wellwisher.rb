@@ -13,7 +13,7 @@ module Magic
 
         def resolve!
           life_gain = battlefield.creatures.by_type("Elf").count
-          source.trigger_effect(:gain_life, life: life_gain)
+          source.gain_life(life_gain)
         end
       end
 

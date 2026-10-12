@@ -7,6 +7,7 @@ module Magic
     include Keywords
     include Types
     include Targetable
+    include EffectShortcuts
 
     extend Forwardable
     attr_reader :game,
@@ -982,8 +983,9 @@ module Magic
       card.trigger_effect(effect, source: source, **args)
     end
 
-    def create_token(token_class:, amount: 1, controller: self.controller, **args)
-      trigger_effect(:create_token, token_class: token_class, amount: amount, controller: controller, **args)
+    # `create_token(token: Tokens::Treasure)`; the token is under `controller`'s control.
+    def create_token(token:, amount: 1, controller: self.controller, **args)
+      trigger_effect(:create_token, token_class: token, amount: amount, controller: controller, **args)
     end
 
     def add_choice(choice, **args)
