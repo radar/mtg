@@ -14,6 +14,14 @@ RSpec.describe Magic::Cards::GrayMerchantOfAsphodel do
     expect(p1.life).to eq(23)
   end
 
+  it "counts hybrid mana symbols towards both of their colours" do
+    ResolvePermanent("Spiteful Visions", owner: p1) # {2}{B/R}{B/R}
+
+    expect(p1.devotion(:black)).to eq(2)
+    expect(p1.devotion(:red)).to eq(2)
+    expect(p1.devotion(:white)).to eq(0)
+  end
+
   it "counts only your permanents" do
     ResolvePermanent("Blood Artist", owner: p2)
     ResolvePermanent("Gray Merchant Of Asphodel", owner: p1)

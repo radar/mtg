@@ -984,7 +984,7 @@ module Magic
     end
 
     def devotion(color)
-      card.cost.send(color) || 0
+      card.cost.devotion(color)
     end
 
     # Fires +trigger_class+ for this permanent (queued or run at once), counting

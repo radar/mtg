@@ -252,6 +252,16 @@ module Magic
         cost.slice(*Magic::Mana::COLORS)
       end
 
+      public
+
+      # Mana symbols of +color+ in this cost for devotion: hybrid symbols count towards each of their colours.
+      def devotion(color)
+        color = color.to_sym
+        cost.sum { |key, amount| key == color || (hybrid_key?(key) && hybrid_colors_for(key).include?(color)) ? amount : 0 }
+      end
+
+      private
+
       def hybrid_key?(key)
         key.is_a?(Symbol) && key.to_s.include?("_or_")
       end
