@@ -91,6 +91,7 @@ module Magic
         raise CannotPay.new(cost, player) unless can_pay?(player)
 
         pay_colors(color_costs)
+        auto_pay_hybrid_costs(player)
         auto_pay_generic_costs(player) if cost[:generic]
       end
 
@@ -191,11 +192,31 @@ module Magic
         # Mana the colored part of the cost already claimed can't also pay for generic.
         pool = player.spendable_mana_for(for_use)
         deduct_from_pool(pool, color_costs)
+        deduct_from_pool(pool, @hybrid_actual_payments)
         available_mana = pool.flat_map do |color, amount|
           [color] * [amount, 0].max
         end
 
         pay_generic(available_mana.take(cost[:generic]).tally)
+      end
+
+      # Pays each hybrid symbol ({B/R}) with whichever of its colors the pool has, first color first.
+      def auto_pay_hybrid_costs(player)
+        pool = player.spendable_mana_for(for_use)
+        deduct_from_pool(pool, color_costs)
+        hybrid_costs.each do |key, amount|
+          remaining = amount
+          hybrid_colors_for(key).each do |color|
+            break if remaining <= 0
+
+            available = [pool[color] || 0, remaining].min
+            next unless available.positive?
+
+            pool[color] -= available
+            remaining -= available
+            pay_colors(color => available)
+          end
+        end
       end
 
       def pay_colors(color_payments)

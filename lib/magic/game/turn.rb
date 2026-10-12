@@ -53,6 +53,13 @@ module Magic
           turn.checkpoint!
         end
 
+        after_transition to: :second_main do |turn|
+          turn.notify!(
+            Events::SecondMainPhase.new(active_player: turn.active_player)
+          )
+          turn.checkpoint!
+        end
+
         before_transition to: :combat_damage do |turn|
           turn.combat.validate_blocks!
         end
@@ -303,6 +310,11 @@ module Magic
 
       def life_lost_by_player(player)
         events.select { |event| event.is_a?(Events::LifeLoss) && event.player == player }.sum(&:life)
+      end
+
+      # "If an opponent lost life this turn" (Bloomburrow's Lizards).
+      def opponent_lost_life?(player)
+        game.opponents(player).any? { life_lost_by_player(_1).positive? }
       end
 
       def mana_spent_by_player(player)
