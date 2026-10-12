@@ -29,12 +29,8 @@ module Magic
       class SearchAbility < Magic::ActivatedAbility
         costs "{3}{G}, {T}"
 
-        class SearchChoice < Magic::Choice::SearchLibrary
-          def choices = controller.library.select { _1.type?("Squirrel") }
-        end
-
         def resolve!
-          game.choices.add(SearchChoice.new(actor: source, reveal: true))
+          game.choices.add(Magic::Choice::SearchLibrary.new(actor: source, filter: ->(card) { card.type?("Squirrel") }, to_zone: :hand, reveal: true))
         end
       end
 

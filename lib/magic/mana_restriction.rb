@@ -8,6 +8,11 @@ module Magic
       raise NotImplementedError, "#{self.class} must implement #permits?(use)"
     end
 
+    # "Spend this mana only to cast a creature spell."
+    class CreatureSpells < ManaRestriction
+      def permits?(use) = use.is_a?(Magic::Card) && use.creature?
+    end
+
     # "Spend this mana only to cast spells with mana value 4 or greater." Only spells (a card
     # being cast), not abilities of a permanent.
     class MinimumManaValue < ManaRestriction
