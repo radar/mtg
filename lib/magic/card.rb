@@ -22,8 +22,11 @@ module Magic
     # A dream counter (Goliath Daydreamer) on a card in exile; lost when it leaves exile.
     # `exile_with_dream_counter` marks a spell that will go to exile with one as it resolves.
     attr_accessor :dream_counter, :exile_with_dream_counter
+    # Gift: true while this spell resolves (or is a permanent entering) after its caster promised the gift.
+    attr_writer :gift_promised
 
     COST = {}
+    GIFT = nil
     KICKER_COST = {}
     BACK_FACE = nil
     KEYWORDS = []
@@ -129,6 +132,13 @@ module Magic
 
       def kicker_cost(cost)
         const_set(:KICKER_COST, cost)
+      end
+
+      # "Gift a card" / "Gift a Food" / "Gift a tapped Fish" (:card, :food, :tapped_fish): as you cast
+      # it, you may promise an opponent a gift (`Actions::Cast#promise_gift`). It's given as the spell
+      # resolves; the card's effects then check `gift_promised?`.
+      def gift(kind)
+        const_set(:GIFT, kind)
       end
 
       def power(power)
@@ -275,6 +285,10 @@ module Magic
     def can_be_countered?
       !game.battlefield.static_abilities.any? { |ability| ability.respond_to?(:prevents_countering?) && ability.prevents_countering?(self) }
     end
+
+    def gift_kind = self.class::GIFT
+
+    def gift_promised? = !!@gift_promised
 
     def return_to_hand
       move_to_hand!

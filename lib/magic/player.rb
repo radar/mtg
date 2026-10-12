@@ -221,8 +221,18 @@ module Magic
 
     def can_be_targeted_by?(source, controller: source&.controller)
       return true if source.nil?
+      return false if hexproof? && controller != self
 
       !protected_from?(source)
+    end
+
+    # "You gain hexproof until end of turn" (Dawn's Truce): lasts through the turn it was granted on.
+    def gain_hexproof_until_end_of_turn!
+      @hexproof_on_turn = game.current_turn.number
+    end
+
+    def hexproof?
+      !@hexproof_on_turn.nil? && @hexproof_on_turn == game.current_turn.number
     end
 
     # With a `restriction` ("spend this mana only to ..."), each unit is kept in

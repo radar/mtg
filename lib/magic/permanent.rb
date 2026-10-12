@@ -58,6 +58,10 @@ module Magic
     attr_accessor :entered_from_zone
     # The number of the turn during which the current controller gained control of this permanent.
     attr_accessor :controlled_since_turn
+    # Gift: the spell this permanent came from had its gift promised.
+    attr_writer :gift_promised
+
+    def gift_promised? = !!@gift_promised
 
     def self.resolve(game:, card:, owner: card.owner, from_zone: nil, enters_tapped: card.enters_tapped?, token: card.token?, cast: true, kicked: false, copy: false, attach_to: nil, controller: owner, mana_spent: {}, evoked: false)
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:, controller:)
@@ -74,6 +78,7 @@ module Magic
         copy: copy,
       )
       permanent.mana_spent = mana_spent
+      permanent.gift_promised = card.gift_promised? if card.respond_to?(:gift_promised?)
       permanent.copy_choice_pending = card.enters_as_copy?
       permanent.evoked = evoked
 

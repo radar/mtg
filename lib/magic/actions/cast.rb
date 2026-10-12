@@ -42,6 +42,7 @@ module Magic
       alias_method :name, :inspect
 
       def countered!
+        card.gift_promised = false
         kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold)
         game.notify!(Events::SpellCountered.new(spell: card, player: player))
         @harmonize ? card.exile! : card.move_to_graveyard!(card.owner)
@@ -469,7 +470,39 @@ module Magic
         pools.all? { |pool| pool.any? }
       end
 
+      # Gift (rule 702.174): as you cast the spell you may promise an opponent a gift. Only cards
+      # with a `gift` can; the gift is given as the spell resolves, before its effects.
+      def promise_gift
+        raise "#{card.name} has no gift" unless card.gift_kind
+
+        @gift_promised = true
+        card.gift_promised = true # so the card's target_choices can already depend on it
+        self
+      end
+
+      def gift_promised? = !!@gift_promised
+
       def resolve!
+        return resolve_spell! unless @gift_promised
+
+        give_gift!
+        resolve_spell!
+      ensure
+        card.gift_promised = false if @gift_promised
+      end
+
+      def give_gift!
+        recipient = game.opponents(player).first
+        case card.gift_kind
+        when :card then card.trigger_effect(:draw_cards, player: recipient, number_to_draw: 1)
+        when :food then card.trigger_effect(:create_token, token_class: Tokens::Food, controller: recipient)
+        when :treasure then card.trigger_effect(:create_token, token_class: Tokens::Treasure, controller: recipient)
+        when :tapped_fish then card.trigger_effect(:create_token, token_class: Tokens::Fish, controller: recipient, enters_tapped: true)
+        end
+        game.notify!(Events::GiftGiven.new(player: player, recipient: recipient))
+      end
+
+      def resolve_spell!
         if modes.any?
           modes.each { |mode| mode.resolve! }
         else
