@@ -22,7 +22,7 @@ module Magic
         def call
           creature = actor.attached_to
           trigger_effect(:tap, target: creature)
-          trigger_effect(:add_counter, counter_type: "stun", target: creature, amount: 3) unless actor.gift_promised?
+          add_counter("stun", to: creature, amount: 3) unless actor.gift_promised?
         end
       end
 

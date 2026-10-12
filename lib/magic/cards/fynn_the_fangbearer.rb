@@ -15,7 +15,7 @@ module Magic
         end
 
         def call
-          [that_player].each { trigger_effect(:add_counter, counter_type: "poison", target: _1, amount: 2) }
+          [that_player].each { add_counter("poison", to: _1, amount: 2) }
         end
       end
 

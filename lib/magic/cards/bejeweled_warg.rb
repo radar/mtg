@@ -27,7 +27,7 @@ module Magic
             target ||= wolves.first
             raise ArgumentError, "#{target&.name.inspect} is not a Wolf you control" unless wolves.include?(target)
 
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
+            add_counter("+1/+1", to: target)
           when :treasure
             create_token(token: Tokens::Treasure)
           else raise "Invalid mode chosen for Bejeweled Warg: #{mode}"

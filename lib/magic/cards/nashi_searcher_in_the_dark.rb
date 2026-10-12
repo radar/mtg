@@ -27,7 +27,7 @@ module Magic
           raise ArgumentError, "not a valid choice" unless cards.all? { choices.include?(_1) }
 
           cards.each(&:move_to_hand!)
-          trigger_effect(:add_counter, counter_type: "+1/+1", target: actor, amount: 1) if cards.empty?
+          add_counter("+1/+1", to: actor) if cards.empty?
         end
       end
 

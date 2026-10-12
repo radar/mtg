@@ -20,7 +20,7 @@ module Magic
             small = target.power <= 2
             actor.exiled_cards << target.card
             trigger_effect(:exile, target: target)
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: actor, amount: 1) if small
+            add_counter("+1/+1", to: actor) if small
           end
         end
 

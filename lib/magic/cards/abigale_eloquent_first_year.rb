@@ -17,7 +17,7 @@ module Magic
         # counter on that creature."
         def resolve!(target:)
           target.lose_all_abilities!
-          %w[flying first\ strike lifelink].each { trigger_effect(:add_counter, counter_type: _1, target:) }
+          %w[flying first\ strike lifelink].each { add_counter(_1, to: target) }
         end
       end
 

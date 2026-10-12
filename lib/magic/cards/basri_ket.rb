@@ -15,7 +15,7 @@ module Magic
             trigger_effect(:create_token, token_class: SoldierToken, controller: owner)
 
             owner.creatures.each do |creature|
-              trigger_effect(:add_counter, target: creature, counter_type: "+1/+1")
+              add_counter("+1/+1", to: creature)
             end
           end
         end

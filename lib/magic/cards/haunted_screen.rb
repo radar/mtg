@@ -26,7 +26,7 @@ module Magic
 
         def resolve!
           source.become_creature!(power: 0, toughness: 0, types: [T::Creatures["Spirit"]], until_eot: false)
-          trigger_effect(:add_counter, counter_type: "+1/+1", target: source, amount: 7)
+          add_counter("+1/+1", to: source, amount: 7)
         end
       end
 

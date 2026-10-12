@@ -30,7 +30,7 @@ module Magic
         def costs = [Costs::MultiTap.new(4) { controller.permanents.select(&:token?).reject(&:tapped?) }]
 
         def resolve!
-          trigger_effect(:add_counter, counter_type: "+1/+1", target: source, amount: 3)
+          add_counter("+1/+1", to: source, amount: 3)
           trigger_effect(:grant_keyword, target: source, keyword: :trample)
         end
       end

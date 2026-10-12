@@ -30,7 +30,7 @@ module Magic
       # each put a counter on it, since the engine reports deaths one event at a time.
       class CreatureDiesTrigger < TriggeredAbility
         def call
-          trigger_effect(:add_counter, target: actor, counter_type: "rev", amount: 1)
+          add_counter("rev", to: actor)
         end
       end
 

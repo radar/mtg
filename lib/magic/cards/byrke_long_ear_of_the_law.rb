@@ -17,7 +17,7 @@ module Magic
           def choice_amount = 0..2
 
           def resolve!(targets:)
-            Array(targets).first(2).each { trigger_effect(:add_counter, counter_type: "+1/+1", target: _1, amount: 1) }
+            Array(targets).first(2).each { add_counter("+1/+1", to: _1) }
           end
         end
 
@@ -33,7 +33,7 @@ module Magic
         def call
           event.attacks.map(&:attacker).select { |creature| creature.controller == controller }.each do |creature|
             count = creature.counters.of_type(Counters::Plus1Plus1).count
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: creature, amount: count) if count.positive?
+            add_counter("+1/+1", to: creature, amount: count) if count.positive?
           end
         end
 

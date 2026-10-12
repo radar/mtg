@@ -23,7 +23,7 @@ module Magic
 
           card.return_to_battlefield!
           returned = game.battlefield.permanents.find { |permanent| permanent.card.equal?(card) }
-          trigger_effect(:add_counter, counter_type: "flying", target: returned, amount: 1) if returned
+          add_counter("flying", to: returned) if returned
         end
       end
 

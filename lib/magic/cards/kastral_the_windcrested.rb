@@ -36,7 +36,7 @@ module Magic
               game.choices.add(choice) if choice.choices.any?
             when :counters
               battlefield.controlled_by(controller).creatures.select { _1.type?("Bird") }.each do |bird|
-                trigger_effect(:add_counter, counter_type: "+1/+1", target: bird, amount: 1)
+                add_counter("+1/+1", to: bird)
               end
             when :draw
               draw_card

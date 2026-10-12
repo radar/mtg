@@ -63,7 +63,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: target)
+            add_counter("+1/+1", to: target)
             game.tick! # so the counter counts towards power
             return unless battlefield.controlled_by(controller).creatures.any? { _1.power >= 7 }
             return if actor.exiled_cards.nonland.none?

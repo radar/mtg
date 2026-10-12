@@ -36,7 +36,7 @@ module Magic
           @remaining -= 1
           ManifestChoice.perform(actor: self)
         else
-          @manifested.each { |creature| trigger_effect(:add_counter, counter_type: "+1/+1", target: creature, amount: @x) }
+          @manifested.each { |creature| add_counter("+1/+1", to: creature, amount: @x) }
         end
       end
     end

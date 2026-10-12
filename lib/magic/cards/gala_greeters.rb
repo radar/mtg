@@ -25,7 +25,7 @@ module Magic
 
           case mode
           when COUNTER
-            trigger_effect(:add_counter, target: actor, counter_type: "+1/+1")
+            add_counter("+1/+1", to: actor)
           when TREASURE
             actor.trigger_effect(:create_token, token_class: Tokens::Treasure, enters_tapped: true)
           when LIFE

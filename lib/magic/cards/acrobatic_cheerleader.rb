@@ -17,7 +17,7 @@ module Magic
 
         def call
           actor.trigger_ever!(self.class)
-          trigger_effect(:add_counter, counter_type: "flying", target: actor, amount: 1)
+          add_counter("flying", to: actor)
         end
       end
 

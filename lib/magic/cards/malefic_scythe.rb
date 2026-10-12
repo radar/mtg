@@ -24,7 +24,7 @@ module Magic
         def should_perform? = event.permanent == actor.attached_to
 
         def call
-          trigger_effect(:add_counter, target: actor, counter_type: "soul", amount: 1)
+          add_counter("soul", to: actor)
         end
       end
 

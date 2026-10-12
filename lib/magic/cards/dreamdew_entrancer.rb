@@ -19,7 +19,7 @@ module Magic
 
           def resolve!(target:)
             trigger_effect(:tap, target: target)
-            trigger_effect(:add_counter, counter_type: "stun", target: target, amount: 3)
+            add_counter("stun", to: target, amount: 3)
             draw_cards(2) if target.controller == controller
           end
         end

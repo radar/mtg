@@ -14,7 +14,7 @@ module Magic
         costs "{1}, Sacrifice another creature"
 
         def resolve!
-          trigger_effect(:add_counter, target: source, counter_type: "+1/+1", amount: 1)
+          add_counter("+1/+1", to: source)
         end
       end
 

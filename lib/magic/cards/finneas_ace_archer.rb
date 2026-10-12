@@ -16,7 +16,7 @@ module Magic
 
         def call
           (battlefield.controlled_by(controller).creatures - [actor]).each do |creature|
-            add_counter("+1/+1", target: creature) if creature.token? || creature.type?("Rabbit")
+            add_counter("+1/+1", to: creature) if creature.token? || creature.type?("Rabbit")
           end
           game.tick!
           total = battlefield.controlled_by(controller).creatures.sum(&:power)

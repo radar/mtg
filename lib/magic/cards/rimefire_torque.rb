@@ -23,7 +23,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:add_counter, counter_type: "charge", target: actor)
+          add_counter("charge", to: actor)
         end
       end
 

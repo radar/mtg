@@ -33,7 +33,7 @@ module Magic
         def resolve!
           source.exiled_cards.select { _1.creature? && _1.zone&.exile? }.each do |card|
             permanent = card.resolve!(controller: controller)
-            trigger_effect(:add_counter, counter_type: "flying", target: permanent, amount: 1)
+            add_counter("flying", to: permanent)
             permanent.add_types("Spirit", until_eot: false)
             permanent.modify_base_power(1, until_eot: false)
             permanent.modify_base_toughness(1, until_eot: false)

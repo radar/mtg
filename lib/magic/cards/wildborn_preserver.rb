@@ -17,7 +17,7 @@ module Magic
         class PayXChoice < Magic::Choice::PayX
           def resolve!(**args)
             super(**args)
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: actor, amount: x)
+            add_counter("+1/+1", to: actor, amount: x)
           end
         end
 

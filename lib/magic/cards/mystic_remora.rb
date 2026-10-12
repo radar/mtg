@@ -24,7 +24,7 @@ module Magic
 
       class UpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         def call
-          trigger_effect(:add_counter, target: actor, counter_type: "age", amount: 1)
+          add_counter("age", to: actor)
           game.choices.add(UpkeepChoice.new(actor: actor))
         end
       end

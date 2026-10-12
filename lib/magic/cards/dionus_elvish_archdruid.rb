@@ -15,7 +15,7 @@ module Magic
 
         def call
           event.permanent.untap!
-          add_counter("+1/+1", target: event.permanent)
+          add_counter("+1/+1", to: event.permanent)
         end
       end
 

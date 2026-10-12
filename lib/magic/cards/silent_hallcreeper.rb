@@ -40,7 +40,7 @@ module Magic
 
           case mode
           when COUNTERS
-            trigger_effect(:add_counter, target: actor, counter_type: "+1/+1", amount: 2)
+            add_counter("+1/+1", to: actor, amount: 2)
           when DRAW
             controller.draw!
           when COPY

@@ -25,7 +25,7 @@ module Magic
 
         def resolve!(distribution:)
           distribution.each do |target, amount|
-            amount.times { trigger_effect(:add_counter, counter_type: "+1/+1", target: target) }
+            amount.times { add_counter("+1/+1", to: target) }
           end
         end
       end

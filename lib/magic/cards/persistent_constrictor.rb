@@ -25,7 +25,7 @@ module Magic
         def optional? = true
 
         def resolve!(target:)
-          trigger_effect(:add_counter, counter_type: "-1/-1", target: target)
+          add_counter("-1/-1", to: target)
         end
       end
 

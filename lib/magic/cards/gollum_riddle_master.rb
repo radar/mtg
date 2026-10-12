@@ -44,7 +44,7 @@ module Magic
           actor.card.chosen_modes = [*actor.card.chosen_modes, mode]
           case mode
           when :counter
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: actor, amount: 1)
+            add_counter("+1/+1", to: actor)
           when :drain
             game.opponents(controller).each { |opponent| trigger_effect(:lose_life, target: opponent, life: 2) }
             gain_life(2)

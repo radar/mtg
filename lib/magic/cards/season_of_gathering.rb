@@ -11,7 +11,7 @@ module Magic
         def target_choices = battlefield.controlled_by(controller).creatures
 
         def resolve!(target:)
-          trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
+          add_counter("+1/+1", to: target)
           trigger_effect(:grant_keyword, target: target, keyword: :vigilance)
           trigger_effect(:grant_keyword, target: target, keyword: :trample)
         end

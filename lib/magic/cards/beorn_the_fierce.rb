@@ -27,7 +27,7 @@ module Magic
         def choice_amount = 0..1
 
         def resolve!(target:)
-          trigger_effect(:add_counter, counter_type: "trample", target: target, amount: 1)
+          add_counter("trample", to: target)
           target.add_types("Bear", until_eot: false)
           game.tick!
           draw_if_three_bears

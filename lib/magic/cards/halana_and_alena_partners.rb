@@ -22,7 +22,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: actor.power)
+            add_counter("+1/+1", to: target, amount: actor.power)
             trigger_effect(:grant_keyword, target: target, keyword: :haste)
           end
         end

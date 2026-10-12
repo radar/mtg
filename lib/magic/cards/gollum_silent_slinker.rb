@@ -21,7 +21,7 @@ module Magic
 
       def adventure_resolve!(targets:, **)
         creature, player = targets
-        trigger_effect(:add_counter, counter_type: "+1/+1", target: creature, amount: 1) if creature
+        add_counter("+1/+1", to: creature) if creature
         trigger_effect(:gain_life, target: player, life: 2)
       end
     end

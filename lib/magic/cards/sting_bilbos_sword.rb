@@ -27,7 +27,7 @@ module Magic
         def call
           opponent = game.opponents(controller).first
           creatures = opponent.creatures.count
-          trigger_effect(:add_counter, counter_type: "hone", target: actor, amount: creatures) if creatures.positive?
+          add_counter("hone", to: actor, amount: creatures) if creatures.positive?
           choice = AttachChoice.new(actor: actor)
           game.add_choice(choice) if choice.choices.any?
         end

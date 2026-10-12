@@ -13,7 +13,7 @@ module Magic
 
       def resolve!(targets:)
         biter, victim = targets
-        trigger_effect(:add_counter, counter_type: "+1/+1", target: biter, amount: 1)
+        add_counter("+1/+1", to: biter)
         biter.bite!(victim)
       end
     end

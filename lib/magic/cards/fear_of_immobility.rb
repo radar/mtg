@@ -19,7 +19,7 @@ module Magic
           trigger_effect(:tap, target: target)
           return if target.controller == controller
 
-          trigger_effect(:add_counter, counter_type: "stun", target: target, amount: 1)
+          add_counter("stun", to: target)
         end
       end
 

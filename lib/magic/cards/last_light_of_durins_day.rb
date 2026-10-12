@@ -30,7 +30,7 @@ module Magic
         def should_perform? = you? && event.permanent.land? && event.permanent.any_type?("Mountain")
 
         def call
-          trigger_effect(:add_counter, counter_type: "quest", target: actor, amount: 1)
+          add_counter("quest", to: actor)
           return unless actor.counters.of_type(Counters["quest"]).count >= 6
 
           trigger_effect(:sacrifice, target: actor)

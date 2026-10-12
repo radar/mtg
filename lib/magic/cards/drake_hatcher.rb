@@ -33,7 +33,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:add_counter, counter_type: "incubation", target: actor, amount: event.damage)
+          add_counter("incubation", to: actor, amount: event.damage)
         end
       end
 

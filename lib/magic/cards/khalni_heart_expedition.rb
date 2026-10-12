@@ -24,7 +24,7 @@ module Magic
           def prompt = "Put a quest counter on Khalni Heart Expedition?"
 
           def resolve!
-            trigger_effect(:add_counter, counter_type: "quest", target: actor, amount: 1)
+            add_counter("quest", to: actor)
           end
         end
 

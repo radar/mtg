@@ -15,7 +15,7 @@ module Magic
         def resolve!(mode:)
           case mode
           when COUNTER
-            trigger_effect(:add_counter, target: actor, counter_type: "+1/+1")
+            add_counter("+1/+1", to: actor)
           when GAIN_LIFE
             controller.gain_life(4)
           end

@@ -6,7 +6,7 @@ module Magic
 
     class DarknessDescends < Sorcery
       def resolve!
-        battlefield.creatures.each { trigger_effect(:add_counter, counter_type: "-1/-1", target: _1, amount: 2) }
+        battlefield.creatures.each { add_counter("-1/-1", to: _1, amount: 2) }
       end
     end
   end

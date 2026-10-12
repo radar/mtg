@@ -23,7 +23,7 @@ module Magic
           def resolve!(targets:)
             raise ArgumentError, "at most two creatures may be chosen" if targets.size > 2
 
-            targets.each { |target| trigger_effect(:add_counter, counter_type: "+1/+1", target: target) }
+            targets.each { |target| add_counter("+1/+1", to: target) }
           end
         end
 

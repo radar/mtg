@@ -19,9 +19,9 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:add_counter, counter_type: "flying", target: target, amount: 1)
-          trigger_effect(:add_counter, counter_type: "deathtouch", target: target, amount: 1)
-          trigger_effect(:add_counter, counter_type: "lifelink", target: target, amount: 1)
+          add_counter("flying", to: target)
+          add_counter("deathtouch", to: target)
+          add_counter("lifelink", to: target)
         end
       end
 

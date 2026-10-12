@@ -13,7 +13,7 @@ module Magic
       module HoneEquipment
         def call
           battlefield.controlled_by(controller).select { _1.type?("Equipment") }.each do |equipment|
-            trigger_effect(:add_counter, counter_type: "hone", target: equipment, amount: 1)
+            add_counter("hone", to: equipment)
           end
         end
       end

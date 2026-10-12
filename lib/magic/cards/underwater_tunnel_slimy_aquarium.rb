@@ -18,7 +18,7 @@ module Magic
         # Manifests dread, then puts a +1/+1 counter on that creature.
         class ManifestChoice < Magic::Choice::ManifestDread
           def manifested(permanent)
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: permanent)
+            add_counter("+1/+1", to: permanent)
           end
         end
 

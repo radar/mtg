@@ -19,14 +19,14 @@ module Magic
 
           def resolve!(distribution: {})
             distribution.each do |target, amount|
-              amount.times { trigger_effect(:add_counter, counter_type: "+1/+1", target: target) }
+              amount.times { add_counter("+1/+1", to: target) }
             end
 
             return unless controller.graveyard.card_type_count >= 6
 
             distribution.each_key do |target|
               existing = target.counters.of_type(Counters::Plus1Plus1).count
-              trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: existing) if existing.positive?
+              add_counter("+1/+1", to: target, amount: existing) if existing.positive?
             end
           end
         end

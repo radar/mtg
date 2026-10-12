@@ -24,7 +24,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:add_counter, counter_type: "+1/+1", target: event.permanent)
+          add_counter("+1/+1", to: event.permanent)
         end
       end
 

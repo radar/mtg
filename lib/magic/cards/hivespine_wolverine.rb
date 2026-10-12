@@ -29,7 +29,7 @@ module Magic
 
           def resolve!(target:)
             case @mode
-            when :counter then trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
+            when :counter then add_counter("+1/+1", to: target)
             when :fight then actor.fights!(target)
             when :destroy then trigger_effect(:destroy_target, target: target)
             end

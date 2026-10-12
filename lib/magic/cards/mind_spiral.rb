@@ -21,7 +21,7 @@ module Magic
 
         creature = targets[1]
         trigger_effect(:tap, target: creature)
-        trigger_effect(:add_counter, counter_type: "stun", target: creature, amount: 1)
+        add_counter("stun", to: creature)
       end
     end
   end

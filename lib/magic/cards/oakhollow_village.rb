@@ -28,7 +28,7 @@ module Magic
           battlefield.controlled_by(controller).creatures.each do |creature|
             next unless entered.include?(creature) && OakhollowVillage::TRIBES.any? { creature.type?(_1) }
 
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: creature, amount: 1)
+            add_counter("+1/+1", to: creature)
           end
         end
       end

@@ -28,7 +28,7 @@ module Magic
         def requirements_met? = game.current_turn.opponent_lost_life?(controller)
 
         def resolve!
-          trigger_effect(:add_counter, counter_type: "+1/+1", target: source, amount: 1)
+          add_counter("+1/+1", to: source)
         end
       end
 

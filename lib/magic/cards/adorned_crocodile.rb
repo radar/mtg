@@ -18,7 +18,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
+          add_counter("+1/+1", to: target)
         end
       end
 

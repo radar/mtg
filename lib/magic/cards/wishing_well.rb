@@ -27,7 +27,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:add_counter, counter_type: "coin", target: source, amount: 1)
+          add_counter("coin", to: source)
           value = source.counters.of_type(Counters["coin"]).count
           choice = CastChoice.new(actor: source, value: value)
           game.add_choice(choice) if choice.choices.any?

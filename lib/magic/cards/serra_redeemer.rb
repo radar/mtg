@@ -14,7 +14,7 @@ module Magic
         def should_perform? = another_creature? && under_your_control? && event.permanent.power <= 2
 
         def call
-          add_counter("+1/+1", target: event.permanent, amount: 2)
+          add_counter("+1/+1", to: event.permanent, amount: 2)
         end
       end
 

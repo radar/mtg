@@ -15,7 +15,7 @@ module Magic
       def resolve!(targets:)
         mine, theirs = targets
 
-        trigger_effect(:add_counter, counter_type: "+1/+1", target: mine, amount: 2)
+        add_counter("+1/+1", to: mine, amount: 2)
         game.tick!
 
         mine.fights!(theirs)

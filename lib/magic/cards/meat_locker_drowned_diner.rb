@@ -12,7 +12,7 @@ module Magic
 
           def resolve!(target:)
             trigger_effect(:tap, target: target)
-            trigger_effect(:add_counter, counter_type: "stun", target: target, amount: 2)
+            add_counter("stun", to: target, amount: 2)
           end
         end
 

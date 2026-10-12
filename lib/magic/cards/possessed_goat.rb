@@ -16,7 +16,7 @@ module Magic
         activate_only_once
 
         def resolve!
-          trigger_effect(:add_counter, counter_type: "+1/+1", target: source, amount: 3)
+          add_counter("+1/+1", to: source, amount: 3)
           source.add_types(T::Creatures["Demon"], until_eot: false)
           source.change_colors!([*source.colors, :black].uniq, until_eot: false)
         end

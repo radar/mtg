@@ -19,7 +19,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:add_counter, counter_type: "lifelink", target: target, amount: 1)
+          add_counter("lifelink", to: target)
         end
       end
 

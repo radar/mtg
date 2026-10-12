@@ -15,7 +15,7 @@ module Magic
       # on the creature you control if the gift was promised. Then those creatures fight each other.
       def resolve!(targets:)
         mine, theirs = targets
-        trigger_effect(:add_counter, counter_type: "+1/+1", target: mine, amount: 1) if gift_promised?
+        add_counter("+1/+1", to: mine) if gift_promised?
         mine.fights!(theirs)
       end
     end

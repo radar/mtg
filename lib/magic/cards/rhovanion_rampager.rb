@@ -18,7 +18,7 @@ module Magic
             sacrifice ||= candidates.first
             power = sacrifice.power
             super(sacrifice: sacrifice)
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: actor, amount: power) if power.positive?
+            add_counter("+1/+1", to: actor, amount: power) if power.positive?
           end
         end
 

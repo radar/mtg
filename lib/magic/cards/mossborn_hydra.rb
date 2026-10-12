@@ -17,7 +17,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:add_counter, counter_type: "+1/+1", target: actor, amount: actor.counters.of_type(Counters["+1/+1"]).count)
+          add_counter("+1/+1", to: actor, amount: actor.counters.of_type(Counters["+1/+1"]).count)
         end
       end
 

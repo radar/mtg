@@ -33,7 +33,7 @@ module Magic
           when 2 then draw_card
           when 3
             controller.creatures.each do |creature|
-              trigger_effect(:add_counter, counter_type: "+1/+1", target: creature, amount: 1)
+              add_counter("+1/+1", to: creature)
             end
           end
         end

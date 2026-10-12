@@ -33,7 +33,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:add_counter, target: actor, counter_type: "+1/+1", amount: 1)
+          add_counter("+1/+1", to: actor)
           actor.grant_keyword(Keywords::CANT_BE_BLOCKED)
         end
       end

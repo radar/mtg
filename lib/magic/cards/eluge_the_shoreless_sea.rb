@@ -58,7 +58,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:add_counter, counter_type: "flood", target: target, amount: 1)
+            add_counter("flood", to: target)
           end
         end
 

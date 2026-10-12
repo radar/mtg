@@ -14,7 +14,7 @@ module Magic
         costs "{2}{G}{G}"
 
         def resolve!
-          trigger_effect(:add_counter, counter_type: "+1/+1", target: source, amount: source.power)
+          add_counter("+1/+1", to: source, amount: source.power)
         end
       end
 

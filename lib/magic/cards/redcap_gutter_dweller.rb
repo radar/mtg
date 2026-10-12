@@ -29,7 +29,7 @@ module Magic
         class SacrificeChoice < Magic::Choice::SacrificePermanent
           def resolve!(sacrifice: nil)
             super
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: actor, amount: 1)
+            add_counter("+1/+1", to: actor)
             if (top = controller.library.first)
               trigger_effect(:exile, target: top)
               game.play_permissions.grant_until_end_of_turn(card: top, player: controller)

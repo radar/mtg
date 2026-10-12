@@ -95,8 +95,9 @@ module Magic
       event.target.is_a?(Permanent) && event.target.creature?
     end
 
-    def add_counter(counter_type, target: actor, amount: 1)
-      trigger_effect(:add_counter, counter_type: counter_type, target: target, amount: amount)
+    # A trigger's counters go on its own permanent unless it says `to:`.
+    def add_counter(counter_type, to: actor, amount: 1, **args)
+      super
     end
 
     def should_perform?

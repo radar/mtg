@@ -13,7 +13,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:add_counter, target: actor, counter_type: "soul")
+          add_counter("soul", to: actor)
         end
       end
 

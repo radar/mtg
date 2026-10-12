@@ -17,7 +17,7 @@ module Magic
         def requirements_met? = controller.graveyard.count >= 7
 
         def resolve!
-          trigger_effect(:add_counter, counter_type: "+1/+1", target: source, amount: 1)
+          add_counter("+1/+1", to: source)
           draw_card
         end
       end

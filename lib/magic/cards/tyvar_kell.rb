@@ -41,7 +41,7 @@ module Magic
         def resolve!(target: nil)
           return unless target
 
-          trigger_effect(:add_counter, target: target, counter_type: "+1/+1")
+          add_counter("+1/+1", to: target)
           target.untap!
           trigger_effect(:grant_keyword, target: target, keyword: :deathtouch)
         end

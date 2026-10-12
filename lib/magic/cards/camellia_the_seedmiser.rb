@@ -44,7 +44,7 @@ module Magic
 
         def resolve!
           controller.creatures.select { _1.type?("Squirrel") }.reject { _1 == source }.each do |squirrel|
-            trigger_effect(:add_counter, counter_type: "+1/+1", target: squirrel, amount: 1)
+            add_counter("+1/+1", to: squirrel)
           end
         end
       end

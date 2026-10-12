@@ -18,7 +18,7 @@ module Magic
           def choice_amount = 0..2
 
           def resolve!(targets:)
-            targets.each { trigger_effect(:add_counter, counter_type: "+1/+1", target: _1, amount: 1) }
+            targets.each { add_counter("+1/+1", to: _1) }
           end
         end
 
