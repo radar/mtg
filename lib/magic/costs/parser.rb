@@ -23,6 +23,8 @@ module Magic
             Sacrifice.new(source, source.controller.creatures.select(&:defender?))
           when /Sacrifice another creature/
             SacrificeAnother.new(source, source.controller.creatures.reject { _1 == source })
+          when /Sacrifice a Snail/
+            Sacrifice.new(source, source.controller.permanents.select { _1.type?("Snail") })
           when /Sacrifice a token/
             Sacrifice.new(source, source.controller.permanents.select(&:token?))
           when /Sacrifice a creature/

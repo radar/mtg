@@ -511,7 +511,6 @@ module Magic
     end
 
     def enters_as_copy? = false
-    # "Exile ~" as the last instruction of a spell (Morningtide's Light): it isn't put into the graveyard.
     # "If that spell would be put into your graveyard, exile it instead" for one cast (`exile_once!`), or
     # always for a card that overrides this (Morningtide's Light).
     def exile_once! = @exile_once = true
