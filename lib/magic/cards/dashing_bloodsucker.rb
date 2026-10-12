@@ -12,7 +12,7 @@ module Magic
       # +2/+0 and gains lifelink until end of turn."
       class EerieTrigger < TriggeredAbility::Eerie
         def call
-          trigger_effect(:modify_power_toughness, target: actor, power: 2, toughness: 0, until_eot: true)
+          pump(actor, 2, 0)
           actor.grant_keyword(Cards::Keywords::LIFELINK, until_eot: true)
         end
       end

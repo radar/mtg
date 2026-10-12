@@ -18,7 +18,7 @@ module Magic
         def call
           attacker = event.attacks.first.attacker
           x = controller.permanents.count { _1.type?("Kithkin") }
-          trigger_effect(:modify_power_toughness, target: attacker, power: x, toughness: x, until_eot: true)
+          pump(attacker, x, x)
         end
       end
 

@@ -11,7 +11,7 @@ module Magic
       # Valiant -- it gets +0/+2 until end of turn.
       class ValiantTrigger < TriggeredAbility::Valiant
         def call
-          trigger_effect(:modify_power_toughness, power: 0, toughness: 2, target: actor, until_eot: true)
+          pump(actor, 0, 2)
         end
       end
 

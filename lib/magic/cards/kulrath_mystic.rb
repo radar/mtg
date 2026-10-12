@@ -13,7 +13,7 @@ module Magic
         def should_perform? = you? && spell.mana_value >= 4
 
         def call
-          trigger_effect(:modify_power_toughness, target: actor, power: 2, toughness: 0)
+          pump(actor, 2, 0)
           trigger_effect(:grant_keyword, target: actor, keyword: :vigilance)
         end
       end

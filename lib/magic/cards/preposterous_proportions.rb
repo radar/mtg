@@ -7,7 +7,7 @@ module Magic
     class PreposterousProportions < Sorcery
       def resolve!
         battlefield.controlled_by(controller).creatures.each do |creature|
-          trigger_effect(:modify_power_toughness, target: creature, power: 10, toughness: 10)
+          pump(creature, 10, 10)
           trigger_effect(:grant_keyword, target: creature, keyword: :vigilance)
         end
       end

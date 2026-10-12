@@ -29,7 +29,7 @@ module Magic
         def target_choices = battlefield.creatures.controlled_by(controller)
 
         def resolve!(target:)
-          trigger_effect(:modify_power_toughness, target: target, power: 3, toughness: 3)
+          pump(target, 3, 3)
         end
       end
 

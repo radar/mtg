@@ -10,7 +10,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:modify_power_toughness, target: target, power: 1, toughness: 0)
+        pump(target, 1, 0)
         trigger_effect(:grant_keyword, target: target, keyword: :first_strike)
       end
     end

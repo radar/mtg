@@ -14,7 +14,7 @@ module Magic
       # power to up to one target creature an opponent controls."
       def resolve!(targets:)
         creature, victim = targets
-        trigger_effect(:modify_power_toughness, target: creature, power: 1, toughness: 0)
+        pump(creature, 1, 0)
         game.tick! # so the +1/+0 counts towards the damage
         deal_damage(creature.power, to: victim) if victim
       end

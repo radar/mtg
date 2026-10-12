@@ -34,7 +34,7 @@ module Magic
 
         def resolve!(target:)
           x = controller.graveyard.cards.count
-          trigger_effect(:modify_power_toughness, target:, power: -x, toughness: -x)
+          pump(target, -x, -x)
         end
       end
 

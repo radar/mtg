@@ -24,7 +24,7 @@ module Magic
 
         def call
           battlefield.controlled_by(controller).creatures.select { _1.type?("Bat") }.each do |bat|
-            trigger_effect(:modify_power_toughness, power: 1, toughness: 0, target: bat, until_eot: true)
+            pump(bat, 1, 0)
             trigger_effect(:grant_keyword, target: bat, keyword: :deathtouch)
           end
         end

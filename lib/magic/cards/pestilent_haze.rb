@@ -8,7 +8,7 @@ module Magic
       class ShrinkCreatures < Mode
         def resolve!
           battlefield.creatures.each do |creature|
-            trigger_effect(:modify_power_toughness, target: creature, power: -2, toughness: -2)
+            pump(creature, -2, -2)
           end
         end
       end

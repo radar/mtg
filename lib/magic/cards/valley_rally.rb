@@ -16,7 +16,7 @@ module Magic
       # you control gains first strike until end of turn.
       def resolve!(targets: [])
         battlefield.controlled_by(controller).creatures.each do |creature|
-          trigger_effect(:modify_power_toughness, power: 2, toughness: 0, target: creature, until_eot: true)
+          pump(creature, 2, 0)
         end
         trigger_effect(:grant_keyword, target: targets.first, keyword: :first_strike) if gift_promised? && targets.first
       end

@@ -9,7 +9,7 @@ module Magic
       # "Target creature gets +3/+3 until end of turn. If a creature entered the battlefield under
       # your control this turn, draw a card."
       def resolve!(target:)
-        trigger_effect(:modify_power_toughness, target:, power: 3, toughness: 3)
+        pump(target, 3, 3)
         trigger_effect(:draw_card) if creature_entered_this_turn?
       end
 

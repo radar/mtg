@@ -16,7 +16,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:modify_power_toughness, target: actor, power: 1, toughness: 0)
+          pump(actor, 1, 0)
           controller.creatures.each { |creature| trigger_effect(:grant_keyword, target: creature, keyword: :trample) }
         end
       end

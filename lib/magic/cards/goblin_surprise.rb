@@ -7,7 +7,7 @@ module Magic
     class GoblinSurprise < Instant
       class Mode1 < Mode
         def resolve!
-          battlefield.controlled_by(controller).creatures.each { |creature| trigger_effect(:modify_power_toughness, target: creature, power: 2, toughness: 0) }
+          battlefield.controlled_by(controller).creatures.each { |creature| pump(creature, 2, 0) }
         end
       end
 

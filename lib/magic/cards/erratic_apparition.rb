@@ -13,7 +13,7 @@ module Magic
       # +1/+1 until end of turn."
       class EerieTrigger < TriggeredAbility::Eerie
         def call
-          trigger_effect(:modify_power_toughness, target: actor, power: 1, toughness: 1, until_eot: true)
+          pump(actor, 1, 1)
         end
       end
 

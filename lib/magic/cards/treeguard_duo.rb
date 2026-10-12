@@ -19,7 +19,7 @@ module Magic
           def resolve!(target:)
             x = choices.count
             trigger_effect(:grant_keyword, target: target, keyword: :vigilance)
-            trigger_effect(:modify_power_toughness, power: x, toughness: x, target: target, until_eot: true)
+            pump(target, x, x)
           end
         end
 

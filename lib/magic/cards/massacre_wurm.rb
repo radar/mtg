@@ -10,7 +10,7 @@ module Magic
     class MassacreWurm < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          battlefield.not_controlled_by(controller).creatures.each { |creature| trigger_effect(:modify_power_toughness, target: creature, power: -2, toughness: -2) }
+          battlefield.not_controlled_by(controller).creatures.each { |creature| pump(creature, -2, -2) }
         end
       end
 

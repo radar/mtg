@@ -24,7 +24,7 @@ module Magic
 
       # "Target creature gets +3/+0 until end of turn. When it dies this turn, manifest dread."
       def resolve!(target:)
-        trigger_effect(:modify_power_toughness, target: target, power: 3, toughness: 0, until_eot: true)
+        pump(target, 3, 0)
         target.state[:turn_inside_out_player] = controller
         target.register_turn_trigger(Events::CreatureDied, DiesTrigger)
       end

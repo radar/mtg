@@ -25,7 +25,7 @@ module Magic
         def should_perform? = you? && !spell.creature?
 
         def call
-          trigger_effect(:modify_power_toughness, target: actor, power: 1, toughness: 1, until_eot: true)
+          pump(actor, 1, 1)
           opponents.each { |opponent| deal_damage(1, to: opponent) }
         end
       end

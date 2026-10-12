@@ -11,7 +11,7 @@ module Magic
       # Valiant -- it gets +1/+0 and gains first strike until end of turn. Scry 1.
       class ValiantTrigger < TriggeredAbility::Valiant
         def call
-          trigger_effect(:modify_power_toughness, power: 1, toughness: 0, target: actor, until_eot: true)
+          pump(actor, 1, 0)
           trigger_effect(:grant_keyword, target: actor, keyword: :first_strike)
           game.choices.add(Magic::Choice::Scry.new(actor: actor, amount: 1))
         end

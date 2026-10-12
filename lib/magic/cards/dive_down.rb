@@ -10,7 +10,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:modify_power_toughness, target: target, power: 0, toughness: 3)
+        pump(target, 0, 3)
         trigger_effect(:grant_keyword, target: target, keyword: :hexproof)
       end
     end

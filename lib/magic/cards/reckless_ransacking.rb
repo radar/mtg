@@ -10,7 +10,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:modify_power_toughness, target: target, power: 3, toughness: 2)
+        pump(target, 3, 2)
         create_token(token: Tokens::Treasure)
       end
     end

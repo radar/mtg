@@ -11,7 +11,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:modify_power_toughness, target: target, power: -5, toughness: -5)
+          pump(target, -5, -5)
           target.register_turn_replacement(Magic::Effects::MovePermanentZone, Magic::ReplacementEffect::ExileInsteadOfDying)
         end
       end
@@ -22,7 +22,7 @@ module Magic
         end
 
         def resolve!(target:)
-          target.creatures.each { |creature| trigger_effect(:modify_power_toughness, target: creature, power: -1, toughness: -1) }
+          target.creatures.each { |creature| pump(creature, -1, -1) }
         end
       end
 

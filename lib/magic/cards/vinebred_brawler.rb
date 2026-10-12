@@ -16,7 +16,7 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          trigger_effect(:modify_power_toughness, target:, power: 2, toughness: 1)
+          pump(target, 2, 1)
         end
       end
 

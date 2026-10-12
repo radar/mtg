@@ -10,7 +10,7 @@ module Magic
       # Target creature you control gets +2/+2 until end of turn. If the gift was promised, that
       # creature also gains indestructible until end of turn.
       def resolve!(target:)
-        trigger_effect(:modify_power_toughness, power: 2, toughness: 2, target: target, until_eot: true)
+        pump(target, 2, 2)
         trigger_effect(:grant_keyword, target: target, keyword: :indestructible) if gift_promised?
       end
     end

@@ -12,7 +12,7 @@ module Magic
         costs "{1}{R}"
 
         def resolve!
-          trigger_effect(:modify_power_toughness, target: source, power: 1, toughness: 0)
+          pump(source, 1, 0)
           trigger_effect(:grant_keyword, target: source, keyword: :menace)
         end
       end

@@ -22,7 +22,7 @@ module Magic
 
         def resolve!(targets:)
           targets.first(@amount).each do |target|
-            trigger_effect(:modify_power_toughness, target: target, power: -2, toughness: -2)
+            pump(target, -2, -2)
           end
         end
 

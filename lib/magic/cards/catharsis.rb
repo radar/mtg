@@ -32,7 +32,7 @@ module Magic
 
         def call
           controller.creatures.each do |creature|
-            trigger_effect(:modify_power_toughness, target: creature, power: 1, toughness: 1)
+            pump(creature, 1, 1)
             trigger_effect(:grant_keyword, target: creature, keyword: :haste)
           end
         end

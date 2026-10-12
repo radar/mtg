@@ -29,7 +29,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:modify_power_toughness, power: 1, toughness: 0, target: target, until_eot: true)
+          pump(target, 1, 0)
           trigger_effect(:grant_keyword, target: target, keyword: :haste)
         end
       end

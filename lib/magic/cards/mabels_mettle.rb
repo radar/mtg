@@ -15,8 +15,8 @@ module Magic
       end
 
       def resolve!(targets:)
-        trigger_effect(:modify_power_toughness, target: targets[0], power: 2, toughness: 2)
-        trigger_effect(:modify_power_toughness, target: targets[1], power: 1, toughness: 1)
+        pump(targets[0], 2, 2)
+        pump(targets[1], 1, 1)
       end
     end
   end

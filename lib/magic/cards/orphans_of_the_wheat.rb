@@ -19,7 +19,7 @@ module Magic
           raise ArgumentError, "#{invalid.map(&:name).join(', ')} can't be tapped" if invalid.any?
 
           targets.each(&:tap!)
-          trigger_effect(:modify_power_toughness, target: actor, power: targets.size, toughness: targets.size) if targets.any?
+          pump(actor, targets.size, targets.size) if targets.any?
         end
       end
 

@@ -9,7 +9,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:modify_power_toughness, power: 4, toughness: 4, target: target, until_eot: true)
+        pump(target, 4, 4)
       end
     end
   end

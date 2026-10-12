@@ -7,7 +7,7 @@ module Magic
     class Overrun < Sorcery
       def resolve!
         battlefield.controlled_by(controller).creatures.each do |creature|
-          trigger_effect(:modify_power_toughness, target: creature, power: 3, toughness: 3)
+          pump(creature, 3, 3)
           trigger_effect(:grant_keyword, target: creature, keyword: :trample)
         end
       end

@@ -31,7 +31,7 @@ module Magic
 
       def resolve!(target:)
         target.untap!
-        trigger_effect(:modify_power_toughness, target: target, power: 2, toughness: 2)
+        pump(target, 2, 2)
         return unless target.type?("Dwarf")
 
         choice = AttachChoice.new(actor: self, creature: target)

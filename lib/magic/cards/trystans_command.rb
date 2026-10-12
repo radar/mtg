@@ -31,7 +31,7 @@ module Magic
 
         def resolve!(target:)
           target.creatures.each do |creature|
-            trigger_effect(:modify_power_toughness, target: creature, power: 3, toughness: 3)
+            pump(creature, 3, 3)
             creature.untap!
           end
         end

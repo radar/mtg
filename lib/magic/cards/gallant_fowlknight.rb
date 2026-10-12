@@ -11,7 +11,7 @@ module Magic
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
           battlefield.controlled_by(controller).creatures.each do |creature|
-            trigger_effect(:modify_power_toughness, target: creature, power: 1, toughness: 0, until_eot: true)
+            pump(creature, 1, 0)
             creature.grant_keyword(Cards::Keywords::FIRST_STRIKE, until_eot: true) if creature.type?("Kithkin")
           end
         end

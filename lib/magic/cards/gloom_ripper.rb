@@ -23,7 +23,7 @@ module Magic
           def choice_amount = 0..1
 
           def resolve!(target:)
-            trigger_effect(:modify_power_toughness, target: target, power: 0, toughness: -@amount, until_eot: true)
+            pump(target, 0, -@amount)
           end
         end
 
@@ -34,7 +34,7 @@ module Magic
 
           def resolve!(target:)
             x = controller.creatures.by_type("Elf").count + controller.graveyard.by_any_type("Elf").count
-            trigger_effect(:modify_power_toughness, target: target, power: x, toughness: 0, until_eot: true)
+            pump(target, x, 0)
 
             opponent_choice = OpponentTargetChoice.new(actor: actor, amount: x)
             game.add_choice(opponent_choice) if opponent_choice.choices.any?

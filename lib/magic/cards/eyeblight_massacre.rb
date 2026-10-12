@@ -6,7 +6,7 @@ module Magic
 
       def resolve!
         creatures.excluding_type("Elf").each do |creature|
-          trigger_effect(:modify_power_toughness, power: -2, toughness: -2, target: creature, until_eot: true)
+          pump(creature, -2, -2)
         end
       end
     end

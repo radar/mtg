@@ -25,7 +25,7 @@ module Magic
 
         def resolve!
           x = controller.lands.count
-          trigger_effect(:modify_power_toughness, power: x, toughness: x, target: source, until_eot: true)
+          pump(source, x, x)
         end
       end
 

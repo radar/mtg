@@ -28,7 +28,7 @@ module Magic
             when :token
               trigger_effect(:create_token, token_class: Tokens::Rabbit, enters_tapped: true, attacking: true, attack_target: @target)
             when :pump
-              @attackers.each { trigger_effect(:modify_power_toughness, power: 1, toughness: 1, target: _1, until_eot: true) }
+              @attackers.each { pump(_1, 1, 1) }
             else
               raise ArgumentError, "choose :token or :pump"
             end

@@ -16,7 +16,7 @@ module Magic
 
         def call
           battlefield.controlled_by(controller).creatures.each do |creature|
-            trigger_effect(:modify_power_toughness, target: creature, power: 1, toughness: 0)
+            pump(creature, 1, 0)
             trigger_effect(:grant_keyword, target: creature, keyword: :trample)
           end
         end

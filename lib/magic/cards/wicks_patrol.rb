@@ -18,7 +18,7 @@ module Magic
 
           def resolve!(target:)
             x = controller.graveyard.map(&:mana_value).max || 0
-            trigger_effect(:modify_power_toughness, power: -x, toughness: -x, target: target, until_eot: true)
+            pump(target, -x, -x)
           end
         end
 

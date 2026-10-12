@@ -14,7 +14,7 @@ module Magic
       # target creature you don't control.
       def resolve!(targets:)
         mine, theirs = targets
-        trigger_effect(:modify_power_toughness, power: 1, toughness: 0, target: mine, until_eot: true)
+        pump(mine, 1, 0)
         game.tick!
         mine.bite!(theirs)
       end

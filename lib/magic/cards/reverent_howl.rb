@@ -19,7 +19,7 @@ module Magic
         def target_choices = battlefield.creatures
 
         def resolve!(target:)
-          trigger_effect(:modify_power_toughness, target: target, power: 2, toughness: 2)
+          pump(target, 2, 2)
           trigger_effect(:grant_keyword, target: target, keyword: :lifelink)
         end
       end

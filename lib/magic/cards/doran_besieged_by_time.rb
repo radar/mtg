@@ -37,7 +37,7 @@ module Magic
 
         def call
           difference = (creature.power - creature.toughness).abs
-          trigger_effect(:modify_power_toughness, target: creature, power: difference, toughness: difference)
+          pump(creature, difference, difference)
         end
       end
 

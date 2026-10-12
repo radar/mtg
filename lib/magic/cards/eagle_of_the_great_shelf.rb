@@ -16,7 +16,7 @@ module Magic
 
         def call
           bonus = controller.creatures.count - 1
-          trigger_effect(:modify_power_toughness, target: actor, power: bonus, toughness: bonus, until_eot: true)
+          pump(actor, bonus, bonus)
         end
       end
 

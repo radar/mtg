@@ -5,6 +5,7 @@ module Magic
   #   create_token token: Tokens::Treasure   # trigger_effect(:create_token, token_class: Tokens::Treasure)
   #   deal_damage 3, to: target              # trigger_effect(:deal_damage, target: target, damage: 3)
   #   add_counter "+1/+1", to: target        # trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
+  #   pump target, 2, 2                      # trigger_effect(:modify_power_toughness, target: target, power: 2, toughness: 2)
   #   draw_card                              # trigger_effect(:draw_cards, number_to_draw: 1)
   #   draw_cards 2
   #   gain_life 3                            # trigger_effect(:gain_life, life: 3): the controller gains it
@@ -21,6 +22,11 @@ module Magic
     # "Put a +1/+1 counter on target creature": `add_counter "+1/+1", to: target`; `amount:` defaults to 1.
     def add_counter(counter_type, to:, amount: 1, **args)
       trigger_effect(:add_counter, counter_type:, target: to, amount:, **args)
+    end
+
+    # "Target creature gets +2/+2 until end of turn": `pump target, 2, 2` (`until_eot: false` for a lasting change).
+    def pump(target, power, toughness, **args)
+      trigger_effect(:modify_power_toughness, target:, power:, toughness:, **args)
     end
 
     def draw_card

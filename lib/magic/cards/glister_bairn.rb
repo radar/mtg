@@ -17,7 +17,7 @@ module Magic
 
         def resolve!(target:)
           x = controller.colors_among_permanents
-          trigger_effect(:modify_power_toughness, power: x, toughness: x, target: target, until_eot: true)
+          pump(target, x, x)
         end
       end
 

@@ -25,7 +25,7 @@ module Magic
 
           def call
             event.attacks.map(&:attacker).select { _1.controller == controller }.each do |attacker|
-              trigger_effect(:modify_power_toughness, target: attacker, power: 1, toughness: 0, until_eot: true)
+              pump(attacker, 1, 0)
             end
           end
         end

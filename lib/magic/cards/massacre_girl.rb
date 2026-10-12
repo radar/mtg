@@ -18,7 +18,7 @@ module Magic
 
         def debuff!
           game.creatures.except(actor).each do |creature|
-            trigger_effect(:modify_power_toughness, target: creature, power: -1, toughness: -1)
+            pump(creature, -1, -1)
           end
         end
       end
@@ -26,7 +26,7 @@ module Magic
       class CreatureDiedTrigger < TriggeredAbility
         def call
           game.creatures.except(actor).each do |creature|
-            trigger_effect(:modify_power_toughness, target: creature, power: -1, toughness: -1)
+            pump(creature, -1, -1)
           end
         end
       end

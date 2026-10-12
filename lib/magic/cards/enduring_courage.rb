@@ -15,7 +15,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:modify_power_toughness, target: event.permanent, power: 2, toughness: 0)
+          pump(event.permanent, 2, 0)
           trigger_effect(:grant_keyword, target: event.permanent, keyword: :haste)
         end
       end

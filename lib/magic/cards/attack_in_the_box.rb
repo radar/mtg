@@ -32,7 +32,7 @@ module Magic
 
         class MayChoice < Magic::Choice::May
           def resolve!
-            trigger_effect(:modify_power_toughness, target: actor, power: 4, toughness: 0)
+            pump(actor, 4, 0)
             game.subscribe(SacrificeAtEndStep.new(game: game, permanent: actor))
           end
         end

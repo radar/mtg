@@ -10,7 +10,7 @@ module Magic
       # "One or two target creatures each get +2/+1 until end of turn."
       def resolve!(targets: [])
         targets.first(2).each do |target|
-          trigger_effect(:modify_power_toughness, target:, power: 2, toughness: 1)
+          pump(target, 2, 1)
         end
       end
     end

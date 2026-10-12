@@ -14,7 +14,7 @@ module Magic
 
         def call
           battlefield.controlled_by(controller).creatures.select { _1.type?("Raccoon") }.each do |raccoon|
-            trigger_effect(:modify_power_toughness, power: 1, toughness: 1, target: raccoon, until_eot: true)
+            pump(raccoon, 1, 1)
             trigger_effect(:grant_keyword, target: raccoon, keyword: :vigilance)
           end
         end

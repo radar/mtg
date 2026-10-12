@@ -16,7 +16,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:modify_power_toughness, target: target, power: 5, toughness: 5)
+          pump(target, 5, 5)
           trigger_effect(:grant_keyword, target: target, keyword: :trample)
         end
       end

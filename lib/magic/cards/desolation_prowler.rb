@@ -14,7 +14,7 @@ module Magic
         once_each_turn
 
         def resolve!
-          trigger_effect(:modify_power_toughness, target: source, power: 2, toughness: 2)
+          pump(source, 2, 2)
         end
       end
 

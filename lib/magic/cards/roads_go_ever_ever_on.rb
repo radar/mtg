@@ -45,7 +45,7 @@ module Magic
 
           def resolve!(target:)
             plains = controller.permanents.count { |permanent| permanent.type?("Plains") }
-            trigger_effect(:modify_power_toughness, target: target, power: plains, toughness: plains, until_eot: true)
+            pump(target, plains, plains)
           end
         end
 

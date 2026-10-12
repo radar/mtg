@@ -17,7 +17,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:modify_power_toughness, power: 1, toughness: 0, target: target, until_eot: true)
+            pump(target, 1, 0)
             resolutions = (actor.state[:resolutions] ||= Hash.new(0))
             turn = game.current_turn.number
             resolutions[turn] += 1

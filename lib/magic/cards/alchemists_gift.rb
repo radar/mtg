@@ -31,7 +31,7 @@ module Magic
 
       # "Target creature gets +1/+1 and gains your choice of deathtouch or lifelink until end of turn."
       def resolve!(target:)
-        trigger_effect(:modify_power_toughness, target:, power: 1, toughness: 1)
+        pump(target, 1, 1)
         game.add_choice(KeywordChoice.new(actor: self, creature: target))
       end
     end

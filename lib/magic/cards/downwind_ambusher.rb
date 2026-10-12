@@ -30,7 +30,7 @@ module Magic
 
           def resolve!(target:)
             if @mode == :shrink
-              trigger_effect(:modify_power_toughness, power: -1, toughness: -1, target: target, until_eot: true)
+              pump(target, -1, -1)
             else
               trigger_effect(:destroy_target, target: target)
             end

@@ -22,7 +22,7 @@ module Magic
       # until end of turn.
       def resolve!(targets:)
         trigger_effect(:draw_cards, player: targets.first, number_to_draw: 2)
-        trigger_effect(:modify_power_toughness, power: 2, toughness: 0, target: targets[1], until_eot: true) if gift_promised?
+        pump(targets[1], 2, 0) if gift_promised?
       end
     end
   end

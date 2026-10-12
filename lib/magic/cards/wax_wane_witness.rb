@@ -14,7 +14,7 @@ module Magic
         def should_perform? = event.player == controller && controllers_turn?
 
         def call
-          trigger_effect(:modify_power_toughness, power: 1, toughness: 0, target: actor, until_eot: true)
+          pump(actor, 1, 0)
         end
       end
 

@@ -14,7 +14,7 @@ module Magic
         def threshold = 4
 
         def call
-          trigger_effect(:modify_power_toughness, power: 2, toughness: 1, target: actor, until_eot: true)
+          pump(actor, 2, 1)
         end
       end
 

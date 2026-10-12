@@ -27,7 +27,7 @@ module Magic
         def resolve!
           x = controller.creatures.map(&:power).max.to_i
           controller.creatures.each do |creature|
-            trigger_effect(:modify_power_toughness, power: x, toughness: x, target: creature, until_eot: true)
+            pump(creature, x, x)
           end
         end
       end

@@ -17,7 +17,7 @@ module Magic
 
       class Mode2 < Mode
         def resolve!
-          battlefield.not_controlled_by(controller).creatures.each { |creature| trigger_effect(:modify_power_toughness, target: creature, power: -1, toughness: -1) }
+          battlefield.not_controlled_by(controller).creatures.each { |creature| pump(creature, -1, -1) }
         end
       end
 

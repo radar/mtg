@@ -9,7 +9,7 @@ module Magic
 
       # "Double the power of target creature until end of turn."
       def resolve!(target:)
-        trigger_effect(:modify_power_toughness, target:, power: target.power, toughness: 0)
+        pump(target, target.power, 0)
       end
     end
   end

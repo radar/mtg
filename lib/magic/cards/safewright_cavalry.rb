@@ -17,7 +17,7 @@ module Magic
         def target_choices = controller.creatures.by_type("Elf")
 
         def resolve!(target:)
-          trigger_effect(:modify_power_toughness, target:, power: 2, toughness: 2)
+          pump(target, 2, 2)
         end
       end
 

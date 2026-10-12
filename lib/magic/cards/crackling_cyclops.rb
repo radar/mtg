@@ -14,7 +14,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:modify_power_toughness, target: actor, power: 3, toughness: 0)
+          pump(actor, 3, 0)
         end
       end
 

@@ -24,7 +24,7 @@ module Magic
 
           def call
             attacker = event.attacks.first.attacker
-            trigger_effect(:modify_power_toughness, target: attacker, power: 1, toughness: 0, until_eot: true)
+            pump(attacker, 1, 0)
             attacker.grant_keyword(Cards::Keywords::DEATHTOUCH, until_eot: true)
           end
         end

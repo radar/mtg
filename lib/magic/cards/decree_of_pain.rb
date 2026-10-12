@@ -17,7 +17,7 @@ module Magic
       def cycling_effect!
         super
         game.battlefield.creatures.each do |creature|
-          trigger_effect(:modify_power_toughness, target: creature, power: -2, toughness: -2, until_eot: true)
+          pump(creature, -2, -2)
         end
       end
     end

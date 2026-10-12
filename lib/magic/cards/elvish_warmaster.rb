@@ -42,7 +42,7 @@ module Magic
 
         def resolve!
           controller.creatures.by_any_type("Elf").each do |elf|
-            trigger_effect(:modify_power_toughness, power: 2, toughness: 2, target: elf, until_eot: true)
+            pump(elf, 2, 2)
             trigger_effect(:grant_keyword, keyword: :deathtouch, target: elf)
           end
         end

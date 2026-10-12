@@ -14,7 +14,7 @@ module Magic
 
         def resolve!(choice:)
           trigger_effect(:sacrifice, target: choice)
-          trigger_effect(:modify_power_toughness, power: 2, toughness: 2, target: actor)
+          pump(actor, 2, 2)
           trigger_effect(:grant_keyword, keyword: :trample, target: actor)
         end
       end

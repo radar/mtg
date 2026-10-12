@@ -13,7 +13,7 @@ module Magic
       class ValiantTrigger < TriggeredAbility::Valiant
         def call
           battlefield.controlled_by(controller).creatures.select { _1.type?("Mouse") }.each do |mouse|
-            trigger_effect(:modify_power_toughness, power: 1, toughness: 0, target: mouse, until_eot: true)
+            pump(mouse, 1, 0)
           end
         end
       end

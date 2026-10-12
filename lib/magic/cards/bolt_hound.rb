@@ -15,7 +15,7 @@ module Magic
 
         def call
           (controller.creatures - [actor]).each do |creature|
-            trigger_effect(:modify_power_toughness, target: creature, power: 1, toughness: 0)
+            pump(creature, 1, 0)
           end
         end
       end

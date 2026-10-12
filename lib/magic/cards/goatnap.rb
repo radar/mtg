@@ -14,7 +14,7 @@ module Magic
         target.untap!
         trigger_effect(:grant_keyword, target: target, keyword: :haste)
         if target.type?("Goat")
-          trigger_effect(:modify_power_toughness, target: target, power: 3, toughness: 0)
+          pump(target, 3, 0)
         end
       end
     end

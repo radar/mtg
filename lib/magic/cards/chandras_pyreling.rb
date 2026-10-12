@@ -12,7 +12,7 @@ module Magic
       # double strike until end of turn."
       class DamageTrigger < TriggeredAbility::NoncombatDamageToOpponent
         def call
-          trigger_effect(:modify_power_toughness, target: actor, power: 1, toughness: 0)
+          pump(actor, 1, 0)
           actor.grant_keyword(Keywords::DOUBLE_STRIKE)
         end
       end

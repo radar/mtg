@@ -21,7 +21,7 @@ module Magic
 
         def resolve!(target:)
           x = game.battlefield.creatures.by_any_type("Elf").count
-          trigger_effect(:modify_power_toughness, power: x, toughness: x, target: target, until_eot: true)
+          pump(target, x, x)
         end
       end
 

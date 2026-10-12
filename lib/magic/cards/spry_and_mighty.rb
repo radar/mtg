@@ -21,7 +21,7 @@ module Magic
           x = (targets[0].power - targets[1].power).abs
           draw_cards(x) if x.positive?
           targets.each do |creature|
-            trigger_effect(:modify_power_toughness, target: creature, power: x, toughness: x)
+            pump(creature, x, x)
             trigger_effect(:grant_keyword, target: creature, keyword: :trample)
           end
         end
