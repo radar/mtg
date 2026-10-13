@@ -686,9 +686,9 @@ module Magic
         recipient = game.opponents(player).first
         case card.gift_kind
         when :card then card.trigger_effect(:draw_cards, player: recipient, number_to_draw: 1)
-        when :food then card.trigger_effect(:create_token, token_class: Tokens::Food, controller: recipient)
-        when :treasure then card.trigger_effect(:create_token, token_class: Tokens::Treasure, controller: recipient)
-        when :tapped_fish then card.trigger_effect(:create_token, token_class: Tokens::Fish, controller: recipient, enters_tapped: true)
+        when :food then card.create_token(token:Tokens::Food, controller: recipient)
+        when :treasure then card.create_token(token:Tokens::Treasure, controller: recipient)
+        when :tapped_fish then card.create_token(token:Tokens::Fish, controller: recipient, enters_tapped: true)
         end
         game.notify!(Events::GiftGiven.new(player: player, recipient: recipient))
       end

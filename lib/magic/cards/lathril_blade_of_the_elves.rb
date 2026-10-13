@@ -39,7 +39,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:create_token, token_class: ElfWarriorToken, amount: event.damage)
+          create_token(token:ElfWarriorToken, amount: event.damage)
         end
       end
 

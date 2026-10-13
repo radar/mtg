@@ -35,7 +35,7 @@ module Magic
       def create_spirit
         return unless amount.positive?
 
-        trigger_effect(:create_token, token_class: SpiritToken, base_power: amount, base_toughness: amount, controller: controller)
+        create_token(token:SpiritToken, base_power: amount, base_toughness: amount, controller: controller)
       end
     end
   end

@@ -64,7 +64,7 @@ module Magic
         def description = "Create a green Treefolk creature token with reach and \"This token's power and toughness are each equal to the number of lands you control.\""
 
         def resolve!
-          source.trigger_effect(:create_token, token_class: TreefolkToken)
+          create_token(token:TreefolkToken)
         end
       end
 

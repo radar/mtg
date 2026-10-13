@@ -27,7 +27,7 @@ module Magic
         end
 
         def call
-          axe = Array(trigger_effect(:create_token, token_class: Tokens::Axe, controller: controller)).flatten.first
+          axe = Array(create_token(token:Tokens::Axe, controller: controller)).flatten.first
           return unless axe
 
           choice = AttachChoice.new(actor: actor, axe: axe)

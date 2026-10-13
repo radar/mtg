@@ -14,7 +14,7 @@ module Magic
 
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          actor.trigger_effect(:create_token, token_class: HumanSoldierToken)
+          create_token(token:HumanSoldierToken)
         end
       end
 

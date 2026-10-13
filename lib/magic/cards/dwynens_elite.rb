@@ -19,7 +19,7 @@ module Magic
         def call
           return unless controller.creatures.except(actor).by_type("Elf").any?
 
-          actor.trigger_effect(:create_token, token_class: ElfWarriorToken)
+          create_token(token:ElfWarriorToken)
         end
       end
 

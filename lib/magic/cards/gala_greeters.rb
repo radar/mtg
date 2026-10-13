@@ -27,7 +27,7 @@ module Magic
           when COUNTER
             add_counter("+1/+1", to: actor)
           when TREASURE
-            actor.trigger_effect(:create_token, token_class: Tokens::Treasure, enters_tapped: true)
+            create_token(token:Tokens::Treasure, enters_tapped: true)
           when LIFE
             controller.gain_life(2)
           end

@@ -15,7 +15,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:create_token, token_class: Tokens::Treasure, amount: event.damage)
+          create_token(token:Tokens::Treasure, amount: event.damage)
         end
       end
 

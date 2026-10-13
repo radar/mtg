@@ -36,7 +36,7 @@ module Magic
 
         def resolve!
           loop do
-            source.trigger_effect(:create_token, token_class: InsectToken)
+            create_token(token:InsectToken)
             milled = controller.mill(1).first
             break unless milled.type?(T::Creatures["Insect"])
 

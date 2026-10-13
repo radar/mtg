@@ -19,7 +19,7 @@ module Magic
         def prompt = "Create a 1/1 green Elf Warrior creature token?"
 
         def resolve!
-          actor.trigger_effect(:create_token, token_class: ElfWarriorToken)
+          create_token(token:ElfWarriorToken)
         end
       end
 

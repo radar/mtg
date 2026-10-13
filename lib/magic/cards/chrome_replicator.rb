@@ -18,7 +18,7 @@ module Magic
         names = game.battlefield.nonland.nontoken.map(&:name)
         duplicate_names = names.group_by(&:itself).values.any? { |group| group.length > 1 }
         if duplicate_names
-          actor.trigger_effect(:create_token, token_class: Construct)
+          create_token(token:Construct)
         end
       end
     end

@@ -26,7 +26,7 @@ module Magic
         end
 
         def call
-          Array(trigger_effect(:create_token, token_class: WarriorToken, amount: controller.graveyard.creatures.count, enters_tapped: true, attacking: true, attack_target: game.current_turn.attacks.find { _1.attacker == actor }&.target)).each do |token|
+          Array(create_token(token:WarriorToken, amount: controller.graveyard.creatures.count, enters_tapped: true, attacking: true, attack_target: game.current_turn.attacks.find { _1.attacker == actor }&.target)).each do |token|
             token.register_turn_trigger(Events::BeginningOfEndStep, SacrificeTokenTrigger)
           end
         end

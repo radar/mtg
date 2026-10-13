@@ -44,7 +44,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:create_token, token_class: KnightToken)
+          create_token(token:KnightToken)
         end
       end
 

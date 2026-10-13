@@ -26,7 +26,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:create_token, token_class: CatToken)
+          create_token(token:CatToken)
         end
       end
 

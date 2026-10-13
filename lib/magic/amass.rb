@@ -25,7 +25,7 @@ module Magic
 
     def self.create_army(source:, controller:, subtype:)
       token_class = GoblinArmyToken
-      created = source.trigger_effect(:create_token, token_class: token_class, controller: controller)
+      created = source.create_token(token: token_class, controller: controller)
       Array(created).flatten.first
     end
   end

@@ -16,7 +16,7 @@ module Magic
       # "When this Equipment enters, create a 2/2 red Dwarf creature token, then attach this Equipment to it."
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          token = Array(trigger_effect(:create_token, token_class: Tokens::Dwarf, controller: controller)).flatten.first
+          token = Array(create_token(token:Tokens::Dwarf, controller: controller)).flatten.first
           actor.attach_to!(token) if token
         end
       end

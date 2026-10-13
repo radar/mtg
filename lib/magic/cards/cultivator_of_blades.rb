@@ -33,7 +33,7 @@ module Magic
           when COUNTERS
             add_counter("+1/+1", to: actor, amount: 2)
           when TOKENS
-            actor.trigger_effect(:create_token, token_class: ServoToken, amount: 2)
+            create_token(token:ServoToken, amount: 2)
           end
         end
       end

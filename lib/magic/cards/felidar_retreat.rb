@@ -35,7 +35,7 @@ module Magic
         def resolve!(mode:)
           case mode
           when :token
-            actor.trigger_effect(:create_token, token_class: CatBeastToken)
+            create_token(token:CatBeastToken)
           when :counter
             controller.creatures.each do |creature|
               add_counter "+1/+1", to: creature
