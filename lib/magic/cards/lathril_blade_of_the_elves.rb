@@ -26,7 +26,7 @@ module Magic
             lose_life opponent, 10
           end
 
-          source.trigger_effect(:gain_life, source: source, life: 10, target: source.controller)
+          gain_life 10
         end
       end
 

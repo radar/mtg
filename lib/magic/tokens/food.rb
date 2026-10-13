@@ -13,7 +13,7 @@ module Magic
       costs "{2}, {T}, Sacrifice {this}"
 
       def resolve!
-        trigger_effect(:gain_life, life: 3)
+        gain_life 3
       end
     end)
   end

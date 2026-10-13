@@ -17,7 +17,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:gain_life)
+          gain_life
         end
       end
 

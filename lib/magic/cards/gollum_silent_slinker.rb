@@ -22,7 +22,7 @@ module Magic
       def adventure_resolve!(targets:, **)
         creature, player = targets
         add_counter("+1/+1", to: creature) if creature
-        trigger_effect(:gain_life, target: player, life: 2)
+        gain_life 2, to: player
       end
     end
   end
