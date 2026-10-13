@@ -49,7 +49,7 @@ module Magic
         def call
           count = actor.tokens_owed
           actor.tokens_created!
-          trigger_effect(:create_token, token_class: BirdSoldierToken, amount: count, controller: actor.token_controller)
+          create_token(token:BirdSoldierToken, amount: count, controller: actor.token_controller)
         end
       end
 

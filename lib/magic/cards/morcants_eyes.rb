@@ -27,7 +27,7 @@ module Magic
 
         def resolve!
           elves = controller.graveyard.cards.count { |card| card.type?("Elf") }
-          trigger_effect(:create_token, token_class: ElfToken, amount: elves)
+          create_token(token:ElfToken, amount: elves)
         end
       end
 

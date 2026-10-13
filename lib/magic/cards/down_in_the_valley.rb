@@ -52,7 +52,7 @@ module Magic
         def should_perform? = you? && actor.card.landfall_permanent.equal?(actor)
 
         def call
-          trigger_effect(:create_token, token_class: ElfToken)
+          create_token(token:ElfToken)
         end
       end
 

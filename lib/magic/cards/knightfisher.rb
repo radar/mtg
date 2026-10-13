@@ -22,7 +22,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: FishToken)
+          create_token(token:FishToken)
         end
       end
 

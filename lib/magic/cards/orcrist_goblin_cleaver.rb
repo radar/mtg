@@ -27,7 +27,7 @@ module Magic
 
         def resolve!(creature_type:)
           amount = controller.creatures.count { _1.type?(creature_type) }
-          trigger_effect(:create_token, token_class: Tokens::Treasure, controller: controller, amount: amount) if amount.positive?
+          create_token(token:Tokens::Treasure, controller: controller, amount: amount) if amount.positive?
         end
       end
 

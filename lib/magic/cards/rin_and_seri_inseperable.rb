@@ -46,11 +46,11 @@ module Magic
 
         def call
           if event.spell.type?("Dog")
-            trigger_effect(:create_token, token_class: CatToken)
+            create_token(token:CatToken)
           end
 
           if event.spell.type?("Cat")
-            trigger_effect(:create_token, token_class: DogToken)
+            create_token(token:DogToken)
           end
         end
       end

@@ -48,7 +48,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: MyrToken)
+          create_token(token:MyrToken)
           choice = CopyChoice.new(actor: actor)
           game.choices.add(choice) if choice.choices.size > 1
         end

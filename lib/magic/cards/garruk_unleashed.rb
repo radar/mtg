@@ -40,7 +40,7 @@ module Magic
         def description = "Create a 3/3 green Beast creature token. Then if an opponent controls more creatures than you, put a loyalty counter on Garruk."
 
         def resolve!
-          trigger_effect(:create_token, token_class: BeastToken)
+          create_token(token:BeastToken)
           opponent_has_more = game.opponents(controller).any? { |opponent| opponent.creatures.count > controller.creatures.count }
           source.change_loyalty!(1) if opponent_has_more
         end

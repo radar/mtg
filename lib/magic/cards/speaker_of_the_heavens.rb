@@ -26,7 +26,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:create_token, token_class: AngelToken)
+          create_token(token:AngelToken)
         end
       end
 

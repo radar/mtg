@@ -17,7 +17,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: ZombieToken, amount: 2)
+          create_token(token:ZombieToken, amount: 2)
         end
       end
 

@@ -24,7 +24,7 @@ module Magic
         gift = kicker_cost.paid?
         if gift
           opponent = game.opponents(controller).first
-          trigger_effect(:create_token, token_class: Tokens::Treasure, controller: opponent, amount: 1)
+          create_token(token:Tokens::Treasure, controller: opponent, amount: 1)
         end
 
         game.stack.remove(target)

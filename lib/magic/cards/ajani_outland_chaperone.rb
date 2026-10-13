@@ -19,7 +19,7 @@ module Magic
         def description = "Create a 1/1 green and white Kithkin creature token."
 
         def resolve!
-          trigger_effect(:create_token, token_class: KithkinToken)
+          create_token(token:KithkinToken)
         end
       end
 

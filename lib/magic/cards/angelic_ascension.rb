@@ -23,7 +23,7 @@ module Magic
 
       def resolve!(target:)
         exile_target(target)
-        trigger_effect(:create_token, controller: target.controller, token_class: AngelToken)
+        create_token(token: AngelToken, controller: target.controller)
       end
     end
   end

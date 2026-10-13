@@ -15,7 +15,7 @@ module Magic
 
       def resolve!
         elves = controller.creatures.by_type("Elf")
-        trigger_effect(:create_token, token_class: ElfWarriorToken, amount: elves.count)
+        create_token(token:ElfWarriorToken, amount: elves.count)
       end
     end
   end

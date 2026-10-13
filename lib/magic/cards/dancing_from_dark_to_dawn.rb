@@ -46,7 +46,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: DancingFromDarkToDawn::BearToken)
+          create_token(token:DancingFromDarkToDawn::BearToken)
         end
       end
 

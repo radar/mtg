@@ -24,7 +24,7 @@ module Magic
 
         def call
           exile_target(actor)
-          trigger_effect(:create_token, token_class: DemonToken)
+          create_token(token:DemonToken)
         end
       end
 

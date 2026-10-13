@@ -13,7 +13,7 @@ module Magic
       end
 
       def resolve!
-        trigger_effect(:create_token, token_class: RabbitToken, amount: 3)
+        create_token(token:RabbitToken, amount: 3)
       end
     end
   end

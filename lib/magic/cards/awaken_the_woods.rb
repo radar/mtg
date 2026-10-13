@@ -12,7 +12,7 @@ module Magic
       end
 
       def resolve!(value_for_x:)
-        trigger_effect(:create_token, token_class: ForestDryadToken, amount: value_for_x)
+        create_token(token:ForestDryadToken, amount: value_for_x)
       end
     end
   end

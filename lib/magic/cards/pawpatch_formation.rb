@@ -28,7 +28,7 @@ module Magic
       class Mode3 < Mode
         def resolve!
           trigger_effect(:draw_card)
-          trigger_effect(:create_token, token_class: Tokens::Food)
+          create_token(token:Tokens::Food)
         end
       end
 

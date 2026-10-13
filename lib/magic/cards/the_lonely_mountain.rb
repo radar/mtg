@@ -28,7 +28,7 @@ module Magic
         activate_only_as_sorcery
 
         def resolve!
-          trigger_effect(:create_token, token_class: DwarfToken, controller: controller)
+          create_token(token:DwarfToken, controller: controller)
         end
       end
 

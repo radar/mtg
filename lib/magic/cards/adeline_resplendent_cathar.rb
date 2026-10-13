@@ -41,7 +41,7 @@ module Magic
         def choices = [@opponent, *@opponent.permanents.select(&:planeswalker?)]
 
         def resolve!(target:)
-          trigger_effect(:create_token, token_class: HumanToken, amount: 1, enters_tapped: true, attacking: true, attack_target: target)
+          create_token(token:HumanToken, amount: 1, enters_tapped: true, attacking: true, attack_target: target)
         end
       end
 

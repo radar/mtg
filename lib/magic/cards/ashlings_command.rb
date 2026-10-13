@@ -30,7 +30,7 @@ module Magic
         def target_choices = game.players
 
         def resolve!(target:)
-          trigger_effect(:create_token, token_class: Tokens::Treasure, controller: target, amount: 2)
+          create_token(token:Tokens::Treasure, controller: target, amount: 2)
         end
       end
 

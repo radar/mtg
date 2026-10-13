@@ -8,7 +8,7 @@ module Magic
       # When this Class enters, create a 1/1 blue and red Otter creature token with prowess.
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:create_token, token_class: Tokens::Otter)
+          create_token(token:Tokens::Otter)
         end
       end
 
@@ -42,7 +42,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: Tokens::Otter)
+          create_token(token:Tokens::Otter)
         end
       end
 

@@ -19,7 +19,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: RatToken, amount: 2)
+          create_token(token:RatToken, amount: 2)
         end
       end
 

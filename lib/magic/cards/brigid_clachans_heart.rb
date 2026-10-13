@@ -48,7 +48,7 @@ module Magic
         def should_perform? = event.permanent == actor
 
         def call
-          trigger_effect(:create_token, token_class: KithkinToken)
+          create_token(token:KithkinToken)
         end
       end
 

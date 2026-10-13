@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!
-        trigger_effect(:create_token, token_class: RatToken, amount: controller.graveyard.creatures.count, enters_tapped: true)
+        create_token(token:RatToken, amount: controller.graveyard.creatures.count, enters_tapped: true)
       end
     end
   end

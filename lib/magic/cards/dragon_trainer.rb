@@ -18,7 +18,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: DragonToken)
+          create_token(token:DragonToken)
         end
       end
 

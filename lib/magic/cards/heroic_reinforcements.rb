@@ -13,7 +13,7 @@ module Magic
       end
 
       def resolve!
-        trigger_effect(:create_token, token_class: SoldierToken, amount: 2)
+        create_token(token:SoldierToken, amount: 2)
         battlefield.controlled_by(controller).creatures.each do |creature|
           pump(creature, 1, 1)
           give_keyword(creature, :haste)

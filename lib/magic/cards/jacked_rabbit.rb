@@ -35,7 +35,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: RabbitToken, amount: actor.power) if actor.power.positive?
+          create_token(token:RabbitToken, amount: actor.power) if actor.power.positive?
         end
       end
 

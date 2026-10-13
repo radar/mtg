@@ -16,7 +16,7 @@ module Magic
       # When this Class enters, create a 0/4 white Wall creature token with defender.
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:create_token, token_class: WallToken)
+          create_token(token:WallToken)
         end
       end
 

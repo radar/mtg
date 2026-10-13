@@ -27,7 +27,7 @@ module Magic
       class PayChoice < Magic::Choice::PayMana
         def resolve!(**args)
           super(**args)
-          trigger_effect(:create_token, token_class: ZombieToken)
+          create_token(token:ZombieToken)
         end
       end
 

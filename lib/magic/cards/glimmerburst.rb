@@ -8,7 +8,7 @@ module Magic
       # "Draw two cards. Create a 1/1 white Glimmer enchantment creature token."
       def resolve!
         draw_cards(2)
-        trigger_effect(:create_token, token_class: GlimmerSeeker::GlimmerToken)
+        create_token(token:GlimmerSeeker::GlimmerToken)
 
         super
       end

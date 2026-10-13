@@ -21,7 +21,7 @@ module Magic
       # creature gets +1/+1 and has vigilance, trample, and haste" and equip {2}.
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:create_token, token_class: Tokens::Cragflame)
+          create_token(token:Tokens::Cragflame)
         end
       end
 

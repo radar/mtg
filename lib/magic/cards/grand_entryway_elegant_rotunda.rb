@@ -7,7 +7,7 @@ module Magic
 
         # "When you unlock this door, create a 1/1 white Glimmer enchantment creature token."
         when_unlocked do
-          trigger_effect(:create_token, token_class: GlimmerSeeker::GlimmerToken)
+          create_token(token:GlimmerSeeker::GlimmerToken)
         end
       end
 

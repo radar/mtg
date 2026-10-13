@@ -10,7 +10,7 @@ module Magic
     class VinereapMentor < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:create_token, token_class: Tokens::Food)
+          create_token(token:Tokens::Food)
         end
       end
 
@@ -18,7 +18,7 @@ module Magic
 
       class DiesTrigger < TriggeredAbility::Death
         def call
-          trigger_effect(:create_token, token_class: Tokens::Food)
+          create_token(token:Tokens::Food)
         end
       end
 

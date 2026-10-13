@@ -13,7 +13,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: Tokens::Treasure, controller: controller)
+          create_token(token:Tokens::Treasure, controller: controller)
         end
       end
 

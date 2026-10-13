@@ -24,7 +24,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: Tokens::Dwarf, controller: controller)
+          create_token(token:Tokens::Dwarf, controller: controller)
         end
       end
 

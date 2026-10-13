@@ -11,7 +11,7 @@ module Magic
 
       def resolve!(target:)
         pump(target, -2, -2)
-        trigger_effect(:create_token, token_class: Tokens::Food)
+        create_token(token:Tokens::Food)
       end
     end
   end

@@ -22,7 +22,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: GremlinToken)
+          create_token(token:GremlinToken)
         end
       end
 

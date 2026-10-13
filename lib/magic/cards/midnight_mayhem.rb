@@ -15,7 +15,7 @@ module Magic
       # "Create three 1/1 red Gremlin creature tokens. Gremlins you control gain menace, lifelink, and haste until end
       # of turn."
       def resolve!
-        3.times { trigger_effect(:create_token, token_class: GremlinToken) }
+        3.times { create_token(token:GremlinToken) }
         controller.creatures.select { _1.type?("Gremlin") }.each do |gremlin|
           %i[menace lifelink haste].each { |keyword| give_keyword(gremlin, keyword) }
         end

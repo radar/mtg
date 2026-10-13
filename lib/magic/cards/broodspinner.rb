@@ -30,7 +30,7 @@ module Magic
         costs "{4}{B}{G}, {T}, Sacrifice {this}"
 
         def resolve!
-          controller.graveyard.card_type_count.times { trigger_effect(:create_token, token_class: InsectToken) }
+          controller.graveyard.card_type_count.times { create_token(token:InsectToken) }
         end
       end
 

@@ -9,7 +9,7 @@ module Magic
       # When this artifact enters and when you sacrifice it, create a 1/1 white Rabbit creature token and scry 1.
       class RabbitTrigger < TriggeredAbility
         def call
-          trigger_effect(:create_token, token_class: Tokens::Rabbit)
+          create_token(token:Tokens::Rabbit)
           game.choices.add(Magic::Choice::Scry.new(actor: actor, amount: 1))
         end
       end

@@ -17,11 +17,11 @@ module Magic
       # 6/6 red Dragon creature token with flying."
       class TreasureChapter < Saga::ChapterAbility
         def resolve!
-          trigger_effect(:create_token, token_class: Tokens::Treasure, controller: controller)
+          create_token(token:Tokens::Treasure, controller: controller)
           return unless controller.permanents.count { _1.type?("Treasure") } >= 4
 
           actor.sacrifice!
-          trigger_effect(:create_token, token_class: DragonToken, controller: controller)
+          create_token(token:DragonToken, controller: controller)
         end
       end
 

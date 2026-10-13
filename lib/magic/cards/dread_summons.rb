@@ -14,7 +14,7 @@ module Magic
 
       def resolve!(value_for_x: 0)
         milled = game.players.flat_map { _1.mill([value_for_x, _1.library.count].min) }
-        trigger_effect(:create_token, token_class: ZombieToken, amount: milled.count { _1.type?("Creature") }, enters_tapped: true)
+        create_token(token:ZombieToken, amount: milled.count { _1.type?("Creature") }, enters_tapped: true)
       end
     end
   end

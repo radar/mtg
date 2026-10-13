@@ -17,7 +17,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: RabbitToken, amount: controller.creatures.count { _1 != actor && _1.name == actor.name })
+          create_token(token:RabbitToken, amount: controller.creatures.count { _1 != actor && _1.name == actor.name })
         end
       end
 

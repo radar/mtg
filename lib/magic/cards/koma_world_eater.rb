@@ -24,7 +24,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: KomasCoilToken, amount: 4)
+          create_token(token:KomasCoilToken, amount: 4)
         end
       end
 

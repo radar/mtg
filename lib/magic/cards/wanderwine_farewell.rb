@@ -25,7 +25,7 @@ module Magic
 
         return unless controller.creatures.by_type("Merfolk").any?
 
-        trigger_effect(:create_token, token_class: MerfolkToken, amount: targets.count)
+        create_token(token:MerfolkToken, amount: targets.count)
       end
     end
   end

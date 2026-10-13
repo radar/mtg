@@ -30,7 +30,7 @@ module Magic
       # block' and 'Creatures you control attack each combat if able.'"
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          opponents.each { |opponent| trigger_effect(:create_token, token_class: PirateToken, controller: opponent) }
+          opponents.each { |opponent| create_token(token:PirateToken, controller: opponent) }
         end
       end
 

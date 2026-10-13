@@ -19,7 +19,7 @@ module Magic
         target.move_to_hand!
         return unless game.current_turn.events.any? { |event| event.is_a?(Events::CreatureDied) }
 
-        trigger_effect(:create_token, token_class: SaprolingToken, amount: 2)
+        create_token(token:SaprolingToken, amount: 2)
       end
     end
   end

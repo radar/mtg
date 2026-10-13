@@ -19,7 +19,7 @@ module Magic
         def description = "Create three 1/1 white Soldier creature tokens."
 
         def resolve!
-          trigger_effect(:create_token, token_class: SoldierToken, amount: 3, controller: controller)
+          create_token(token:SoldierToken, amount: 3, controller: controller)
         end
       end
 

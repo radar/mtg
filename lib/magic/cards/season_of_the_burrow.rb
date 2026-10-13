@@ -9,7 +9,7 @@ module Magic
         points 1
 
         def resolve!
-          trigger_effect(:create_token, token_class: Tokens::Rabbit)
+          create_token(token:Tokens::Rabbit)
         end
       end
 

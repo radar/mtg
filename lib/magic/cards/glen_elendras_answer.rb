@@ -27,7 +27,7 @@ module Magic
         abilities.each { trigger_effect(:counter_ability, target: _1) }
 
         countered = spells.count + abilities.count
-        trigger_effect(:create_token, token_class: FaerieToken, amount: countered) if countered.positive?
+        create_token(token:FaerieToken, amount: countered) if countered.positive?
       end
 
       private

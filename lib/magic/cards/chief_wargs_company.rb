@@ -23,7 +23,7 @@ module Magic
 
       class UpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         def call
-          trigger_effect(:create_token, token_class: ChiefWargsCompany::WolfToken)
+          create_token(token:ChiefWargsCompany::WolfToken)
         end
       end
 

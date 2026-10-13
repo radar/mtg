@@ -17,7 +17,7 @@ module Magic
       # "Whenever this permanent enters or attacks, create a tapped colorless land token named Everywhere that is every
       # basic land type."
       enters_or_attacks do
-        trigger_effect(:create_token, token_class: OverlordOfTheHauntwoods::EverywhereToken, enters_tapped: true)
+        create_token(token:OverlordOfTheHauntwoods::EverywhereToken, enters_tapped: true)
       end
     end
   end

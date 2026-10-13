@@ -49,7 +49,7 @@ module Magic
 
         def resolve!
           count = controller.graveyard.lands.count
-          trigger_effect(:create_token, token_class: WormToken, amount: count)
+          create_token(token:WormToken, amount: count)
         end
       end
 

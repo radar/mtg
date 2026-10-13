@@ -16,7 +16,7 @@ module Magic
       # all combat damage that would be dealt this turn by non-Spider creatures."
       def resolve!
         attacking_you = game.current_turn.attacks.count { |attack| attack.defending_player == controller }
-        trigger_effect(:create_token, token_class: SpiderToken, amount: attacking_you)
+        create_token(token:SpiderToken, amount: attacking_you)
         game.current_turn.prevent_combat_damage_except_from("Spider")
         super
       end

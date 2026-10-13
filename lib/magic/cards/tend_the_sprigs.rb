@@ -23,7 +23,7 @@ module Magic
           super
           return unless controller.permanents.count { _1.land? || _1.type?("Treefolk") } >= 7
 
-          trigger_effect(:create_token, token_class: TreefolkToken)
+          create_token(token:TreefolkToken)
         end
       end
 

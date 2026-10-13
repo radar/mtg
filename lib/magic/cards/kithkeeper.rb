@@ -18,7 +18,7 @@ module Magic
       # Vivid -- When this creature enters, create X 1/1 green and white Kithkin creature tokens.
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:create_token, token_class: KithkinToken, amount: controller.colors_among_permanents)
+          create_token(token:KithkinToken, amount: controller.colors_among_permanents)
         end
       end
 

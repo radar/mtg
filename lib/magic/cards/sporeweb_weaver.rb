@@ -23,7 +23,7 @@ module Magic
 
         def call
           trigger_effect(:gain_life, source: actor, life: 1)
-          trigger_effect(:create_token, token_class: SaprolingToken)
+          create_token(token:SaprolingToken)
         end
       end
 

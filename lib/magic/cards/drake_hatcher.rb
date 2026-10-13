@@ -21,7 +21,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:create_token, token_class: DrakeToken)
+          create_token(token:DrakeToken)
         end
       end
 

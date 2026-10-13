@@ -31,7 +31,7 @@ module Magic
 
         class MayChoice < Magic::Choice::May
           def resolve!
-            trigger_effect(:create_token, token_class: ScionOfTheDeepToken)
+            create_token(token:ScionOfTheDeepToken)
           end
         end
 

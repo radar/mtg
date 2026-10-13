@@ -9,7 +9,7 @@ module Magic
 
       # "When this creature enters, create a tapped Treasure token."
       enters_the_battlefield do
-        trigger_effect(:create_token, token_class: Tokens::Treasure, enters_tapped: true)
+        create_token(token:Tokens::Treasure, enters_tapped: true)
       end
     end
   end

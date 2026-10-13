@@ -30,7 +30,7 @@ module Magic
       class DiesTrigger < TriggeredAbility::Death
         def call
           x = actor.counters.count
-          trigger_effect(:create_token, token_class: SpiritToken, base_power: x, base_toughness: x)
+          create_token(token:SpiritToken, base_power: x, base_toughness: x)
         end
       end
 

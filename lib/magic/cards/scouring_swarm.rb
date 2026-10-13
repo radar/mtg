@@ -28,7 +28,7 @@ module Magic
             copy = ScouringSwarm.new(game: game, owner: controller)
             Permanent.token_copy(game: game, owner: controller, card: copy, enters_tapped: true)
           else
-            trigger_effect(:create_token, token_class: InsectToken, enters_tapped: true)
+            create_token(token:InsectToken, enters_tapped: true)
           end
         end
       end

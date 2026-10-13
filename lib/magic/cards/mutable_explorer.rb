@@ -11,7 +11,7 @@ module Magic
       # "When this creature enters, create a tapped Mutavault token."
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:create_token, token_class: Tokens::Mutavault, enters_tapped: true)
+          create_token(token:Tokens::Mutavault, enters_tapped: true)
         end
       end
 

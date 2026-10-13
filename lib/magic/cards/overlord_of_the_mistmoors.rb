@@ -17,7 +17,7 @@ module Magic
 
       # "Whenever this permanent enters or attacks, create two 2/1 white Insect creature tokens with flying."
       enters_or_attacks do
-        trigger_effect(:create_token, token_class: OverlordOfTheMistmoors::InsectToken, amount: 2)
+        create_token(token:OverlordOfTheMistmoors::InsectToken, amount: 2)
       end
     end
   end

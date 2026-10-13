@@ -26,7 +26,7 @@ module Magic
           def resolve!(mode:)
             case mode
             when :token
-              trigger_effect(:create_token, token_class: Tokens::Rabbit, enters_tapped: true, attacking: true, attack_target: @target)
+              create_token(token:Tokens::Rabbit, enters_tapped: true, attacking: true, attack_target: @target)
             when :pump
               @attackers.each { pump(_1, 1, 1) }
             else

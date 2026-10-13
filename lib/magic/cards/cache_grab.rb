@@ -10,7 +10,7 @@ module Magic
         def resolve!(target: nil)
           super
           squirrel = target&.type?("Squirrel") || controller.permanents.any? { _1.type?("Squirrel") }
-          trigger_effect(:create_token, token_class: Tokens::Food) if squirrel
+          create_token(token:Tokens::Food) if squirrel
         end
       end
 

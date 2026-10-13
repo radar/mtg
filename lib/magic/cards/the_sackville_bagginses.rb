@@ -18,7 +18,7 @@ module Magic
         def resolve!(sacrifice: nil)
           super
           draw_card
-          trigger_effect(:create_token, token_class: Tokens::Treasure, controller: controller)
+          create_token(token:Tokens::Treasure, controller: controller)
         end
       end
 

@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!
-        trigger_effect(:create_token, token_class: ElephantToken)
+        create_token(token:ElephantToken)
       end
     end
   end

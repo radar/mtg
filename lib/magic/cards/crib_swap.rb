@@ -20,7 +20,7 @@ module Magic
 
       def resolve!(target:)
         exile_target(target)
-        trigger_effect(:create_token, token_class: ShapeshifterToken, controller: target.controller)
+        create_token(token:ShapeshifterToken, controller: target.controller)
       end
     end
   end

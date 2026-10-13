@@ -16,7 +16,7 @@ module Magic
       adventure x: 1, generic: 2, white: 1
 
       def adventure_resolve!(value_for_x: 0, **)
-        trigger_effect(:create_token, token_class: DwarfToken, amount: value_for_x) if value_for_x.positive?
+        create_token(token:DwarfToken, amount: value_for_x) if value_for_x.positive?
       end
 
       # "As this enchantment enters, choose a creature type."

@@ -22,7 +22,7 @@ module Magic
         def call
           lands = battlefield.controlled_by(controller).lands.count
           if lands < 6
-            trigger_effect(:create_token, token_class: InsectToken)
+            create_token(token:InsectToken)
           else
             Permanent.token_copy(
               game: game,

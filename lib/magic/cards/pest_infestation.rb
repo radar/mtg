@@ -21,7 +21,7 @@ module Magic
       end
 
       def resolve!(value_for_x:)
-        trigger_effect(:create_token, token_class: PestToken, amount: 2 * value_for_x)
+        create_token(token:PestToken, amount: 2 * value_for_x)
       end
     end
   end

@@ -21,7 +21,7 @@ module Magic
         def should_perform? = super && actor.mana_spent?(:white, 2)
 
         def call
-          trigger_effect(:create_token, token_class: KithkinToken, amount: 2)
+          create_token(token:KithkinToken, amount: 2)
         end
       end
 

@@ -13,7 +13,7 @@ module Magic
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
           count = battlefield.artifacts.not_controlled_by(controller).count
-          trigger_effect(:create_token, token_class: Tokens::Treasure, amount: count, enters_tapped: true) if count.positive?
+          create_token(token:Tokens::Treasure, amount: count, enters_tapped: true) if count.positive?
         end
       end
 

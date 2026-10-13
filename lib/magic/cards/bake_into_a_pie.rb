@@ -11,7 +11,7 @@ module Magic
 
       def resolve!(target:)
         destroy(target)
-        trigger_effect(:create_token, token_class: Tokens::Food)
+        create_token(token:Tokens::Food)
       end
     end
   end

@@ -19,7 +19,7 @@ module Magic
       # named Stone Boulder."
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:create_token, token_class: StoneBoulderToken)
+          create_token(token:StoneBoulderToken)
         end
       end
 
@@ -29,7 +29,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: StoneBoulderToken)
+          create_token(token:StoneBoulderToken)
         end
       end
 

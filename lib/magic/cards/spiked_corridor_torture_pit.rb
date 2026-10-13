@@ -38,7 +38,7 @@ module Magic
         # "When you unlock this door, create three 1/1 red Devil creature tokens with 'When this token dies, it deals 1 damage
         # to any target.'"
         when_unlocked do
-          3.times { trigger_effect(:create_token, token_class: SpikedCorridorTorturePit::DevilToken) }
+          3.times { create_token(token:SpikedCorridorTorturePit::DevilToken) }
         end
       end
 

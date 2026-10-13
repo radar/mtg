@@ -23,7 +23,7 @@ module Magic
         costs "{3}, {T}, Pay 1 life"
 
         def resolve!
-          trigger_effect(:create_token, token_class: Tokens::Fish)
+          create_token(token:Tokens::Fish)
         end
       end
 

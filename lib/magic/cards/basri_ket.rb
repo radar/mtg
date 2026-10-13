@@ -12,7 +12,7 @@ module Magic
             return unless event.active_player == owner
             game = owner.game
 
-            trigger_effect(:create_token, token_class: SoldierToken, controller: owner)
+            create_token(token:SoldierToken, controller: owner)
 
             owner.creatures.each do |creature|
               add_counter("+1/+1", to: creature)
@@ -47,7 +47,7 @@ module Magic
           attackers = game.current_turn.attacks.count
 
           attackers.times do
-            trigger_effect(:create_token, token_class: SoldierToken, enters_tapped: true, attacking: true)
+            create_token(token:SoldierToken, enters_tapped: true, attacking: true)
           end
         end
       end

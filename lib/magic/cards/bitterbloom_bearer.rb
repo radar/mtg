@@ -21,7 +21,7 @@ module Magic
       class UpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         def call
           lose_life(controller, 1)
-          trigger_effect(:create_token, token_class: FaerieToken)
+          create_token(token:FaerieToken)
         end
       end
 

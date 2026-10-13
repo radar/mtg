@@ -19,7 +19,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:create_token, token_class: GoblinToken, amount: controller.permanents.by_type("Goblin").count)
+          create_token(token:GoblinToken, amount: controller.permanents.by_type("Goblin").count)
         end
       end
 

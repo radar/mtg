@@ -11,7 +11,7 @@ module Magic
 
       def resolve!
         draw_cards(2)
-        trigger_effect(:create_token, token_class: Tokens::Treasure, amount: 2)
+        create_token(token:Tokens::Treasure, amount: 2)
       end
     end
   end

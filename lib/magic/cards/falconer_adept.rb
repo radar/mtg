@@ -22,7 +22,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: BirdToken, enters_tapped: true, attacking: true)
+          create_token(token:BirdToken, enters_tapped: true, attacking: true)
         end
       end
 

@@ -33,7 +33,7 @@ module Magic
         # unlocked doors among Rooms you control."
         when_unlocked do
           x = controller.unlocked_doors.size
-          trigger_effect(:create_token, token_class: SmokyLoungeMistySalon::SpiritToken, base_power: x, base_toughness: x)
+          create_token(token:SmokyLoungeMistySalon::SpiritToken, base_power: x, base_toughness: x)
         end
       end
 

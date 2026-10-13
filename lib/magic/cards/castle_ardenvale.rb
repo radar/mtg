@@ -24,7 +24,7 @@ module Magic
         costs "{2}{W}{W}, {T}"
 
         def resolve!
-          trigger_effect(:create_token, token_class: HumanToken)
+          create_token(token:HumanToken)
         end
       end
 

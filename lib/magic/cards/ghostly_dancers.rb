@@ -77,7 +77,7 @@ module Magic
       # Spirit creature token with flying."
       class EerieTrigger < TriggeredAbility::Eerie
         def call
-          trigger_effect(:create_token, token_class: SpiritToken)
+          create_token(token:SpiritToken)
         end
       end
 

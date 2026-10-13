@@ -10,7 +10,7 @@ module Magic
     class CatCollector < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:create_token, token_class: Tokens::Food)
+          create_token(token:Tokens::Food)
         end
       end
 
@@ -29,7 +29,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: CatToken)
+          create_token(token:CatToken)
         end
       end
 

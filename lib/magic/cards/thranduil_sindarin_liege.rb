@@ -53,7 +53,7 @@ module Magic
         def should_perform? = you?
 
         def call
-          trigger_effect(:create_token, token_class: ElfToken, controller: controller)
+          create_token(token:ElfToken, controller: controller)
         end
       end
 

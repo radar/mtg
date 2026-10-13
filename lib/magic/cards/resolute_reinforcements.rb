@@ -18,7 +18,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: SoldierToken)
+          create_token(token:SoldierToken)
         end
       end
 

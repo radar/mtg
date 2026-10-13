@@ -12,7 +12,7 @@ module Magic
       # Gremlin creature token."
       class EerieTrigger < TriggeredAbility::Eerie
         def call
-          trigger_effect(:create_token, token_class: MidnightMayhem::GremlinToken)
+          create_token(token:MidnightMayhem::GremlinToken)
         end
       end
 

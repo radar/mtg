@@ -26,7 +26,7 @@ module Magic
       end
 
       def resolve!
-        trigger_effect(:create_token, token_class: FaerieToken, amount: 2)
+        create_token(token:FaerieToken, amount: 2)
         choice = TapChoice.new(actor: self)
         game.add_choice(choice) if choice.choices.any?
       end

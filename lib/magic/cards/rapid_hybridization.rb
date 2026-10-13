@@ -21,7 +21,7 @@ module Magic
       def resolve!(target:)
         creature_controller = target.controller
         target.destroy!(regenerate: false)
-        trigger_effect(:create_token, token_class: FrogLizardToken, controller: creature_controller)
+        create_token(token:FrogLizardToken, controller: creature_controller)
       end
     end
   end

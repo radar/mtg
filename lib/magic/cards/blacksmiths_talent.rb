@@ -9,7 +9,7 @@ module Magic
       # creature gets +1/+1" and equip {2}.
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:create_token, token_class: Tokens::Sword)
+          create_token(token:Tokens::Sword)
         end
       end
 

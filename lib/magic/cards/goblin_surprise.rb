@@ -20,7 +20,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:create_token, token_class: GoblinToken, amount: 2)
+          create_token(token:GoblinToken, amount: 2)
         end
       end
 

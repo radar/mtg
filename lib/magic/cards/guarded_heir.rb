@@ -18,7 +18,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: KnightToken, amount: 2)
+          create_token(token:KnightToken, amount: 2)
         end
       end
 

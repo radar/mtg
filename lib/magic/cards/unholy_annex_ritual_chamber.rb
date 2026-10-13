@@ -38,7 +38,7 @@ module Magic
 
         # "When you unlock this door, create a 6/6 black Demon creature token with flying."
         when_unlocked do
-          trigger_effect(:create_token, token_class: UnholyAnnexRitualChamber::DemonToken)
+          create_token(token:UnholyAnnexRitualChamber::DemonToken)
         end
       end
 

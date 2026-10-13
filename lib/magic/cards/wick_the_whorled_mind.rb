@@ -27,7 +27,7 @@ module Magic
           if battlefield.controlled_by(controller).creatures.any? { _1.type?("Snail") }
             game.add_choice(SnailChoice.new(actor: actor))
           else
-            trigger_effect(:create_token, token_class: Tokens::Snail)
+            create_token(token:Tokens::Snail)
           end
         end
       end

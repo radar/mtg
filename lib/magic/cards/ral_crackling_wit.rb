@@ -23,7 +23,7 @@ module Magic
         def description = "Create a 1/1 blue and red Otter creature token with prowess."
 
         def resolve!
-          trigger_effect(:create_token, token_class: Tokens::Otter)
+          create_token(token:Tokens::Otter)
         end
       end
 

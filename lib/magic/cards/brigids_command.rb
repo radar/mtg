@@ -21,7 +21,7 @@ module Magic
         def target_choices = game.players
 
         def resolve!(target:)
-          trigger_effect(:create_token, token_class: KithkinToken, controller: target)
+          create_token(token:KithkinToken, controller: target)
         end
       end
 

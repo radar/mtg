@@ -14,7 +14,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:create_token, token_class: HumanWarriorToken)
+          create_token(token:HumanWarriorToken)
         end
       end
 
@@ -27,7 +27,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:create_token, token_class: ElfWarriorToken)
+          create_token(token:ElfWarriorToken)
         end
       end
 

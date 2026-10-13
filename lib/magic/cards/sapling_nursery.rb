@@ -24,7 +24,7 @@ module Magic
         def should_perform? = event.player == controller
 
         def call
-          trigger_effect(:create_token, token_class: TreefolkToken)
+          create_token(token:TreefolkToken)
         end
       end
 

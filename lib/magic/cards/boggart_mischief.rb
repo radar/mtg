@@ -18,7 +18,7 @@ module Magic
           class BlightChoice < Magic::Choice::Blight
             def resolve!(**args)
               super(**args)
-              trigger_effect(:create_token, token_class: GoblinToken, amount: 2)
+              create_token(token:GoblinToken, amount: 2)
             end
           end
 

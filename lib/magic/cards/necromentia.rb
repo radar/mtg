@@ -35,7 +35,7 @@ module Magic
           from_other = [*opponent.graveyard.cards, *opponent.library.cards].select { |card| card.name == name }
           [*from_hand, *from_other].each(&:exile!)
           opponent.shuffle!
-          trigger_effect(:create_token, token_class: ZombieToken, controller: opponent, amount: from_hand.count) if from_hand.any?
+          create_token(token:ZombieToken, controller: opponent, amount: from_hand.count) if from_hand.any?
         end
       end
 

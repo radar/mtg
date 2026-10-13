@@ -35,7 +35,7 @@ module Magic
 
         def resolve!
           amount = source.counters.of_type(Counters::Nest).count
-          trigger_effect(:create_token, token_class: SpiderToken, amount:) if amount.positive?
+          create_token(token:SpiderToken, amount:) if amount.positive?
         end
       end
 

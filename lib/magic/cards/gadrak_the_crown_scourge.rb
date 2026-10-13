@@ -20,7 +20,7 @@ module Magic
 
         def call
           died = game.current_turn.events.count { |event| event.is_a?(Events::CreatureDied) && !event.permanent.token? }
-          trigger_effect(:create_token, token_class: Tokens::Treasure, amount: died) if died > 0
+          create_token(token:Tokens::Treasure, amount: died) if died > 0
         end
       end
 

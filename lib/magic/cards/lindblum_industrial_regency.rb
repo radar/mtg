@@ -18,7 +18,7 @@ module Magic
       def activated_abilities = [ManaAbility]
 
       def adventure_resolve!(**)
-        trigger_effect(:create_token, token_class: WizardToken)
+        create_token(token:WizardToken)
       end
 
       class WizardToken < Token

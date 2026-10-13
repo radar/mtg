@@ -26,7 +26,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: TobyBeastieBefriender::BeastToken)
+          create_token(token:TobyBeastieBefriender::BeastToken)
         end
       end
 

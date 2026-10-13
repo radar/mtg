@@ -9,7 +9,7 @@ module Magic
 
       # "When this creature enters, create a colorless Equipment artifact token named Axe ..."
       enters_the_battlefield do
-        trigger_effect(:create_token, token_class: Tokens::Axe)
+        create_token(token:Tokens::Axe)
       end
     end
   end

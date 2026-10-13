@@ -61,7 +61,7 @@ module Magic
         def description = "Create two 3/3 green Elk creature tokens."
 
         def resolve!
-          trigger_effect(:create_token, token_class: ElkToken, amount: 2)
+          create_token(token:ElkToken, amount: 2)
         end
       end
 

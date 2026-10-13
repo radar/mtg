@@ -17,7 +17,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:create_token, token_class: KithkinToken)
+          create_token(token:KithkinToken)
         end
       end
 
@@ -32,7 +32,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: KithkinToken, amount: 2)
+          create_token(token:KithkinToken, amount: 2)
         end
       end
 

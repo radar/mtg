@@ -21,7 +21,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:create_token, token_class: GoblinToken)
+          create_token(token:GoblinToken)
         end
       end
 
