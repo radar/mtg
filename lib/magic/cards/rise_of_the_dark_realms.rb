@@ -7,7 +7,7 @@ module Magic
     class RiseOfTheDarkRealms < Sorcery
       def resolve!
         cards = game.graveyard_cards.select { _1.type?("Creature") }
-        cards.each { trigger_effect(:return_target_from_graveyard_to_battlefield, target: _1, controller: controller) }
+        cards.each { reanimate _1, controller: controller }
       end
     end
   end

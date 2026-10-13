@@ -21,7 +21,7 @@ module Magic
         class PayManaChoice < Magic::Choice::PayMana
           def resolve!(**args)
             super(**args)
-            trigger_effect(:return_target_from_graveyard_to_battlefield, target: actor, controller: controller) if actor.zone&.graveyard?
+            reanimate actor, controller: controller if actor.zone&.graveyard?
           end
         end
 

@@ -18,7 +18,7 @@ module Magic
       # the battlefield. If the gift was promised, return up to three instead.
       def resolve!(targets:)
         targets.each do |card|
-          trigger_effect(:return_target_from_graveyard_to_battlefield, target: card, controller: controller)
+          reanimate card, controller: controller
         end
       end
     end

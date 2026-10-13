@@ -34,7 +34,7 @@ module Magic
         def target_choices = controller.graveyard.permanents.select { _1.mana_value <= 3 }
 
         def resolve!(target:)
-          trigger_effect(:return_target_from_graveyard_to_battlefield, target: target, controller: controller, counters: { "indestructible" => 1 })
+          reanimate target, controller: controller, counters: { "indestructible" => 1 }
         end
       end
 

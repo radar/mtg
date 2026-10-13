@@ -22,7 +22,7 @@ module Magic
         invalid = targets - choices
         raise ArgumentError, "#{invalid.map(&:name).join(', ')} can't be put onto the battlefield" if invalid.any?
 
-        targets.each { trigger_effect(:return_target_from_graveyard_to_battlefield, target: _1, controller: controller) }
+        targets.each { reanimate _1, controller: controller }
         (cards - targets).each(&:move_to_graveyard!)
       end
     end

@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:return_target_from_graveyard_to_battlefield, target: target)
+        reanimate target
       end
     end
   end

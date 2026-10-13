@@ -14,7 +14,7 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          trigger_effect(:return_target_from_graveyard_to_battlefield, target:, controller:)
+          reanimate target, controller:
         end
       end
 

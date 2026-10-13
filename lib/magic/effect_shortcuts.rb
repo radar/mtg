@@ -62,6 +62,12 @@ module Magic
       trigger_effect(:tap, target:, **args)
     end
 
+    # "Return target creature card from your graveyard to the battlefield": `reanimate target, controller: controller`.
+    # `controller:` defaults to the card's owner; `counters:` are what it enters with, as { "finality" => 1 }.
+    def reanimate(target, **args)
+      trigger_effect(:return_target_from_graveyard_to_battlefield, target:, **args)
+    end
+
     # "Return target creature to its owner's hand."
     def bounce(target, **args)
       trigger_effect(:return_to_owners_hand, target:, **args)

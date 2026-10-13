@@ -14,7 +14,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:return_target_from_graveyard_to_battlefield, target: target)
+        reanimate target
         return if your_main_phase?
 
         game.choices.add(Magic::Choice::Blight.new(actor: self, amount: 2)) if Magic::Choice::Blight.possible?(controller, game)
