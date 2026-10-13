@@ -11,7 +11,7 @@ module Magic
 
       def resolve!(target:)
         target.move_to_hand!
-        draw_card(player: controller) if target.type?("Zombie")
+        draw_card if target.type?("Zombie")
       end
     end
   end

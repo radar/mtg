@@ -16,7 +16,7 @@ module Magic
           discarded.each(&:discard!)
           return if discarded.empty?
 
-          draw_cards(discarded.count, player: controller)
+          draw_cards(discarded.count)
           return unless Magic::Storied.enduring_story?(controller)
 
           game.opponents(controller).each do |opponent|

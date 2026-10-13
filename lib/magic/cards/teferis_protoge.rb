@@ -11,7 +11,7 @@ module Magic
         costs "{1}{U}, {T}"
 
         def resolve!
-          draw_card(player: controller)
+          draw_card
           add_choice(:discard)
         end
       end

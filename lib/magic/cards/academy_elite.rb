@@ -31,7 +31,7 @@ module Magic
         end
 
         def resolve!
-          draw_card(source: source)
+          draw_card
           add_choice(:discard)
         end
       end
