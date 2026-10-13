@@ -64,7 +64,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:destroy_target, target: actor.attached_to)
+          destroy(actor.attached_to)
         end
       end
 

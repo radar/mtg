@@ -13,7 +13,7 @@ module Magic
       def resolve!(target:)
         power = target.power
         battlefield.creatures.select { |creature| creature.power > power }.each do |creature|
-          trigger_effect(:destroy_target, target: creature)
+          destroy(creature)
         end
       end
     end

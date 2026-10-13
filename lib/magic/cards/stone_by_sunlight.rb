@@ -9,7 +9,7 @@ module Magic
         def target_choices = battlefield.creatures.select { _1.power >= 4 }
 
         def resolve!(target:)
-          trigger_effect(:destroy_target, target: target)
+          destroy(target)
         end
       end
 

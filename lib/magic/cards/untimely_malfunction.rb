@@ -10,7 +10,7 @@ module Magic
         def target_choices = battlefield.artifacts
 
         def resolve!(target:)
-          trigger_effect(:destroy_target, target:)
+          destroy(target)
         end
       end
 

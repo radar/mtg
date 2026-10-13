@@ -7,7 +7,7 @@ module Magic
       def target_choices = battlefield.creatures
 
       def resolve!(target:)
-        trigger_effect(:destroy_target, target: target)
+        destroy(target)
         controller.lose_life(2)
       end
     end

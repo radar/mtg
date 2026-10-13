@@ -35,7 +35,7 @@ module Magic
 
         def resolve!(target:)
           opponent = target.controller
-          trigger_effect(:destroy_target, target: target)
+          destroy(target)
           # The permanent, not its card, is the actor: a token's card has no controller.
           game.search_library(target, find: :basic_lands, to: :battlefield) if opponent.library.basic_lands.any?
         end

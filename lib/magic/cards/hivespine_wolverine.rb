@@ -31,7 +31,7 @@ module Magic
             case @mode
             when :counter then add_counter("+1/+1", to: target)
             when :fight then actor.fights!(target)
-            when :destroy then trigger_effect(:destroy_target, target: target)
+            when :destroy then destroy(target)
             end
           end
         end

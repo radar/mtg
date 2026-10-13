@@ -13,7 +13,7 @@ module Magic
 
       def resolve!(target:)
         if target
-          trigger_effect(:destroy_target, target: target)
+          destroy(target)
         end
       end
     end

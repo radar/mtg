@@ -32,7 +32,7 @@ module Magic
             if @mode == :shrink
               pump(target, -1, -1)
             else
-              trigger_effect(:destroy_target, target: target)
+              destroy(target)
             end
           end
         end

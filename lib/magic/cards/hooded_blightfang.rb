@@ -30,7 +30,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:destroy_target, target: event.target)
+          destroy(event.target)
         end
       end
 

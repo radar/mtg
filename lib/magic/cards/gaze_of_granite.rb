@@ -6,7 +6,7 @@ module Magic
 
       def resolve!(value_for_x:)
         battlefield.permanents.reject(&:land?).select { |permanent| permanent.mana_value <= value_for_x }.each do |permanent|
-          trigger_effect(:destroy_target, target: permanent)
+          destroy(permanent)
         end
       end
     end

@@ -30,7 +30,7 @@ module Magic
           deal_damage(1, to: target)
           return unless target.is_a?(Magic::Permanent) && target.type?("Dragon")
 
-          trigger_effect(:destroy_target, target: target)
+          destroy(target)
         end
       end
 

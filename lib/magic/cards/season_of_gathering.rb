@@ -27,7 +27,7 @@ module Magic
           def resolve!(type:)
             raise ArgumentError, "choose Artifact or Enchantment" unless choices.include?(type)
 
-            battlefield.by_any_type(type).each { trigger_effect(:destroy_target, target: _1) }
+            battlefield.by_any_type(type).each { destroy(_1) }
           end
         end
 

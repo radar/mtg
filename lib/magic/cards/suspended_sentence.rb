@@ -13,7 +13,7 @@ module Magic
       # counters on it."
       def resolve!(target:)
         opponent = target.controller
-        trigger_effect(:destroy_target, target: target)
+        destroy(target)
         trigger_effect(:lose_life, target: opponent, life: 3)
         self.exile_with_time_counters = 3
       end

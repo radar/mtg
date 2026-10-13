@@ -17,7 +17,7 @@ module Magic
 
       def resolve!(target:)
         controller = target.controller
-        trigger_effect(:destroy_target, target: target)
+        destroy(target)
         trigger_effect(:create_token, controller: controller, token_class: BeastToken)
       end
     end

@@ -33,7 +33,7 @@ module Magic
           if rest.any?
             SadisticShellGame.ask(actor: actor, players: rest, chosen: chosen)
           else
-            chosen.uniq.each { trigger_effect(:destroy_target, target: _1) }
+            chosen.uniq.each { destroy(_1) }
           end
         end
       end

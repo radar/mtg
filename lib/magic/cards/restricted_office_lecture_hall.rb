@@ -7,7 +7,7 @@ module Magic
 
         # "When you unlock this door, destroy all creatures with power 3 or greater."
         when_unlocked do
-          game.battlefield.creatures.select { _1.power >= 3 }.each { trigger_effect(:destroy_target, target: _1) }
+          game.battlefield.creatures.select { _1.power >= 3 }.each { destroy(_1) }
         end
       end
 

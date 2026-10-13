@@ -30,7 +30,7 @@ module Magic
 
         def resolve!
           game.battlefield.creatures.select { |creature| creature.power >= 4 }.each do |creature|
-            trigger_effect(:destroy_target, target: creature)
+            destroy(creature)
           end
         end
       end

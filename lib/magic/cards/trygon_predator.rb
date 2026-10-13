@@ -23,7 +23,7 @@ module Magic
             def choice_amount = 1
 
             def resolve!(target:)
-              trigger_effect(:destroy_target, target: target)
+              destroy(target)
             end
           end
 

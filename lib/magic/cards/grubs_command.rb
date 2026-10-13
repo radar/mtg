@@ -25,7 +25,7 @@ module Magic
         def target_choices = battlefield.creatures + battlefield.permanents.by_any_type(T::Artifact)
 
         def resolve!(target:)
-          trigger_effect(:destroy_target, target: target)
+          destroy(target)
         end
       end
 

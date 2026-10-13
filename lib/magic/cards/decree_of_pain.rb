@@ -8,7 +8,7 @@ module Magic
       # "Destroy all creatures. They can't be regenerated. Draw a card for each creature destroyed this way."
       def resolve!
         creatures = game.battlefield.creatures.to_a
-        creatures.each { trigger_effect(:destroy_target, target: _1) }
+        creatures.each { destroy(_1) }
         destroyed = creatures.count { _1.zone.nil? }
         draw_cards(destroyed) if destroyed.positive?
       end

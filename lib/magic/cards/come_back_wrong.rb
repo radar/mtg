@@ -13,7 +13,7 @@ module Magic
         return if target.token?
 
         card = target.card
-        trigger_effect(:destroy_target, target: target)
+        destroy(target)
         return unless card.creature? && card.zone&.graveyard?
 
         returned = Permanent.put_onto_battlefield(game: game, card: card, from_zone: card.zone, controller: controller)

@@ -18,7 +18,7 @@ module Magic
         def target_choices = battlefield.permanents.by_any_type(T::Artifact, T::Enchantment)
 
         def resolve!(target:)
-          trigger_effect(:destroy_target, target: target)
+          destroy(target)
           card.kicker_cost.reset!
         end
       end
@@ -28,7 +28,7 @@ module Magic
         def target_choices = battlefield.creatures.select { _1.cmc >= 3 }
 
         def resolve!(target:)
-          trigger_effect(:destroy_target, target: target)
+          destroy(target)
           card.kicker_cost.reset!
         end
       end

@@ -5,7 +5,8 @@ module Magic
   #   create_token token: Tokens::Treasure   # trigger_effect(:create_token, token_class: Tokens::Treasure)
   #   deal_damage 3, to: target              # trigger_effect(:deal_damage, target: target, damage: 3)
   #   add_counter "+1/+1", to: target        # trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
-  #   give_keyword target, :haste            # trigger_effect(:grant_keyword, target: target, keyword: :haste)
+  #   destroy target                         # trigger_effect(:destroy_target, target: target)
+  #   give_keyword target, :haste           # trigger_effect(:grant_keyword, target: target, keyword: :haste)
   #   pump target, 2, 2                     # trigger_effect(:modify_power_toughness, target: target, power: 2, toughness: 2)
   #   draw_card                              # trigger_effect(:draw_cards, number_to_draw: 1)
   #   draw_cards 2
@@ -34,6 +35,10 @@ module Magic
     # permanent already has one (Permanents::Modifications) that takes only the keyword.
     def give_keyword(target, keyword, **args)
       trigger_effect(:grant_keyword, target:, keyword:, **args)
+    end
+
+    def destroy(target, **args)
+      trigger_effect(:destroy_target, target:, **args)
     end
 
     def draw_card

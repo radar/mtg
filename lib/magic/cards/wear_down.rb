@@ -17,7 +17,7 @@ module Magic
       # Destroy target artifact or enchantment. If the gift was promised, instead destroy two target
       # artifacts and/or enchantments.
       def resolve!(targets:)
-        targets.each { trigger_effect(:destroy_target, target: _1) }
+        targets.each { destroy(_1) }
       end
     end
   end

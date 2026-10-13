@@ -17,7 +17,7 @@ module Magic
 
       # "Destroy target nonland permanent."
       def resolve!(target:)
-        trigger_effect(:destroy_target, target:)
+        destroy(target)
       end
     end
   end

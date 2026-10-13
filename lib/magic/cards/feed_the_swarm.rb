@@ -13,7 +13,7 @@ module Magic
       # "Destroy target creature or enchantment an opponent controls. You lose life equal to that permanent's mana value."
       def resolve!(target:)
         life = target.mana_value
-        trigger_effect(:destroy_target, target: target)
+        destroy(target)
         trigger_effect(:lose_life, target: controller, life: life)
       end
     end

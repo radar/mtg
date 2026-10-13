@@ -22,7 +22,7 @@ module Magic
         def target_choices = battlefield.creatures + battlefield.permanents.enchantments
 
         def resolve!(target:)
-          trigger_effect(:destroy_target, target: target)
+          destroy(target)
         end
       end
 

@@ -14,7 +14,7 @@ module Magic
       # "Destroy target creature. Its controller manifests dread."
       def resolve!(target:)
         victim = target.controller
-        trigger_effect(:destroy_target, target: target)
+        destroy(target)
         Magic::Choice::ManifestDread.perform(actor: self, player: victim)
       end
     end
