@@ -206,8 +206,9 @@ isn't supported.
   an effect directly.
 - Effect code runs inside a card, a `Mode`, an `ActivatedAbility`, a
   `TriggeredAbility`, a `Saga::ChapterAbility` or a `Choice`, all of which have
-  `trigger_effect`, `controller`, `game` and `battlefield`; use only those
-  (`game.opponents(controller)`, not `opponents`).
+  `trigger_effect` and its shorthands (`EffectShortcuts`: `deal_damage`, `draw_card`, `add_counter`, ...),
+  `controller`, `game` and `battlefield`; use only those (`game.opponents(controller)`, not `opponents`).
+  Emit the shorthand, not `trigger_effect(:name, ...)`, whenever one exists; `remove_counter` and `sacrifice` have none yet.
 - `resolve_call` may be several lines (a `do ... end` block); `EffectList` indents them.
 
 ## EffectList

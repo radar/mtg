@@ -27,7 +27,7 @@ module Magic
         def optional_target? = true
 
         def resolve_call
-          adds = counters.map { |amount, type| "trigger_effect(:add_counter, counter_type: #{type.inspect}, target: _1, amount: #{amount})" }
+          adds = counters.map { |amount, type| "add_counter #{type.inspect}, to: _1, amount: #{amount}" }
           "targets.each { #{adds.join('; ')} }"
         end
       end

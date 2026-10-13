@@ -23,9 +23,9 @@ module Magic
         def target_choices = who == "target player" ? "game.players" : nil
 
         def resolve_call
-          return "trigger_effect(:add_counter, counter_type: \"poison\", target: target, amount: #{amount})" if who == "target player"
+          return "add_counter \"poison\", to: target, amount: #{amount}" if who == "target player"
 
-          "#{WHO.fetch(who)}.each { trigger_effect(:add_counter, counter_type: \"poison\", target: _1, amount: #{amount}) }"
+          "#{WHO.fetch(who)}.each { add_counter \"poison\", to: _1, amount: #{amount} }"
         end
       end
     end

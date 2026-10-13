@@ -22,16 +22,15 @@ module Magic
         def target_choices = { "target player" => "game.players", "target opponent" => "game.opponents(controller)" }[who]
 
         def resolve_call
-          return "trigger_effect(:draw_card)" if amount == 1 && !who
-          if UNTARGETED.key?(who)
-            args = amount == 1 ? "" : ", number_to_draw: #{amount}"
-            return "#{UNTARGETED[who]}.each { trigger_effect(:draw_cards, player: _1#{args}) }"
-          end
+          return "draw_card" if amount == 1 && !who
+          return "#{UNTARGETED[who]}.each { #{draw(amount, '_1')} }" if UNTARGETED.key?(who)
 
-          args = []
-          args << "player: target" if who
-          args << "number_to_draw: #{amount}" unless amount == 1
-          "trigger_effect(:draw_cards, #{args.join(', ')})"
+          draw(amount, ("target" if who))
+        end
+
+        def draw(amount, player)
+          call = amount == 1 ? "draw_card" : "draw_cards #{amount}"
+          player ? "#{call}#{amount == 1 ? ' ' : ', '}player: #{player}" : call
         end
       end
     end

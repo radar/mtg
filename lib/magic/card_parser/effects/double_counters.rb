@@ -29,9 +29,9 @@ module Magic
         def resolve_call
           type = "Counters[#{counter_type.inspect}]"
           if who == :self
-            "trigger_effect(:add_counter, counter_type: #{counter_type.inspect}, target: #{targets}, amount: #{targets}.counters.of_type(#{type}).count)"
+            "add_counter #{counter_type.inspect}, to: #{targets}, amount: #{targets}.counters.of_type(#{type}).count"
           else
-            "#{targets}.each { trigger_effect(:add_counter, counter_type: #{counter_type.inspect}, target: _1, amount: _1.counters.of_type(#{type}).count) }"
+            "#{targets}.each { add_counter #{counter_type.inspect}, to: _1, amount: _1.counters.of_type(#{type}).count }"
           end
         end
       end

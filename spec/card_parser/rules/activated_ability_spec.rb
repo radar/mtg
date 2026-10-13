@@ -53,7 +53,7 @@ RSpec.describe Magic::CardParser::Rules::ActivatedAbility do
         end
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, target: target, damage: 1)
+          deal_damage 1, to: target
         end
       end
     RUBY
@@ -62,7 +62,7 @@ RSpec.describe Magic::CardParser::Rules::ActivatedAbility do
   it "gives an ability with several targets one list of choices per target" do
     source = described_class.parse("{2}, {T}: Tap target creature. Target player mills two cards.").class_source("ActivatedAbility")
     expect(source).to include("def multi_target? = true", "battlefield.creatures,\n      game.players,",
-                              "trigger_effect(:tap, target: targets[0])", "targets[1].mill(2)")
+                              "tap_permanent targets[0]", "targets[1].mill(2)")
   end
 
   it "renders a sorcery-speed requirement" do

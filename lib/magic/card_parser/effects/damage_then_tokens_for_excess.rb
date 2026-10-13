@@ -28,7 +28,7 @@ module Magic
           <<~RUBY.chomp
             lethal = [target.toughness - target.damage, 0].max
             marked = target.damage
-            trigger_effect(:deal_damage, target: target, damage: value_for_x)
+            deal_damage value_for_x, to: target
             excess = [(target.damage - marked) - lethal, 0].max
             #{token.with(amount: 'excess').resolve_call}
           RUBY

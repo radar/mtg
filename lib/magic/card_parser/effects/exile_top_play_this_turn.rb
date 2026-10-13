@@ -19,7 +19,7 @@ module Magic
         def resolve_call
           <<~RUBY.chomp
             if (top = controller.library.first)
-              trigger_effect(:exile, target: top)
+              exile_target top
               game.play_permissions.grant_until_end_of_turn(card: top, player: controller)
             end
           RUBY

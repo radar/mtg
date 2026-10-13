@@ -35,7 +35,7 @@ module Magic
 
         def resolve_call
           lines = ["biter, victim = targets"]
-          lines << %(trigger_effect(:add_counter, counter_type: "+1/+1", target: biter, amount: 1)) if counter
+          lines << %(add_counter "+1/+1", to: biter) if counter
           lines << "biter.bite!(victim)"
           lines.join("\n")
         end

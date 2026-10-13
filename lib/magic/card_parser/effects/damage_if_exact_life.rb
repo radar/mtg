@@ -17,7 +17,7 @@ module Magic
         def target_choices = "game.players"
 
         def resolve_call
-          "trigger_effect(:deal_damage, target: target, damage: #{damage}) if target.life == #{life}"
+          "deal_damage #{damage}, to: target if target.life == #{life}"
         end
       end
     end

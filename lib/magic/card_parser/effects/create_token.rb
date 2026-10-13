@@ -58,14 +58,14 @@ module Magic
         def token_const = "#{CardGenerator.const_name(token_name || subtypes)}Token"
 
         def resolve_call
-          args = ["token_class: #{token_const}"]
+          args = ["token: #{token_const}"]
           args << "amount: #{amount}" unless amount == 1
           args << "controller: target" if who
           args << "enters_tapped: true" if tapped
-          call = "trigger_effect(:create_token, #{args.join(', ')})"
+          call = "create_token #{args.join(', ')}"
           return call unless haste_until_eot
 
-          "Array(#{call}).each { |token| trigger_effect(:grant_keyword, target: token, keyword: :haste) }"
+          "Array(#{call}).each { |token| give_keyword token, :haste }"
         end
 
         def definitions

@@ -17,7 +17,7 @@ module Magic
         def resolve_call
           <<~RUBY.chomp
             game.players.each { |player| [*player.hand.cards].each(&:discard!) }
-            game.players.each { |player| trigger_effect(:draw_cards, player: player, number_to_draw: #{amount}) }
+            game.players.each { |player| draw_cards #{amount}, player: player }
           RUBY
         end
       end

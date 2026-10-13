@@ -49,10 +49,10 @@ module Magic
         end
 
         def resolve_call
-          return "target.creatures.each { trigger_effect(:deal_damage, target: _1, damage: #{amount}) }" if targets == PLAYER_CREATURES
-          return "#{UNTARGETED[targets]}.each { trigger_effect(:deal_damage, target: _1, damage: #{amount}) }" if UNTARGETED.key?(targets)
+          return "target.creatures.each { deal_damage #{amount}, to: _1 }" if targets == PLAYER_CREATURES
+          return "#{UNTARGETED[targets]}.each { deal_damage #{amount}, to: _1 }" if UNTARGETED.key?(targets)
 
-          "trigger_effect(:deal_damage, target: target, damage: #{amount})"
+          "deal_damage #{amount}, to: target"
         end
       end
     end
