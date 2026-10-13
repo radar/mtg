@@ -15,7 +15,7 @@ module Magic
       # "Whenever a player draws a card, this enchantment deals 1 damage to that player."
       class CardDrawTrigger < TriggeredAbility
         def call
-          actor.trigger_effect(:deal_damage, source: actor, target: event.player, damage: 1)
+          deal_damage 1, to: event.player
         end
       end
 

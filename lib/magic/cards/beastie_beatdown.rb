@@ -22,7 +22,7 @@ module Magic
           trigger_effect(:add_counter, counter_type: "+1/+1", source: mine, target: mine, amount: 2)
           game.tick!
         end
-        trigger_effect(:deal_damage, source: mine, target: theirs, damage: mine.power)
+        deal_damage mine.power, to: theirs, source: mine
       end
     end
   end

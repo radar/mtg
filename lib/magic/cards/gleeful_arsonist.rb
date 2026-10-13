@@ -15,7 +15,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:deal_damage, source: actor, target: event.player, damage: actor.power)
+          deal_damage actor.power, to: event.player
         end
       end
 

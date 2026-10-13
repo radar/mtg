@@ -26,7 +26,7 @@ module Magic
         end
 
         def decline!
-          trigger_effect(:deal_damage, source: actor, target: @permanent.controller, damage: 5)
+          deal_damage 5, to: @permanent.controller
         end
       end
 

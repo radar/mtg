@@ -36,7 +36,7 @@ module Magic
         def resolve!(mode:)
           case mode
           when DAMAGE
-            game.opponents(controller).each { trigger_effect(:deal_damage, source: actor, target: _1, damage: 3) }
+            game.opponents(controller).each { deal_damage 3, to: _1 }
           when EXILE
             cards = controller.library.cards.first(2)
             cards.each(&:exile!)

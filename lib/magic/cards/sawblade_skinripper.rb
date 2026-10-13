@@ -37,7 +37,7 @@ module Magic
         def choices = game.any_target
 
         def resolve!(target:)
-          actor.trigger_effect(:deal_damage, source: actor, target:, damage: amount)
+          deal_damage amount, to: target
         end
       end
 

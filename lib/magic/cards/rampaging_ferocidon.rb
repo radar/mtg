@@ -19,7 +19,7 @@ module Magic
         def should_perform? = another_creature?
 
         def call
-          actor.trigger_effect(:deal_damage, source: actor, target: event.permanent.controller, damage: 1)
+          deal_damage 1, to: event.permanent.controller
         end
       end
 

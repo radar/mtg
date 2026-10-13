@@ -17,7 +17,7 @@ module Magic
         def prompt = "Deal 1 damage to #{@victim.name}?"
 
         def resolve!
-          trigger_effect(:deal_damage, source: actor, target: @victim, damage: 1)
+          deal_damage 1, to: @victim
         end
       end
 

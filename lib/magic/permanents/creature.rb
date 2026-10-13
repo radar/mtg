@@ -47,7 +47,7 @@ module Magic
         # Current power, including anything that changed since continuous effects last applied.
         [self, other].each(&:apply_continuous_effects!)
         my_power, their_power = power, other.power
-        trigger_effect(:deal_damage, source: self, target: other, damage: my_power) if my_power.positive?
+        deal_damage my_power, to: other if my_power.positive?
         other.trigger_effect(:deal_damage, source: other, target: self, damage: their_power) if their_power.positive?
       end
 
@@ -57,7 +57,7 @@ module Magic
         return unless creature? && zone&.battlefield? && other&.zone&.battlefield?
 
         apply_continuous_effects!
-        trigger_effect(:deal_damage, source: self, target: other, damage: power) if power.positive?
+        deal_damage power, to: other if power.positive?
       end
 
       # One-way combat damage (CombatPhase uses it); see #fights! for the keyword action.

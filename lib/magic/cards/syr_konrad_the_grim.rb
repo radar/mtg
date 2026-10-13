@@ -10,7 +10,7 @@ module Magic
     class SyrKonradTheGrim < Creature
       module Ping
         def ping
-          opponents.each { |opponent| actor.trigger_effect(:deal_damage, source: actor, target: opponent, damage: 1) }
+          opponents.each { |opponent| deal_damage 1, to: opponent }
         end
       end
 

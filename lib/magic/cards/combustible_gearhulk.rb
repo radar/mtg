@@ -28,7 +28,7 @@ module Magic
         def decline!
           milled = controller.mill(3)
           damage = milled.sum(&:mana_value)
-          trigger_effect(:deal_damage, source: actor, target: @opponent, damage: damage) if damage.positive?
+          deal_damage damage, to: @opponent if damage.positive?
         end
       end
 

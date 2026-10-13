@@ -28,7 +28,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:deal_damage, source: actor, target: event.player, damage: 1)
+          deal_damage 1, to: event.player
         end
       end
 

@@ -60,7 +60,7 @@ module Magic
         end
 
         def decline!
-          trigger_effect(:deal_damage, source: actor, target: @victim, damage: 2)
+          deal_damage 2, to: @victim
         end
       end
 
@@ -74,7 +74,7 @@ module Magic
           if battlefield.controlled_by(victim).creatures.any?
             game.add_choice(SacrificeOrDamageChoice.new(actor: actor, victim: victim))
           else
-            actor.trigger_effect(:deal_damage, source: actor, target: victim, damage: 2)
+            deal_damage 2, to: victim
           end
         end
       end

@@ -16,7 +16,7 @@ module Magic
 
         def resolve!
           super
-          trigger_effect(:deal_damage, source: source, target: controller, damage: 1)
+          deal_damage 1, to: controller, source: source
         end
       end
 

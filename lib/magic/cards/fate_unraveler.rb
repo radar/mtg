@@ -13,7 +13,7 @@ module Magic
         def should_perform? = opponents.include?(event.player)
 
         def call
-          actor.trigger_effect(:deal_damage, source: actor, target: event.player, damage: 1)
+          deal_damage 1, to: event.player
         end
       end
 

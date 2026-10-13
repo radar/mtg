@@ -25,7 +25,7 @@ module Magic
           time_counters = actor.counters.of_type(Counters::Time).count
           if time_counters >= 7
             actor.remove_counter(counter_type: Counters::Time, amount: time_counters)
-            trigger_effect(:deal_damage, source: actor, target: controller, damage: 20)
+            deal_damage 20, to: controller
           end
         end
       end

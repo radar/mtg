@@ -22,7 +22,7 @@ module Magic
         end
 
         def decline!
-          trigger_effect(:deal_damage, source: @enchantment, target: @enchantment.controller, damage: @enchantment.mana_value)
+          deal_damage @enchantment.mana_value, to: @enchantment.controller, source: @enchantment
         end
       end
 
