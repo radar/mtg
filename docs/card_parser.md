@@ -208,6 +208,9 @@ isn't supported.
   `TriggeredAbility`, a `Saga::ChapterAbility` or a `Choice`, all of which have
   `trigger_effect`, `controller`, `game` and `battlefield`; use only those
   (`game.opponents(controller)`, not `opponents`).
+- Emit the `Magic::EffectShortcuts` (`deal_damage 3, to: target`, `draw_card`, `create_token(token: ...)`,
+  `lose_life player, 2`, ...; see `lib/magic/effect_shortcuts.rb`) rather than a raw
+  `trigger_effect(:name, ...)` wherever one exists.
 - `resolve_call` may be several lines (a `do ... end` block); `EffectList` indents them.
 
 ## EffectList
