@@ -16,7 +16,7 @@ module Magic
 
         def call
           actor.trigger_once_this_turn!(self.class)
-          actor.trigger_effect(:draw_card)
+          draw_card
         end
       end
 

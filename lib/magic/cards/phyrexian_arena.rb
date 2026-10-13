@@ -8,7 +8,7 @@ module Magic
     class PhyrexianArena < Card
       class BeginningOfUpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         def call
-          actor.trigger_effect(:draw_cards, source: actor)
+          draw_card
           lose_life controller, 1
         end
       end

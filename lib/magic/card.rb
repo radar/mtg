@@ -680,7 +680,7 @@ module Magic
       if cycling_search
         game.search_library(self, find: cycling_search, to: :hand, reveal: true)
       else
-        trigger_effect(:draw_cards, number_to_draw: 1)
+        draw_card
       end
     end
 

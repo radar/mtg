@@ -11,7 +11,7 @@ module Magic
     class CloudkinSeer < Creature
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
-          actor.trigger_effect(:draw_cards)
+          draw_card
         end
       end
 

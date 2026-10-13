@@ -4,7 +4,7 @@ module Magic
     # define `call`, and list `EerieTrigger.handlers` in the card's `event_handlers`:
     #
     #   class EerieTrigger < TriggeredAbility::Eerie
-    #     def call = trigger_effect(:draw_card)
+    #     def call = draw_card
     #   end
     #
     #   def event_handlers = EerieTrigger.handlers

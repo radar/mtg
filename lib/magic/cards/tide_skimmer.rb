@@ -14,7 +14,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:draw_cards)
+          draw_card
         end
       end
 

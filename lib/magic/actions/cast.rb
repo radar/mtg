@@ -685,7 +685,7 @@ module Magic
       def give_gift!
         recipient = game.opponents(player).first
         case card.gift_kind
-        when :card then card.trigger_effect(:draw_cards, player: recipient, number_to_draw: 1)
+        when :card then card.draw_card(player: recipient)
         when :food then card.create_token(token:Tokens::Food, controller: recipient)
         when :treasure then card.create_token(token:Tokens::Treasure, controller: recipient)
         when :tapped_fish then card.create_token(token:Tokens::Fish, controller: recipient, enters_tapped: true)

@@ -11,7 +11,7 @@ module Magic
       class SurveilChoice < Magic::Choice::Surveil
         def resolve!(**args)
           super(**args)
-          actor.trigger_effect(:draw_cards)
+          draw_card
         end
       end
 

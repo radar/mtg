@@ -5,7 +5,7 @@ module Magic
       cost "{2}{U}"
 
       enters_the_battlefield do
-        actor.trigger_effect(:draw_cards, player: controller)
+        draw_card
         actor.add_choice(:discard)
       end
 
