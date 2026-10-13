@@ -16,7 +16,7 @@ module Magic
           return unless land.land? && @source.tapped?
 
           land.controller.add_mana(**mana)
-          land.trigger_effect(:deal_damage, source: land, target: land.controller, damage: 1)
+          land.deal_damage 1, to: land.controller
         end
       end
 

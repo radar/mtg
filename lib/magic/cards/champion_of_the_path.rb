@@ -23,7 +23,7 @@ module Magic
         def call
           elemental = event.permanent
           game.opponents(controller).each do |opponent|
-            elemental.trigger_effect(:deal_damage, source: elemental, target: opponent, damage: elemental.power)
+            elemental.deal_damage elemental.power, to: opponent
           end
         end
       end

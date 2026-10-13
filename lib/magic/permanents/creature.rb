@@ -48,7 +48,7 @@ module Magic
         [self, other].each(&:apply_continuous_effects!)
         my_power, their_power = power, other.power
         deal_damage my_power, to: other if my_power.positive?
-        other.trigger_effect(:deal_damage, source: other, target: self, damage: their_power) if their_power.positive?
+        other.deal_damage their_power, to: self if their_power.positive?
       end
 
       # "Target creature you control deals damage equal to its power to target creature or planeswalker."

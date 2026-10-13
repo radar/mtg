@@ -30,7 +30,7 @@ module Magic
       def resolve!(target:)
         damage = target.power
         battlefield.creatures.reject { _1 == target }.each do |creature|
-          target.trigger_effect(:deal_damage, source: target, target: creature, damage: damage)
+          target.deal_damage damage, to: creature
         end
         game.add_delayed_trigger(source: self, event_class: Events::CreatureDied, trigger_class: CreatureDiedTrigger)
       end
