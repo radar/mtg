@@ -27,7 +27,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:lose_life, target: @player, life: 1)
+          lose_life(@player, 1)
         end
       end
 

@@ -16,7 +16,7 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          trigger_effect(:lose_life, target: target, life: 1)
+          lose_life(target, 1)
           gain_life(1)
         end
       end

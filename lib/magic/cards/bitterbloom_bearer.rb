@@ -20,7 +20,7 @@ module Magic
       # creature token with flying."
       class UpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         def call
-          trigger_effect(:lose_life, target: controller, life: 1)
+          lose_life(controller, 1)
           trigger_effect(:create_token, token_class: FaerieToken)
         end
       end

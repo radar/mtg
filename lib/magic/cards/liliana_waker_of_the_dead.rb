@@ -17,7 +17,7 @@ module Magic
             if player.hand.any?
               game.add_choice(Magic::Choice::Discard.new(player:))
             elsif game.opponents(controller).include?(player)
-              trigger_effect(:lose_life, target: player, life: 3)
+              lose_life(player, 3)
             end
           end
         end

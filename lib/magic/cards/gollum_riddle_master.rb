@@ -46,7 +46,7 @@ module Magic
           when :counter
             add_counter("+1/+1", to: actor)
           when :drain
-            game.opponents(controller).each { |opponent| trigger_effect(:lose_life, target: opponent, life: 2) }
+            game.opponents(controller).each { |opponent| lose_life(opponent, 2) }
             gain_life(2)
           when :draw
             draw_card

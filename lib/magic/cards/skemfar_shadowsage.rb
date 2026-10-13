@@ -28,7 +28,7 @@ module Magic
 
           x = greatest_shared_type_count
           if mode == DRAIN
-            game.opponents(controller).each { |opponent| trigger_effect(:lose_life, target: opponent, life: x) }
+            game.opponents(controller).each { |opponent| lose_life(opponent, x) }
           else
             gain_life(x)
           end

@@ -8,7 +8,7 @@ module Magic
       class SearchChoice < Magic::Choice::SearchLibrary
         def resolve!(**args)
           super(**args)
-          trigger_effect(:lose_life, target: controller, life: 3)
+          lose_life(controller, 3)
         end
       end
 

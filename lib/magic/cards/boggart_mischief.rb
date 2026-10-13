@@ -40,7 +40,7 @@ module Magic
         end
 
         def call
-          game.opponents(controller).each { trigger_effect(:lose_life, target: _1, life: 1) }
+          game.opponents(controller).each { lose_life(_1, 1) }
           gain_life(1)
         end
       end

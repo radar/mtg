@@ -12,7 +12,7 @@ module Magic
 
         def resolve!
           draw_card
-          trigger_effect(:lose_life, target: controller, life: 1)
+          lose_life(controller, 1)
         end
       end
 
@@ -37,7 +37,7 @@ module Magic
         def receive_event(event)
           case event
           when Events::CardDraw
-            trigger_effect(:lose_life, target: owner, life: 2)
+            lose_life(owner, 2)
           end
         end
       end

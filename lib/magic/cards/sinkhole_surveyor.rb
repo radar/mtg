@@ -15,7 +15,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:lose_life, target: controller, life: 1)
+          lose_life(controller, 1)
           game.choices.add(Magic::Choice::Endure.new(actor: actor, amount: 1))
         end
       end

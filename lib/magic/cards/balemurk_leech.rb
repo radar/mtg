@@ -12,7 +12,7 @@ module Magic
       # 1 life."
       class EerieTrigger < TriggeredAbility::Eerie
         def call
-          opponents.each { trigger_effect(:lose_life, target: _1, life: 1) }
+          opponents.each { lose_life(_1, 1) }
         end
       end
 

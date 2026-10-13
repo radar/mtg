@@ -17,7 +17,7 @@ module Magic
 
         def call
           player = event.target
-          trigger_effect(:lose_life, target: player, life: (player.life / 2.0).ceil) if player.life.positive?
+          lose_life(player, (player.life / 2.0).ceil) if player.life.positive?
         end
       end
 

@@ -24,7 +24,7 @@ module Magic
         def should_perform? = actor.level >= 2 && event.player != controller && event.player.hand.count <= 1
 
         def call
-          trigger_effect(:lose_life, target: event.player, life: 2)
+          lose_life(event.player, 2)
         end
       end
 

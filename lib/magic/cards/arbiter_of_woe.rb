@@ -17,7 +17,7 @@ module Magic
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
           game.opponents(controller).each { |opponent| game.add_choice(Magic::Choice::Discard.new(player: opponent)) }
-          game.opponents(controller).each { trigger_effect(:lose_life, target: _1, life: 2) }
+          game.opponents(controller).each { lose_life(_1, 2) }
           trigger_effect(:draw_card)
           gain_life(2)
         end

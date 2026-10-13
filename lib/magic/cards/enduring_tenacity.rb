@@ -15,7 +15,7 @@ module Magic
         end
 
         def call
-          opponents.each { trigger_effect(:lose_life, target: _1, life: event.life) }
+          opponents.each { lose_life(_1, event.life) }
         end
       end
 

@@ -14,7 +14,7 @@ module Magic
             def resolve!(**args)
               super(**args)
               trigger_effect(:draw_card)
-              trigger_effect(:lose_life, target: controller, life: 1)
+              lose_life(controller, 1)
             end
           end
 
@@ -40,7 +40,7 @@ module Magic
             def resolve!(**args)
               super(**args)
               trigger_effect(:draw_card)
-              trigger_effect(:lose_life, target: controller, life: 1)
+              lose_life(controller, 1)
             end
           end
 

@@ -24,7 +24,7 @@ module Magic
         def should_perform? = event.permanent.controller == controller
 
         def call
-          opponents.each { |opponent| trigger_effect(:lose_life, target: opponent, life: 1) }
+          opponents.each { |opponent| lose_life(opponent, 1) }
           gain_life(1)
         end
       end

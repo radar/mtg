@@ -44,7 +44,7 @@ module Magic
         count = target.creatures.by_type(chosen_creature_type).count
 
         trigger_effect(:draw_cards, player: target, number_to_draw: count)
-        trigger_effect(:lose_life, target: target, life: count)
+        lose_life(target, count)
       end
     end
   end

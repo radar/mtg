@@ -21,7 +21,7 @@ module Magic
             exiled = targets.uniq
             targets.uniq.each { exile_target(_1) }
             if exiled.any?(&:creature?)
-              game.opponents(controller).each { trigger_effect(:lose_life, target: _1, life: 2) }
+              game.opponents(controller).each { lose_life(_1, 2) }
               gain_life(2)
             end
           end

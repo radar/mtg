@@ -13,7 +13,7 @@ module Magic
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
           x = controller.colors_among_permanents
-          opponents.each { |opponent| trigger_effect(:lose_life, target: opponent, life: x) }
+          opponents.each { |opponent| lose_life(opponent, x) }
           gain_life(x)
         end
       end

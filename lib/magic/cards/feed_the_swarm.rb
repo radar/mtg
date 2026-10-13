@@ -14,7 +14,7 @@ module Magic
       def resolve!(target:)
         life = target.mana_value
         destroy(target)
-        trigger_effect(:lose_life, target: controller, life: life)
+        lose_life(controller, life)
       end
     end
   end

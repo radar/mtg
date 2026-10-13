@@ -10,7 +10,7 @@ module Magic
 
         def resolve!(target:)
           trigger_effect(:draw_cards, player: target, number_to_draw: 2)
-          trigger_effect(:lose_life, target: target, life: 2)
+          lose_life(target, 2)
         end
       end
 

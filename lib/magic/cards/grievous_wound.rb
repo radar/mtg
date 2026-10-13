@@ -26,7 +26,7 @@ module Magic
 
         def call
           player = actor.attached_to
-          trigger_effect(:lose_life, target: player, life: (player.life / 2.0).ceil)
+          lose_life(player, (player.life / 2.0).ceil)
         end
       end
 

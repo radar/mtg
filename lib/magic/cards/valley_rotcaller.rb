@@ -20,7 +20,7 @@ module Magic
           x = (battlefield.controlled_by(controller).creatures - [actor]).count { |creature| TYPES.any? { creature.type?(_1) } }
           return if x.zero?
 
-          opponents.each { |opponent| trigger_effect(:lose_life, target: opponent, life: x) }
+          opponents.each { |opponent| lose_life(opponent, x) }
           gain_life(x)
         end
       end

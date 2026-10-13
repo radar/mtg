@@ -21,10 +21,10 @@ module Magic
           def call
             trigger_effect(:draw_card)
             if controller.creatures.any? { _1.type?("Demon") }
-              opponents.each { trigger_effect(:lose_life, target: _1, life: 2) }
+              opponents.each { lose_life(_1, 2) }
               gain_life(2)
             else
-              trigger_effect(:lose_life, target: controller, life: 2)
+              lose_life(controller, 2)
             end
           end
         end

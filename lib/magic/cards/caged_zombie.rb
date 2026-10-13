@@ -17,7 +17,7 @@ module Magic
         end
 
         def resolve!
-          game.opponents(controller).each { |opponent| trigger_effect(:lose_life, target: opponent, life: 2) }
+          game.opponents(controller).each { |opponent| lose_life(opponent, 2) }
         end
       end
 

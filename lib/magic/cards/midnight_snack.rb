@@ -13,7 +13,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:lose_life, target: target, life: game.current_turn.events.select { |e| e.is_a?(Events::LifeGain) && e.player == controller }.sum(&:life))
+          lose_life(target, game.current_turn.events.select { |e| e.is_a?(Events::LifeGain) && e.player == controller }.sum(&:life))
         end
       end
 

@@ -14,7 +14,7 @@ module Magic
         def should_perform? = event.attacker == actor
 
         def call
-          trigger_effect(:lose_life, target: event.blocker.controller, life: 2)
+          lose_life(event.blocker.controller, 2)
           gain_life(2)
         end
       end

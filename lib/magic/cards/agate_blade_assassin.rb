@@ -15,7 +15,7 @@ module Magic
         def call
           attack = event.attacks.find { _1.attacker == actor }
           defender = attack.target.is_a?(Player) ? attack.target : attack.target.controller
-          trigger_effect(:lose_life, target: defender, life: 1)
+          lose_life(defender, 1)
           gain_life(1)
         end
       end

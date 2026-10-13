@@ -18,7 +18,7 @@ module Magic
 
           trigger_effect(:reveal_cards, target: [top])
           top.move_to_hand!
-          trigger_effect(:lose_life, target: controller, life: top.mana_value) if top.mana_value.positive?
+          lose_life(controller, top.mana_value) if top.mana_value.positive?
         end
       end
 

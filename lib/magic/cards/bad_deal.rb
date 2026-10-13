@@ -10,7 +10,7 @@ module Magic
         game.opponents(controller).each do |opponent|
           game.add_choice(Magic::Choice::Discard.new(player: opponent, amount: 2)) if opponent.hand.any?
         end
-        game.players.each { |player| trigger_effect(:lose_life, target: player, life: 2) }
+        game.players.each { |player| lose_life(player, 2) }
       end
     end
   end

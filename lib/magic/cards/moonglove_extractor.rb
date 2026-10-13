@@ -15,7 +15,7 @@ module Magic
 
         def call
           trigger_effect(:draw_card)
-          trigger_effect(:lose_life, target: controller, life: 1)
+          lose_life(controller, 1)
         end
       end
 

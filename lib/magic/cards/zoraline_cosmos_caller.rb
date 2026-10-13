@@ -37,7 +37,7 @@ module Magic
 
           def resolve!(payment: nil)
             super
-            trigger_effect(:lose_life, target: controller, life: 2)
+            lose_life(controller, 2)
             choice = ReturnChoice.new(actor: actor)
             game.add_choice(choice) if choice.choices.any?
           end

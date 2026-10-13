@@ -22,7 +22,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:lose_life, target: event.permanent.controller, life: 2)
+          lose_life(event.permanent.controller, 2)
         end
       end
 

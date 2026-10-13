@@ -13,7 +13,7 @@ module Magic
         def call
           controller.mill(3)
           if controller.graveyard.cards.any? { |card| card.type?("Elf") }
-            game.opponents(controller).each { trigger_effect(:lose_life, target: _1, life: 2) }
+            game.opponents(controller).each { lose_life(_1, 2) }
             gain_life(2)
           end
         end

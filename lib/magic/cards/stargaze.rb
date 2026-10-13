@@ -22,7 +22,7 @@ module Magic
 
           picked.each(&:move_to_hand!)
           (looked_at - picked).each(&:move_to_graveyard!)
-          trigger_effect(:lose_life, target: controller, life: amount)
+          lose_life(controller, amount)
         end
       end
 

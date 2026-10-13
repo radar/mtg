@@ -20,7 +20,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:lose_life, target: that_player, life: 1)
+          lose_life(that_player, 1)
         end
       end
 

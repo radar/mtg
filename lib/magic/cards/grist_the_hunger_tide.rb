@@ -89,7 +89,7 @@ module Magic
         def resolve!
           amount = graveyard.creatures.count
           game.opponents(controller).each do |opponent|
-            trigger_effect(:lose_life, target: opponent, life: amount)
+            lose_life(opponent, amount)
           end
         end
       end

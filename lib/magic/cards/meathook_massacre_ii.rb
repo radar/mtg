@@ -32,7 +32,7 @@ module Magic
         def resolve!
           return unless controller.life >= 3 && @card.zone&.graveyard?
 
-          trigger_effect(:lose_life, target: controller, life: 3)
+          lose_life(controller, 3)
           Permanent.put_onto_battlefield(game: game, card: @card, from_zone: @card.zone, controller: controller, counters: { "finality" => 1 })
         end
       end
@@ -54,7 +54,7 @@ module Magic
 
         def resolve!
           if opponent.life >= 3
-            trigger_effect(:lose_life, target: opponent, life: 3)
+            lose_life(opponent, 3)
           else
             decline!
           end

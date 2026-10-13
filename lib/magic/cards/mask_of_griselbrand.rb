@@ -23,7 +23,7 @@ module Magic
         def resolve!
           return unless @amount.positive? && controller.life >= @amount
 
-          trigger_effect(:lose_life, target: controller, life: @amount)
+          lose_life(controller, @amount)
           draw_cards(@amount)
         end
       end

@@ -9,7 +9,7 @@ module Magic
         def resolve!(**args)
           super(**args)
           draw_cards(2)
-          trigger_effect(:lose_life, target: controller, life: 2)
+          lose_life(controller, 2)
         end
       end
 

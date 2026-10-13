@@ -13,7 +13,7 @@ module Magic
 
         def call
           shrines = controller.permanents.by_type("Shrine").count
-          opponents.each { |opponent| trigger_effect(:lose_life, target: opponent, life: shrines) }
+          opponents.each { |opponent| lose_life(opponent, shrines) }
           gain_life(shrines)
         end
       end

@@ -49,7 +49,7 @@ module Magic
 
         def resolve!
           x = controller.graveyard.creatures.count
-          game.opponents(controller).each { |opponent| trigger_effect(:lose_life, target: opponent, life: x) } if x.positive?
+          game.opponents(controller).each { |opponent| lose_life(opponent, x) } if x.positive?
         end
       end
 

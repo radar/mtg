@@ -17,7 +17,7 @@ module Magic
         def prompt = "Have #{@victim.name} lose 1 life?"
 
         def resolve!
-          trigger_effect(:lose_life, target: @victim, life: 1)
+          lose_life(@victim, 1)
         end
       end
 

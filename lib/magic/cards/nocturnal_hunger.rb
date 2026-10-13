@@ -10,7 +10,7 @@ module Magic
       # Destroy target creature. If the gift wasn't promised, you lose 2 life.
       def resolve!(target:)
         destroy(target)
-        trigger_effect(:lose_life, target: controller, life: 2) unless gift_promised?
+        lose_life(controller, 2) unless gift_promised?
       end
     end
   end

@@ -19,7 +19,7 @@ module Magic
           return unless controller.life >= 1
 
           controller.pay_mana(payment)
-          trigger_effect(:lose_life, target: controller, life: 1)
+          lose_life(controller, 1)
           trigger_effect(:draw_card)
         end
       end

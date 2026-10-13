@@ -45,7 +45,7 @@ module Magic
       class DrawStepTrigger < TriggeredAbility
         def call
           player = event.player
-          trigger_effect(:lose_life, target: player, life: 3)
+          lose_life(player, 3)
           game.add_choice(SearchChoice.new(actor: actor, player: player))
         end
       end
