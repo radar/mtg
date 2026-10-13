@@ -14,7 +14,7 @@ module Magic
           revealed = controller.library.first(4)
           return if revealed.empty?
 
-          actor.trigger_effect(:reveal_cards, target: revealed)
+          reveal_cards revealed
 
           elves, rest = revealed.partition { |card| card.type?("Elf") }
           elves.each(&:move_to_hand!)

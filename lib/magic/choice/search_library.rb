@@ -23,7 +23,7 @@ module Magic
             target.resolve!(enters_tapped: enters_tapped)
           end
         when :hand
-          trigger_effect(:reveal_cards, target: targets) if reveal
+          reveal_cards targets if reveal
           targets.map do |target|
             target.move_to_hand!
           end
@@ -32,7 +32,7 @@ module Magic
           targets.map(&:move_to_graveyard!)
         when :top
           # "...then shuffle and put that card on top": shuffle first, then move it to the top.
-          trigger_effect(:reveal_cards, target: targets) if reveal
+          reveal_cards targets if reveal
           chooser.shuffle!
           targets.each { |target| target.move_zone!(to: chooser.library) }
           return targets

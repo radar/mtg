@@ -20,7 +20,7 @@ module Magic
           library = controller.library
           found = library.find { _1.type?("Land") }
           revealed = library.take_while { !_1.equal?(found) }
-          trigger_effect(:reveal_cards, target: [*revealed, found].compact)
+          reveal_cards [*revealed, found].compact
           found&.move_to_hand!
           revealed.shuffle.each do |card|
             library.remove(card)

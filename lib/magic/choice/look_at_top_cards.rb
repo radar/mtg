@@ -22,7 +22,7 @@ module Magic
         raise ArgumentError, "#{target.name} is not a valid choice" if target && !choices.include?(target)
 
         if target
-          trigger_effect(:reveal_cards, target: [target])
+          reveal_cards [target]
           target.move_to_hand!
         end
 

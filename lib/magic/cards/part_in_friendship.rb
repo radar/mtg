@@ -19,7 +19,7 @@ module Magic
           library = controller.library
           found = library.find { _1.type?("Creature") }
           revealed = library.take_while { !_1.equal?(found) }
-          trigger_effect(:reveal_cards, target: [*revealed, found].compact)
+          reveal_cards [*revealed, found].compact
           # "If its mana value is less than or equal to the number of lands you control, put it onto the battlefield.
           # Otherwise, put it into your hand."
           if found && found.mana_value <= controller.lands.count
