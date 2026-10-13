@@ -40,7 +40,7 @@ module Magic
 
         def call
           other_attackers = event.attacks.reject { |attack| attack.attacker == actor }.count
-          actor.trigger_effect(:modify_power_toughness, power: other_attackers, target: actor, until_eot: true)
+          pump actor, other_attackers
         end
       end
 

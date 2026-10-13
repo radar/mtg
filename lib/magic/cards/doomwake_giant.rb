@@ -15,7 +15,7 @@ module Magic
 
         def call
           creatures_opponents_control.each do |creature|
-            actor.trigger_effect(:modify_power_toughness, power: -1, toughness: -1, target: creature, until_eot: true)
+            pump creature, -1, -1
           end
         end
       end

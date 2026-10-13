@@ -12,7 +12,7 @@ module Magic
       class ETB < TriggeredAbility::EnterTheBattlefield
         def call
           other_creatures_you_control.each do |creature|
-            actor.trigger_effect(:modify_power_toughness, power: 2, toughness: 2, target: creature, until_eot: true)
+            pump creature, 2, 2
             creature.grant_keyword(Cards::Keywords::VIGILANCE, until_eot: true)
             creature.grant_keyword(Cards::Keywords::TRAMPLE, until_eot: true)
           end

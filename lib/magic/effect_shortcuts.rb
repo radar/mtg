@@ -33,7 +33,7 @@ module Magic
     end
 
     # "Target creature gets +2/+2 until end of turn": `pump target, 2, 2` (`until_eot: false` for a lasting change).
-    def pump(target, power, toughness, **args)
+    def pump(target, power = 0, toughness = 0, **args)
       trigger_effect(:modify_power_toughness, target:, power:, toughness:, **args)
     end
 
@@ -92,7 +92,9 @@ module Magic
       trigger_effect(:draw_cards, number_to_draw: number, player:, **args)
     end
 
-    def gain_life(life, **args)
+    # "You gain 3 life": `gain_life 3`; `to:` names another player. A bare `gain_life` gains 1.
+    def gain_life(life = 1, to: nil, **args)
+      args[:target] = to if to
       trigger_effect(:gain_life, life:, **args)
     end
   end

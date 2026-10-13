@@ -15,8 +15,8 @@ module Magic
       def resolve!(targets:)
         first_creature, second_creature = targets
 
-        trigger_effect(:modify_power_toughness, target: first_creature, toughness: 2)
-        trigger_effect(:modify_power_toughness, target: second_creature, power: -2)
+        pump first_creature, 0, 2
+        pump second_creature, -2
       end
     end
   end

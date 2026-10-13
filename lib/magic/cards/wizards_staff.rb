@@ -32,7 +32,7 @@ module Magic
           creature = actor.attached_to
           times = 1 + game.battlefield.static_abilities.of_type(Abilities::Static::TriggeredAbilityDoubler).count { _1.doubles_trigger_for?(creature, event) }
           times.times do
-            actor.trigger_effect(:modify_power_toughness, source: creature, target: creature, power: 1, toughness: 1)
+            pump creature, 1, 1, source: creature
           end
         end
       end

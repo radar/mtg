@@ -40,7 +40,7 @@ module Magic
       class Chapter3 < Saga::ChapterAbility
         def resolve!
           actor.controller.creatures.select { |creature| creature.type?("Elf") }.each do |elf|
-            actor.trigger_effect(:modify_power_toughness, target: elf, power: 1, toughness: 0, until_eot: true)
+            pump elf, 1
             elf.grant_keyword(Keywords::VIGILANCE, until_eot: true)
           end
         end

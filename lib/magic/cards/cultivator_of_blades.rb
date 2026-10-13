@@ -53,7 +53,7 @@ module Magic
 
         def resolve!
           @other_attackers.each do |attacker|
-            attacker.trigger_effect(:modify_power_toughness, power: @power, toughness: @power, target: attacker, until_eot: true)
+            pump attacker, @power, @power, source: attacker
           end
         end
       end

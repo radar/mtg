@@ -21,7 +21,7 @@ module Magic
         end
 
         def resolve!(target:)
-          actor.trigger_effect(:modify_power_toughness, power: 2, target: target)
+          pump target, 2
         end
       end
     end
