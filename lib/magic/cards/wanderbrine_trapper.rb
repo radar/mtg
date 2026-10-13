@@ -20,7 +20,7 @@ module Magic
         def target_choices = battlefield.not_controlled_by(controller).creatures
 
         def resolve!(target:)
-          trigger_effect(:tap, target:)
+          tap_permanent(target)
         end
       end
 

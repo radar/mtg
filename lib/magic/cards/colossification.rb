@@ -20,7 +20,7 @@ module Magic
 
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:tap, target: actor.attached_to)
+          tap_permanent(actor.attached_to)
         end
       end
 

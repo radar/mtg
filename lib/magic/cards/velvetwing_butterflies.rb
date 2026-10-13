@@ -17,7 +17,7 @@ module Magic
       def target_choices = battlefield.creatures
 
       def adventure_resolve!(targets:, **)
-        targets.uniq.first(2).each { |creature| trigger_effect(:tap, target: creature) }
+        targets.uniq.first(2).each { |creature| tap_permanent(creature) }
       end
     end
   end

@@ -25,7 +25,7 @@ module Magic
           creature = actor.attached_to
           return unless creature
 
-          trigger_effect(:tap, target: creature)
+          tap_permanent(creature)
           creature.counters.map(&:class).tally.each do |counter_class, amount|
             creature.remove_counter(counter_type: counter_class, amount: amount)
           end

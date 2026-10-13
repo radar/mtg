@@ -14,7 +14,7 @@ module Magic
 
         def resolve!
           give_keyword(source, :indestructible)
-          trigger_effect(:tap, target: source)
+          tap_permanent(source)
         end
       end
 

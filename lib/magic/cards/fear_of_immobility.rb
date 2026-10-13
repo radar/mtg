@@ -16,7 +16,7 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          trigger_effect(:tap, target: target)
+          tap_permanent(target)
           return if target.controller == controller
 
           add_counter("stun", to: target)

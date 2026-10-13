@@ -28,7 +28,7 @@ module Magic
           def choice_amount = 0..2
 
           def resolve!(targets:)
-            Array(targets).first(2).each { trigger_effect(:tap, target: _1) }
+            Array(targets).first(2).each { tap_permanent(_1) }
           end
         end
 

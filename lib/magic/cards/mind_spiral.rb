@@ -20,7 +20,7 @@ module Magic
         return unless gift_promised?
 
         creature = targets[1]
-        trigger_effect(:tap, target: creature)
+        tap_permanent(creature)
         add_counter("stun", to: creature)
       end
     end

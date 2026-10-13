@@ -21,7 +21,7 @@ module Magic
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
           creature = actor.attached_to
-          trigger_effect(:tap, target: creature)
+          tap_permanent(creature)
           add_counter("stun", to: creature, amount: 3) unless actor.gift_promised?
         end
       end

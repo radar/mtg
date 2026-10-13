@@ -21,7 +21,7 @@ module Magic
         def choice_amount = 1
 
         def resolve!(target:)
-          @mode == ModeChoice::TAP ? trigger_effect(:tap, target: target) : target.untap!
+          @mode == ModeChoice::TAP ? tap_permanent(target) : target.untap!
         end
       end
 

@@ -17,7 +17,7 @@ module Magic
       # "Up to two target creatures": any number of targets from 0 to 2.
       def resolve!(targets: [])
         targets.first(2).each do |target|
-          trigger_effect(:tap, target: target)
+          tap_permanent(target)
           add_counter("stun", to: target)
         end
         draw_card

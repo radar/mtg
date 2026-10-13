@@ -80,7 +80,7 @@ module Magic
         def target_choices = battlefield.creatures
 
         def resolve!(target:)
-          trigger_effect(:tap, target: target)
+          tap_permanent(target)
           add_counter("stun", to: target, amount: 2)
         end
       end

@@ -20,7 +20,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:tap, target: target)
+          tap_permanent(target)
         end
       end
 

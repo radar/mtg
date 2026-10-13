@@ -16,7 +16,7 @@ module Magic
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
           creature = actor.attached_to
-          trigger_effect(:tap, target: creature) if creature
+          tap_permanent(creature) if creature
         end
       end
 

@@ -6,7 +6,8 @@ module Magic
   #   deal_damage 3, to: target              # trigger_effect(:deal_damage, target: target, damage: 3)
   #   add_counter "+1/+1", to: target        # trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
   #   destroy target                         # trigger_effect(:destroy_target, target: target)
-  #   lose_life opponent, 2                  # trigger_effect(:lose_life, target: opponent, life: 2)
+  #   tap_permanent target                   # trigger_effect(:tap, target: target)
+  #   lose_life opponent, 2                 # trigger_effect(:lose_life, target: opponent, life: 2)
   #   exile_target target                   # trigger_effect(:exile, target: target)
   #   give_keyword target, :haste          # trigger_effect(:grant_keyword, target: target, keyword: :haste)
   #   pump target, 2, 2                     # trigger_effect(:modify_power_toughness, target: target, power: 2, toughness: 2)
@@ -51,6 +52,11 @@ module Magic
     # "Each opponent loses 2 life": `lose_life opponent, 2`.
     def lose_life(player, life, **args)
       trigger_effect(:lose_life, target: player, life:, **args)
+    end
+
+    # Not `tap`: every object already has Kernel#tap.
+    def tap_permanent(target, **args)
+      trigger_effect(:tap, target:, **args)
     end
 
     def draw_card
