@@ -20,7 +20,7 @@ module Magic
       def choice_amount = 1
 
       def resolve!(target:)
-        add_counter Counters::Minus1Minus1, to: target, amount: amount
+        add_counter "-1/-1", to: target, amount: amount
       end
     end
   end
