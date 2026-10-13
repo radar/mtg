@@ -15,7 +15,7 @@ module Magic
 
       # "Exile target creature."
       def resolve!(target:)
-        trigger_effect(:exile, target:)
+        exile_target(target)
       end
     end
   end

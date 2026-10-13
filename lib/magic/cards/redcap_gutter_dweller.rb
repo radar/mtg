@@ -31,7 +31,7 @@ module Magic
             super
             add_counter("+1/+1", to: actor)
             if (top = controller.library.first)
-              trigger_effect(:exile, target: top)
+              exile_target(top)
               game.play_permissions.grant_until_end_of_turn(card: top, player: controller)
             end
           end

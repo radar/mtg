@@ -39,7 +39,7 @@ module Magic
         def target_choices = game.players.flat_map { _1.graveyard.cards.to_a }
 
         def resolve!(target:)
-          trigger_effect(:exile, target: target)
+          exile_target(target)
           source.exiled_cards << target
         end
       end

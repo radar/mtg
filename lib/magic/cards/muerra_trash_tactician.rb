@@ -49,7 +49,7 @@ module Magic
 
         def call
           controller.library.first(2).each do |card|
-            trigger_effect(:exile, target: card)
+            exile_target(card)
             game.play_permissions.grant_until_end_of_next_turn(card: card, player: controller)
           end
         end

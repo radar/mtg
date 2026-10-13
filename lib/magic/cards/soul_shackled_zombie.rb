@@ -19,7 +19,7 @@ module Magic
           def resolve!(targets:)
             raise ArgumentError, "targets must all be in a single graveyard" unless targets.map(&:zone).uniq.size <= 1
             exiled = targets.uniq
-            targets.uniq.each { trigger_effect(:exile, target: _1) }
+            targets.uniq.each { exile_target(_1) }
             if exiled.any?(&:creature?)
               game.opponents(controller).each { trigger_effect(:lose_life, target: _1, life: 2) }
               gain_life(2)

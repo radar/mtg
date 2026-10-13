@@ -8,25 +8,25 @@ module Magic
 
       class ExileArtifacts < Mode
         def resolve!
-          game.battlefield.permanents.by_any_type(T::Artifact).to_a.each { |permanent| trigger_effect(:exile, target: permanent) }
+          game.battlefield.permanents.by_any_type(T::Artifact).to_a.each { |permanent| exile_target(permanent) }
         end
       end
 
       class ExileCreatures < Mode
         def resolve!
-          game.battlefield.creatures.to_a.each { |permanent| trigger_effect(:exile, target: permanent) }
+          game.battlefield.creatures.to_a.each { |permanent| exile_target(permanent) }
         end
       end
 
       class ExileEnchantments < Mode
         def resolve!
-          game.battlefield.permanents.enchantments.to_a.each { |permanent| trigger_effect(:exile, target: permanent) }
+          game.battlefield.permanents.enchantments.to_a.each { |permanent| exile_target(permanent) }
         end
       end
 
       class ExileGraveyards < Mode
         def resolve!
-          game.graveyard_cards.to_a.each { |card| trigger_effect(:exile, target: card) }
+          game.graveyard_cards.to_a.each { |card| exile_target(card) }
         end
       end
 

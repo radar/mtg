@@ -31,7 +31,7 @@ module Magic
       # cards ... Until your next turn, prevent all damage that would be dealt to you."
       def resolve!(targets: [])
         cards = targets.map(&:card)
-        targets.each { trigger_effect(:exile, target: _1) }
+        targets.each { exile_target(_1) }
         game.subscribe(ReturnLater.new(game:, cards:)) if cards.any?
         controller.prevent_all_damage_until_next_turn!
       end

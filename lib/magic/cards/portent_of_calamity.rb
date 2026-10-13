@@ -61,7 +61,7 @@ module Magic
           raise ArgumentError, "chosen cards must be revealed" unless (cards - revealed).empty?
           raise ArgumentError, "at most one card for each card type" unless distinct_types?(cards)
 
-          cards.each { trigger_effect(:exile, target: _1) }
+          cards.each { exile_target(_1) }
           (revealed - cards).each(&:move_to_graveyard!)
           return if cards.empty?
 

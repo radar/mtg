@@ -33,7 +33,7 @@ module Magic
           def choice_amount = 0..1
 
           def resolve!(target:)
-            trigger_effect(:exile, target: target)
+            exile_target(target)
             finish
           end
 

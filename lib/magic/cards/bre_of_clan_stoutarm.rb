@@ -48,7 +48,7 @@ module Magic
         def call
           card = nil
           while (top = controller.library.first)
-            trigger_effect(:exile, target: top)
+            exile_target(top)
             next if top.land?
 
             card = top

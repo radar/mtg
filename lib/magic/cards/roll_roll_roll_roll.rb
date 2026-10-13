@@ -33,7 +33,7 @@ module Magic
             return if target.nil?
 
             card = target.card
-            trigger_effect(:exile, target: target)
+            exile_target(target)
             game.subscribe(ReturnLater.new(game: game, card: card)) unless target.token?
           end
         end

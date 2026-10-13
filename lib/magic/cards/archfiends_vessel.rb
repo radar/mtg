@@ -23,7 +23,7 @@ module Magic
         def should_perform? = this? && event.from&.graveyard?
 
         def call
-          trigger_effect(:exile, target: actor)
+          exile_target(actor)
           trigger_effect(:create_token, token_class: DemonToken)
         end
       end

@@ -22,7 +22,7 @@ module Magic
           class MayBlink < Magic::Choice::May
             def resolve!
               card = actor.card
-              trigger_effect(:exile, target: actor)
+              exile_target(actor)
               card.resolve!(controller: card.owner) if card.zone&.exile?
             end
           end

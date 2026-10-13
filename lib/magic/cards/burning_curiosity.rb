@@ -12,7 +12,7 @@ module Magic
         player = controller
         cards = player.library.first(kicker_cost.paid? ? 3 : 2)
         cards.each do |card|
-          trigger_effect(:exile, target: card)
+          exile_target(card)
           game.play_permissions.grant_until_end_of_next_turn(card:, player:)
         end
       end

@@ -19,7 +19,7 @@ module Magic
 
         def resolve!(target:)
           card = target.card
-          trigger_effect(:exile, target: target)
+          exile_target(target)
           returned = card.resolve!(controller: card.owner) if card.zone&.exile?
           returned&.add_counter("+1/+1")
         end

@@ -26,7 +26,7 @@ module Magic
 
       def adventure_resolve!(targets:, **)
         cards = targets.map(&:card)
-        targets.each { |target| trigger_effect(:exile, target: target) }
+        targets.each { |target| exile_target(target) }
         cards.each do |card|
           next if card.token?
 

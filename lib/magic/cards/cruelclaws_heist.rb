@@ -17,7 +17,7 @@ module Magic
         def resolve!(card:)
           raise ArgumentError, "#{card.name} is not a legal choice" unless choices.include?(card)
 
-          trigger_effect(:exile, target: card)
+          exile_target(card)
           game.play_permissions.grant_while_exiled(card: card, player: controller, any_mana: true) if @castable
         end
       end

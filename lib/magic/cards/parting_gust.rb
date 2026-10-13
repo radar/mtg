@@ -12,7 +12,7 @@ module Magic
       # end step.
       def resolve!(target:)
         card = target.card
-        trigger_effect(:exile, target: target)
+        exile_target(target)
         game.subscribe(DelayedReturn.new(game: game, cards: [card], counters: { "+1/+1" => 1 })) unless gift_promised?
       end
     end

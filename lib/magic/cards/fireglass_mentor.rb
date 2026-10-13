@@ -32,7 +32,7 @@ module Magic
 
         def call
           cards = controller.library.first(2)
-          cards.each { trigger_effect(:exile, target: _1) }
+          cards.each { exile_target(_1) }
           game.choices.add(PlayChoice.new(actor: actor, cards: cards)) if cards.any?
         end
       end

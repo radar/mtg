@@ -14,7 +14,7 @@ module Magic
 
       def adventure_resolve!(**)
         controller.library.take(2).each do |card|
-          trigger_effect(:exile, target: card)
+          exile_target(card)
           game.play_permissions.grant_while_exiled_if_controlling(card: card, player: controller, type: "Wizard")
         end
       end

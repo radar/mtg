@@ -12,7 +12,7 @@ module Magic
         game.opponents(caster).each do |opponent|
           total = 0
           while total < 5 && (card = opponent.library.first)
-            trigger_effect(:exile, target: card)
+            exile_target(card)
             total += card.mana_value
             game.play_permissions.grant_until_end_of_turn(card:, player: caster, free: true) unless card.land?
           end

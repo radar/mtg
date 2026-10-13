@@ -47,7 +47,7 @@ module Magic
         def call
           exiled = nil
           while (card = controller.library.first)
-            trigger_effect(:exile, target: card)
+            exile_target(card)
             unless card.land?
               exiled = card
               break

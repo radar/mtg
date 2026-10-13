@@ -56,7 +56,7 @@ module Magic
         def resolve!(targets: [])
           targets = targets.first(2)
           cards = targets.reject(&:token?).map(&:card)
-          targets.each { |permanent| trigger_effect(:exile, target: permanent) }
+          targets.each { |permanent| exile_target(permanent) }
           game.subscribe(ReturnLater.new(game:, cards:)) if cards.any?
         end
       end

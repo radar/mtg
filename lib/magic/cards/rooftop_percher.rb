@@ -17,7 +17,7 @@ module Magic
         def resolve!(targets:)
           raise ArgumentError, "at most two cards may be chosen" if targets.size > 2
 
-          targets.each { |target| trigger_effect(:exile, target: target) }
+          targets.each { |target| exile_target(target) }
         end
       end
 

@@ -9,7 +9,7 @@ module Magic
       def resolve!
         player = controller
         player.library.first(5).each do |card|
-          trigger_effect(:exile, target: card)
+          exile_target(card)
           game.play_permissions.grant_until_end_of_next_turn(card:, player:)
         end
         player.grant_additional_land_this_turn!

@@ -12,7 +12,7 @@ module Magic
       # battlefield, then shuffles the rest into their library."
       def resolve!(target:)
         player = target.controller
-        trigger_effect(:exile, target:)
+        exile_target(target)
 
         revealed = []
         creature = nil

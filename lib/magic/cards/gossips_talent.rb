@@ -50,7 +50,7 @@ module Magic
 
           def resolve!
             card = @creature.card
-            trigger_effect(:exile, target: @creature)
+            exile_target(@creature)
             card.resolve!(controller: card.owner) if card.zone&.exile?
           end
         end

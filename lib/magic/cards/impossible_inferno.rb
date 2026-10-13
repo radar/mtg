@@ -16,7 +16,7 @@ module Magic
         return unless controller.graveyard.delirium?
 
         top = controller.library.first or return
-        trigger_effect(:exile, target: top)
+        exile_target(top)
         game.play_permissions.grant_until_end_of_next_turn(card: top, player: controller)
       end
     end

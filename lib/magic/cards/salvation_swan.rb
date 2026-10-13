@@ -20,7 +20,7 @@ module Magic
 
           def resolve!(target:)
             card = target.card
-            trigger_effect(:exile, target: target)
+            exile_target(target)
             game.subscribe(DelayedReturn.new(game: game, cards: [card], counters: { "flying" => 1 }))
           end
         end

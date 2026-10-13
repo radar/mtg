@@ -19,7 +19,7 @@ module Magic
           def resolve!(target:)
             small = target.power <= 2
             actor.exiled_cards << target.card
-            trigger_effect(:exile, target: target)
+            exile_target(target)
             add_counter("+1/+1", to: actor) if small
           end
         end

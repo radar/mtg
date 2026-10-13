@@ -71,7 +71,7 @@ module Magic
           raise ArgumentError, "choose one of the revealed cards" unless choices.include?(target)
 
           choices.each(&:conceal!)
-          trigger_effect(:exile, target:)
+          exile_target(target)
           actor.exiled_cards << target
         end
       end

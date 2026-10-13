@@ -23,7 +23,7 @@ module Magic
         costs "{1}{W}, Blight 1, Sacrifice {this}"
 
         def resolve!
-          trigger_effect(:exile, target: source.attached_to)
+          exile_target(source.attached_to)
         end
       end
 

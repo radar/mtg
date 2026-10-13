@@ -10,7 +10,7 @@ module Magic
 
       def resolve!(target:)
         controller = target.controller
-        trigger_effect(:exile, target: target)
+        exile_target(target)
         # The permanent, not its card, is the actor: a token's card has no controller.
         target.game.search_library(target, find: :basic_lands, to: :battlefield, tapped: true) if controller.library.basic_lands.any?
       end

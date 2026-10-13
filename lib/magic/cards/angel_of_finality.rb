@@ -18,7 +18,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            [*target.graveyard.cards].each { trigger_effect(:exile, target: _1) }
+            [*target.graveyard.cards].each { exile_target(_1) }
           end
         end
 

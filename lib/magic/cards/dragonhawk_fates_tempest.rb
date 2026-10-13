@@ -41,7 +41,7 @@ module Magic
           x = battlefield.controlled_by(controller).creatures.count { _1.power >= 4 }
           cards = controller.library.first(x)
           cards.each do |card|
-            trigger_effect(:exile, target: card)
+            exile_target(card)
             game.play_permissions.grant_until_next_end_step(card: card, player: controller)
           end
           game.subscribe(EndStepDamage.new(game: game, source: actor, player: controller, cards: cards)) if cards.any?

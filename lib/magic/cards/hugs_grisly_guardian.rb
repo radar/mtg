@@ -18,7 +18,7 @@ module Magic
         def call
           x = actor.mana_spent.values.sum - 4
           controller.library.first([x, 0].max).each do |card|
-            trigger_effect(:exile, target: card)
+            exile_target(card)
             game.play_permissions.grant_until_end_of_next_turn(card: card, player: controller)
           end
         end

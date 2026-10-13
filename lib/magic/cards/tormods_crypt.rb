@@ -14,7 +14,7 @@ module Magic
 
         def resolve!(target:)
           target.graveyard.each do |card|
-            trigger_effect(:exile, target: card)
+            exile_target(card)
           end
         end
       end

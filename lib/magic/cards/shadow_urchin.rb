@@ -25,7 +25,7 @@ module Magic
 
         def call
           controller.library.first(event.permanent.counters.count).each do |card|
-            trigger_effect(:exile, target: card)
+            exile_target(card)
             game.play_permissions.grant_until_next_end_step(card:, player: controller)
           end
         end

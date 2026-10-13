@@ -47,7 +47,7 @@ module Magic
         cards = player.library.first([amount, 0].max)
         return if cards.empty?
 
-        cards.each { trigger_effect(:exile, target: _1) }
+        cards.each { exile_target(_1) }
         game.add_choice(ChooseExiledCard.new(actor: self, player:, cards:))
       end
     end

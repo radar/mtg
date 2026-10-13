@@ -11,7 +11,7 @@ module Magic
       def resolve!(target:)
         card = target.card
         draws = %w[Bird Frog Otter Rat].any? { target.type?(_1) }
-        trigger_effect(:exile, target: target)
+        exile_target(target)
         card.resolve!(controller: card.owner) if card.zone&.exile?
         draw_card if draws
       end

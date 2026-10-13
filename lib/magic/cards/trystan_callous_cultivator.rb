@@ -21,7 +21,7 @@ module Magic
         def resolve!(target:)
           raise ArgumentError, "#{target.name} isn't an Elf card in your graveyard" unless choices.include?(target)
 
-          trigger_effect(:exile, target:)
+          exile_target(target)
           game.opponents(controller).each { trigger_effect(:lose_life, target: _1, life: 2) }
         end
       end

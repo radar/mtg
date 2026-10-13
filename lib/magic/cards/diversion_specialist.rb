@@ -16,7 +16,7 @@ module Magic
         def resolve!
           card = controller.library.first or return
 
-          trigger_effect(:exile, target: card)
+          exile_target(card)
           game.play_permissions.grant_until_end_of_turn(card: card, player: controller)
         end
       end

@@ -9,7 +9,7 @@ module Magic
         def target_choices = battlefield.creatures
 
         def resolve!(target:)
-          trigger_effect(:exile, target: target)
+          exile_target(target)
         end
       end
 
@@ -28,7 +28,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:exile, target: target)
+            exile_target(target)
           end
         end
 

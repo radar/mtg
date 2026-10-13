@@ -18,7 +18,7 @@ module Magic
         def resolve!(card:)
           raise ArgumentError, "#{card.name} is not in hand" unless choices.include?(card)
 
-          trigger_effect(:exile, target: card)
+          exile_target(card)
         end
       end
 

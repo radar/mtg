@@ -24,7 +24,7 @@ module Magic
 
       def resolve!(target:)
         attackers = battlefield.creatures.attacking.controlled_by(target).to_a
-        attackers.each { trigger_effect(:exile, target: _1) }
+        attackers.each { exile_target(_1) }
         choice = SearchChoice.new(actor: self, player: target, upto: attackers.size)
         game.add_choice(choice) if attackers.any? && choice.choices.any?
       end
