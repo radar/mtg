@@ -21,7 +21,7 @@ module Magic
 
         def resolve!(payment: {})
           controller.pay_mana(payment)
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

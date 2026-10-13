@@ -25,7 +25,7 @@ module Magic
 
         def call
           if controller.creatures.any? { _1.type?("Glimmer") }
-            trigger_effect(:draw_card)
+            draw_card
           else
             create_token(token:GlimmerToken)
           end

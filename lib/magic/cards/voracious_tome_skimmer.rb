@@ -14,7 +14,7 @@ module Magic
           return unless controller.life >= 1
 
           lose_life(controller, 1)
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

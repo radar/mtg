@@ -15,7 +15,7 @@ module Magic
       # color."
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:draw_card)
+          draw_card
           game.choices.add(ColorChoice.new(actor:))
         end
       end
@@ -27,7 +27,7 @@ module Magic
         def requirements_met? = controller.colors_among_permanents == 5
 
         def resolve!
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

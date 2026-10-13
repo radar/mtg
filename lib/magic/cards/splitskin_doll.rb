@@ -12,7 +12,7 @@ module Magic
       # 2 or less."
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:draw_card)
+          draw_card
           return if controller.creatures.any? { _1 != actor && _1.power <= 2 }
 
           game.choices.add(Magic::Choice::Discard.new(actor:, player: controller)) if hand.any?

@@ -14,7 +14,7 @@ module Magic
         def prompt = "Draw a card?"
 
         def resolve!
-          trigger_effect(:draw_card)
+          draw_card
           game.add_choice(Magic::Choice::Discard.new(player: controller, actor: actor)) unless face_down_activity_this_turn?
         end
 

@@ -49,7 +49,7 @@ module Magic
           when BOUNCE
             choice = BounceChoice.new(actor: actor)
             game.choices.add(choice) if choice.choices.any?
-          when DRAW then trigger_effect(:draw_card)
+          when DRAW then draw_card
           else raise ArgumentError, "unknown mode #{mode.inspect}"
           end
         end

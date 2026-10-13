@@ -13,7 +13,7 @@ module Magic
       def resolve!(target:)
         bounce(target)
         if kicker_cost.paid?
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
     end

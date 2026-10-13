@@ -13,7 +13,7 @@ module Magic
         def call
           game.opponents(controller).each { lose_life(_1, 2) }
           gain_life(2)
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 
@@ -27,7 +27,7 @@ module Magic
         def call
           game.opponents(controller).each { lose_life(_1, 2) }
           gain_life(2)
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

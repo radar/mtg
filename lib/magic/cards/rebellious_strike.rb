@@ -11,7 +11,7 @@ module Magic
 
       def resolve!(target:)
         pump(target, 3, 0)
-        trigger_effect(:draw_card)
+        draw_card
       end
     end
   end

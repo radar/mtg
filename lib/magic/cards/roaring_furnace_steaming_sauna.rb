@@ -39,7 +39,7 @@ module Magic
           def should_perform? = event.active_player == controller
 
           def call
-            trigger_effect(:draw_card)
+            draw_card
           end
         end
 

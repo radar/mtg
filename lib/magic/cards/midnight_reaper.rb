@@ -15,7 +15,7 @@ module Magic
 
         def call
           [controller].each { deal_damage(1, to: _1) }
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

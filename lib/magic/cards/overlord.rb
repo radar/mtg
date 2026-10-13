@@ -10,7 +10,7 @@ module Magic
     #     power 6
     #     toughness 6
     #
-    #     enters_or_attacks { trigger_effect(:draw_card) }
+    #     enters_or_attacks { draw_card }
     #   end
     #
     # Cast it for its impending cost with `player.cast_as(:impending, card:)`. It isn't a creature while it has time

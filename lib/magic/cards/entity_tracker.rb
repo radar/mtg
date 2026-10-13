@@ -12,7 +12,7 @@ module Magic
       # "Eerie -- Whenever an enchantment you control enters and whenever you fully unlock a Room, draw a card."
       class EerieTrigger < TriggeredAbility::Eerie
         def call
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

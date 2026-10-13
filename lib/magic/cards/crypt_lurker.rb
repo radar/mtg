@@ -19,7 +19,7 @@ module Magic
 
         def resolve!(target:)
           target.is_a?(Magic::Permanent) ? target.sacrifice! : target.discard!
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

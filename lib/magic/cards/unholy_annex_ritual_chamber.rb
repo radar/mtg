@@ -19,7 +19,7 @@ module Magic
           def should_perform? = event.active_player == controller
 
           def call
-            trigger_effect(:draw_card)
+            draw_card
             if controller.creatures.any? { _1.type?("Demon") }
               opponents.each { lose_life(_1, 2) }
               gain_life(2)

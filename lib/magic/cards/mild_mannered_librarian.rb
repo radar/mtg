@@ -16,7 +16,7 @@ module Magic
         def resolve!
           source.become_creature_type!(T::Creatures["Werewolf"])
           add_counter("+1/+1", to: source, amount: 2)
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

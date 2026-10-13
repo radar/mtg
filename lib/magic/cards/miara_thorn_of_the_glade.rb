@@ -20,7 +20,7 @@ module Magic
 
           controller.pay_mana(payment)
           lose_life(controller, 1)
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

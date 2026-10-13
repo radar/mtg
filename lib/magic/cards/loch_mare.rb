@@ -14,7 +14,7 @@ module Magic
         costs "{1}{U}, Remove 1 -1/-1 counters from {this}"
 
         def resolve!
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

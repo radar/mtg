@@ -13,7 +13,7 @@ module Magic
         def resolve!(card:)
           super
           actor.trigger_once_this_turn!(EntersTrigger)
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

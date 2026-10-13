@@ -12,7 +12,7 @@ module Magic
       # "Target creature can't be blocked this turn. Draw a card."
       def resolve!(target:)
         give_keyword(target, :cant_be_blocked)
-        trigger_effect(:draw_card)
+        draw_card
 
         super()
       end

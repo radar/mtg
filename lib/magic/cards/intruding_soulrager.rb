@@ -15,7 +15,7 @@ module Magic
 
         def resolve!(sacrificed:)
           game.opponents(controller).each { deal_damage(2, to: _1) }
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

@@ -29,7 +29,7 @@ module Magic
           case mode
           when :token then create_token(token:BeastToken)
           when :life then gain_life(3)
-          when :draw then trigger_effect(:draw_card)
+          when :draw then draw_card
           else raise "Invalid mode chosen for Elder Gargaroth: #{mode}"
           end
         end

@@ -10,7 +10,7 @@ module Magic
       # your control this turn, draw a card."
       def resolve!(target:)
         pump(target, 3, 3)
-        trigger_effect(:draw_card) if creature_entered_this_turn?
+        draw_card if creature_entered_this_turn?
       end
 
       private

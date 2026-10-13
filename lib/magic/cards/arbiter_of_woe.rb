@@ -18,7 +18,7 @@ module Magic
         def call
           game.opponents(controller).each { |opponent| game.add_choice(Magic::Choice::Discard.new(player: opponent)) }
           game.opponents(controller).each { lose_life(_1, 2) }
-          trigger_effect(:draw_card)
+          draw_card
           gain_life(2)
         end
       end

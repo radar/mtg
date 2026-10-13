@@ -11,7 +11,7 @@ module Magic
 
       def resolve!(target:)
         deal_damage(1, to: target)
-        trigger_effect(:draw_card)
+        draw_card
       end
     end
   end

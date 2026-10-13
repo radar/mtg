@@ -31,7 +31,7 @@ module Magic
         costs "{1}{B}, Sacrifice {this}"
 
         def resolve!
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

@@ -15,7 +15,7 @@ module Magic
 
         def call
           gain_life(1)
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

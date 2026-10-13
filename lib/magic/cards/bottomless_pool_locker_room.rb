@@ -40,7 +40,7 @@ module Magic
 
           def call
             actor.state[:locker_room_step] = step_key
-            trigger_effect(:draw_card)
+            draw_card
           end
 
           private

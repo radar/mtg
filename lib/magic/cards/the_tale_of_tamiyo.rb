@@ -16,7 +16,7 @@ module Magic
             milled = controller.mill(2).to_a
             break unless milled.size == 2 && share_a_card_type?(*milled)
 
-            trigger_effect(:draw_card)
+            draw_card
           end
         end
 

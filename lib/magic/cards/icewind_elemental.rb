@@ -11,7 +11,7 @@ module Magic
     class IcewindElemental < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:draw_card)
+          draw_card
           game.choices.add(Magic::Choice::Discard.new(actor: actor, player: controller))
         end
       end

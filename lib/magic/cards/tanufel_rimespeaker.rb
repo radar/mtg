@@ -12,7 +12,7 @@ module Magic
         def should_perform? = you? && spell.mana_value >= 4
 
         def call
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

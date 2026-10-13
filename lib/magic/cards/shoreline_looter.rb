@@ -16,7 +16,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:draw_card)
+          draw_card
           unless controller.graveyard.cards.count >= 7
             game.add_choice(Magic::Choice::Discard.new(player: controller))
           end

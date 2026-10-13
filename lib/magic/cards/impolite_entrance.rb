@@ -12,7 +12,7 @@ module Magic
       def resolve!(target:)
         give_keyword(target, :trample)
         give_keyword(target, :haste)
-        trigger_effect(:draw_card)
+        draw_card
       end
     end
   end

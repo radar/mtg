@@ -10,7 +10,7 @@ module Magic
         def should_perform? = controller.creatures.any? { |creature| creature.power >= 4 }
 
         def call
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 
@@ -32,7 +32,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

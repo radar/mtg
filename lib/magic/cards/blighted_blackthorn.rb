@@ -13,7 +13,7 @@ module Magic
           class BlightChoice < Magic::Choice::Blight
             def resolve!(**args)
               super(**args)
-              trigger_effect(:draw_card)
+              draw_card
               lose_life(controller, 1)
             end
           end
@@ -39,7 +39,7 @@ module Magic
           class BlightChoice < Magic::Choice::Blight
             def resolve!(**args)
               super(**args)
-              trigger_effect(:draw_card)
+              draw_card
               lose_life(controller, 1)
             end
           end

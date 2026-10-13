@@ -27,7 +27,7 @@ module Magic
           end
 
           cards.each(&:move_to_graveyard!)
-          cards.size.times { trigger_effect(:draw_card) }
+          cards.size.times { draw_card }
         end
       end
 

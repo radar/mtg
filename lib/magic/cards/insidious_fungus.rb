@@ -48,7 +48,7 @@ module Magic
             choice = DestroyChoice.new(actor: actor, type: mode == ARTIFACT ? "Artifact" : "Enchantment")
             game.add_choice(choice) if choice.choices.any?
           when DRAW
-            trigger_effect(:draw_card)
+            draw_card
             choice = LandChoice.new(actor: actor)
             game.add_choice(choice) if choice.choices.any?
           else

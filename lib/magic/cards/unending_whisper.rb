@@ -7,7 +7,7 @@ module Magic
 
     class UnendingWhisper < Sorcery
       def resolve!
-        trigger_effect(:draw_card)
+        draw_card
       end
     end
   end

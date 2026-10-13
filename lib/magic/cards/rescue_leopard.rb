@@ -17,7 +17,7 @@ module Magic
           class DiscardChoice < Magic::Choice::Discard
             def resolve!(**args)
               super(**args)
-              trigger_effect(:draw_card)
+              draw_card
             end
           end
 

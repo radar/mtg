@@ -16,7 +16,7 @@ module Magic
         activate_only_as_sorcery
 
         def resolve!
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 
