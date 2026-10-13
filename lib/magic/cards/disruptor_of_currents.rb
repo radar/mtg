@@ -19,7 +19,7 @@ module Magic
           def choice_amount = 0..1
 
           def resolve!(target:)
-            trigger_effect(:return_to_owners_hand, target: target)
+            bounce(target)
           end
         end
 

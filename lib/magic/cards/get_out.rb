@@ -23,7 +23,7 @@ module Magic
         end
 
         def resolve!(targets:)
-          targets.first(2).each { |target| trigger_effect(:return_to_owners_hand, target: target) }
+          targets.first(2).each { |target| bounce(target) }
         end
       end
 

@@ -6,7 +6,8 @@ module Magic
   #   deal_damage 3, to: target              # trigger_effect(:deal_damage, target: target, damage: 3)
   #   add_counter "+1/+1", to: target        # trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
   #   destroy target                         # trigger_effect(:destroy_target, target: target)
-  #   tap_permanent target                   # trigger_effect(:tap, target: target)
+  #   bounce target                          # trigger_effect(:return_to_owners_hand, target: target)
+  #   tap_permanent target                  # trigger_effect(:tap, target: target)
   #   lose_life opponent, 2                 # trigger_effect(:lose_life, target: opponent, life: 2)
   #   exile_target target                   # trigger_effect(:exile, target: target)
   #   give_keyword target, :haste          # trigger_effect(:grant_keyword, target: target, keyword: :haste)
@@ -57,6 +58,11 @@ module Magic
     # Not `tap`: every object already has Kernel#tap.
     def tap_permanent(target, **args)
       trigger_effect(:tap, target:, **args)
+    end
+
+    # "Return target creature to its owner's hand."
+    def bounce(target, **args)
+      trigger_effect(:return_to_owners_hand, target:, **args)
     end
 
     def draw_card

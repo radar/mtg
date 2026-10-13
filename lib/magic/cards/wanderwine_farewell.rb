@@ -20,7 +20,7 @@ module Magic
 
       def resolve!(targets:)
         targets = targets.first(2)
-        targets.each { |target| trigger_effect(:return_to_owners_hand, target: target) }
+        targets.each { |target| bounce(target) }
         game.tick!
 
         return unless controller.creatures.by_type("Merfolk").any?

@@ -26,7 +26,7 @@ module Magic
         chosen = targets.uniq
         chosen = chosen.first(1) unless kicker_cost.paid?
         returned = chosen.select { _1.zone&.battlefield? }
-        returned.each { |creature| trigger_effect(:return_to_owners_hand, target: creature) }
+        returned.each { |creature| bounce(creature) }
         @tokens_owed = returned.size
         @token_controller = controller
         @tokens_turn = game.current_turn.number

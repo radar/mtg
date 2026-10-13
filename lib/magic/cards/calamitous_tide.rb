@@ -15,7 +15,7 @@ module Magic
 
       # Return up to two target creatures to their owners' hands. Draw two cards, then discard a card.
       def resolve!(targets: [])
-        targets.each { trigger_effect(:return_to_owners_hand, target: _1) }
+        targets.each { bounce(_1) }
         draw_cards(2)
         game.choices.add(DiscardChoice.new(actor: self, player: controller)) if controller.hand.any?
       end

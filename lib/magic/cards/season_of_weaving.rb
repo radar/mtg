@@ -29,7 +29,7 @@ module Magic
         points 3
 
         def resolve!
-          battlefield.reject { _1.land? || _1.token? }.each { trigger_effect(:return_to_owners_hand, target: _1) }
+          battlefield.reject { _1.land? || _1.token? }.each { bounce(_1) }
         end
       end
 

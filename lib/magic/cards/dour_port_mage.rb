@@ -28,7 +28,7 @@ module Magic
         def target_choices = battlefield.controlled_by(controller).creatures - [source]
 
         def resolve!(target:)
-          trigger_effect(:return_to_owners_hand, target: target)
+          bounce(target)
         end
       end
 

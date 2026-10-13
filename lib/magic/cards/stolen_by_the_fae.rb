@@ -23,7 +23,7 @@ module Magic
       end
 
       def resolve!(target:, value_for_x:)
-        trigger_effect(:return_to_owners_hand, target: target)
+        bounce(target)
         trigger_effect(:create_token, token_class: FaerieToken, amount: value_for_x) if value_for_x.positive?
       end
     end
