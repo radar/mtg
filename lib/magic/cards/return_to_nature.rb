@@ -31,7 +31,7 @@ module Magic
         end
 
         def resolve!(target:)
-          exile_target target, source: source
+          exile_target target
         end
       end
 

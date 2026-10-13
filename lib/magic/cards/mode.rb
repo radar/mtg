@@ -31,8 +31,9 @@ module Magic
         card
       end
 
-      def name
-        card.name
+      # Rule 113.7: the source of a mode's effects is the card, not the mode.
+      def trigger_effect(effect, **args)
+        super(effect, **{ source: source }.merge(args))
       end
 
       def battlefield
