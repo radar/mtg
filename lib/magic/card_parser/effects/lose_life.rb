@@ -19,10 +19,10 @@ module Magic
 
         def resolve_call
           case who
-          when "each opponent" then "game.opponents(controller).each { trigger_effect(:lose_life, target: _1, life: #{amount}) }"
-          when "that player" then "trigger_effect(:lose_life, target: that_player, life: #{amount})"
-          when "you" then "trigger_effect(:lose_life, target: controller, life: #{amount})"
-          else "trigger_effect(:lose_life, target: target, life: #{amount})"
+          when "each opponent" then "game.opponents(controller).each { lose_life _1, #{amount} }"
+          when "that player" then "lose_life that_player, #{amount}"
+          when "you" then "lose_life controller, #{amount}"
+          else "lose_life target, #{amount}"
           end
         end
       end

@@ -20,7 +20,7 @@ module Magic
 
         def resolve_call
           lines = ["#{THIS}.add_types(T::Creatures[#{type.inspect}])"]
-          keywords.each { lines << "trigger_effect(:grant_keyword, target: #{THIS}, keyword: #{_1.inspect})" }
+          keywords.each { lines << "give_keyword #{THIS}, #{_1.inspect}" }
           lines.join("\n")
         end
       end

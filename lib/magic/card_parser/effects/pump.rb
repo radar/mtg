@@ -85,9 +85,9 @@ module Magic
           if power && until_next_turn
             lines << "#{target}.modify_power_toughness_until_turn_of!(controller, #{power}, #{toughness})"
           elsif power
-            lines << "trigger_effect(:modify_power_toughness, target: #{target}, power: #{amount(power)}, toughness: #{amount(toughness)})"
+            lines << "pump #{target}, #{amount(power)}, #{amount(toughness)}"
           end
-          keywords.each { lines << "trigger_effect(:grant_keyword, target: #{target}, keyword: #{_1.inspect})" }
+          keywords.each { lines << "give_keyword #{target}, #{_1.inspect}" }
           lines.join("\n")
         end
       end

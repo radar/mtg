@@ -9,7 +9,7 @@ RSpec.describe "graveyard triggers and combat requirements" do
     back = parser::Effect.parse("Return ~ from your graveyard to the battlefield.")
     expect(back).to be_a(parser::Effects::ReturnThisFromGraveyard)
     expect(back.works_from_graveyard?).to be(true)
-    expect(back.resolve_call).to include(":return_target_from_graveyard_to_battlefield", "if #{parser::Effect::THIS}.zone&.graveyard?")
+    expect(back.resolve_call).to include("reanimate ","if #{parser::Effect::THIS}.zone&.graveyard?")
     top = parser::Effect.parse("Put ~ from your graveyard on top of your library.")
     expect(top.resolve_call).to include("move_zone!(to: #{parser::Effect::THIS}.owner.library)")
   end

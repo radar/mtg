@@ -88,7 +88,7 @@ module Magic
         private
 
         def add(target)
-          counters.map { |amount, type| "trigger_effect(:add_counter, counter_type: #{type.inspect}, target: #{target}, amount: #{amount})" }.join("\n")
+          counters.map { |amount, type| "add_counter #{type.inspect}, to: #{target}, amount: #{amount}" }.join("\n")
         end
       end
     end

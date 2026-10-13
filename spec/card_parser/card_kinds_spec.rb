@@ -9,11 +9,11 @@ RSpec.describe "CardParser card kinds" do
   it "generates an instant with its effect" do
     source = generate("Lightning Bolt {R}\nInstant\nLightning Bolt deals 3 damage to any target.\n")
     expect(source).to include('LightningBolt = Instant("Lightning Bolt") do', "cost red: 1", "class LightningBolt < Instant",
-                              "game.any_target", "trigger_effect(:deal_damage, target: target, damage: 3)")
+                              "game.any_target", "deal_damage 3, to: target")
   end
 
   it "generates a sorcery, enchantment and artifact" do
-    expect(generate("Rite {1}{B}\nSorcery\nYou gain 3 life.\n")).to include('Sorcery("Rite")', "trigger_effect(:gain_life")
+    expect(generate("Rite {1}{B}\nSorcery\nYou gain 3 life.\n")).to include('Sorcery("Rite")', "gain_life 3")
     expect(generate("Aura Of Calm {2}{W}\nEnchantment\n")).to include('Enchantment("Aura Of Calm")')
     expect(generate("Baubles {2}\nArtifact\n")).to include('Artifact("Baubles")')
   end

@@ -21,9 +21,9 @@ module Magic
 
         def resolve_call
           counters = "#{THIS}.counters.of_type(#{counter})"
-          return "trigger_effect(:remove_counter, counter_type: #{counter}, target: #{THIS}, amount: #{counters}.count) if #{counters}.any?" if amount == :all
+          return "remove_counters #{counter}, from: #{THIS}, amount: #{counters}.count if #{counters}.any?" if amount == :all
 
-          "trigger_effect(:remove_counter, counter_type: #{counter}, target: #{THIS}, amount: #{amount}) " \
+          "remove_counters #{counter}, from: #{THIS}, amount: #{amount} " \
             "if #{counters}.count >= #{amount}"
         end
       end

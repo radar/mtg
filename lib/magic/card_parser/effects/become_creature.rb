@@ -26,7 +26,7 @@ module Magic
 
         def resolve_call
           lines = ["#{THIS}.become_creature!(power: #{power}, toughness: #{toughness}, types: [#{types.join(', ')}])"]
-          keywords.each { lines << "trigger_effect(:grant_keyword, target: #{THIS}, keyword: #{_1.inspect})" }
+          keywords.each { lines << "give_keyword #{THIS}, #{_1.inspect}" }
           lines.join("\n")
         end
       end

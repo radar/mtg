@@ -13,7 +13,7 @@ module Magic
           new(amount: Number.parse($~[:amount])) if LINE.match(text)
         end
 
-        def resolve_call = "trigger_effect(:gain_life, target: controller, life: #{amount})"
+        def resolve_call = "gain_life #{amount}"
       end
     end
   end

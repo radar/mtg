@@ -9,7 +9,7 @@ RSpec.describe Magic::CardParser::Effects::ReturnCards do
     effect = parse("Return target creature card from your graveyard to the battlefield.")
     expect(effect).to be_a(described_class)
     expect(effect.target_choices).to eq('controller.graveyard.cards.select { _1.type?("Creature") }')
-    expect(effect.resolve_call).to eq("trigger_effect(:return_target_from_graveyard_to_battlefield, target: target, controller: target.owner)")
+    expect(effect.resolve_call).to eq("reanimate target, controller: target.owner")
   end
 
   it "reads mana value filters, including the creature's own power" do
@@ -39,7 +39,7 @@ RSpec.describe Magic::CardParser::Effects::ReturnCards do
 
   it "reads a follow-up draw if the card is of a creature type" do
     effect = parse("Return target creature card from your graveyard to your hand. If it's a Zombie card, draw a card.")
-    expect(effect.resolve_call).to eq("target.move_to_hand!\ntrigger_effect(:draw_cards, player: controller) if target.type?(\"Zombie\")")
+    expect(effect.resolve_call).to eq("target.move_to_hand!\ndraw_card if target.type?(\"Zombie\")")
   end
 
   it "ignores sentences it doesn't understand" do

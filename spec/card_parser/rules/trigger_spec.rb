@@ -16,9 +16,9 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
 
   it "puts counters on the creature that entered, and scales life gain by a count" do
     counters = parse("Whenever another creature you control enters, put a +1/+1 counter on that creature.")
-    expect(counters.effect_list.effects.first.resolve_call).to include("target: event.permanent")
+    expect(counters.effect_list.effects.first.resolve_call).to include("to: event.permanent")
     life = parse("When ~ enters, you gain 2 life for each Gate you control.")
-    expect(life.effect_list.effects.first.resolve_call).to eq('trigger_effect(:gain_life, target: controller, life: 2 * controller.permanents.by_type("Gate").count)')
+    expect(life.effect_list.effects.first.resolve_call).to eq('gain_life 2 * controller.permanents.by_type("Gate").count')
   end
 
   it "parses another non-<Type> creature you control entering" do
@@ -140,7 +140,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
   it "runs the effects after an \"up to one\" target whether or not one is chosen" do
     source = parse("When ~ enters, ~ fights up to one target creature you don't control. You gain 2 life.").class_source("EntersTrigger")
     expect(source).to include("def choice_amount = 0..1", "def decline! = finish",
-                              "def finish\n      trigger_effect(:gain_life, target: controller, life: 2)",
+                              "def finish\n      gain_life 2",
                               "choice.choices.any? ? game.add_choice(choice) : choice.finish")
     expect(source).not_to include("return if")
   end
@@ -207,7 +207,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     expect(optional.if_you_dont).to eq([Magic::CardParser::Effects::LoseLife.new("you", 3)])
 
     source = described_class.parse("At the beginning of your upkeep, you may blight 2. When you do, draw a card.").effect_list.trigger_source
-    expect(source).to include("class BlightChoice < Magic::Choice::Blight", "trigger_effect(:draw_card)")
+    expect(source).to include("class BlightChoice < Magic::Choice::Blight", "draw_card")
   end
 
   it "parses creature-type-qualified dies triggers" do
@@ -238,7 +238,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
 
   it "wraps an optional effect in a MayChoice" do
     source = parse("Whenever you cast a creature spell, you may draw a card.").class_source("SpellCastTrigger")
-    expect(source).to include("class MayChoice < Magic::Choice::May\n    def resolve!\n      trigger_effect(:draw_card)",
+    expect(source).to include("class MayChoice < Magic::Choice::May\n    def resolve!\n      draw_card",
                               "def call\n    game.choices.add(MayChoice.new(actor: actor))")
   end
 
@@ -275,7 +275,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     expect(parse("When ~ enters, draw a card.").class_source("EntersTrigger")).to eq(<<~RUBY)
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
     RUBY
@@ -284,7 +284,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
   it "renders the condition" do
     source = parse("Whenever you cast a creature spell, draw a card.").class_source("SpellCastTrigger")
     expect(source).to include("class SpellCastTrigger < TriggeredAbility::SpellCast",
-                              "def should_perform?\n    you? && spell.type?(\"Creature\")\n  end", "trigger_effect(:draw_card)")
+                              "def should_perform?\n    you? && spell.type?(\"Creature\")\n  end", "draw_card")
   end
 
   it "parses casting a spell during an opponent's turn" do
@@ -297,7 +297,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     source = parse("At the beginning of your end step, if another creature entered the battlefield under your control this turn, draw a card.")
       .class_source("EndStepIfCreatureEnteredTrigger")
     expect(source).to include("class EndStepIfCreatureEnteredTrigger < TriggeredAbility::BeginningOfEndStep",
-                              "controllers_end_step? && game.current_turn.events.any?", "trigger_effect(:draw_card)")
+                              "controllers_end_step? && game.current_turn.events.any?", "draw_card")
   end
 
   it "parses an each-end-step trigger conditional on you having put a counter on a creature" do
@@ -310,7 +310,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
   it "chooses targets with a choice, running later effects there too" do
     source = parse("When ~ enters, it deals 2 damage to any target. You gain 1 life.").class_source("EntersTrigger")
     expect(source).to include("class TargetChoice < Magic::Choice::Targeted", "game.any_target",
-                              "def resolve!(target:)\n      trigger_effect(:deal_damage, target: target, damage: 2)\n      trigger_effect(:gain_life",
+                              "def resolve!(target:)\n      deal_damage 2, to: target\n      gain_life",
                               "def call\n    choice = TargetChoice.new(actor: actor)\n    game.add_choice(choice) if choice.choices.any?")
   end
 
@@ -322,8 +322,8 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
 
   it "runs the effects after an optional one whether or not it is accepted" do
     source = parse("When ~ dies, you may draw a card. If you do, you lose 1 life. You gain 1 life.").class_source("DiesTrigger")
-    expect(source).to include("trigger_effect(:draw_card)\n      trigger_effect(:lose_life",
-                              "def decline! = finish", "def finish\n      trigger_effect(:gain_life")
+    expect(source).to include("draw_card\n      lose_life",
+                              "def decline! = finish", "def finish\n      gain_life")
   end
 
   it "reads Mobilize N as an attack trigger that makes tapped and attacking Warriors" do

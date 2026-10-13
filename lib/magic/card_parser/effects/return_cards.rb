@@ -85,11 +85,11 @@ module Magic
         def resolve_call
           single = !all && max_targets == 1
           subject = single ? "target" : "_1"
-          move = destination == :hand ? "#{subject}.move_to_hand!" : "trigger_effect(:return_target_from_graveyard_to_battlefield, target: #{subject}, controller: #{under_your_control ? 'controller' : "#{subject}.owner"})"
+          move = destination == :hand ? "#{subject}.move_to_hand!" : "reanimate #{subject}, controller: #{under_your_control ? 'controller' : "#{subject}.owner"}"
           lines = []
           lines << "cards = #{cards}" if all
           lines << (single ? move : "#{all ? 'cards' : 'targets.uniq'}.each { #{move} }")
-          lines << "trigger_effect(:draw_cards, player: controller) if target.type?(#{draw_if_type.inspect})" if draw_if_type
+          lines << "draw_card if target.type?(#{draw_if_type.inspect})" if draw_if_type
           lines.join("\n")
         end
       end

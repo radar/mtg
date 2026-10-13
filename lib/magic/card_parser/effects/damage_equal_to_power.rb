@@ -18,7 +18,7 @@ module Magic
         def target_choices = DealDamage::TARGETS.fetch(targets)
 
         def resolve_call
-          "trigger_effect(:deal_damage, source: #{Effect::THIS}, target: target, damage: #{Effect::THIS}.power)"
+          "deal_damage #{Effect::THIS}.power, to: target, source: #{Effect::THIS}"
         end
       end
     end

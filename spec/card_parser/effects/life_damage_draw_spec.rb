@@ -17,10 +17,10 @@ RSpec.describe Magic::CardParser::Effect do
 
   it "parses 'each player' and 'that player' draws, life loss and damage" do
     expect(described_class.parse("Each player draws a card.").resolve_call)
-      .to eq("game.players.each { trigger_effect(:draw_cards, player: _1) }")
+      .to eq("game.players.each { draw_card(player: _1) }")
     expect(described_class.parse("That player draws an additional card.").resolve_call)
-      .to eq("[that_player].each { trigger_effect(:draw_cards, player: _1) }")
-    expect(described_class.parse("That player loses 5 life.").resolve_call).to eq("trigger_effect(:lose_life, target: that_player, life: 5)")
+      .to eq("[that_player].each { draw_card(player: _1) }")
+    expect(described_class.parse("That player loses 5 life.").resolve_call).to eq("lose_life that_player, 5")
     expect(described_class.parse("~ deals 2 damage to that player.").resolve_call).to include("[that_player]")
   end
 
@@ -46,25 +46,25 @@ RSpec.describe Magic::CardParser::Effect, "(batch 3)" do
   it "parses damage if a player has exactly N life" do
     effect = described_class.parse("If target player has exactly 10 life, ~ deals 10 damage to that player.")
     expect(effect.target_choices).to eq("game.players")
-    expect(effect.resolve_call).to eq("trigger_effect(:deal_damage, target: target, damage: 10) if target.life == 10")
+    expect(effect.resolve_call).to eq("deal_damage 10, to: target if target.life == 10")
   end
 
   it "parses a +1/+1 counter before a bite as one two-target effect" do
     bite = described_class.parse("Put a +1/+1 counter on target creature you control. Then that creature deals damage equal to its power to target creature an opponent controls.")
     expect(bite.counter).to be(true)
-    expect(bite.resolve_call.lines.map(&:strip)).to eq(["biter, victim = targets", 'trigger_effect(:add_counter, counter_type: "+1/+1", target: biter, amount: 1)', "biter.bite!(victim)"])
+    expect(bite.resolve_call.lines.map(&:strip)).to eq(["biter, victim = targets", 'add_counter "+1/+1", to: biter', "biter.bite!(victim)"])
     expect(described_class.parse("Target creature you control deals damage equal to its power to target creature.").counter).to be(false)
   end
 
   it "parses 'it deals damage equal to its power'" do
     effect = described_class.parse("It deals damage equal to its power to target creature or planeswalker.")
     expect(effect.target_choices).to eq("battlefield.creatures + battlefield.planeswalkers")
-    expect(effect.resolve_call).to include("damage: #{Magic::CardParser::Effect::THIS}.power")
+    expect(effect.resolve_call).to include("deal_damage #{Magic::CardParser::Effect::THIS}.power")
   end
 
   it "parses a wheel" do
     expect(described_class.parse("Each player discards their hand, then draws seven cards.").resolve_call)
-      .to include("number_to_draw: 7").and include("discard!")
+      .to include("draw_cards 7, player: player").and include("discard!")
   end
 
   it "parses poison counters" do
@@ -204,7 +204,7 @@ RSpec.describe Magic::CardParser::Rules::ActivatedAbility, "activate only once" 
     rule = described_class.parse("{3}{G}: ~ becomes a Werewolf. Put two +1/+1 counters on it and you draw a card. Activate only once.")
     expect(rule.once_ever).to be(true)
     expect(rule.class_source("Ability")).to include("activate_only_once")
-    expect(rule.class_source("Ability")).to include("target: source, amount: 2")
+    expect(rule.class_source("Ability")).to include('add_counter "+1/+1", to: source, amount: 2')
     expect(described_class.parse("{T}: Draw a card. Activate only once each turn.").once_ever).to be(false)
   end
 end

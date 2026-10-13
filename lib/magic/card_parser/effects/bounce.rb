@@ -16,7 +16,7 @@ module Magic
 
         def target_choices = targets
         def optional_target? = optional
-        def resolve_call = "trigger_effect(:return_to_owners_hand, target: target)"
+        def resolve_call = "bounce target"
       end
     end
   end

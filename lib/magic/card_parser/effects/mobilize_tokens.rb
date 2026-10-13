@@ -23,7 +23,7 @@ module Magic
 
         def resolve_call
           <<~RUBY.chomp
-            Array(trigger_effect(:create_token, token_class: #{token.token_const}, amount: #{amount}, enters_tapped: true, attacking: true, attack_target: game.current_turn.attacks.find { _1.attacker == #{THIS} }&.target)).each do |token|
+            Array(create_token(token: #{token.token_const},amount: #{amount}, enters_tapped: true, attacking: true, attack_target: game.current_turn.attacks.find { _1.attacker == #{THIS} }&.target)).each do |token|
               token.register_turn_trigger(Events::BeginningOfEndStep, SacrificeTokenTrigger)
             end
           RUBY

@@ -13,7 +13,7 @@ module Magic
           new if LINE.match?(text)
         end
 
-        def resolve_call = "trigger_effect(:sacrifice, target: #{THIS})"
+        def resolve_call = "sacrifice #{THIS}"
       end
     end
   end

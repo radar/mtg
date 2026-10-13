@@ -194,7 +194,7 @@ RSpec.describe "CardParser effects from the FDN token bucket (sacrifice choice, 
 
     expect(code).to include("ward generic: 3, life: 3")
     expect(code).to include("amount: event.spell.mana_value")
-    expect(code).to include("keyword: :haste")
+    expect(code).to include("give_keyword(token, :haste)")
   end
 
   it "copies a creature card put into a graveyard this turn as an extra type" do

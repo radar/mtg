@@ -9,7 +9,7 @@ RSpec.describe Magic::CardParser::Effects::ExileFromGraveyards do
     effect = parse("Exile up to one target card from a graveyard.")
     expect(effect.target_choices).to eq("game.graveyard_cards")
     expect(effect.optional_target?).to be(true)
-    expect(effect.resolve_call).to eq("trigger_effect(:exile, target: target)")
+    expect(effect.resolve_call).to eq("exile_target target")
   end
 
   it "reads a mandatory target from your or an opponent's graveyard" do
@@ -20,13 +20,13 @@ RSpec.describe Magic::CardParser::Effects::ExileFromGraveyards do
   it "reads 'target player's graveyard'" do
     effect = parse("Exile target player's graveyard.")
     expect(effect.target_choices).to eq("game.players")
-    expect(effect.resolve_call).to eq("[*target.graveyard.cards].each { trigger_effect(:exile, target: _1) }")
+    expect(effect.resolve_call).to eq("[*target.graveyard.cards].each { exile_target _1 }")
   end
 
   it "reads up to two cards from a single graveyard with the creature drain" do
     effect = parse("Exile up to two target cards from a single graveyard. If at least one creature card was exiled this way, each opponent loses 2 life and you gain 2 life.")
     expect(effect.max_targets).to eq(2)
-    expect(effect.resolve_call).to include("single graveyard", "if exiled.any?(&:creature?)", "life: 2")
+    expect(effect.resolve_call).to include("single graveyard", "if exiled.any?(&:creature?)", "lose_life _1, 2", "gain_life 2")
   end
 
   it "doesn't read other exile sentences" do
@@ -37,7 +37,7 @@ end
 RSpec.describe Magic::CardParser::Effects::TapTarget do
   it "reads 'Tap ~'" do
     effect = Magic::CardParser::Effect.parse("Tap ~.")
-    expect(effect.resolve_call).to eq("trigger_effect(:tap, target: #{Magic::CardParser::Effect::THIS})")
+    expect(effect.resolve_call).to eq("tap_permanent #{Magic::CardParser::Effect::THIS}")
     expect(effect.target_choices).to be_nil
     expect(effect.earlier_target?).to be(false)
   end

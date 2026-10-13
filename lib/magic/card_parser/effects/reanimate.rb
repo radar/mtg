@@ -23,7 +23,7 @@ module Magic
           "#{cards}.by_any_type(#{card_types.map(&:inspect).join(', ')})"
         end
 
-        def resolve_call = "trigger_effect(:return_target_from_graveyard_to_battlefield, target: target, controller: controller)"
+        def resolve_call = "reanimate target, controller: controller"
       end
     end
   end

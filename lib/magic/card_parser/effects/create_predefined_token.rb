@@ -21,10 +21,10 @@ module Magic
         def target_choices = { "target player" => "game.players", "target opponent" => "game.opponents(controller)" }[who]
 
         def resolve_call
-          args = ["token_class: Tokens::#{token}"]
+          args = ["token: Tokens::#{token}"]
           args << "amount: #{amount}" unless amount == 1
           args << "controller: target" if who
-          "trigger_effect(:create_token, #{args.join(', ')})"
+          "create_token(#{args.join(', ')})"
         end
       end
     end

@@ -21,13 +21,13 @@ RSpec.describe Magic::CardParser::Rules::Modal do
         end
 
         def resolve!(target:)
-          trigger_effect(:deal_damage, target: target, damage: 2)
+          deal_damage 2, to: target
         end
       end
 
       class Mode2 < Mode
         def resolve!
-          trigger_effect(:draw_card)
+          draw_card
         end
       end
 

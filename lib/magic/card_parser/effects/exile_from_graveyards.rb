@@ -36,17 +36,17 @@ module Magic
         def optional_target? = optional
 
         def resolve_call
-          return "[*target.graveyard.cards].each { trigger_effect(:exile, target: _1) }" if player_graveyard
-          return "trigger_effect(:exile, target: target)" if max_targets == 1
+          return "[*target.graveyard.cards].each { exile_target _1 }" if player_graveyard
+          return "exile_target target" if max_targets == 1
 
           lines = []
           lines << "raise ArgumentError, \"targets must all be in a single graveyard\" unless targets.map(&:zone).uniq.size <= 1" if single
           lines << "exiled = targets.uniq" if drain
-          lines << "targets.uniq.each { trigger_effect(:exile, target: _1) }"
+          lines << "targets.uniq.each { exile_target _1 }"
           if drain
             lines << "if exiled.any?(&:creature?)"
-            lines << "  game.opponents(controller).each { trigger_effect(:lose_life, target: _1, life: #{drain[0]}) }"
-            lines << "  trigger_effect(:gain_life, target: controller, life: #{drain[1]})"
+            lines << "  game.opponents(controller).each { lose_life _1, #{drain[0]} }"
+            lines << "  gain_life #{drain[1]}"
             lines << "end"
           end
           lines.join("\n")

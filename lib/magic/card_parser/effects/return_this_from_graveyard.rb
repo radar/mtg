@@ -22,7 +22,7 @@ module Magic
         def resolve_call
           this = Effect::THIS
           move = if destination == :battlefield
-                   "trigger_effect(:return_target_from_graveyard_to_battlefield, target: #{this}, controller: controller)"
+                   "reanimate #{this}, controller: controller"
                  else
                    "#{this}.move_zone!(to: #{this}.owner.library)"
                  end

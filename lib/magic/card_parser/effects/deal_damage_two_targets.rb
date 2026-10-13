@@ -22,8 +22,8 @@ module Magic
         def resolve_call
           <<~RUBY.chomp
             first, second = targets
-            trigger_effect(:deal_damage, target: first, damage: #{first_amount})
-            trigger_effect(:deal_damage, target: second, damage: #{second_amount})
+            deal_damage #{first_amount}, to: first
+            deal_damage #{second_amount}, to: second
           RUBY
         end
       end

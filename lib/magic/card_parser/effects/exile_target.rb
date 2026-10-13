@@ -17,7 +17,7 @@ module Magic
 
         def target_choices = targets
         def optional_target? = optional
-        def resolve_call = "trigger_effect(:exile, target: target)"
+        def resolve_call = "exile_target target"
       end
     end
   end

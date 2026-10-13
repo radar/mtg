@@ -21,7 +21,7 @@ module Magic
 
         def target_choices = reference.choices
         def earlier_target? = reference.earlier_target?
-        def resolve_call = "trigger_effect(:tap, target: #{reference.object})"
+        def resolve_call = "tap_permanent #{reference.object}"
       end
     end
   end

@@ -33,7 +33,7 @@ module Magic
           filters.empty? ? "game.stack.spells" : "game.stack.spells.select { #{filters.join(' && ')} }"
         end
 
-        def resolve_call = "trigger_effect(:counter_spell, target: target)"
+        def resolve_call = "counter_spell target"
 
         private
 
