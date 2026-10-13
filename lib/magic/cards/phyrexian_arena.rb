@@ -9,7 +9,7 @@ module Magic
       class BeginningOfUpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         def call
           actor.trigger_effect(:draw_cards, source: actor)
-          actor.trigger_effect(:lose_life, target: controller, life: 1)
+          lose_life controller, 1
         end
       end
 

@@ -35,7 +35,7 @@ module Magic
         def should_perform? = opponents.include?(event.player)
 
         def call
-          actor.trigger_effect(:lose_life, target: event.player, life: 1)
+          lose_life event.player, 1
           choice = TargetChoice.new(actor: actor, opponent: event.player)
           game.add_choice(choice) if choice.choices.any?
         end

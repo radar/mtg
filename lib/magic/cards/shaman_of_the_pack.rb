@@ -21,7 +21,7 @@ module Magic
 
         def resolve!(target:)
           elf_count = controller.creatures.by_any_type("Elf").count
-          target.trigger_effect(:lose_life, source: actor, life: elf_count)
+          lose_life target, elf_count
         end
       end
 

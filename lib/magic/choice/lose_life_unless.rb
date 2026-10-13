@@ -32,7 +32,7 @@ module Magic
       end
 
       def decline!
-        trigger_effect(:lose_life, target: player, life: life)
+        lose_life player, life
       end
     end
   end

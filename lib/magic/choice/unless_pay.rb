@@ -57,7 +57,7 @@ module Magic
       def pay_life
         return false if chooser.life < life
 
-        trigger_effect(:lose_life, target: chooser, life: life)
+        lose_life chooser, life
         true
       end
 

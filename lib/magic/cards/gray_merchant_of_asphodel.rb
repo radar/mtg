@@ -14,7 +14,7 @@ module Magic
         def call
           x = controller.devotion(:black)
           lost = opponents.sum do |opponent|
-            actor.trigger_effect(:lose_life, target: opponent, life: x)
+            lose_life opponent, x
             x
           end
           actor.gain_life(lost) if lost.positive?

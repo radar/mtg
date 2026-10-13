@@ -27,7 +27,7 @@ module Magic
       def resolve!(payment: {}, pay_life: false, discard: nil, sacrifice: nil, sacrifices: [])
         if paid?(payment, pay_life, discard, sacrifice, sacrifices)
           payer.pay_mana(payment) if generic
-          trigger_effect(:lose_life, target: payer, life: life) if life
+          lose_life payer, life if life
           payer.hand.discard(discard) if discard?
           sacrifice.sacrifice! if sacrifice_type
           sacrifices.each(&:sacrifice!) if sacrifice_nonland
