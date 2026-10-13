@@ -12,7 +12,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:move_card_zone, from: target.zone, target: target, to: controller.hand)
+        move_card target, to: controller.hand
       end
     end
   end

@@ -13,7 +13,7 @@ module Magic
         end
 
         def resolve!(choice:)
-          trigger_effect(:sacrifice, target: choice)
+          sacrifice choice
           pump(actor, 2, 2)
           give_keyword(actor, :trample)
         end

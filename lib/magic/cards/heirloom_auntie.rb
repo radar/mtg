@@ -18,7 +18,7 @@ module Magic
         class SurveilChoice < Magic::Choice::Surveil
           def resolve!(**args)
             super(**args)
-            trigger_effect(:remove_counter, counter_type: Counters::Minus1Minus1, target: actor, amount: 1) if actor.counters.of_type(Counters::Minus1Minus1).count >= 1
+            remove_counters "-1/-1", from: actor if actor.counters.of_type(Counters::Minus1Minus1).count >= 1
           end
         end
 

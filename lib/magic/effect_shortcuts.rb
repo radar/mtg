@@ -17,6 +17,12 @@ module Magic
   #   draw_card                              # trigger_effect(:draw_cards, number_to_draw: 1)
   #   draw_cards 2
   #   gain_life 3                            # trigger_effect(:gain_life, life: 3): the controller gains it
+  #   reanimate target, controller: me       # trigger_effect(:return_target_from_graveyard_to_battlefield, ...)
+  #   sacrifice actor                        # trigger_effect(:sacrifice, target: actor)
+  #   remove_counters "-1/-1", from: actor   # trigger_effect(:remove_counter, counter_type: ..., target: actor)
+  #   counter_ability target, phase_out target, lose_game player
+  #   move_card card, to: hand               # trigger_effect(:move_card_zone, from: card.zone, target: card, to: hand)
+  #   copy_as_token card                     # trigger_effect(:create_token_copy, card: card)
   module EffectShortcuts
     def create_token(token:, **args)
       trigger_effect(:create_token, token_class: token, **args)
@@ -96,6 +102,44 @@ module Magic
     def gain_life(life = 1, to: nil, **args)
       args[:target] = to if to
       trigger_effect(:gain_life, life:, **args)
+    end
+
+    # "Sacrifice this": `sacrifice actor`. Not `sacrifice!`, which a permanent already has.
+    def sacrifice(target, **args)
+      trigger_effect(:sacrifice, target:, **args)
+    end
+
+    # "Remove a -1/-1 counter from this": `remove_counters "-1/-1", from: actor`. Not `remove_counter`: a permanent
+    # already has one that takes its own counters.
+    def remove_counters(counter_type, from:, amount: 1, **args)
+      counter_type = Counters[counter_type] if counter_type.is_a?(String)
+      trigger_effect(:remove_counter, counter_type:, target: from, amount:, **args)
+    end
+
+    # "Counter target activated or triggered ability."
+    def counter_ability(target, **args)
+      trigger_effect(:counter_ability, target:, **args)
+    end
+
+    # "Target permanent phases out."
+    def phase_out(target, **args)
+      trigger_effect(:phase_out, target:, **args)
+    end
+
+    # "You lose the game."
+    def lose_game(player, **args)
+      trigger_effect(:lose_game, player:, **args)
+    end
+
+    # "Return target card to its owner's hand": `move_card card, to: controller.hand`. `from:` defaults to the zone the
+    # card is in; `placement:` is a position in the destination.
+    def move_card(card, to:, from: card.zone, **args)
+      trigger_effect(:move_card_zone, from:, target: card, to:, **args)
+    end
+
+    # "Create a token that's a copy of target creature": returns the tokens created.
+    def copy_as_token(card, **args)
+      trigger_effect(:create_token_copy, card:, **args)
     end
   end
 end

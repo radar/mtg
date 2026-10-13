@@ -22,7 +22,7 @@ module Magic
         end
 
         def resolve!(target:)
-          actor.trigger_effect(:sacrifice, target: target)
+          sacrifice target
         end
       end
 

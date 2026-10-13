@@ -69,7 +69,7 @@ module Magic
       end
 
       def unpaid!
-        penalty == :sacrifice ? trigger_effect(:sacrifice, target: actor) : actor.tap!
+        penalty == :sacrifice ? sacrifice(actor) : actor.tap!
       end
     end
   end

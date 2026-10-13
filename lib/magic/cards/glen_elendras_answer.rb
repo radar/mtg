@@ -24,7 +24,7 @@ module Magic
         abilities = game.stack.abilities.select { opponents.include?(ability_controller(_1)) }
 
         spells.each { counter_spell(_1) }
-        abilities.each { trigger_effect(:counter_ability, target: _1) }
+        abilities.each { counter_ability _1 }
 
         countered = spells.count + abilities.count
         create_token(token:FaerieToken, amount: countered) if countered.positive?

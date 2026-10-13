@@ -21,7 +21,7 @@ module Magic
 
         def resolve!(target:)
           library = target.owner.library
-          trigger_effect(:move_card_zone, from: target.zone, target: target, to: library, placement: library.count)
+          move_card target, to: library, placement: library.count
         end
       end
 

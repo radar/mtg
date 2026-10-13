@@ -20,7 +20,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:counter_ability, target: target)
+          counter_ability target
         end
       end
 

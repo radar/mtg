@@ -33,7 +33,7 @@ module Magic
           add_counter("quest", to: actor)
           return unless actor.counters.of_type(Counters["quest"]).count >= 6
 
-          trigger_effect(:sacrifice, target: actor)
+          sacrifice actor
           game.add_choice(DragonChoice.new(actor: actor))
         end
       end

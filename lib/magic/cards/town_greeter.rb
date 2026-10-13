@@ -24,7 +24,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:move_card_zone, from: target.zone, target: target, to: controller.hand)
+          move_card target, to: controller.hand
           gain_life(2) if target.type?("Town")
         end
       end

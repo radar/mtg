@@ -35,7 +35,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:phase_out, target: target)
+          phase_out target
         end
       end
 

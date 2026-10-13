@@ -4,7 +4,7 @@ module Magic
       type "Land"
 
       enters_the_battlefield do
-        actor.trigger_effect(:sacrifice, target: actor)
+        sacrifice actor
       end
     end
 

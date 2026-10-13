@@ -22,7 +22,7 @@ module Magic
 
       class LTB < TriggeredAbility::EnterTheBattlefield
         def call
-          actor.trigger_effect(:lose_game, player: controller)
+          lose_game controller
         end
       end
 

@@ -48,7 +48,7 @@ module Magic
 
         def resolve!
           game.opponents(controller).each do |_opponent|
-            [*trigger_effect(:create_token_copy, card: source)].each do |token|
+            [*copy_as_token(source)].each do |token|
               token.grant_haste!
               token.must_attack_this_turn!
               token.register_turn_trigger(Events::BeginningOfEndStep, EndStepSacrifice)

@@ -11,7 +11,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            [*trigger_effect(:create_token_copy, card: target.copiable_card)].each do |token|
+            [*copy_as_token(target.copiable_card)].each do |token|
               token.add_types(T::Creatures["Reflection"], until_eot: false)
             end
           end

@@ -24,7 +24,7 @@ module Magic
         end
 
         def resolve!(target:)
-          [*trigger_effect(:create_token_copy, card: target.copiable_card)].each do |token|
+          [*copy_as_token(target.copiable_card)].each do |token|
             token.modify_base_power(1, until_eot: false)
             token.modify_base_toughness(1, until_eot: false)
             token.change_colors!((token.colors + [:red]).uniq, until_eot: false)

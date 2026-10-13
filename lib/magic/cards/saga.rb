@@ -56,7 +56,7 @@ module Magic
           # that has triggered but not yet left the stack, ...
           # A Saga that transformed as its final chapter is a creature now: it is not sacrificed.
           if final && actor.card.respond_to?(:chapters)
-            actor.trigger_effect(:sacrifice, source: actor, target: actor)
+            sacrifice actor
           end
         end
       end

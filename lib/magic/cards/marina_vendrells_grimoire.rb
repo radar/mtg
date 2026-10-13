@@ -43,7 +43,7 @@ module Magic
           hand = controller.hand
           if hand.count <= event.life
             hand.cards.to_a.dup.each(&:move_to_graveyard!)
-            trigger_effect(:lose_game, player: controller)
+            lose_game controller
           else
             game.add_choice(Magic::Choice::Discard.new(player: controller, actor:, amount: event.life))
           end
