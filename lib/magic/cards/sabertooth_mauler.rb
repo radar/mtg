@@ -14,7 +14,7 @@ module Magic
         end
 
         def call
-          trigger_effect(:add_counter, counter_type: "+1/+1", source: actor, target: actor)
+          add_counter "+1/+1"
           actor.untap!
         end
       end

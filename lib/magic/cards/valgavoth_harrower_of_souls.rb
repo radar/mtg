@@ -19,7 +19,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:add_counter, source: actor, counter_type: "+1/+1", target: actor)
+          add_counter "+1/+1"
           actor.draw_card
         end
       end

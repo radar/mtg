@@ -19,7 +19,7 @@ module Magic
       def resolve!(targets:)
         mine, theirs = targets
         if controller.graveyard.delirium?
-          trigger_effect(:add_counter, counter_type: "+1/+1", source: mine, target: mine, amount: 2)
+          add_counter "+1/+1", to: mine, amount: 2, source: mine
           game.tick!
         end
         deal_damage mine.power, to: theirs, source: mine

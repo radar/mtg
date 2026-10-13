@@ -23,7 +23,7 @@ module Magic
       def resolve!
         return create_spirit unless creature_on_battlefield?
 
-        trigger_effect(:add_counter, counter_type: "+1/+1", target: creature, amount: amount)
+        add_counter "+1/+1", to: creature, amount: amount
       end
 
       def decline! = create_spirit

@@ -14,7 +14,7 @@ module Magic
 
         def call
           actor.trigger_effect(:lose_life, target: event.player, life: 1)
-          actor.trigger_effect(:add_counter, source: actor, counter_type: "+1/+1", target: actor)
+          add_counter "+1/+1"
         end
       end
 

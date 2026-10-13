@@ -32,7 +32,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:add_counter, counter_type: "lore", target: actor)
+          add_counter "lore"
         end
       end
 

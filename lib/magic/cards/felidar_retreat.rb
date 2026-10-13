@@ -38,7 +38,7 @@ module Magic
             actor.trigger_effect(:create_token, token_class: CatBeastToken)
           when :counter
             controller.creatures.each do |creature|
-              actor.trigger_effect(:add_counter, target: creature, counter_type: "+1/+1")
+              add_counter "+1/+1", to: creature
               creature.grant_keyword(Cards::Keywords::VIGILANCE)
             end
           else

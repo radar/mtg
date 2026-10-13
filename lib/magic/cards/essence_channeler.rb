@@ -42,7 +42,7 @@ module Magic
 
           def resolve!(target:)
             @counters.group_by(&:class).each do |counter_class, counters|
-              trigger_effect(:add_counter, counter_type: counter_class, target: target, amount: counters.size)
+              add_counter counter_class, to: target, amount: counters.size
             end
           end
         end

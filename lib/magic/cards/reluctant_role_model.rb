@@ -21,7 +21,7 @@ module Magic
 
         def resolve!(mode:)
           counter = COUNTERS.fetch(mode) { raise ArgumentError, "unknown counter #{mode.inspect}" }
-          trigger_effect(:add_counter, source: actor, target: actor, counter_type: counter)
+          add_counter counter, to: actor
         end
       end
 
@@ -49,7 +49,7 @@ module Magic
 
         def resolve!(target:)
           @counters.map(&:class).tally.each do |counter_type, amount|
-            trigger_effect(:add_counter, source: actor, target: target, counter_type: counter_type, amount: amount)
+            add_counter counter_type, to: target, amount: amount
           end
         end
 

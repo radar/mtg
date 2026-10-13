@@ -18,7 +18,7 @@ module Magic
 
         # ...put a +1/+1 counter on Quirion Dryad.
         def call
-          actor.trigger_effect(:add_counter, counter_type: "+1/+1", target: actor)
+          add_counter "+1/+1"
         end
       end
 

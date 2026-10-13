@@ -20,7 +20,7 @@ module Magic
       def choice_amount = 1
 
       def resolve!(target:)
-        trigger_effect(:add_counter, counter_type: Counters::Minus1Minus1, target: target, amount: amount)
+        add_counter Counters::Minus1Minus1, to: target, amount: amount
       end
     end
   end
