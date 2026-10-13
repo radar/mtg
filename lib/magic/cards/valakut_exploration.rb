@@ -14,7 +14,7 @@ module Magic
           card = controller.library.first
           return unless card
 
-          actor.trigger_effect(:exile, target: card)
+          exile_target card
           actor.exiled_cards << card
         end
       end

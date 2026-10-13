@@ -15,7 +15,7 @@ module Magic
 
         def call
           card = event.permanent.card
-          actor.trigger_effect(:exile, target: card)
+          exile_target card
           actor.exiled_cards << card
         end
       end

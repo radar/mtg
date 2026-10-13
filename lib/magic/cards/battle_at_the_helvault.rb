@@ -37,7 +37,7 @@ module Magic
 
           # An exiled token ceases to exist, so there is nothing to return later.
           actor.exiled_cards << target.card unless target.token?
-          actor.trigger_effect(:exile, target: target)
+          exile_target target
         end
       end
 

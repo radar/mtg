@@ -32,7 +32,7 @@ module Magic
         end
 
         def call
-          actor.trigger_effect(:exile, target: actor)
+          exile_target actor
         end
       end
 

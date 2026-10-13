@@ -31,7 +31,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:exile, source: source, target: target)
+          exile_target target, source: source
         end
       end
 

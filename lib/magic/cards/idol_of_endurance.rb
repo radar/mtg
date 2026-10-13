@@ -9,7 +9,7 @@ module Magic
         def call
           cards_to_exile = controller.graveyard.cmc_lte(3)
           cards_to_exile.each do |card|
-            actor.trigger_effect(:exile, target: card)
+            exile_target card
             actor.exiled_cards << card
           end
         end

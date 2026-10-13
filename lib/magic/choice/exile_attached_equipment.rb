@@ -20,7 +20,7 @@ module Magic
       def resolve!(target:)
         raise ArgumentError, "#{target.name} is not Equipment attached to #{creature.name}" unless choices.include?(target)
 
-        trigger_effect(:exile, target: target)
+        exile_target target
       end
     end
   end

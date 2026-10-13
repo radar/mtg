@@ -27,7 +27,7 @@ module Magic
           end
 
           permanents.each do |permanent|
-            trigger_effect(:exile, source: source, target: permanent)
+            exile_target permanent, source: source
           end
         end
       end

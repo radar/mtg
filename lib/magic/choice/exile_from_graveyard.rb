@@ -15,7 +15,7 @@ module Magic
       def resolve!(target:)
         raise ArgumentError, "#{target.name} isn't an #{type} card in your graveyard" unless choices.include?(target)
 
-        trigger_effect(:exile, target:)
+        exile_target target
       end
     end
   end
