@@ -14,7 +14,7 @@ module Magic
         end
 
         def resolve!(target:)
-          @source.deal_damage(target: target)
+          @source.deal_damage(1, to: target)
         end
       end
 
@@ -23,16 +23,12 @@ module Magic
       end
 
       def resolve!(target:)
-        deal_damage(target: target)
+        deal_damage(1, to: target)
 
         storm_count = game.current_turn.spells_cast.count - 1
         return unless storm_count.positive?
 
         Magic::CopyEffect.resolve_with_choice!(actor: self, receiver: Copy.new(source: self), targets: [target], copies: storm_count)
-      end
-
-      def deal_damage(target:)
-        trigger_effect(:deal_damage, target: target, damage: 1)
       end
     end
   end
