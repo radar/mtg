@@ -23,7 +23,7 @@ module Magic
         spells = game.stack.spells.select { opponents.include?(_1.player) && _1.card.can_be_countered? }
         abilities = game.stack.abilities.select { opponents.include?(ability_controller(_1)) }
 
-        spells.each { trigger_effect(:counter_spell, target: _1) }
+        spells.each { counter_spell(_1) }
         abilities.each { trigger_effect(:counter_ability, target: _1) }
 
         countered = spells.count + abilities.count

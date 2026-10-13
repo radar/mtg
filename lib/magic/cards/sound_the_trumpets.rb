@@ -14,7 +14,7 @@ module Magic
 
       def resolve!(target:)
         small = target.card.mana_value <= 2
-        trigger_effect(:counter_spell, target: target)
+        counter_spell(target)
         Magic::Recruit.call(player: controller) if small
       end
     end

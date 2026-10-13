@@ -9,7 +9,7 @@ module Magic
         def target_choices = game.stack.spells.reject { _1.card == card }
 
         def resolve!(target:)
-          trigger_effect(:counter_spell, target: target)
+          counter_spell(target)
         end
       end
 

@@ -18,7 +18,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:counter_spell, target: target)
+            counter_spell(target)
           end
         end
 

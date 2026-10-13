@@ -28,7 +28,7 @@ module Magic
 
         def resolve!
           if costs.none?(&:paid?)
-            trigger_effect(:counter_spell, target: target)
+            counter_spell(target)
           end
         end
       end

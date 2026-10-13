@@ -28,7 +28,7 @@ module Magic
 
         def resolve!
           if costs.none?(&:paid?)
-            trigger_effect(:counter_spell, target: target)
+            counter_spell(target)
           else
             game.choices.add(Magic::Choice::Surveil.new(actor: actor, amount: 2))
           end

@@ -6,7 +6,8 @@ module Magic
   #   deal_damage 3, to: target              # trigger_effect(:deal_damage, target: target, damage: 3)
   #   add_counter "+1/+1", to: target        # trigger_effect(:add_counter, counter_type: "+1/+1", target: target, amount: 1)
   #   destroy target                         # trigger_effect(:destroy_target, target: target)
-  #   bounce target                          # trigger_effect(:return_to_owners_hand, target: target)
+  #   counter_spell target                   # trigger_effect(:counter_spell, target: target)
+  #   bounce target                         # trigger_effect(:return_to_owners_hand, target: target)
   #   tap_permanent target                  # trigger_effect(:tap, target: target)
   #   lose_life opponent, 2                 # trigger_effect(:lose_life, target: opponent, life: 2)
   #   exile_target target                   # trigger_effect(:exile, target: target)
@@ -63,6 +64,11 @@ module Magic
     # "Return target creature to its owner's hand."
     def bounce(target, **args)
       trigger_effect(:return_to_owners_hand, target:, **args)
+    end
+
+    # "Counter target spell."
+    def counter_spell(target, **args)
+      trigger_effect(:counter_spell, target:, **args)
     end
 
     def draw_card
