@@ -16,7 +16,7 @@ module Magic
 
         def resolve!
           super
-          deal_damage 1, to: controller, source: source
+          deal_damage 1, to: controller
         end
       end
 

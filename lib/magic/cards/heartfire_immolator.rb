@@ -17,7 +17,7 @@ module Magic
         end
 
         def resolve!(target:)
-          deal_damage source.power, to: target, source: source
+          deal_damage source.power, to: target
         end
       end
 

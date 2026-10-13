@@ -23,8 +23,10 @@ module Magic
 
     def multi_target? = false
 
+    # Rule 113.7: the source of an ability is the object that generated it, so effects it creates have `source` as
+    # their source, not the ability itself.
     def trigger_effect(effect, **args)
-      source.trigger_effect(effect, source: self, **args)
+      source.trigger_effect(effect, **{ source: source }.merge(args))
     end
 
     def add_choice(choice, **args)

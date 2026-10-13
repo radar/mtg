@@ -58,7 +58,7 @@ module Magic
           return unless enchantment.zone&.battlefield?
 
           card = exiled.card
-          exile_target exiled, source: source
+          exile_target exiled
           game.subscribe(ReturnWhenLeaves.new(game: game, card: card, enchantment: enchantment))
         end
       end

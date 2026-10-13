@@ -12,7 +12,7 @@ module Magic
         def single_target? = true
 
         def resolve!(target:)
-          deal_damage 3, to: target, source: source
+          deal_damage 3, to: target
         end
       end
 
@@ -27,7 +27,7 @@ module Magic
           end
 
           permanents.each do |permanent|
-            exile_target permanent, source: source
+            exile_target permanent
           end
         end
       end

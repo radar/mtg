@@ -23,7 +23,7 @@ module Magic
         def resolve!
           opponents = game.opponents(source.controller)
           opponents.each do |opponent|
-            lose_life opponent, 10, source: source
+            lose_life opponent, 10
           end
 
           source.trigger_effect(:gain_life, source: source, life: 10, target: source.controller)
