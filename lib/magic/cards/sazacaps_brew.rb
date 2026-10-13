@@ -21,7 +21,7 @@ module Magic
       # Target player draws two cards. If the gift was promised, target creature you control gets +2/+0
       # until end of turn.
       def resolve!(targets:)
-        trigger_effect(:draw_cards, player: targets.first, number_to_draw: 2)
+        draw_cards(2, player: targets.first)
         pump(targets[1], 2, 0) if gift_promised?
       end
     end

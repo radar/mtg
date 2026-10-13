@@ -21,7 +21,7 @@ module Magic
         def resolve!(target:)
           spell_controller = target.player
           counter_spell(target)
-          trigger_effect(:draw_cards, player: spell_controller, number_to_draw: 1)
+          draw_card(player: spell_controller)
         end
       end
 

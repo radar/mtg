@@ -22,7 +22,7 @@ module Magic
         def target_choices = game.players
 
         def resolve!(target:)
-          trigger_effect(:draw_cards, player: target)
+          draw_card(player: target)
         end
       end
 

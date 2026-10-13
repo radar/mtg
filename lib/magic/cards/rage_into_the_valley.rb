@@ -5,7 +5,7 @@ module Magic
       cost generic: 2, black: 1
 
       def resolve!
-        trigger_effect(:draw_cards, source: self)
+        draw_card
         lose_life(controller, 1)
         Magic::Amass.call(source: self, controller: controller, amount: 2)
       end

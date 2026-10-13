@@ -43,7 +43,7 @@ module Magic
       def draw_and_lose(target)
         count = target.creatures.by_type(chosen_creature_type).count
 
-        trigger_effect(:draw_cards, player: target, number_to_draw: count)
+        draw_cards(count, player: target)
         lose_life(target, count)
       end
     end

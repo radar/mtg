@@ -22,7 +22,7 @@ module Magic
         def resolve!(target:)
           player = target.controller
           exile_target(target)
-          trigger_effect(:draw_cards, player: player, number_to_draw: 1)
+          draw_card(player: player)
         end
       end
 

@@ -64,7 +64,7 @@ module Magic
           return unless event.is_a?(Events::SpellCast) && event.player == owner && event.spell.type?("Elf")
 
           game.stack.spells.find { _1.card == event.spell }&.gain_haste_on_resolve!
-          trigger_effect(:draw_cards, player: owner, number_to_draw: 2)
+          draw_cards(2, player: owner)
         end
       end
 

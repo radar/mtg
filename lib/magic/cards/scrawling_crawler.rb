@@ -10,7 +10,7 @@ module Magic
     class ScrawlingCrawler < Creature
       class UpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         def call
-          game.players.each { trigger_effect(:draw_cards, player: _1) }
+          game.players.each { draw_card(player: _1) }
         end
       end
 

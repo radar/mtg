@@ -8,7 +8,7 @@ module Magic
     class DictateOfKruphix < Enchantment
       class DrawStepTrigger < TriggeredAbility
         def call
-          [that_player].each { trigger_effect(:draw_cards, player: _1) }
+          [that_player].each { draw_card(player: _1) }
         end
       end
 

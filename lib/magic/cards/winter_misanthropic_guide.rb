@@ -12,7 +12,7 @@ module Magic
       # "At the beginning of your upkeep, each player draws two cards."
       class UpkeepTrigger < TriggeredAbility::BeginningOfYourUpkeep
         def call
-          game.players.each { trigger_effect(:draw_cards, player: _1, number_to_draw: 2) }
+          game.players.each { draw_cards(2, player: _1) }
         end
       end
 

@@ -25,7 +25,7 @@ module Magic
         costs "{2}{W}"
 
         def resolve!
-          game.players.each { |player| trigger_effect(:draw_cards, player: player, number_to_draw: 1) }
+          game.players.each { |player| draw_card(player: player) }
         end
       end
 

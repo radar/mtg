@@ -21,7 +21,7 @@ module Magic
         def should_perform? = event.permanent == actor.attached_to
 
         def call
-          trigger_effect(:draw_cards, player: event.permanent.controller)
+          draw_card(player: event.permanent.controller)
         end
       end
 

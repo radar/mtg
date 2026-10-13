@@ -10,7 +10,7 @@ module Magic
 
       # "Target player draws two cards and loses 2 life."
       def resolve!(target:)
-        trigger_effect(:draw_cards, player: target, number_to_draw: 2)
+        draw_cards(2, player: target)
         lose_life(target, 2)
       end
     end

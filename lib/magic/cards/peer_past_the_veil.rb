@@ -9,7 +9,7 @@ module Magic
       def resolve!
         # A resolving spell is still in its zone (the hand) until `Actions::Cast` moves it, so skip it.
         [*controller.hand.cards].reject { _1 == self }.each(&:discard!)
-        trigger_effect(:draw_cards, player: controller, number_to_draw: controller.graveyard.card_type_count)
+        draw_cards(controller.graveyard.card_type_count, player: controller)
       end
     end
   end

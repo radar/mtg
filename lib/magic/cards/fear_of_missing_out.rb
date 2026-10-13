@@ -12,7 +12,7 @@ module Magic
       class DiscardThenDraw < Magic::Choice::Discard
         def resolve!(**)
           super
-          trigger_effect(:draw_cards, player: player, number_to_draw: 1)
+          draw_card(player: player)
         end
       end
 

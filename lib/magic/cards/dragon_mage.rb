@@ -16,7 +16,7 @@ module Magic
 
         def call
           game.players.each { |player| [*player.hand.cards].each(&:discard!) }
-          game.players.each { |player| trigger_effect(:draw_cards, player: player, number_to_draw: 7) }
+          game.players.each { |player| draw_cards(7, player: player) }
         end
       end
 

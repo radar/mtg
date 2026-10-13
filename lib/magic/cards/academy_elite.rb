@@ -31,7 +31,7 @@ module Magic
         end
 
         def resolve!
-          trigger_effect(:draw_cards, source: source)
+          draw_card(source: source)
           add_choice(:discard)
         end
       end

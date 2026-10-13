@@ -7,7 +7,7 @@ module Magic
 
       # `flashback` is true when this spell was cast from the graveyard.
       def resolve!(flashback: false)
-        trigger_effect(:draw_cards, source: self, number_to_draw: flashback ? 2 : 1)
+        draw_cards(flashback ? 2 : 1)
       end
     end
   end

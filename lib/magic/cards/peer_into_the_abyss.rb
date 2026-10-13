@@ -12,7 +12,7 @@ module Magic
       end
 
       def resolve!(target:)
-        trigger_effect(:draw_cards, player: target, number_to_draw: (target.library.count / 2.0).ceil)
+        draw_cards((target.library.count / 2.0).ceil, player: target)
         lose_life(target, (target.life / 2.0).ceil)
       end
     end

@@ -77,12 +77,13 @@ module Magic
       trigger_effect(:reveal_cards, target: cards, **args)
     end
 
-    def draw_card
-      draw_cards(1)
+    # `player:` defaults to the source's controller.
+    def draw_card(**args)
+      draw_cards(1, **args)
     end
 
-    def draw_cards(number)
-      trigger_effect(:draw_cards, number_to_draw: number)
+    def draw_cards(number, player: nil, **args)
+      trigger_effect(:draw_cards, number_to_draw: number, player:, **args)
     end
 
     def gain_life(life, **args)

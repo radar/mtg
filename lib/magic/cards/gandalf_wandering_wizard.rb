@@ -16,7 +16,7 @@ module Magic
         def resolve!
           owner = source.owner
           game.add_effect(Effects::ShuffleIntoLibrary.new(source: source, target: source))
-          trigger_effect(:draw_cards, player: owner, number_to_draw: 3)
+          draw_cards(3, player: owner)
         end
       end
 
