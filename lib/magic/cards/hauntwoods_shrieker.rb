@@ -42,7 +42,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:reveal_cards, target: [target.card])
+          reveal_cards([target.card])
           return unless target.card.creature? && target.can_be_turned_face_up?
 
           game.add_choice(TurnFaceUpChoice.new(actor: source, permanent: target))

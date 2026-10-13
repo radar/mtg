@@ -49,7 +49,7 @@ module Magic
               break
             end
           end
-          trigger_effect(:reveal_cards, target: revealed) if revealed.any?
+          reveal_cards(revealed) if revealed.any?
           # Everything revealed goes to the bottom, except the card taken; in the order it was revealed.
           (revealed - [found]).each do |card|
             player.library.remove(card)

@@ -25,7 +25,7 @@ module Magic
         end
 
         def resolve!(target:)
-          trigger_effect(:reveal_cards, target: target.hand.cards)
+          reveal_cards(target.hand.cards)
           choice = DiscardChoice.new(actor: self, player: target)
           game.choices.add(choice) if choice.choices.any?
         end

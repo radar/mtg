@@ -16,7 +16,7 @@ module Magic
         def call
           top = controller.library.first or return
 
-          trigger_effect(:reveal_cards, target: [top])
+          reveal_cards([top])
           top.move_to_hand!
           lose_life(controller, top.mana_value) if top.mana_value.positive?
         end

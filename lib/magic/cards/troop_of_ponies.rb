@@ -18,7 +18,7 @@ module Magic
         def resolve!(targets:)
           raise ArgumentError, "can search for at most 2 cards, got #{targets.size}" if targets.size > 2
 
-          trigger_effect(:reveal_cards, target: targets) if targets.any?
+          reveal_cards(targets) if targets.any?
           battlefield_land, hand_land = targets
           battlefield_land&.resolve!(enters_tapped: true)
           hand_land&.move_to_hand!

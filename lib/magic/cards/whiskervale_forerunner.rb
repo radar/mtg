@@ -17,7 +17,7 @@ module Magic
             if target && controller == game.current_turn.active_player
               raise ArgumentError, "#{target.name} is not a valid choice" unless choices.include?(target)
 
-              trigger_effect(:reveal_cards, target: [target])
+              reveal_cards([target])
               Permanent.put_onto_battlefield(card: target, game: game, from_zone: target.zone, controller: controller)
               (looked_at - [target]).shuffle.each do |card|
                 controller.library.remove(card)

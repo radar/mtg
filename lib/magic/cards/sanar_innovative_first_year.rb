@@ -59,7 +59,7 @@ module Magic
           end
           return if revealed.empty?
 
-          trigger_effect(:reveal_cards, target: revealed)
+          reveal_cards(revealed)
           game.add_choice(ExileChoice.new(actor: actor, revealed: revealed, colors: colors))
         end
       end

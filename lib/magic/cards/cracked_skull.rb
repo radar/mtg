@@ -43,7 +43,7 @@ module Magic
           def choice_amount = 1
 
           def resolve!(target:)
-            trigger_effect(:reveal_cards, target: target.hand.cards)
+            reveal_cards(target.hand.cards)
             return if target.hand.cards.all?(&:land?)
 
             game.choices.add(DiscardChoice.new(actor:, player: target))

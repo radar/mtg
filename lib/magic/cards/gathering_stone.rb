@@ -26,7 +26,7 @@ module Magic
           when :hand
             raise ArgumentError, "#{card.name} is not of the chosen type" unless card.type?(actor.chosen_creature_type)
 
-            trigger_effect(:reveal_cards, target: [card])
+            reveal_cards([card])
             card.move_to_hand!
           when :graveyard
             card.discard!

@@ -23,7 +23,7 @@ module Magic
             break
           end
         end
-        trigger_effect(:reveal_cards, target: revealed) if revealed.any?
+        reveal_cards(revealed) if revealed.any?
         creature&.resolve!
         player.shuffle!
       end

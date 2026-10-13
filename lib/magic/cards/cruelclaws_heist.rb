@@ -28,7 +28,7 @@ module Magic
       # promised, you may cast that card for as long as it remains exiled, and mana of any type can be spent to
       # cast it.
       def resolve!(target:)
-        trigger_effect(:reveal_cards, target: target.hand.cards.to_a)
+        reveal_cards(target.hand.cards.to_a)
         choice = ExileChoice.new(actor: self, player: target, castable: gift_promised?)
         game.choices.add(choice) if choice.choices.any?
       end

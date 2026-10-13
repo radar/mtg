@@ -18,7 +18,7 @@ module Magic
         def call
           library = controller.library
           revealed = library.first(7)
-          trigger_effect(:reveal_cards, target: revealed)
+          reveal_cards(revealed)
           enchantments, rest = revealed.partition(&:enchantment?)
           enchantments.each(&:move_to_hand!)
           rest.shuffle.each do |card|

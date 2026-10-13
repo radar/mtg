@@ -90,7 +90,7 @@ module Magic
       # Reveal the top X cards of your library.
       def resolve!(value_for_x:)
         revealed = controller.library.first(value_for_x)
-        trigger_effect(:reveal_cards, target: revealed) if revealed.any?
+        reveal_cards(revealed) if revealed.any?
         game.choices.add(ExileChoice.new(actor: self, revealed: revealed))
       end
     end

@@ -32,7 +32,7 @@ module Magic
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def call
           opponents.each do |opponent|
-            trigger_effect(:reveal_cards, target: opponent.hand.cards) if opponent.hand.any?
+            reveal_cards(opponent.hand.cards) if opponent.hand.any?
             choice = ExileChoice.new(actor:, opponent:)
             game.add_choice(choice) if choice.choices.any?
           end

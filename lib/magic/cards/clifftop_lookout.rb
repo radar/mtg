@@ -22,7 +22,7 @@ module Magic
               break
             end
           end
-          trigger_effect(:reveal_cards, target: revealed) if revealed.any?
+          reveal_cards(revealed) if revealed.any?
           if land
             Permanent.put_onto_battlefield(card: land, game: game, from_zone: land.zone, controller: controller, enters_tapped: true)
           end

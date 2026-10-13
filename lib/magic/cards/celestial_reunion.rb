@@ -23,7 +23,7 @@ module Magic
           targets = Array(targets)
           raise ArgumentError, "can search for at most 1 card, got #{targets.size}" if targets.size > 1
 
-          trigger_effect(:reveal_cards, target: targets)
+          reveal_cards(targets)
           targets.each do |target|
             @chosen_type && target.type?(@chosen_type) ? target.resolve!(enters_tapped: false) : target.move_to_hand!
           end

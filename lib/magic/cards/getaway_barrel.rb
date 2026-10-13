@@ -14,7 +14,7 @@ module Magic
         def call
           library = controller.library
           revealed = library.take(13)
-          trigger_effect(:reveal_cards, target: revealed) if revealed.any?
+          reveal_cards(revealed) if revealed.any?
 
           creature = revealed.select(&:creature?).sample
           creature&.resolve!(controller: controller)

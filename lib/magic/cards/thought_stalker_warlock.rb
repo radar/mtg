@@ -17,7 +17,7 @@ module Magic
             next if opponent.hand.none?
 
             if game.current_turn.life_lost_by_player(opponent).positive?
-              trigger_effect(:reveal_cards, target: opponent.hand.cards.to_a)
+              reveal_cards(opponent.hand.cards.to_a)
               choice = Magic::Choice::DiscardFromRevealedHand.new(actor: actor, player: opponent, excluded_types: ["Land"])
               game.choices.add(choice) if choice.choices.any?
             else
