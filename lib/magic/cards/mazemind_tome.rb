@@ -36,12 +36,7 @@ module Magic
 
       def state_triggered_abilities = [StateTriggeredAbility]
 
-      class StateTriggeredAbility
-        attr_reader :source
-        def initialize(source:)
-          @source = source
-        end
-
+      class StateTriggeredAbility < Magic::Ability
         def name
           self.class
         end
@@ -52,8 +47,8 @@ module Magic
 
         def resolve!
           if source.zone.battlefield?
-            source.trigger_effect(:exile, target: source)
-            source.gain_life(4)
+            exile_target source
+            gain_life 4
           end
         end
       end
