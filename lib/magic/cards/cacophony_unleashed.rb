@@ -12,7 +12,7 @@ module Magic
 
         def call
           game.battlefield.creatures.reject(&:enchantment?).each do |creature|
-            actor.trigger_effect(:destroy_target, target: creature)
+            destroy creature
           end
         end
       end

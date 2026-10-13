@@ -46,7 +46,7 @@ module Magic
         elsif players.size > 1
           ask(actor: actor, players: players.drop(1), chosen: chosen)
         else
-          chosen.uniq.each { actor.trigger_effect(:destroy_target, target: _1) }
+          chosen.uniq.each { destroy _1 }
         end
       end
 

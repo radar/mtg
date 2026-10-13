@@ -32,7 +32,7 @@ module Magic
       end
 
       def decline!
-        trigger_effect(:counter_spell, target: spell)
+        counter_spell spell
       end
     end
   end

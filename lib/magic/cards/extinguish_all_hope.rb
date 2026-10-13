@@ -5,7 +5,7 @@ module Magic
 
       def resolve!
         creatures.non("Enchantment").each do |creature|
-          trigger_effect(:destroy_target, source: self, target: creature)
+          destroy creature
         end
 
         super

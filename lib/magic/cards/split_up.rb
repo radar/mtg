@@ -8,14 +8,14 @@ module Magic
       # Destroy all tapped creatures.
       class DestroyTapped < Mode
         def resolve!
-          battlefield.creatures.select(&:tapped?).each { trigger_effect(:destroy_target, source: self, target: _1) }
+          battlefield.creatures.select(&:tapped?).each { destroy _1 }
         end
       end
 
       # Destroy all untapped creatures.
       class DestroyUntapped < Mode
         def resolve!
-          battlefield.creatures.reject(&:tapped?).each { trigger_effect(:destroy_target, source: self, target: _1) }
+          battlefield.creatures.reject(&:tapped?).each { destroy _1 }
         end
       end
 
