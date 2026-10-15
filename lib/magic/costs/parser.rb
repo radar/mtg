@@ -54,6 +54,8 @@ module Magic
             Blight.new(source, amount: $~[:amount].to_i)
           when /\APay (?<amount>\d+) life\z/i
             PayLife.new(source, amount: $~[:amount].to_i)
+          when /\APay (?<energy>(?:\{E\})+)\z/
+            PayEnergy.new(source, amount: $~[:energy].scan("{E}").size)
           when /Sacrifice {this}/
             SelfSacrifice.new(source)
           when /Exile {this}/

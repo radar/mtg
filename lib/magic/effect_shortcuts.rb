@@ -20,6 +20,7 @@ module Magic
   #   reanimate target, controller: me       # trigger_effect(:return_target_from_graveyard_to_battlefield, ...)
   #   sacrifice actor                        # trigger_effect(:sacrifice, target: actor)
   #   remove_counters "-1/-1", from: actor   # trigger_effect(:remove_counter, counter_type: ..., target: actor)
+  #   gain_energy 2                          # add_counter "energy", to: controller, amount: 2 (Player#energy, Costs::PayEnergy)
   #   counter_ability target, phase_out target, lose_game player
   #   move_card card, to: hand               # trigger_effect(:move_card_zone, from: card.zone, target: card, to: hand)
   #   copy_as_token card                     # trigger_effect(:create_token_copy, card: card)
@@ -114,6 +115,11 @@ module Magic
     def remove_counters(counter_type, from:, amount: 1, **args)
       counter_type = Counters[counter_type] if counter_type.is_a?(String)
       trigger_effect(:remove_counter, counter_type:, target: from, amount:, **args)
+    end
+
+    # "You get {E}{E}": `gain_energy 2`; `to:` names another player, otherwise the controller gets it.
+    def gain_energy(amount = 1, to: nil, **args)
+      add_counter("energy", to: to || controller, amount:, **args)
     end
 
     # "Counter target activated or triggered ability."

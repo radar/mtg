@@ -10,6 +10,7 @@ module Magic
       when "incarnation" then Incarnation
       when "page" then Page
       when "poison" then Poison
+      when "energy" then Energy
       when "blessing" then Blessing
       when "stun" then Stun
       when "hatchling" then Hatchling

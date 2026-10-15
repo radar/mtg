@@ -598,6 +598,18 @@ module Magic
       @counters = Counters::Collection.new(@counters + Array.new(amount) { resolved.new })
     end
 
+    # How many energy counters ({E}) the player has.
+    def energy
+      counters.of_type(Counters::Energy).count
+    end
+
+    # Pays +amount+ {E}; raises unless the player has that many.
+    def pay_energy!(amount)
+      raise "#{name} can't pay #{amount} {E}: only has #{energy}" if energy < amount
+
+      amount.times { counters.remove_first(Counters::Energy) }
+    end
+
     def devotion(color)
       permanents.sum { |permanent| permanent.devotion(color) }
     end
