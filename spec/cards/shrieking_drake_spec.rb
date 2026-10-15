@@ -75,12 +75,14 @@ RSpec.describe Magic::Cards::ShriekingDrake do
     end
 
     it "returns another creature instead of the dead Drake" do
-      ResolvePermanent("Grizzly Bears", owner: p1)
+      bears = 2.times.map { ResolvePermanent("Grizzly Bears", owner: p1) }
       cast_drake_and_kill_it
       game.settle!
+      expect(game.choices).not_to be_empty
+      expect(game.choices.last.choices).to contain_exactly(*bears)
       game.skip_choice!
       expect(p1.graveyard.cards.map(&:name)).to eq(["Shrieking Drake"])
-      expect(p1.hand.cards.map(&:name)).to include("Grizzly Bears")
+      expect(p1.hand.cards.map(&:name).count("Grizzly Bears")).to eq(1)
       expect(p1.hand.cards.map(&:name)).not_to include("Shrieking Drake")
     end
   end
