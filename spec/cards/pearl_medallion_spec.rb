@@ -20,6 +20,14 @@ RSpec.describe Magic::Cards::PearlMedallion do
     expect(p1.creatures.map(&:name)).to include("Story Seeker")
   end
 
+  it "doesn't reduce white spells an opponent casts" do
+    go_to_main_phase_for!(p2)
+    p2.add_mana(white: 1)
+
+    expect { p2.cast(card: Card("Story Seeker", owner: p2)) { |a| a.pay_mana(white: 1) } }
+      .to raise_error(Magic::Costs::Mana::CannotPay)
+  end
+
   it "doesn't reduce non-white spells" do
     p1.add_mana(green: 1)
 
