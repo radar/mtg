@@ -21,7 +21,7 @@ module Magic
 
         after_transition to: :untap do |turn|
           turn.battlefield.phased_out.permanents.controlled_by(turn.active_player).each(&:phase_in!)
-          turn.battlefield.permanents.controlled_by(turn.active_player).each(&:untap_during_untap_step)
+          turn.untap_step_permanents.each(&:untap_during_untap_step)
           turn.untap_during_other_players_untap_step!
         end
 
@@ -209,6 +209,17 @@ module Magic
         else
           game.settle!
         end
+      end
+
+      # The active player's permanents that untap during the untap step. Static abilities answering
+      # `cannot_untap_during_untap_step(permanents, active_player)` (Winter Moon) return the permanents that must stay
+      # tapped, chosen from the active player's permanents.
+      def untap_step_permanents
+        permanents = battlefield.permanents.controlled_by(active_player).to_a
+        battlefield.static_abilities.select { _1.respond_to?(:cannot_untap_during_untap_step) }.each do |ability|
+          permanents -= ability.cannot_untap_during_untap_step(permanents, active_player)
+        end
+        permanents
       end
 
       # "Untap each creature you control during each other player's untap step" (Prop Room): static abilities answering
