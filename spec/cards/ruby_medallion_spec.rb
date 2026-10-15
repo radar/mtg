@@ -22,6 +22,13 @@ RSpec.describe Magic::Cards::RubyMedallion do
     expect(bears.power).to eq(5)
   end
 
+  it "doesn't reduce red spells an opponent casts" do
+    p2.add_mana(red: 1)
+
+    expect { p2.cast(card: Card("Sure Strike", owner: p2)) { |a| a.pay_mana(red: 1).targeting(bears) } }
+      .to raise_error(Magic::Costs::Mana::CannotPay)
+  end
+
   it "doesn't reduce non-red spells" do
     p1.add_mana(green: 1)
 
