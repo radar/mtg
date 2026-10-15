@@ -3,6 +3,10 @@ module Magic
     # Suspend (rule 702.62a): a special action. Pay the suspend cost to exile the card from your hand with its time counters
     # instead of casting it. Legal whenever the card could be cast (an instant any time, anything else at sorcery speed).
     class Suspend < Action
+      # What suspend mana is being spent on, as `Costs::Mana#for_use`. Suspending is a special action: it is neither
+      # casting a spell nor activating an ability, so spell and ability mana restrictions refuse it.
+      Use = Data.define(:card)
+
       attr_reader :card
 
       def initialize(card:, **args)
@@ -15,7 +19,7 @@ module Magic
       def uses_priority? = false
 
       def mana_cost
-        @mana_cost ||= Costs::Mana.new(card.suspend_cost.dup).tap { |cost| cost.for_use = card }
+        @mana_cost ||= Costs::Mana.new(card.suspend_cost.dup).tap { |cost| cost.for_use = Use.new(card: card) }
       end
 
       def pay_mana(payment)

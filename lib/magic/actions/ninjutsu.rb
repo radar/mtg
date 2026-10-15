@@ -17,7 +17,7 @@ module Magic
       def name = "Ninjutsu (#{card.name})"
 
       def mana_cost
-        @mana_cost ||= Costs::Mana.new(card.ninjutsu_cost.cost.dup).tap { |cost| cost.for_use = card }
+        @mana_cost ||= Costs::Mana.new(card.ninjutsu_cost.cost.dup).tap { |cost| cost.for_use = AbilityUse.new(source: card) }
       end
 
       def pay_mana(payment)

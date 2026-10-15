@@ -9,7 +9,7 @@ module Magic
       end
 
       def mana_cost
-        @mana_cost ||= card.cycling_cost
+        @mana_cost ||= card.cycling_cost.tap { |cost| cost.for_use = AbilityUse.new(source: card) }
       end
 
       def pay_mana(payment)

@@ -47,11 +47,11 @@ module Magic
       end
     end
 
-    # "Spend this mana only to cast a colorless spell or to activate an ability" (Sage of the Unknowable). An ability is
-    # activated through its source permanent, so any permanent counts.
+    # "Spend this mana only to cast a colorless spell or to activate an ability" (Sage of the Unknowable). Any ability
+    # counts (`Actions::AbilityUse`: on the battlefield, or from hand or graveyard), but not special actions like suspend.
     class ColorlessSpellOrAbility < ManaRestriction
       def permits?(use)
-        (use.is_a?(Magic::Card) && use.colorless?) || use.is_a?(Magic::Permanent)
+        (use.is_a?(Magic::Card) && use.colorless?) || use.is_a?(Magic::Actions::AbilityUse)
       end
     end
 

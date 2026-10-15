@@ -8,7 +8,7 @@ module Magic
         @costs = @ability.costs
         # So restricted mana ("spend only on abilities of Elemental sources") counts wherever
         # these costs are checked or paid: `legal_actions`, `#pay`, or `GameRunner`.
-        @costs.each { |cost| cost.for_use = @ability.source if cost.is_a?(Costs::Mana) }
+        @costs.each { |cost| cost.for_use = AbilityUse.new(source: @ability.source) if cost.is_a?(Costs::Mana) }
         @targets = []
         super(**args)
       end
