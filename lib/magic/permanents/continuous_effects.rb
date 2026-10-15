@@ -60,7 +60,7 @@ module Magic
         # #controller=, not recomputed here.
 
         # Layer 3 (text-changing, e.g. "loses all abilities")
-        permanent.lost_all_abilities_by_effect = characteristic_settings.any?(&:loses_all_abilities?)
+        permanent.lost_all_abilities_by_effect = characteristic_settings.any?(&:loses_all_abilities?) || land_type_settings.any?
 
         # Layer 4 (type-changing)
         types = calculate_types
@@ -163,6 +163,7 @@ module Magic
         ]
 
         types = types.uniq
+        types = replace_land_subtypes(types)
         types -= Magic::Types::Creatures.values if modifiers_by_type(Modifications::LoseCreatureTypes).any?
         if (set = modifiers_by_type(Modifications::SetCreatureTypes).max_by(&:timestamp))
           types = (types - Magic::Types::Creatures.values) | set.type_grants
@@ -174,6 +175,18 @@ module Magic
         # Impending: "isn't a creature until the last is removed."
         types -= [T::Creature] if permanent.impending_now?
         types
+      end
+
+      # CR 305.7: the latest land-type-setting effect wins; every old land subtype goes.
+      def replace_land_subtypes(types)
+        setting = land_type_settings.max_by(&:timestamp)
+        return types unless setting
+
+        types.reject { |type| type.is_a?(Class) && type < Magic::Types::Lands::BasicLand || Magic::Types::Lands::OTHER_SUBTYPES.include?(type) } | [setting.land_type]
+      end
+
+      def land_type_settings
+        static_abilities_for(permanent).of_type(Abilities::Static::LandTypeSetting)
       end
 
       def calculate_color
@@ -232,12 +245,19 @@ module Magic
           *(permanent.lost_all_abilities? ? [] : copiable_card.activated_abilities),
           # Land types specifically give one mana ability each
           *class_types.flat_map { |type| type::ManaAbility},
+          *land_type_setting_mana_ability,
           *granted_activated_abilities,
           *modifiers_by_type(Modifications::GrantActivatedAbility).map(&:ability_class),
         ]
         .map do |ability|
           ability.new(source: permanent)
         end
+      end
+
+      # The land type set by a LandTypeSetting brings its mana ability even though the land lost its own abilities.
+      def land_type_setting_mana_ability
+        setting = land_type_settings.max_by(&:timestamp)
+        setting ? [setting.land_type::ManaAbility] : []
       end
 
       def granted_activated_abilities

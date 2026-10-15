@@ -4,6 +4,9 @@ module Magic
     module Lands
       Gate = "Gate".freeze
       Town = "Town".freeze
+      # Land subtypes that aren't basic land types; CR 305.7 removes these along with the basic ones.
+      OTHER_SUBTYPES = [Gate, Town, "Cave", "Desert", "Lair", "Locus", "Mine", "Power-Plant", "Sphere", "Tower"].freeze
+
       class BasicLand
         def self.==(other)
           self.name.split("::").last == other
