@@ -52,4 +52,36 @@ RSpec.describe Magic::Cards::ShriekingDrake do
     expect(card.zone).to eq(p1.hand)
     expect(p1.creatures.map(&:name)).to eq(["Grizzly Bears"])
   end
+
+  context "when the Drake leaves the battlefield before its trigger resolves" do
+    def cast_drake_and_kill_it
+      go_to_main_phase!
+      p1.hand.add(card)
+      p1.add_mana(blue: 1)
+      p1.cast(card:) { |a| a.pay_mana(blue: 1) }
+      game.stack.resolve!
+      p1.creatures.find { _1.name == "Shrieking Drake" }.destroy!
+    end
+
+    it "does not return it from the graveyard when nothing else is controlled" do
+      bear = ResolvePermanent("Grizzly Bears", owner: p1)
+      cast_drake_and_kill_it
+      bear.destroy!
+      game.settle!
+      hand_names = p1.hand.cards.map(&:name)
+      game.skip_choice!
+      expect(p1.graveyard.cards.map(&:name)).to contain_exactly("Shrieking Drake", "Grizzly Bears")
+      expect(p1.hand.cards.map(&:name)).to eq(hand_names)
+    end
+
+    it "returns another creature instead of the dead Drake" do
+      ResolvePermanent("Grizzly Bears", owner: p1)
+      cast_drake_and_kill_it
+      game.settle!
+      game.skip_choice!
+      expect(p1.graveyard.cards.map(&:name)).to eq(["Shrieking Drake"])
+      expect(p1.hand.cards.map(&:name)).to include("Grizzly Bears")
+      expect(p1.hand.cards.map(&:name)).not_to include("Shrieking Drake")
+    end
+  end
 end

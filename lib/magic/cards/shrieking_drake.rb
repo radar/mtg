@@ -25,7 +25,9 @@ module Magic
         end
 
         def decline!
-          bounce(actor)
+          # The Drake may have left the battlefield in response; never pull it back from another zone.
+          options = choices
+          bounce(options.include?(actor) ? actor : options.first) if options.any?
         end
       end
 
