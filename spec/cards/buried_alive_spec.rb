@@ -25,7 +25,8 @@ RSpec.describe Magic::Cards::BuriedAlive do
     expect(game.choices.last.choices).not_to include(island)
   end
 
-  it "puts up to three chosen creature cards into the graveyard" do
+  it "puts up to three chosen creature cards into the graveyard, then shuffles" do
+    expect(p1).to receive(:shuffle!)
     game.resolve_choice!(targets: bears.first(3))
     expect(bears.first(3).map(&:zone)).to all(eq(p1.graveyard))
     expect(bears.last.zone).to eq(p1.library)
