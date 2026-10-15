@@ -38,6 +38,8 @@ module Magic
             Sacrifice.new(source, source.controller.lands)
           when /\AReturn two lands you control to their owner's hand\z/
             ReturnLands.new(source, 2)
+          when /\AReturn an? (?<type>[A-Z][\w-]*) you control to its owner's hand\z/
+            ReturnCreatureType.new(source, $~[:type])
           when /\ASacrifice a Treasure\z/
             Sacrifice.new(source, source.controller.permanents.select { _1.type?("Treasure") })
           when /\ASacrifice a Room\z/

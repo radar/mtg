@@ -126,6 +126,10 @@ module Magic
         pay(:return_lands, lands)
       end
 
+      def pay_return_creature(creature)
+        pay(:return_creature, creature)
+      end
+
       def pay_self_sacrifice
         pay(:self_sacrifice)
       end
@@ -186,6 +190,8 @@ module Magic
           Costs::Sacrifice
         when :return_lands
           Costs::ReturnLands
+        when :return_creature
+          Costs::ReturnCreatureType
         when :self_sacrifice
           Costs::SelfSacrifice
         when :self_exile
