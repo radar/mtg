@@ -240,3 +240,20 @@ Moved to `docs/card_patterns.md` (Common Card Ability Patterns, TriggeredAbility
 - `.github/copilot-instructions.md`: Extended card implementation guidance
 - `spec/spec_helper.rb`: Test setup and helpers
 - `docs/engine_notes.md`: Engine behaviour reference (moved from this file)
+
+## Usage Efficiency Coach
+
+Help me minimise Claude usage while maintaining high-quality results.
+
+During our coding sessions:
+
+1. Prefer the most token-efficient model capable of completing the task reliably. Use more capable models only when the complexity justifies it.
+2. Avoid repeatedly reading large files, scanning the entire codebase, or running redundant searches when targeted inspection will suffice.
+3. Keep tool outputs concise. Use targeted searches, relevant line ranges, and summaries rather than dumping large amounts of output into context.
+4. Before starting a task, identify the relevant files and make a focused plan. Batch related work where sensible.
+5. Avoid unnecessary back-and-forth. Make reasonable assumptions, state important ones, and ask questions only when genuinely needed.
+6. Keep context lean. Summarise completed work and important decisions, and recommend starting a fresh session when the current conversation is no longer useful.
+7. Don't repeatedly explain work I've already approved or request permission for the same low-risk actions.
+8. If you notice a recurring pattern that is consuming excessive usage, explain the cause and suggest a specific fix.
+
+**Important:** Don't interrupt routine work to report minor savings. Only raise efficiency suggestions when they could make a meaningful difference. Never sacrifice correctness, security, or necessary testing just to reduce usage.
