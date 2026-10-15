@@ -1,0 +1,55 @@
+# frozen_string_literal: true
+
+require "spec_helper"
+
+RSpec.describe Magic::Cards::ShriekingDrake do
+  include_context "two player game"
+
+  let(:card) { Card("Shrieking Drake", owner: p1) }
+
+  def cast_drake
+    go_to_main_phase!
+    p1.hand.add(card)
+    p1.add_mana(blue: 1)
+    p1.cast(card:) { |a| a.pay_mana(blue: 1) }
+    game.stack.resolve!
+    game.settle!
+  end
+
+  it "is a 1/1 flyer" do
+    drake = ResolvePermanent("Shrieking Drake", owner: p1)
+    expect([drake.power, drake.toughness]).to eq([1, 1])
+    expect(drake.flying?).to eq(true)
+  end
+
+  it "returns itself to hand when it is the only creature you control" do
+    cast_drake
+    expect(card.zone).to eq(p1.hand)
+    expect(p1.creatures).to be_empty
+  end
+
+  it "lets you return another creature you control instead" do
+    bear = ResolvePermanent("Grizzly Bears", owner: p1)
+    cast_drake
+    expect(game.choices.last.choices).to contain_exactly(bear, p1.creatures.find { _1.name == "Shrieking Drake" })
+    game.resolve_choice!(target: bear)
+    expect(bear.card.zone).to eq(p1.hand)
+    expect(p1.creatures.map(&:name)).to eq(["Shrieking Drake"])
+  end
+
+  it "does not offer an opponent's creature" do
+    theirs = ResolvePermanent("Grizzly Bears", owner: p2)
+    mine = ResolvePermanent("Grizzly Bears", owner: p1)
+    cast_drake
+    expect(game.choices.last.choices).not_to include(theirs)
+    expect(game.choices.last.choices).to include(mine)
+  end
+
+  it "returns the Drake when the choice is skipped" do
+    ResolvePermanent("Grizzly Bears", owner: p1)
+    cast_drake
+    game.skip_choice!
+    expect(card.zone).to eq(p1.hand)
+    expect(p1.creatures.map(&:name)).to eq(["Grizzly Bears"])
+  end
+end
