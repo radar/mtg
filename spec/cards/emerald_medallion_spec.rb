@@ -20,6 +20,14 @@ RSpec.describe Magic::Cards::EmeraldMedallion do
     expect(p1.creatures.map(&:name)).to include("Grizzly Bears")
   end
 
+  it "doesn't reduce green spells an opponent casts" do
+    go_to_main_phase_for!(p2)
+    p2.add_mana(green: 1)
+
+    expect { p2.cast(card: Card("Grizzly Bears", owner: p2)) { |a| a.pay_mana(green: 1) } }
+      .to raise_error(Magic::Costs::Mana::CannotPay)
+  end
+
   it "doesn't reduce non-green spells" do
     p1.add_mana(white: 1)
 
