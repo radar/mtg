@@ -8,6 +8,7 @@ module Magic
       CHANGELING = Class.new(Keyword)
       DEATHTOUCH = Class.new(Keyword)
       DEFENDER = Class.new(Keyword)
+      DEVOID = Class.new(Keyword)
       DOUBLE_STRIKE = Class.new(Keyword)
       FEAR = Class.new(Keyword)
       FIRST_STRIKE = Class.new(Keyword)
@@ -75,6 +76,11 @@ module Magic
 
       def changeling?
         has_keyword?(Keywords::CHANGELING)
+      end
+
+      # Devoid (rule 702.114a): a characteristic-defining ability, so the card is colorless in every zone.
+      def devoid?
+        has_keyword?(Keywords::DEVOID)
       end
 
       def infect?

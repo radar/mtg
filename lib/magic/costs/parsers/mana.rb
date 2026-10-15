@@ -8,7 +8,8 @@ module Magic
             "U" => :blue,
             "B" => :black,
             "R" => :red,
-            "G" => :green
+            "G" => :green,
+            "C" => :colorless
           }
 
           cost

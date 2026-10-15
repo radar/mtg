@@ -92,7 +92,7 @@ module Magic
 
         pay_x(payment[:x]) if payment[:x]
         pay_generic(payment[:generic]) if payment[:generic]
-        pay_colors(payment.slice(*Magic::Mana::COLORS))
+        pay_colors(payment.slice(*Magic::Mana::COST_SYMBOLS))
       end
 
       def auto_pay(player:)
@@ -108,7 +108,7 @@ module Magic
       def mana_spent
         colored = @any_color ? @actual_color_payments : color_costs.merge(@hybrid_actual_payments) { |_key, a, b| a + b }
         [colored, @payments[:generic], @payments[:x]].each_with_object(Hash.new(0)) do |payment, spent|
-          payment.each { |color, amount| spent[color] += amount if Magic::Mana::COLORS.include?(color) }
+          payment.each { |color, amount| spent[color] += amount if Magic::Mana::COST_SYMBOLS.include?(color) }
         end
       end
 
@@ -270,7 +270,7 @@ module Magic
       end
 
       def color_costs
-        cost.slice(*Magic::Mana::COLORS)
+        cost.slice(*Magic::Mana::COST_SYMBOLS)
       end
 
       public

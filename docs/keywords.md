@@ -74,7 +74,7 @@ Ordered by card count. No engine support; a card using one hand-rolls it or is u
 | Morph | 153 |  |
 | Partner | 143 |  |
 | Double | 142 |  |
-| Devoid | 134 |  |
+| Devoid | 134 | cards/keywords.rb (`keywords :devoid`); card.rb `colors` |
 | Landwalk | 133 |  |
 | Cumulative upkeep | 82 |  |
 | Affinity | 78 |  |

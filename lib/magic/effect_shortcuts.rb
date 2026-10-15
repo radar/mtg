@@ -29,6 +29,17 @@ module Magic
       trigger_effect(:create_token, token_class: token, **args)
     end
 
+    # "Create a 0/1 colorless Eldrazi Spawn creature token with 'Sacrifice this token: Add {C}'": `create_eldrazi_spawn`
+    # (`create_eldrazi_spawn 2` for two); extra keywords (`controller:`) go to `create_token`.
+    def create_eldrazi_spawn(amount = 1, **args)
+      create_token(token: Tokens::EldraziSpawn, amount:, **args)
+    end
+
+    # The 1/1 Eldrazi Scion version: `create_eldrazi_scion 2`.
+    def create_eldrazi_scion(amount = 1, **args)
+      create_token(token: Tokens::EldraziScion, amount:, **args)
+    end
+
     # "Deal 3 damage to target creature": `deal_damage 3, to: target`; the source is the card or ability.
     def deal_damage(damage, to:, **args)
       trigger_effect(:deal_damage, target: to, damage:, **args)

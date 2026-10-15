@@ -305,7 +305,7 @@ module Magic
     alias_method :converted_mana_cost, :mana_value
 
     def colors
-      cost.colors
+      devoid? ? [] : cost.colors
     end
 
     def back_face
@@ -322,7 +322,7 @@ module Magic
     def self_mana_cost_adjustment = nil
 
     def color_identity
-      colors.dup
+      cost.colors.dup
     end
 
     def multi_colored?
