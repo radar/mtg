@@ -58,13 +58,35 @@ RSpec.describe Magic::Cards::MoggMob do
 
   it "puts all damage on one target when the choice is skipped" do
     activate
-    first = game.choices.last.choices.first
-    game.skip_choice!
+    # Creatures come before players, and the sacrificed Mob is gone: the Bears are the first legal target.
+    expect(game.choices.last.choices.first).to eq(bears)
+    expect { game.skip_choice! }.not_to change { p2.life }
     game.settle!
-    if first.is_a?(Magic::Player)
-      expect(first.life).to eq(17)
-    else
-      expect(first.zone).to be_nil
+    expect(p2.graveyard.cards.map(&:name)).to include("Grizzly Bears")
+  end
+
+  context "with a hexproof creature" do
+    let!(:megalodon) { ResolvePermanent("Spined Megalodon", owner: p2) }
+
+    it "can't divide damage to a hexproof creature of an opponent" do
+      activate
+      choices = game.choices.last.choices
+      expect(choices).not_to include(megalodon)
+      expect(choices).to include(bears, p1, p2)
+      expect { game.resolve_choice!(distribution: { megalodon => 3 }) }.to raise_error(ArgumentError, "illegal target")
+    end
+
+    it "skipping never targets the hexproof creature" do
+      activate
+      game.skip_choice!
+      game.settle!
+      expect(megalodon.damage).to eq(0)
+    end
+
+    it "can still target a hexproof creature of your own" do
+      mine = ResolvePermanent("Spined Megalodon", owner: p1)
+      activate
+      expect(game.choices.last.choices).to include(mine)
     end
   end
 end

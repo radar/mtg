@@ -11,7 +11,9 @@ module Magic
       # "It deals 3 damage divided as you choose among one, two, or three targets." The division is answered when the
       # ability resolves, like the other divided-damage cards; the damage is dealt by the sacrificed Mob.
       class DivideDamageChoice < Magic::Choice
-        def choices = game.any_target
+        # Targets of the sacrificed Mob's ability, so hexproof, shroud and protection apply. (Ward can't be charged
+        # here: the targets are picked as the ability resolves, not when it is put on the stack.)
+        def choices = game.any_target.select { _1.can_be_targeted_by?(actor) }
 
         # Mandatory: skipping puts all 3 on the first legal target.
         def decline!
