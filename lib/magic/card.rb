@@ -426,6 +426,14 @@ module Magic
 
     alias_method :play!, :resolve!
 
+    # Plays a modal double-faced card as its back face (a land): it enters with the back face up, tapped if that
+    # face says so. A separate method because a spell front's `resolve!` is its spell effect.
+    def play_back_face!(controller: owner)
+      permanent = Magic::Permanent.resolve_spell(game:, owner:, controller:, card: self, from_zone: zone, enters_tapped: back_face.enters_tapped?, transformed: true)
+      move_zone!(to: battlefield) unless zone&.battlefield?
+      permanent
+    end
+
     def discard!
       move_zone!(to: zone.owner.graveyard)
     end

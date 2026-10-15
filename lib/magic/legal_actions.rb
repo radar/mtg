@@ -59,7 +59,11 @@ module Magic
     end
 
     def playable_lands
-      cast_candidate_cards.select { |card| card.land? }.filter_map { |card| keep(Actions::PlayLand.new(game: game, player: player, card: card)) }
+      fronts = cast_candidate_cards.select { |card| card.land? }.filter_map { |card| keep(Actions::PlayLand.new(game: game, player: player, card: card)) }
+      # A modal double-faced card whose back face is a land (a spell // land card) can also be played as that land.
+      backs = cast_candidate_cards.select { |card| card.double_faced? && card.back_face.land? }
+        .filter_map { |card| keep(Actions::PlayLand.new(game: game, player: player, card: card, face: :back)) }
+      fronts + backs
     end
 
     def cyclable_cards

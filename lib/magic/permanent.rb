@@ -73,9 +73,9 @@ module Magic
 
     # A spell resolving into a permanent: the card was cast, so it knows how (kicked, evoked, what mana was spent,
     # the X it was cast with).
-    def self.resolve_spell(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil, impending: false)
+    def self.resolve_spell(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil, impending: false, transformed: false)
       counters = impending ? { "time" => card.impending_count } : {}
-      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: true, kicked:, evoked:, mana_spent:, value_for_x:, counters:, impending:)
+      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: true, kicked:, evoked:, mana_spent:, value_for_x:, counters:, impending:, transformed:)
     end
 
     # A card put onto the battlefield by an effect rather than cast (a flicker or reanimation, a token being created).
@@ -90,13 +90,13 @@ module Magic
       enter(game:, card:, owner:, controller:, from_zone: nil, enters_tapped:, attach_to: nil, token: true, copy: true, cast: false)
     end
 
-    def self.enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token:, copy:, cast:, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil, face_down: false, counters: {}, impending: false)
+    def self.enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token:, copy:, cast:, kicked: false, evoked: false, mana_spent: {}, value_for_x: nil, face_down: false, counters: {}, impending: false, transformed: false)
       enters_tapped = false if face_down
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:, controller:)
       card_zone = card.zone unless token || copy
       card.begin_entering! if card.is_a?(Cards::Room)
 
-      permanent = Magic::Permanent.new(game:, owner:, controller:, card:, kicked:, cast:, token:, copy:, face_down:)
+      permanent = Magic::Permanent.new(game:, owner:, controller:, card:, kicked:, cast:, token:, copy:, face_down:, transformed:)
       permanent.mana_spent = mana_spent
       permanent.gift_promised = card.gift_promised? if card.respond_to?(:gift_promised?)
       permanent.x_value = value_for_x
@@ -167,8 +167,10 @@ module Magic
 
     def self.static_abilities(game, type) = game.battlefield.static_abilities.of_type(type)
 
-    def initialize(game:, owner:, card:, controller: owner, token: false, cast: true, kicked: false, copy: false, face_down: false, timestamp: Permanents::ContinuousEffect.next_timestamp)
+    def initialize(game:, owner:, card:, controller: owner, token: false, cast: true, kicked: false, copy: false, face_down: false, transformed: false, timestamp: Permanents::ContinuousEffect.next_timestamp)
       @game = game
+      # Enters with its back face up (a modal double-faced card played as its back face).
+      @transformed = transformed
       @owner = owner
       @controller = controller
       @card = card
