@@ -47,6 +47,14 @@ module Magic
       end
     end
 
+    # "Spend this mana only to cast a colorless spell or to activate an ability" (Sage of the Unknowable). An ability is
+    # activated through its source permanent, so any permanent counts.
+    class ColorlessSpellOrAbility < ManaRestriction
+      def permits?(use)
+        (use.is_a?(Magic::Card) && use.colorless?) || use.is_a?(Magic::Permanent)
+      end
+    end
+
     # "Spend this mana only to cast a legendary spell" (Plaza of Heroes). Only spells, not abilities.
     class LegendarySpell < ManaRestriction
       def permits?(use)
