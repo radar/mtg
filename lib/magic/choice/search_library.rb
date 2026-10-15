@@ -39,6 +39,9 @@ module Magic
         end.tap { chooser.shuffle! }
       end
 
+      # Failing to find (or declining) still shuffles the library.
+      def decline! = chooser.shuffle!
+
       normalize_targets :resolve!
     end
   end
