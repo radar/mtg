@@ -20,6 +20,14 @@ RSpec.describe Magic::Cards::JetMedallion do
     expect(p1.creatures.map(&:name)).to include("Walking Corpse")
   end
 
+  it "doesn't reduce black spells an opponent casts" do
+    go_to_main_phase_for!(p2)
+    p2.add_mana(black: 1)
+
+    expect { p2.cast(card: Card("Walking Corpse", owner: p2)) { |a| a.pay_mana(black: 1) } }
+      .to raise_error(Magic::Costs::Mana::CannotPay)
+  end
+
   it "doesn't reduce non-black spells" do
     p1.add_mana(green: 1)
 
