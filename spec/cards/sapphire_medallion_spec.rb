@@ -20,6 +20,14 @@ RSpec.describe Magic::Cards::SapphireMedallion do
     expect(p1.creatures.map(&:name)).to include("Creeping Peeper")
   end
 
+  it "doesn't reduce blue spells an opponent casts" do
+    go_to_main_phase_for!(p2)
+    p2.add_mana(blue: 1)
+
+    expect { p2.cast(card: Card("Creeping Peeper", owner: p2)) { |a| a.pay_mana(blue: 1) } }
+      .to raise_error(Magic::Costs::Mana::CannotPay)
+  end
+
   it "doesn't reduce non-blue spells" do
     p1.add_mana(green: 1)
 
