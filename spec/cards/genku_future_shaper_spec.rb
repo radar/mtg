@@ -34,6 +34,21 @@ RSpec.describe Magic::Cards::GenkuFutureShaper do
       expect([fox.power, fox.toughness]).to eq([2, 2])
       expect(fox.type?("Fox")).to be(true)
       expect(fox).to have_keyword(:vigilance)
+      expect(fox.colors).to eq([:white])
+    end
+
+    it "skipping the choice creates the first remaining token and records its mode" do
+      lose_permanent
+      game.skip_choice!
+      game.settle!
+
+      expect(tokens.map(&:name)).to eq(["Fox"])
+      lose_permanent
+      expect(game.choices.first.choices).to contain_exactly(:moonfolk, :rat)
+      game.skip_choice!
+      game.settle!
+
+      expect(tokens.map(&:name)).to contain_exactly("Fox", "Moonfolk")
     end
 
     it "creates a 1/2 blue Moonfolk with flying" do
@@ -44,6 +59,8 @@ RSpec.describe Magic::Cards::GenkuFutureShaper do
       token = tokens.first
       expect([token.power, token.toughness]).to eq([1, 2])
       expect(token).to have_keyword(:flying)
+      expect(token.type?("Moonfolk")).to be(true)
+      expect(token.colors).to eq([:blue])
     end
 
     it "creates a 1/1 black Rat with lifelink" do
@@ -54,6 +71,8 @@ RSpec.describe Magic::Cards::GenkuFutureShaper do
       token = tokens.first
       expect([token.power, token.toughness]).to eq([1, 1])
       expect(token).to have_keyword(:lifelink)
+      expect(token.type?("Rat")).to be(true)
+      expect(token.colors).to eq([:black])
     end
 
     it "can't choose the same one twice in a turn, and offers none after all three" do

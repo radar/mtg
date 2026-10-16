@@ -48,6 +48,11 @@ module Magic
           actor.choose_mode_this_turn!(mode)
           create_token(token: TOKENS.fetch(mode))
         end
+
+        # The mode is mandatory, so skipping the choice takes the first one still available.
+        def decline!
+          resolve!(mode: choices.first)
+        end
       end
 
       # "Whenever another nontoken permanent you control leaves the battlefield, choose one that hasn't been chosen this
