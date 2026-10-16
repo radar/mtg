@@ -115,6 +115,10 @@ RSpec.describe Magic::Cards::ImskirIronEater do
 
     it "cannot be activated by an opponent" do
       expect { activate!(who: p2, target: p1) }.to raise_error(Magic::IllegalAction)
+
+      expect(game.battlefield.permanents).to include(stone)
+      expect(p2.mana_pool[:red]).to eq(1)
+      expect(p2.mana_pool[:colorless]).to eq(3)
     end
   end
 end
