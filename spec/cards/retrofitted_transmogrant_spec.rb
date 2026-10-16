@@ -29,6 +29,7 @@ RSpec.describe Magic::Cards::RetrofittedTransmogrant do
     expect(card.zone).to be_battlefield
     permanent = p1.permanents.find { _1.card == card }
     expect(permanent).to be_tapped
+    expect(permanent.counters.of_type(Magic::Counters::Plus1Plus1).count).to eq(2)
     expect([permanent.power, permanent.toughness]).to eq([3, 3])
   end
 
@@ -51,10 +52,35 @@ RSpec.describe Magic::Cards::RetrofittedTransmogrant do
     expect(card.zone).to be_graveyard
   end
 
-  it "isn't offered in the opponent's legal actions" do
+  it "can't be activated by the opponent" do
     card
-    abilities = game.legal_actions(p2).compact.filter_map { _1.respond_to?(:ability) ? _1.ability : nil }
+    ability = card.graveyard_abilities.first
+    p2.add_mana(black: 4)
 
-    expect(abilities.map(&:source)).not_to include(card)
+    expect do
+      p2.activate_ability(ability: ability) { _1.pay_mana(generic: { black: 3 }, black: 1) }
+    end.to raise_error(Magic::IllegalAction)
+    expect(card.zone).to be_graveyard
+  end
+
+  it "can't be activated from the battlefield" do
+    permanent = ResolvePermanent("Retrofitted Transmogrant", owner: p1)
+    ability = Magic::Cards::RetrofittedTransmogrant.new(owner: p1).graveyard_abilities.first
+    p1.add_mana(black: 4)
+
+    expect do
+      p1.activate_ability(ability: ability) { _1.pay_mana(generic: { black: 3 }, black: 1) }
+    end.to raise_error(Magic::IllegalAction)
+    expect(permanent.zone).to be_battlefield
+  end
+
+  it "can't be activated from hand" do
+    hand_card = Card("Retrofitted Transmogrant", owner: p1).tap { p1.hand.add(_1) }
+    p1.add_mana(black: 4)
+
+    expect do
+      p1.activate_ability(ability: hand_card.graveyard_abilities.first) { _1.pay_mana(generic: { black: 3 }, black: 1) }
+    end.to raise_error(Magic::IllegalAction)
+    expect(hand_card.zone).to be_hand
   end
 end
