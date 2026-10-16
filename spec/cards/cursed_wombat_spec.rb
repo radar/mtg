@@ -75,6 +75,18 @@ RSpec.describe Magic::Cards::CursedWombat do
       expect(plus_counters(bears)).to eq(3)
     end
 
+    it "gives each Wombat its own once-per-turn ability" do
+      ResolvePermanent("Cursed Wombat", owner: p1)
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      put_counter(bears)
+
+      expect(plus_counters(bears)).to eq(3)
+
+      put_counter(bears)
+
+      expect(plus_counters(bears)).to eq(4)
+    end
+
     it "triggers again on a later turn" do
       bears = ResolvePermanent("Grizzly Bears", owner: p1)
       put_counter(bears)

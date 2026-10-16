@@ -30,6 +30,17 @@ module Magic
         def call
           add_counter("+1/+1", to: event.permanent)
         end
+
+        private
+
+        # Each Wombat grants its own copy of the ability (CR 113.2c), so the once-per-turn key includes the source.
+        def triggered_this_turn?
+          event.permanent.triggered_once_this_turn?([self.class, actor])
+        end
+
+        def mark_triggered_this_turn!
+          event.permanent.trigger_once_this_turn!([self.class, actor])
+        end
       end
 
       def activated_abilities = [AdaptAbility]
