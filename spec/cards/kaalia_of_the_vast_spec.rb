@@ -85,6 +85,15 @@ RSpec.describe Magic::Cards::KaaliaOfTheVast do
     expect(game.choices).to be_empty
   end
 
+  it "does not trigger when attacking a planeswalker" do
+    angel
+    walker = ResolvePermanent("Ob Nixilis Reignited", owner: p2)
+    attack!(target: walker)
+
+    expect(game.choices).to be_empty
+    expect(angel.zone).to be_hand
+  end
+
   it "does not put in cards from the opponent's hand" do
     p2.hand.add(Card("Serra Angel", owner: p2))
     attack!
