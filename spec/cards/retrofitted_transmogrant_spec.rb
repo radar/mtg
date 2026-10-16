@@ -65,7 +65,7 @@ RSpec.describe Magic::Cards::RetrofittedTransmogrant do
 
   it "can't be activated from the battlefield" do
     permanent = ResolvePermanent("Retrofitted Transmogrant", owner: p1)
-    ability = Magic::Cards::RetrofittedTransmogrant.new(owner: p1).graveyard_abilities.first
+    ability = permanent.card.graveyard_abilities.first
     p1.add_mana(black: 4)
 
     expect do
