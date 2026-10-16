@@ -4,11 +4,7 @@ module Magic
       card_name "Sapling Nursery"
       cost "{6}{G}{G}"
 
-      # "Affinity for Forests (This spell costs {1} less to cast for each Forest you control.)"
-      def self_mana_cost_adjustment
-        player = controller || owner
-        { generic: -> { -[game.battlefield.controlled_by(player).count { _1.type?("Forest") }, 6].min } }
-      end
+      affinity("Forest")
 
       TreefolkToken = Token.create "Treefolk" do
         creature_type "Treefolk"

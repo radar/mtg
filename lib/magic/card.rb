@@ -59,6 +59,14 @@ module Magic
         const_set(:COST, cost)
       end
 
+      # "Affinity for [type]": reduce this spell's generic cost by one for each permanent of that type its controller has.
+      def affinity(type)
+        define_method(:self_mana_cost_adjustment) do
+          player = controller || owner
+          { generic: -> { -game.battlefield.controlled_by(player).count { _1.type?(type) } } }
+        end
+      end
+
       def flashback(cost)
         define_method(:flashback_cost) do
           cost

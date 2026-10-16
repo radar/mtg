@@ -8,10 +8,7 @@ module Magic
     end
 
     class GateColossus < Creature
-      def self_mana_cost_adjustment
-        controller = self.controller || owner
-        { generic: -> { -controller.permanents.by_type("Gate").count } }
-      end
+      affinity("Gate")
 
       def can_be_blocked?(blocker) = blocker.power > 2
 
