@@ -32,12 +32,17 @@ module Magic
         def prompt = "Reveal a card from your hand or the top card of your library."
 
         def resolve!(card:)
-          raise "Invalid card to reveal" unless choices.include?(card)
+          raise ArgumentError, "Invalid card to reveal" unless choices.include?(card)
 
           reveal_cards [card]
           return unless card.creature?
 
           Permanent.put_onto_battlefield(game: game, card: card, from_zone: card.zone, controller: controller)
+        end
+
+        # Revealing is mandatory, so skipping the choice reveals the first card offered.
+        def decline!
+          resolve!(card: choices.first)
         end
       end
 

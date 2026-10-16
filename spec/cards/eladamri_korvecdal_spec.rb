@@ -110,6 +110,49 @@ RSpec.describe Magic::Cards::EladamriKorvecdal do
       expect(p1.lands.map(&:card)).not_to include(land)
     end
 
+    it "rejects an answer that is not one of the offered cards and leaves the choice pending" do
+      p1.library.add(Card("Forest", owner: p1), 0)
+      activate
+      game.stack.resolve!
+
+      expect { game.resolve_choice!(card: Card("Raging Goblin", owner: p1)) }.to raise_error(ArgumentError)
+      expect(game.choices.size).to eq(1)
+    end
+
+    it "skipping the choice reveals the first card offered and puts it onto the battlefield if a creature" do
+      creature = Card("Raging Goblin", owner: p1)
+      p1.hand.add(creature)
+      activate
+      game.stack.resolve!
+      game.skip_choice!
+      game.settle!
+
+      expect(p1.creatures.map(&:name)).to include("Raging Goblin")
+      expect(p1.hand.cards).not_to include(creature)
+    end
+
+    it "can't tap an opponent's untapped creature to pay for the cost" do
+      theirs = ResolvePermanent("Grizzly Bears", owner: p2)
+
+      expect { activate(taps: [bears, theirs]) }.to raise_error(RuntimeError, /Tap exactly 2/)
+      expect(theirs).not_to be_tapped
+      expect(bears).not_to be_tapped
+      expect(cub).not_to be_tapped
+      expect(eladamri).not_to be_tapped
+    end
+
+    it "casts a creature from the top of the library and resolves it onto the battlefield" do
+      creature = Card("Grizzly Bears", owner: p1)
+      p1.library.add(creature, 0)
+      p1.add_mana(green: 2)
+      p1.cast(card: creature) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
+      game.stack.resolve!
+      game.settle!
+
+      expect(p1.creatures.map(&:card)).to include(creature)
+      expect(p1.library.cards).not_to include(creature)
+    end
+
     it "needs two other untapped creatures" do
       cub.tap!
 
