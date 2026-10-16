@@ -31,7 +31,17 @@ module Magic
         return "#{source.name}'s ability cannot be activated" if source.respond_to?(:can_activate_ability?) && !source.can_activate_ability?(ability)
         return "#{source.name}'s ability can only be activated once each turn" if ability.activation_limit_reached?
 
+        return "#{source.name}'s ability can't be activated" if activation_prevented?
+
         "the requirements to activate #{source.name}'s ability are not met" unless @requirements_verified || ability.requirements_met?
+      end
+
+      # A battlefield static ability answering `prevents_activation?(ability)` stops non-mana abilities from being
+      # activated ("Activated abilities of sources with the chosen name can't be activated unless they're mana abilities").
+      def activation_prevented?
+        return false if ability.is_a?(Magic::ManaAbility)
+
+        game.battlefield.static_abilities.any? { |static| static.respond_to?(:prevents_activation?) && static.prevents_activation?(ability) }
       end
 
       # Activation restrictions ("Activate only if you control five or more lands") are checked as the ability is
@@ -43,6 +53,7 @@ module Magic
           raise Magic::IllegalAction.new(self, "#{player.inspect} does not control #{source.name}")
         end
 
+        raise Magic::IllegalAction.new(self, "#{source.name}'s ability can't be activated") if activation_prevented?
         raise Magic::IllegalAction.new(self, "the requirements to activate #{ability.source.name}'s ability are not met") unless ability.requirements_met?
 
         @requirements_verified = true

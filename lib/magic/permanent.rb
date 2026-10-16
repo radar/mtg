@@ -32,7 +32,7 @@ module Magic
     # The card exiled to pay a "behold ... and exile it" cost, returned when this leaves (Costs::Behold).
     attr_accessor :beheld_card
 
-    attr_accessor :copied_card, :chosen_creature_type, :exile_cast_permission_turn, :ring_bearer, :prevent_opponent_lifegain_turn, :pending_mana_ability_uses
+    attr_accessor :copied_card, :chosen_creature_type, :chosen_card_name, :exile_cast_permission_turn, :ring_bearer, :prevent_opponent_lifegain_turn, :pending_mana_ability_uses
 
     # Set by ContinuousEffects from Abilities::Static::CharacteristicSetting.
     attr_accessor :color_override, :lost_all_abilities_by_effect
