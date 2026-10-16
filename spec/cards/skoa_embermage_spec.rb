@@ -34,10 +34,12 @@ RSpec.describe Magic::Cards::SkoaEmbermage do
   end
 
   context "Grandeur" do
-    let!(:skoa) { Card("Skoa, Embermage", owner: p1).tap { p1.hand.add(_1) } }
+    let!(:skoa) do
+      ResolvePermanent("Skoa, Embermage", owner: p1).tap { game.resolve_choice!(target: p1) }
+    end
     let!(:other_skoa) { Card("Skoa, Embermage", owner: p1).tap { p1.hand.add(_1) } }
     let!(:mountains) { 2.times.map { ResolvePermanent("Mountain", owner: p1) } }
-    let(:ability) { skoa.hand_abilities.first }
+    let(:ability) { skoa.activated_abilities.first }
 
     def activate(player: p1, discard: other_skoa, sacrifice: mountains, target: p2)
       player.activate_ability(ability: ability) do |action|
@@ -54,12 +56,11 @@ RSpec.describe Magic::Cards::SkoaEmbermage do
 
       expect(p2.life).to eq(16)
       expect(p1.graveyard.cards).to include(other_skoa)
-      expect(p1.hand.cards).to include(skoa)
       expect(p1.lands).to be_empty
     end
 
     it "can't discard itself" do
-      expect { activate(discard: skoa) }.to raise_error(RuntimeError, /Invalid target chosen for discard/)
+      expect { activate(discard: skoa.card) }.to raise_error(RuntimeError, /Invalid target chosen for discard/)
     end
 
     it "can't discard a card with a different name" do
@@ -74,14 +75,13 @@ RSpec.describe Magic::Cards::SkoaEmbermage do
       expect { activate(sacrifice: [mountains.first, forest]) }.to raise_error(RuntimeError, /Sacrifice exactly two/)
     end
 
-    it "can't be activated from the battlefield" do
-      permanent = ResolvePermanent("Skoa, Embermage", owner: p1)
-
-      expect(permanent.card.hand_abilities.first.requirements_met?).to be(false)
+    it "has no activated ability while in hand" do
+      expect(other_skoa.zone).to be_hand
+      expect(other_skoa.hand_abilities).to be_empty
     end
 
     it "can't be activated by the opponent" do
-      expect { activate(player: p2) }.to raise_error(Magic::IllegalAction)
+      expect { activate(player: p2) }.to raise_error(Magic::IllegalAction, /does not control/)
 
       expect(p1.hand.cards).to include(other_skoa)
       expect(p1.lands.count).to eq(2)

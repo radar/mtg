@@ -40,20 +40,17 @@ module Magic
       end
 
       # "Grandeur -- Discard another card named Skoa, Embermage, Sacrifice two Mountains: Skoa deals 4 damage to any
-      # target." Activated from hand; pay with `pay_discard(other_skoa)` and `pay_sacrifice([mountain, mountain])`.
+      # target." Grandeur is an ability word: this works only while Skoa is on the battlefield. Pay with
+      # `pay_discard(other_skoa)` and `pay_sacrifice([mountain, mountain])`.
       class GrandeurAbility < Magic::ActivatedAbility
         def description = "Grandeur: Skoa deals 4 damage to any target"
 
         def costs
-          player = source.owner
+          player = source.controller
           [
-            Costs::Discard.new(player, ->(card) { card != source && card.name == "Skoa, Embermage" }),
+            Costs::Discard.new(player, ->(card) { card != source.card && card.name == "Skoa, Embermage" }),
             SacrificeTwoMountains.new(source, player.lands.select { _1.type?("Mountain") })
           ]
-        end
-
-        def requirements_met?
-          !!source.zone&.hand? && source.owner == controller
         end
 
         def target_choices = game.any_target
@@ -64,7 +61,7 @@ module Magic
       end
 
       def etb_triggers = [EntersTrigger]
-      def hand_abilities = [GrandeurAbility.new(source: self)]
+      def activated_abilities = [GrandeurAbility]
     end
   end
 end
