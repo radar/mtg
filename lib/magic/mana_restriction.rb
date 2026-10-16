@@ -55,6 +55,14 @@ module Magic
       end
     end
 
+    # "Spend this mana only on costs that contain {X}": a spell with {X} in its mana cost, or an ability whose mana cost
+    # has {X}.
+    class CostsWithX < ManaRestriction
+      def permits?(use)
+        (use.is_a?(Magic::Card) && use.cost.cost.key?(:x)) || (use.is_a?(Magic::Actions::AbilityUse) && use.x_cost?)
+      end
+    end
+
     # "Spend this mana only to cast a legendary spell" (Plaza of Heroes). Only spells, not abilities.
     class LegendarySpell < ManaRestriction
       def permits?(use)

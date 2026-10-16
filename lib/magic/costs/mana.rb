@@ -119,6 +119,7 @@ module Magic
 
         for_use.treasure_mana_spent = false if for_use.respond_to?(:treasure_mana_spent=)
         player.pay_mana(@payments[:generic], for_use: for_use) if @payments[:generic].any?
+        player.pay_mana(@payments[:x], for_use: for_use) if @payments[:x].any?
         if @any_color
           player.pay_mana(@actual_color_payments, for_use: for_use) if @actual_color_payments.any?
         else
