@@ -50,6 +50,45 @@ RSpec.describe Magic::Cards::GuardianOfTheForgotten do
       expect(p1.permanents.select(&:face_down?).map(&:card)).to eq([top])
     end
 
+    it "manifests when the dying creature had an opponent's Equipment attached" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      greaves = ResolvePermanent("Lightning Greaves", owner: p2)
+      greaves.attach_to!(bears)
+      game.tick!
+      bears.destroy!
+      game.settle!
+
+      expect(greaves.controller).to eq(p2)
+      expect(p1.permanents.select(&:face_down?).map(&:card)).to eq([top_card])
+    end
+
+    def enchant_with_capture_sphere(bears, caster:)
+      sphere = Card("Capture Sphere", owner: caster)
+      caster.add_mana(white: 4)
+      game.take_action(cast_action(player: caster, card: sphere).pay_mana(white: 1, generic: { white: 3 }).targeting(bears))
+      game.stack.resolve!
+      game.tick!
+    end
+
+    it "manifests when the dying creature had your own Aura attached" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      enchant_with_capture_sphere(bears, caster: p1)
+      bears.destroy!
+      game.settle!
+
+      expect(p1.permanents.select(&:face_down?).map(&:card)).to eq([top_card])
+    end
+
+    it "does not manifest when the dying creature had only an opponent's Aura attached" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      enchant_with_capture_sphere(bears, caster: p2)
+      expect(bears.attachments.first.controller).to eq(p2)
+      bears.destroy!
+      game.settle!
+
+      expect(p1.permanents.count(&:face_down?)).to eq(0)
+    end
+
     it "does not manifest for an unmodified creature" do
       bears = ResolvePermanent("Grizzly Bears", owner: p1)
       bears.destroy!
