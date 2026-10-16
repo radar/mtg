@@ -127,6 +127,35 @@ RSpec.describe Magic::Cards::EmperorOfBones do
       expect(creature).to have_keyword(:haste)
     end
 
+    it "keeps haste past end of turn (no duration in the Oracle text)" do
+      combat!
+      game.resolve_choice!(target: bears)
+      adapt
+      game.settle!
+      creature = p1.creatures.find { _1.card == bears }
+      current_turn.end!
+      current_turn.cleanup!
+
+      expect(creature).to have_keyword(:haste)
+    end
+
+    it "forgets a returned card, so it is not offered again after finality exiles it" do
+      combat!
+      game.resolve_choice!(target: bears)
+      adapt
+      game.settle!
+      creature = p1.creatures.find { _1.card == bears }
+      creature.sacrifice!
+      game.settle!
+      expect(bears.zone).to be_exile
+
+      emperor.add_counter("+1/+1")
+      game.settle!
+
+      expect(emperor.exiled_cards).not_to include(bears)
+      expect(game.choices).to be_empty
+    end
+
     it "sacrifices it at the beginning of the next end step" do
       combat!
       game.resolve_choice!(target: bears)

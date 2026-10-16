@@ -50,7 +50,9 @@ module Magic
           raise ArgumentError, "#{target.name} is not a valid choice" unless choices.include?(target)
 
           creature = Permanent.put_onto_battlefield(game: game, card: target, from_zone: target.zone, controller: controller, counters: { "finality" => 1 })
-          creature.grant_haste!
+          # It is a new object now (CR 400.7), so it is no longer "exiled with" this creature.
+          actor.remove_from_exile(target)
+          creature.grant_haste!(until_eot: false)
           creature.register_turn_trigger(Events::BeginningOfEndStep, Blitz::EndStepSacrificeTrigger)
         end
       end
