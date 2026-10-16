@@ -265,12 +265,13 @@ module Magic
     # Impending: a creature again once the last time counter is gone.
     def impending_now? = impending? && counters.of_type(Counters::Time).any?
 
-    # Modified (CR 700.9): has a counter on it, or an Equipment or Aura its controller controls attached to it.
+    # Modified (CR 700.9): has a counter on it, is equipped (any Equipment, whoever controls it), or is enchanted by an
+    # Aura its controller controls.
     def modified?
-      counters.any? || attachments.any? { _1.controller == controller }
+      counters.any? || attachments.any? { _1.type?("Equipment") || _1.controller == controller }
     end
 
-    def copy_choice_pending? =!!@copy_choice_pending
+    def copy_choice_pending? = !!@copy_choice_pending
 
     # "If {W}{W} was spent to cast it": at least `amount` mana of `color` went into casting this.
     def mana_spent?(color, amount = 1) = mana_spent.fetch(color, 0) >= amount
