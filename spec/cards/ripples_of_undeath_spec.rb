@@ -40,6 +40,27 @@ RSpec.describe Magic::Cards::RipplesOfUndeath do
       expect(p1.graveyard.count).to eq(2)
     end
 
+    it "still puts a milled card into your hand when the pick is skipped" do
+      first_main_phase!
+      hand = p1.hand.count
+      game.resolve_choice!
+      game.skip_choice!
+
+      expect(p1.hand.count).to eq(hand + 1)
+      expect(p1.graveyard.count).to eq(2)
+      expect(p1.life).to eq(17)
+    end
+
+    it "still puts a milled card into your hand when resolved without a target" do
+      first_main_phase!
+      hand = p1.hand.count
+      game.resolve_choice!
+      game.resolve_choice!
+
+      expect(p1.hand.count).to eq(hand + 1)
+      expect(p1.graveyard.count).to eq(2)
+    end
+
     it "lets you take any one of the three milled cards, not two" do
       first_main_phase!
       game.resolve_choice!

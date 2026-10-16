@@ -7,6 +7,18 @@ module Magic
     class RipplesOfUndeath < Enchantment
       # "Then you may pay {1} and 3 life. If you do, put a card from among those cards into your hand."
       # Accepting pays the mana and the life, then asks which milled card (still in the graveyard) to take.
+      # "Put a card from among those cards into your hand" is mandatory once paid: with no pick, the first is taken.
+      class TakeChoice < Magic::Choice::ReturnFromAmong
+        def resolve!(target: nil, targets: nil)
+          target = choices.first if target.nil? && targets.nil?
+          super(target: target, targets: targets)
+        end
+
+        def decline!
+          resolve!
+        end
+      end
+
       class PayChoice < Magic::Choice::PayMana
         attr_reader :milled
 
@@ -21,7 +33,7 @@ module Magic
           super(**args)
           chooser.lose_life(3)
           cards = milled.select { _1.zone&.graveyard? }
-          game.choices.add(Magic::Choice::ReturnFromAmong.new(actor: actor, cards: cards, filter: ->(_) { true })) if cards.any?
+          game.choices.add(TakeChoice.new(actor: actor, cards: cards, filter: ->(_) { true })) if cards.any?
         end
       end
 
