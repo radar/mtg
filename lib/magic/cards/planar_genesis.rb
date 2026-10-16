@@ -20,7 +20,7 @@ module Magic
         end
       end
 
-      # "If you don't, put a card from among them into your hand." Mandatory, so declining only bottoms the cards.
+      # "If you don't, put a card from among them into your hand." Mandatory, so declining still takes the first card.
       class HandChoice < Magic::Choice
         include BottomsTheRest
 
@@ -37,7 +37,7 @@ module Magic
         end
 
         def decline!
-          bottom(looked_at)
+          resolve!(target: looked_at.first)
         end
       end
 

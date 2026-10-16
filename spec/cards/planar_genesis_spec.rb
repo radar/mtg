@@ -78,6 +78,16 @@ RSpec.describe Magic::Cards::PlanarGenesis do
     expect(forest.zone).to eq(p1.hand)
   end
 
+  it "still puts a card into your hand when the hand choice is skipped" do
+    cast!
+    game.skip_choice!
+    game.skip_choice!
+
+    expect(forest.zone).to eq(p1.hand)
+    expect(bottom(3)).to contain_exactly(island, bears, ring)
+    expect(game.choices).to be_empty
+  end
+
   it "does not allow taking the fifth card into hand" do
     cast!
     game.skip_choice!
