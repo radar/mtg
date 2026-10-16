@@ -115,7 +115,8 @@ RSpec.describe Magic::Cards::CharitableLevy do
       expect(p1.enchantments).not_to include(levy)
       expect(p1.graveyard.cards.map(&:name)).to include("Charitable Levy")
       expect(p1.hand.cards).to include(island)
-      expect(p1.hand.count).to be > hand
+      # +1 for the Sol Ring (still in hand until that spell resolves, blocked by the pending search) and +1 for the draw.
+      expect(p1.hand.count).to eq(hand + 2)
 
       choice = game.choices.last
       expect(choice).to be_a(Magic::Choice::SearchLibrary)
@@ -126,6 +127,7 @@ RSpec.describe Magic::Cards::CharitableLevy do
     it "puts the chosen Plains onto the battlefield tapped" do
       cast_artifact(p1)
       game.settle!
+      expect(p1).to receive(:shuffle!).and_call_original
       game.resolve_choice!(targets: [plains])
       game.settle!
 
@@ -136,10 +138,23 @@ RSpec.describe Magic::Cards::CharitableLevy do
     it "lets you decline the search" do
       cast_artifact(p1)
       game.settle!
+      expect(p1).to receive(:shuffle!).and_call_original
       game.skip_choice!
       game.settle!
 
       expect(p1.lands).to be_empty
+      expect(p1.library.cards).to include(plains)
+    end
+
+    it "does nothing if it's gone before the third trigger resolves" do
+      hand = p1.hand.count
+      cast_artifact(p1)
+      levy.destroy!
+      game.settle!
+
+      expect(collection).to eq(2)
+      expect(p1.hand.count).to eq(hand)
+      expect(game.choices).to be_empty
     end
 
     it "sacrifices when an opponent casts the third spell, and its controller draws and searches" do

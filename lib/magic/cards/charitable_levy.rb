@@ -29,6 +29,8 @@ module Magic
         def should_perform? = !spell.creature?
 
         def call
+          return unless actor.zone&.battlefield?
+
           add_counter(CollectionCounter, to: actor)
           return if actor.counters.of_type(CollectionCounter).count < 3
 
