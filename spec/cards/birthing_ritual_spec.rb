@@ -110,6 +110,31 @@ RSpec.describe Magic::Cards::BirthingRitual do
     end
   end
 
+  context "with a mana value 3 creature card among the top seven" do
+    let!(:cards) do
+      stack_library!("Alpine Grizzly", "Grizzly Bears", "Llanowar Elves", "Terror Of The Peaks", "Forest", "Island", "Swamp", "Plains")
+    end
+    let(:alpine) { cards[0] }
+
+    it "offers it when a mana value 2 creature is sacrificed (X = 3)" do
+      two_drop = ResolvePermanent("Grizzly Bears", owner: p1)
+      end_step!
+      game.resolve_choice!(target: two_drop)
+
+      expect(game.choices.first.choices).to contain_exactly(alpine, bears, elves)
+      expect(game.choices.first.choices).not_to include(cards[3])
+    end
+
+    it "does not offer it when a mana value 1 creature is sacrificed (X = 2)" do
+      one_drop = ResolvePermanent("Llanowar Elves", owner: p1)
+      end_step!
+      game.resolve_choice!(target: one_drop)
+
+      expect(game.choices.first.choices).to contain_exactly(bears, elves)
+      expect(game.choices.first.choices).not_to include(alpine)
+    end
+  end
+
   context "when no creature card can be put onto the battlefield" do
     let!(:cards) { stack_library!("Sol Ring", "Forest", "Island", "Swamp", "Plains", "Mountain", "Terror Of The Peaks", "Forest") }
     let!(:fodder) { ResolvePermanent("Grizzly Bears", owner: p1) }
