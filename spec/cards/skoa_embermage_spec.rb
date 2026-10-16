@@ -82,6 +82,10 @@ RSpec.describe Magic::Cards::SkoaEmbermage do
 
     it "can't be activated by the opponent" do
       expect { activate(player: p2) }.to raise_error(Magic::IllegalAction)
+
+      expect(p1.hand.cards).to include(other_skoa)
+      expect(p1.lands.count).to eq(2)
+      expect(p2.life).to eq(20)
     end
   end
 end

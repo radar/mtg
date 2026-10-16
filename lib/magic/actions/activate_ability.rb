@@ -38,6 +38,11 @@ module Magic
       # proposed (rule 602.5b), before costs such as sacrificing the source are paid. `Player#activate_ability`
       # calls this first; afterwards `illegal_reason` doesn't check them again.
       def verify_requirements!
+        source = ability.source
+        if source.respond_to?(:controller) && source.controller != player
+          raise Magic::IllegalAction.new(self, "#{player.inspect} does not control #{source.name}")
+        end
+
         raise Magic::IllegalAction.new(self, "the requirements to activate #{ability.source.name}'s ability are not met") unless ability.requirements_met?
 
         @requirements_verified = true
