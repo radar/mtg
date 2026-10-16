@@ -10,10 +10,10 @@ RSpec.describe Magic::Cards::ArgentDais do
   def oil = dais.counters.of_type(Magic::Counters["oil"]).count
 
   def attack_with(*creatures, player: p1)
-    go_to_main_phase!
+    player == p1 ? go_to_main_phase! : go_to_main_phase_for!(player)
     skip_to_combat!
     current_turn.declare_attackers!
-    creatures.each { current_turn.declare_attacker(_1, target: p2) }
+    creatures.each { current_turn.declare_attacker(_1, target: player == p1 ? p2 : p1) }
     current_turn.attackers_declared!
     game.settle!
   end
@@ -46,6 +46,14 @@ RSpec.describe Magic::Cards::ArgentDais do
     it "puts only one counter when three creatures attack" do
       bears3 = ResolvePermanent("Grizzly Bears", owner: p1)
       attack_with(bears, bears2, bears3)
+
+      expect(oil).to eq(3)
+    end
+
+    it "puts an oil counter on it when the opponent attacks with two creatures" do
+      theirs = ResolvePermanent("Grizzly Bears", owner: p2)
+      theirs2 = ResolvePermanent("Grizzly Bears", owner: p2)
+      attack_with(theirs, theirs2, player: p2)
 
       expect(oil).to eq(3)
     end
