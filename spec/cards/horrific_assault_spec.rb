@@ -37,7 +37,11 @@ RSpec.describe Magic::Cards::HorrificAssault do
   end
 
   it "does not offer your own creatures as the second target" do
-    expect { assault(mine, mine) }.to raise_error(StandardError)
+    expect { assault(mine, mine) }.to raise_error(Magic::Actions::Cast::InvalidTarget)
+  end
+
+  it "does not accept an opponent's creature as the creature you control" do
+    expect { assault(theirs, theirs) }.to raise_error(Magic::Actions::Cast::InvalidTarget)
   end
 
   it "gains 3 life if you control an Eldrazi" do
