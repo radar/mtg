@@ -12,6 +12,11 @@ module Magic
         @targets = targets
       end
 
+      # The mana the spell was paid with, as `{ color => amount }`; `{}` for a cost that isn't a mana cost.
+      def mana_spent
+        mana_cost.is_a?(Costs::Mana) ? mana_cost.mana_spent : {}
+      end
+
       def flashback?
         @flashback
       end

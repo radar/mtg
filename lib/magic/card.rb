@@ -556,6 +556,11 @@ module Magic
      []
     end
 
+    # "When you cast this spell, ...": `TriggeredAbility::CastThisSpell` subclasses, queued by `Actions::Cast#perform`.
+    def cast_triggers
+      []
+    end
+
     def death_triggers
       []
     end

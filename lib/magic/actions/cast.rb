@@ -573,7 +573,7 @@ module Magic
         end
         game.stack.add(self)
 
-        game.notify!(Events::SpellCast.new(
+        cast_event = Events::SpellCast.new(
           spell: card,
           player: player,
           mana_cost: mana_cost,
@@ -581,8 +581,10 @@ module Magic
           flashback: flashback?,
           # A modal spell's targets belong to its chosen modes, so ward and the like must read them from there too.
           targets: [*targets, *@modes.flat_map(&:targets)].uniq,
-        ))
+        )
+        game.notify!(cast_event)
         announce_targets
+        queue_cast_triggers(cast_event)
 
         copy_for_conspire if @conspired
       end
@@ -738,6 +740,20 @@ module Magic
       end
 
       private
+
+      # "When you cast this spell, ...": the card's own `cast_triggers` (it hears no event from hand or the stack).
+      # Queued after the spell is on the stack, so they go on above it and resolve first. Casting an adventure half
+      # casts the adventure, not the card's permanent face, so its cast triggers don't fire.
+      def queue_cast_triggers(cast_event)
+        return if adventure?
+
+        card.cast_triggers.each do |trigger_class|
+          ability = trigger_class.new(actor: card, event: cast_event)
+          next unless ability.trigger!
+
+          game.queue_triggers? ? game.queue_trigger!(ability) : ability.call
+        end
+      end
 
       # "If you do, when that creature enters, create a 1/1 token copy of it."
       def queue_offspring_triggers(resolved)
