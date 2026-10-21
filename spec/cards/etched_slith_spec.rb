@@ -79,6 +79,40 @@ RSpec.describe Magic::Cards::EtchedSlith do
     expect(bears.counters.of_type(Magic::Counters::Stun).count).to eq(0)
   end
 
+  it "offers no choice if it left the battlefield before the trigger resolved" do
+    p2.add_counter("poison")
+    game.notify!(Magic::Events::CombatDamageDealt.new(source: slith, target: p2, damage: 1))
+    slith.destroy!
+    game.settle!
+
+    expect(game.choices).to be_empty
+    expect(slith.zone).to be_nil
+    expect(p2.counters.count).to eq(1)
+  end
+
+  it "adds no counter when dealing combat damage to a creature" do
+    blockers = 2.times.map { ResolvePermanent("Grizzly Bears", owner: p2) }
+    skip_to_combat!
+    current_turn.declare_attackers!
+    current_turn.declare_attacker(slith, target: p2)
+    current_turn.attackers_declared!
+    blockers.each { current_turn.declare_blocker(_1, attacker: slith) }
+    go_to_combat_damage!
+    game.settle!
+
+    expect(plus_counters(slith)).to eq(0)
+  end
+
+  it "does not offer p1 as an opponent, but offers another permanent p1 controls with a counter" do
+    p1.add_counter("poison")
+    mine = ResolvePermanent("Grizzly Bears", owner: p1)
+    mine.add_counter("+1/+1")
+    game.settle!
+    hit_player!
+
+    expect(game.choices.last.choices).to eq([mine])
+  end
+
   it "removes the first kind if the kind choice is skipped" do
     bears = ResolvePermanent("Grizzly Bears", owner: p2)
     bears.add_counter("+1/+1")

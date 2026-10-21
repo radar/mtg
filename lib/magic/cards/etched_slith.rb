@@ -71,6 +71,9 @@ module Magic
         end
 
         def call
+          # No counter is placed if it left the battlefield, so "when you do" does not happen.
+          return unless game.battlefield.permanents.any? { _1.equal?(actor) }
+
           add_counter("+1/+1", to: actor)
           choice = RemoveCounterChoice.new(actor: actor)
           game.choices.add(choice) if choice.choices.any?
