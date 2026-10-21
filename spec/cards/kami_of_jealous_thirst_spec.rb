@@ -28,12 +28,27 @@ RSpec.describe Magic::Cards::KamiOfJealousThirst do
 
   it "can be activated only once each turn" do
     drain
-    expect { drain }.to raise_error(StandardError)
+    expect { drain }.to raise_error(Magic::IllegalAction, /can only be activated once each turn/)
     expect(p2.life).to eq(18)
   end
 
+  it "can be activated again on the next turn" do
+    drain
+    current_turn.end!
+    current_turn.cleanup!
+    2.times { game.next_turn }
+    expect { drain }.to change { p2.life }.by(-2)
+  end
+
   it "cannot be activated when short of mana" do
-    expect { drain(mana: { black: 1, red: 3 }, payment: {}) }.to raise_error(StandardError)
+    expect { drain(mana: { black: 1, red: 3 }, payment: {}) }.to raise_error(Magic::Costs::Mana::OutstandingBalance)
+    expect(p2.life).to eq(20)
+  end
+
+  it "does not get cheaper when an opponent draws three cards" do
+    3.times { p2.draw! }
+    game.settle!
+    expect { drain(mana: {}, payment: {}) }.to raise_error(Magic::Costs::Mana::OutstandingBalance)
     expect(p2.life).to eq(20)
   end
 
@@ -46,7 +61,7 @@ RSpec.describe Magic::Cards::KamiOfJealousThirst do
   it "still costs full price after drawing only two cards" do
     2.times { p1.draw! }
     game.settle!
-    expect { drain(mana: {}, payment: {}) }.to raise_error(StandardError)
+    expect { drain(mana: {}, payment: {}) }.to raise_error(Magic::Costs::Mana::OutstandingBalance)
     expect(p2.life).to eq(20)
   end
 end
