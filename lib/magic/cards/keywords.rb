@@ -58,6 +58,15 @@ module Magic
         end
       end
 
+      # Annihilator N: `Keywords::Annihilator.new(2)`. The attack trigger is `TriggeredAbility::Annihilator`.
+      class Annihilator < Keyword
+        attr_reader :amount
+
+        def initialize(amount)
+          @amount = amount
+        end
+      end
+
       def self.list(*keywords)
         keywords.map do |keyword|
           keyword.is_a?(Keyword) ? keyword : one(keyword)

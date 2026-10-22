@@ -203,7 +203,7 @@ Ordered by card count. No engine support; a card using one hand-rolls it or is u
 | Solved | 15 |  |
 | Squad | 15 |  |
 | Unleash | 15 |  |
-| Annihilator | 14 |  |
+| Annihilator | 14 | cards/keywords.rb (Annihilator.new(n)); triggered_ability/annihilator.rb; choice/sacrifice_permanents.rb; cards/keyword_handlers/annihilator.rb |
 | Dredge | 14 |  |
 | Flurry | 14 |  |
 | Formidable | 14 |  |

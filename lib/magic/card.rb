@@ -196,6 +196,7 @@ module Magic
         const_set(:KEYWORDS, Keywords.list(*keywords))
 
         include Cards::KeywordHandlers::Prowess if keywords.include?(:prowess)
+        include Cards::KeywordHandlers::Annihilator if keywords.any?(Cards::Keywords::Annihilator)
       end
 
       def protections(*protections)
