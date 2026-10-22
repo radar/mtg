@@ -42,8 +42,9 @@ module Magic
       @permissions = []
     end
 
-    def grant_until_end_of_next_turn(card:, player:)
-      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false)
+    # `any_mana: true`: "mana of any type can be spent to cast it" (Bloodsoaked Insight).
+    def grant_until_end_of_next_turn(card:, player:, any_mana: false)
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false, any_mana:)
     end
 
     # "You may cast that card without paying its mana cost for as long as it remains exiled."
