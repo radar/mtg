@@ -61,7 +61,7 @@ module Magic
 
       def countered!
         card.gift_promised = false
-        kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold) || kicker_cost.is_a?(Costs::Gift)
+        kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold) || kicker_cost.is_a?(Costs::Gift) || kicker_cost.is_a?(Costs::MultipleKickers)
         game.notify!(Events::SpellCountered.new(spell: card, player: player))
         if harmonize? || card.exile_instead_of_graveyard
           card.exile_instead_of_graveyard = false
@@ -718,7 +718,7 @@ module Magic
         after_resolving(resolved)
 
         # The card's own optional behold or gift cost outlives this cast: forget it was paid.
-        kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold) || kicker_cost.is_a?(Costs::Gift)
+        kicker_cost.reset! if kicker_cost.is_a?(Costs::OptionalBehold) || kicker_cost.is_a?(Costs::Gift) || kicker_cost.is_a?(Costs::MultipleKickers)
 
         if resolved.is_a?(Permanent)
           @paid_additional_costs.each { |cost| cost.resolved!(resolved) if cost.respond_to?(:resolved!) }
