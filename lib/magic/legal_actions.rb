@@ -61,8 +61,11 @@ module Magic
     def playable_lands
       fronts = cast_candidate_cards.select { |card| card.land? }.filter_map { |card| keep(Actions::PlayLand.new(game: game, player: player, card: card)) }
       # A modal double-faced card whose back face is a land (a spell // land card) can also be played as that land.
-      backs = cast_candidate_cards.select { |card| card.double_faced? && card.back_face.land? }
-        .filter_map { |card| keep(Actions::PlayLand.new(game: game, player: player, card: card, face: :back)) }
+      back_cards = cast_candidate_cards.select { |card| card.double_faced? && card.back_face.land? }
+      backs = back_cards.filter_map { |card| keep(Actions::PlayLand.new(game: game, player: player, card: card, face: :back)) }
+      # A back face with "you may pay N life" is offered both ways.
+      backs += back_cards.select { |card| card.back_face.shock_life }
+        .filter_map { |card| keep(Actions::PlayLand.new(game: game, player: player, card: card, face: :back, pay_life: true)) }
       fronts + backs
     end
 

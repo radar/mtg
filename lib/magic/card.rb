@@ -430,8 +430,8 @@ module Magic
 
     # Plays a modal double-faced card as its back face (a land): it enters with the back face up, tapped if that
     # face says so. A separate method because a spell front's `resolve!` is its spell effect.
-    def play_back_face!(controller: owner)
-      permanent = Magic::Permanent.resolve_spell(game:, owner:, controller:, card: self, from_zone: zone, enters_tapped: back_face.enters_tapped?, transformed: true)
+    def play_back_face!(controller: owner, enters_tapped: back_face.enters_tapped?)
+      permanent = Magic::Permanent.resolve_spell(game:, owner:, controller:, card: self, from_zone: zone, enters_tapped:, transformed: true)
       move_zone!(to: battlefield) unless zone&.battlefield?
       permanent
     end
@@ -465,6 +465,12 @@ module Magic
 
     def enters_tapped?
       false
+    end
+
+    # "As this land enters, you may pay N life. If you don't, it enters tapped." (a shock land, or a spell // land back
+    # face): N, or nil for a land that does not offer it.
+    def shock_life
+      nil
     end
 
     # Counters the permanent enters with ({ "+1/+1" => 2 }).
