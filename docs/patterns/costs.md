@@ -16,6 +16,8 @@ Activation/casting costs — sacrifice, kicker, discard, exile-self, alternative
 
 **Kicker that widens the targets ("if kicked, instead choose target creature")**: read `kicker_cost.paid?` inside `target_choices`; `pay_kicker` must come before `targeting` in the spec. Example: `ExpelTheUnworthy`.
 
+**Fetch lands ("{T}, Pay 1 life, Sacrifice this land: Search for a Forest or Plains card")**: `costs "{T}, Pay 1 life, Sacrifice {this}"`, then `game.search_library(source, find: ->(card) { card.any_type?("Forest", "Plains") }, to: :battlefield)` (untapped; no `tapped:`). Pass a lambda, not a string, for two land types. Specs: the test library already holds Forests, so assert on `choices.map(&:name).uniq`. Examples: `WindsweptHeath`, `WoodedFoothills`, `FloodedStrand`.
+
 **Living weapon**: an `EnterTheBattlefield` trigger that does `token = Array(create_token(token: GermToken, controller: controller)).flatten.first; actor.attach_to!(token) if token`, beside an Equipment's static buffs. The 0/0 Germ lives only because the equipment buff applies. Examples: `MandibularKite` (defines `PhyrexianGermToken`), `ColossalDreadmask`.
 
 **Kicker on a non-permanent spell (instant/sorcery)**: `actor.kicked?` only works for permanents (the flag is baked into the `Permanent` at resolution). For a spell that never becomes a permanent, check `kicker_cost.paid?` directly on the card instead — the same card instance persists from cast through resolution, so `kicker_cost` (set during `pay_kicker`) is still valid inside `resolve!`. Example: `VastwoodSurge`.
