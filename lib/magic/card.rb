@@ -252,10 +252,11 @@ module Magic
       # unless that player pays the ward cost." One trigger for spells, one for abilities.
       # `discard: true` is "Ward--Discard a card"; `sacrifice: "Food"` is "Ward--Sacrifice a Food";
       # `sacrifice_nonland: 3` is "Ward--Sacrifice three nonland permanents".
-      def ward(life: nil, generic: nil, discard: false, sacrifice: nil, sacrifice_nonland: nil)
+      # `sacrifice_any: 2` is "Ward--Sacrifice two permanents".
+      def ward(life: nil, generic: nil, discard: false, sacrifice: nil, sacrifice_nonland: nil, sacrifice_any: nil)
         ward_call = lambda do |trigger, spell: nil, ability: nil|
           trigger.game.choices.add(
-            Choice::Ward.new(actor: trigger.actor, payer: trigger.event.player, spell: spell, ability: ability, generic: generic, life: life, discard: discard, sacrifice: sacrifice, sacrifice_nonland: sacrifice_nonland)
+            Choice::Ward.new(actor: trigger.actor, payer: trigger.event.player, spell: spell, ability: ability, generic: generic, life: life, discard: discard, sacrifice: sacrifice, sacrifice_nonland: sacrifice_nonland, sacrifice_any: sacrifice_any)
           )
         end
 

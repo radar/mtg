@@ -6,11 +6,13 @@ module Magic
     # `discard: card`, `sacrifice: permanent` and/or `sacrifices: [permanents]`; anything short of the full cost
     # counters the spell or ability.
     class Ward < Magic::Choice
-      attr_reader :payer, :spell, :ability, :generic, :life, :sacrifice_type, :sacrifice_nonland
+      attr_reader :payer, :spell, :ability, :generic, :life, :sacrifice_type, :sacrifice_nonland, :sacrifice_any
 
       # `discard: true` is "Ward--Discard a card"; `sacrifice: "Food"` is "Ward--Sacrifice a Food";
-      # `sacrifice_nonland: 3` is "Ward--Sacrifice three nonland permanents".
-      def initialize(actor:, payer:, generic: nil, life: nil, discard: false, sacrifice: nil, sacrifice_nonland: nil, spell: nil, ability: nil)
+      # `sacrifice_nonland: 3` is "Ward--Sacrifice three nonland permanents"; `sacrifice_any: 2` is
+      # "Ward--Sacrifice two permanents".
+      def initialize(actor:, payer:, generic: nil, life: nil, discard: false, sacrifice: nil, sacrifice_nonland: nil, sacrifice_any: nil, spell: nil, ability: nil)
+        @sacrifice_any = sacrifice_any
         @payer = payer
         @spell = spell
         @ability = ability
@@ -30,7 +32,7 @@ module Magic
           lose_life payer, life if life
           payer.hand.discard(discard) if discard?
           sacrifice.sacrifice! if sacrifice_type
-          sacrifices.each(&:sacrifice!) if sacrifice_nonland
+          sacrifices.each(&:sacrifice!) if sacrifice_nonland || sacrifice_any
         else
           item = stack_item
           game.stack.counter!(item) if item
@@ -46,8 +48,14 @@ module Magic
         return false if discard? && !(discard && payer.hand.cards.include?(discard))
         return false if sacrifice_type && !(sacrifice&.type?(sacrifice_type) && sacrifice.controller == payer)
         return false if sacrifice_nonland && !sacrifice_payable?(sacrifices)
+        return false if sacrifice_any && !any_sacrifice_payable?(sacrifices)
 
         true
+      end
+
+      def any_sacrifice_payable?(sacrifices)
+        sacrifices.size == sacrifice_any && sacrifices.uniq.size == sacrifice_any &&
+          sacrifices.all? { |permanent| permanent.controller == payer }
       end
 
       def sacrifice_payable?(sacrifices)
