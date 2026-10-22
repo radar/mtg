@@ -67,8 +67,11 @@ RSpec.describe Magic::Cards::RiddleGateGargoyle do
       opp = ResolvePermanent("Grizzly Bears", owner: p2)
       attack(bears)
       game.resolve_choice!
-      game.resolve_choice!(target: gargoyle)
 
+      expect(game.choices.first.choices).to include(bears, gargoyle)
+      expect(game.choices.first.choices).not_to include(opp)
+
+      game.resolve_choice!(target: gargoyle)
       expect(opp).not_to be_lifelink
     end
 
