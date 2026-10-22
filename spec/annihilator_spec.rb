@@ -79,6 +79,61 @@ RSpec.describe "Annihilator" do
     expect(p2.permanents).to be_empty
   end
 
+  it "makes the controller of an attacked planeswalker sacrifice (the engine has no battles)" do
+    ResolvePermanent("Island", owner: p2)
+    ResolvePermanent("Forest", owner: p2)
+    ResolvePermanent("Swamp", owner: p2)
+    walker = ResolvePermanent("Ajani, Outland Chaperone", owner: p2)
+    attack(attacker, target: walker)
+
+    expect(game.choices.size).to eq(1)
+    expect(game.choices.first.chooser).to eq(p2)
+    game.skip_choice!
+    game.settle!
+    expect(p2.permanents.size).to eq(2)
+  end
+
+  context "with annihilator granted by a static ability" do
+    let(:granting_class) do
+      grant = Class.new(Magic::Abilities::Static::KeywordGrant) do
+        keyword_grants Magic::Cards::Keywords::Annihilator.new(1), Magic::Cards::Keywords::Annihilator.new(2)
+        applicable_targets { [source] }
+      end
+      Class.new(Magic::Cards::Creature) do
+        const_set(:NAME, "Test Granted Annihilator")
+        creature_type "Eldrazi"
+        power 5
+        toughness 5
+        define_method(:static_abilities) { [grant] }
+        define_method(:event_handlers) do
+          { Magic::Events::CreatureAttacked => Magic::TriggeredAbility::Annihilator }
+        end
+      end
+    end
+
+    let!(:granted) do
+      card = granting_class.new(game:, owner: p1)
+      Magic::Permanent.put_onto_battlefield(game: game, card: card, controller: p1).tap { _1.controlled_since_turn = 0 }
+    end
+
+    before { 5.times { ResolvePermanent("Island", owner: p2) } }
+
+    it "triggers once per instance, each with its own N" do
+      attack(granted)
+      game.settle!
+
+      # Instances of 1 and 2: three permanents in total are sacrificed, in two separate choices.
+      choices = []
+      while (choice = game.choices.first)
+        choices << choice.amount
+        game.skip_choice!
+        game.settle!
+      end
+      expect(choices.sort).to eq([1, 2])
+      expect(p2.permanents.size).to eq(2)
+    end
+  end
+
   it "does not trigger when another creature attacks" do
     ResolvePermanent("Island", owner: p2)
     attack(bears)

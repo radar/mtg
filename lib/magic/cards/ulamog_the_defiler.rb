@@ -35,7 +35,7 @@ module Magic
 
       # "Ulamog has annihilator X, where X is the number of +1/+1 counters on it."
       class CounterAnnihilator < TriggeredAbility::Annihilator
-        def amount = actor.counters.of_type(Counters::Plus1Plus1).count
+        def instance_amounts = [actor.counters.of_type(Counters::Plus1Plus1).count]
       end
 
       def cast_triggers = [CastTrigger]
