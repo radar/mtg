@@ -362,6 +362,11 @@ module Magic
         events.select { |event| event.is_a?(Events::ManaSpent) && event.player == player }.sum(&:amount)
       end
 
+      # Total {E} the player has paid this turn ("if you've paid or lost four or more {E} this turn").
+      def energy_paid_by_player(player)
+        events.select { |event| event.is_a?(Events::EnergyPaid) && event.player == player }.sum(&:amount)
+      end
+
       private
 
       attr_reader :game

@@ -615,6 +615,7 @@ module Magic
       raise "#{name} can't pay #{amount} {E}: only has #{energy}" if energy < amount
 
       amount.times { counters.remove_first(Counters::Energy) }
+      game.notify!(Events::EnergyPaid.new(player: self, amount: amount)) if amount.positive?
     end
 
     def devotion(color)
