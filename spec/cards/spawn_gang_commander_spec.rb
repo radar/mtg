@@ -74,6 +74,25 @@ RSpec.describe Magic::Cards::SpawnGangCommander do
       expect(p1.graveyard.cards.map(&:name)).to include("Spawn-Gang Commander")
     end
 
+    it "only offers Eldrazi as sacrifice choices" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+
+      cost = ability(commander).costs.find { _1.is_a?(Magic::Costs::Sacrifice) }
+
+      expect(cost.choices).to include(spawn, commander)
+      expect(cost.choices).not_to include(bears)
+    end
+
+    it "deals the 2 damage to a creature" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      p1.add_mana(red: 1, colorless: 1)
+
+      activate(commander, sacrifice: spawn, target: bears)
+
+      expect(bears.zone).to be_nil
+      expect(p2.graveyard.cards.map(&:name)).to include("Grizzly Bears")
+    end
+
     it "cannot be paid with coloured mana for {C}" do
       p1.add_mana(red: 2)
 
