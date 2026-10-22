@@ -27,6 +27,11 @@ module Magic
 
         def choice_amount = 1
 
+        # Energy is already paid and the reflexive trigger has a target, so skipping takes the first one.
+        def decline!
+          resolve!(target: choices.first)
+        end
+
         def resolve!(target:)
           add_counter("+1/+1", to: target, amount: 2)
           add_counter("flying", to: target)

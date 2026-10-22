@@ -69,6 +69,27 @@ RSpec.describe Magic::Cards::GuideOfSouls do
       expect(bears.type?("Bear")).to be(true)
     end
 
+    it "gives the attacker flying" do
+      attack(bears)
+      game.resolve_choice!
+      game.settle!
+
+      expect(bears.flying?).to be(true)
+    end
+
+    it "still puts the counters on the first attacker when the target step is skipped" do
+      attack(bears, guide)
+      game.resolve_choice!
+      expect(game.choices.first).to be_a(described_class::TargetChoice)
+      first = game.choices.first.choices.first
+      game.skip_choice!
+      game.settle!
+
+      expect(p1.energy).to eq(0)
+      expect(counters(first, Magic::Counters::Plus1Plus1)).to eq(2)
+      expect(counters(first, Magic::Counters::Flying)).to eq(1)
+    end
+
     it "keeps the Angel type past end of turn" do
       attack(bears)
       game.resolve_choice!
