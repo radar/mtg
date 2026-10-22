@@ -12,6 +12,9 @@ RSpec.describe Magic::Cards::WastescapeBattlemage do
   let!(:opp_bear2) { ResolvePermanent("Grizzly Bears", owner: p2) }
   let!(:opp_sol_ring) { ResolvePermanent("Sol Ring", owner: p2) }
   let!(:opp_plate) { ResolvePermanent("Abundance", owner: p2) }
+  let!(:own_sol_ring) { ResolvePermanent("Sol Ring", owner: p1) }
+  let!(:own_plate) { ResolvePermanent("Abundance", owner: p1) }
+  let!(:own_bears) { ResolvePermanent("Grizzly Bears", owner: p1) }
 
   def cast_mage(green: false, blue: false)
     p1.hand.add(mage)
@@ -48,6 +51,7 @@ RSpec.describe Magic::Cards::WastescapeBattlemage do
 
     expect(choice).to be_a(described_class::ExileChoice)
     expect(choice.choices).to contain_exactly(opp_sol_ring, opp_plate)
+    expect(choice.choices).not_to include(own_sol_ring, own_plate)
     game.resolve_choice!(target: opp_sol_ring)
 
     expect(exiled_names).to eq(["Sol Ring"])
@@ -60,6 +64,7 @@ RSpec.describe Magic::Cards::WastescapeBattlemage do
 
     expect(choice).to be_a(described_class::BounceChoice)
     expect(choice.choices).to contain_exactly(opp_bears, opp_bear2)
+    expect(choice.choices).not_to include(own_bears)
     game.resolve_choice!(target: opp_bears)
 
     expect(p2_hand_names).to eq(["Grizzly Bears"])
