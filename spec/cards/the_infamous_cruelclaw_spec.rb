@@ -51,6 +51,28 @@ RSpec.describe Magic::Cards::TheInfamousCruelclaw do
     expect(game.choices.last).to be_a(described_class::DamageTrigger::MayCast)
   end
 
+  it "stops exiling at the first nonland card, leaving the rest of the library alone" do
+    under = put_on_top("Grizzly Bears")
+    bolt = put_on_top("Lightning Bolt")
+    land = put_on_top("Mountain")
+    library_size = p1.library.count
+    deal_combat_damage
+
+    expect(land.zone).to be_exile
+    expect(bolt.zone).to be_exile
+    expect(under.zone).to eq(p1.library)
+    expect(p1.library.count).to eq(library_size - 2)
+  end
+
+  it "does nothing when a different source deals combat damage to a player" do
+    bolt = put_on_top("Lightning Bolt")
+    game.notify!(Magic::Events::CombatDamageDealt.new(source: bears, target: p2, damage: 2))
+    game.settle!
+
+    expect(bolt.zone).to eq(p1.library)
+    expect(game.choices).to be_empty
+  end
+
   it "lets you choose the target of the spell cast by discarding a card" do
     put_on_top("Lightning Bolt")
     deal_combat_damage
