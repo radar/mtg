@@ -7,6 +7,29 @@ module Magic
     class Powerbalance < Enchantment
       # The second "may": cast the revealed card for free.
       class MayCast < Magic::Choice::May
+        # The caster picks the target of the free cast.
+        class TargetChoice < Magic::Choice::Targeted
+          def initialize(actor:, action:)
+            super(actor: actor)
+            @action = action
+          end
+
+          def prompt = "Choose a target for #{@action.card.name}."
+
+          def choices = @action.target_choices.to_a
+
+          def choice_amount = 1
+
+          def decline!
+            resolve!(target: choices.first)
+          end
+
+          def resolve!(target:)
+            @action.targeting(target)
+            game.take_action(@action)
+          end
+        end
+
         def initialize(actor:, card:)
           @card = card
           super(actor: actor)
@@ -19,11 +42,12 @@ module Magic
 
           action = controller.prepare_cast(card: @card, by_effect: true)
           action.mana_cost = {}
-          if @card.respond_to?(:target_choices) && !(@card.respond_to?(:multi_target?) && @card.multi_target?)
-            choices = action.target_choices
-            action.targeting(choices.first) if choices.any?
+          single_target = @card.respond_to?(:target_choices) && !(@card.respond_to?(:multi_target?) && @card.multi_target?)
+          if single_target && action.target_choices.any?
+            game.add_choice(TargetChoice.new(actor: actor, action: action))
+          else
+            game.take_action(action)
           end
-          game.take_action(action)
         end
       end
 

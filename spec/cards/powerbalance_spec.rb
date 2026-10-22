@@ -89,9 +89,32 @@ RSpec.describe Magic::Cards::Powerbalance do
       p1.add_mana(red: 2)
       expect(game.choices.last).to be_a(described_class::MayCast)
       game.resolve_choice!
+      game.resolve_choice!(target: p2)
 
       expect(game.stack.spells.map(&:card)).to include(top)
       expect(p1.mana_pool.values.sum).to eq(2)
+    end
+
+    it "lets the caster choose the target of the free cast" do
+      game.resolve_choice!
+      choice = game.choices.last
+
+      expect(choice).to be_a(described_class::MayCast::TargetChoice)
+      expect(choice.choices).to contain_exactly(bears, p1, p2)
+      game.resolve_choice!(target: p2)
+      game.stack.resolve!
+      game.settle!
+
+      expect(p2.life).to eq(17)
+      expect(bears.zone).to eq(game.battlefield)
+    end
+
+    it "targets the first legal target if the target choice is skipped" do
+      game.resolve_choice!
+      game.skip_choice!
+
+      expect(game.stack.spells.map(&:card)).to include(top)
+      expect(game.choices).to be_empty
     end
 
     it "leaves the card on top if you decline to cast it" do
