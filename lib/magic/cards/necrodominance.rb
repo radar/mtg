@@ -14,10 +14,9 @@ module Magic
 
       # At the beginning of your end step, you may pay any amount of life. If you do, draw that many cards.
       class PayLifeChoice < Magic::Choice::May
-        # Pay `life` (at most what you have, never negative), then draw that many cards.
+        # Pay `life`, then draw that many cards. You can't pay more life than you have (CR 119.4), so that does nothing.
         def resolve!(life: 0)
-          life = life.clamp(0, controller.life)
-          return if life.zero?
+          return unless life.positive? && life <= controller.life
 
           lose_life controller, life
           draw_cards life

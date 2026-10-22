@@ -21,6 +21,15 @@ RSpec.describe Magic::Cards::Necrodominance do
       expect(p1.hand.count).to eq(hand_size)
     end
 
+    it "does not trigger draw-step abilities such as Sylvan Library" do
+      ResolvePermanent("Necrodominance", owner: p1)
+      ResolvePermanent("Sylvan Library", owner: p1)
+      go_to_main_phase!
+
+      expect(game.choices).to be_empty
+      expect(current_turn.events.find { _1.is_a?(Magic::Events::DrawStep) }).to be_nil
+    end
+
     it "draws normally without it" do
       hand_size = p1.hand.count
       go_to_main_phase!
@@ -45,10 +54,12 @@ RSpec.describe Magic::Cards::Necrodominance do
     end
 
     it "cannot pay more life than you have" do
+      hand_size = p1.hand.count
       current_turn.end!
       game.resolve_choice!(life: 50)
 
-      expect(p1.life).to eq(0)
+      expect(p1.life).to eq(20)
+      expect(p1.hand.count).to eq(hand_size)
     end
 
     it "does nothing when declined" do
@@ -113,6 +124,62 @@ RSpec.describe Magic::Cards::Necrodominance do
       game.settle!
 
       expect(bears.card.zone).to be_exile
+    end
+
+    it "exiles a token that would be put into your graveyard" do
+      ResolvePermanent("Grizzly Bears", owner: p1).create_eldrazi_spawn
+      game.settle!
+      token = p1.creatures.find { _1.token? }
+      token.destroy!
+      game.settle!
+
+      expect(p1.graveyard.cards).to be_empty
+      expect(p1.creatures).not_to include(token)
+    end
+
+    it "exiles an instant you cast as it resolves" do
+      bolt = Card("Lightning Bolt", owner: p1).tap { p1.hand.add(_1) }
+      p1.add_mana(red: 1)
+      p1.cast(card: bolt) do |a|
+        a.pay_mana(red: 1)
+        a.targeting(p2)
+      end
+      game.stack.resolve!
+      game.settle!
+
+      expect(p2.life).to eq(17)
+      expect(bolt.zone).to be_exile
+      expect(p1.graveyard.cards).to be_empty
+    end
+
+    it "exiles a sorcery you cast as it resolves" do
+      sorcery = Card("Crash Through", owner: p1)
+      p1.hand.add(sorcery)
+      p1.add_mana(red: 1)
+      p1.cast(card: sorcery) { |a| a.pay_mana(red: 1) }
+      game.stack.resolve!
+      game.settle!
+
+      expect(sorcery.zone).to be_exile
+      expect(p1.graveyard.cards).to be_empty
+    end
+
+    it "exiles a card milled from your library" do
+      milled = p1.library.cards.first
+      p1.mill(1)
+      game.settle!
+
+      expect(milled.zone).to be_exile
+      expect(p1.graveyard.cards).to be_empty
+    end
+
+    it "exiles Necrodominance itself when it leaves the battlefield" do
+      necro = p1.permanents.find { _1.name == "Necrodominance" }
+      necro.destroy!
+      game.settle!
+
+      expect(necro.card.zone).to be_exile
+      expect(p1.graveyard.cards).to be_empty
     end
 
     it "lets an opponent's cards go to their graveyard" do
