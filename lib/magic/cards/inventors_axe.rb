@@ -32,6 +32,8 @@ module Magic
           def resolve!(target:)
             actor.attach_to!(target)
           end
+
+          def decline! = resolve!(target: choices.first)
         end
 
         def call

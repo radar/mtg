@@ -49,6 +49,16 @@ RSpec.describe Magic::Cards::InventorsAxe do
     expect(bears.power).to eq(2)
   end
 
+  it "still attaches when the target choice is skipped" do
+    ResolvePermanent("Grizzly Bears", owner: p1)
+    cast_axe
+    game.skip_choice!
+    game.settle!
+
+    expect(axe.attached_to).not_to be_nil
+    expect(p1.creatures).to include(axe.attached_to)
+  end
+
   it "doesn't offer an opponent's creature" do
     opp = ResolvePermanent("Grizzly Bears", owner: p2)
     cast_axe
