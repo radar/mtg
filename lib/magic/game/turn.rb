@@ -37,7 +37,10 @@ module Magic
             Events::DrawStep.new(player: turn.active_player)
           )
           # An effect, so that replacement effects ("if you would draw a card", Abundance) see the turn's draw too.
-          turn.add_effect(Effects::DrawCards.new(source: turn.active_player, player: turn.active_player))
+          # "Skip your draw step" is a permanent's `skips_draw_step?`: the step still happens, with no draw.
+          unless turn.active_player.skips_draw_step?
+            turn.add_effect(Effects::DrawCards.new(source: turn.active_player, player: turn.active_player))
+          end
           turn.checkpoint!
         end
 

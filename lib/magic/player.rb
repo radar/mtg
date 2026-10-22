@@ -475,7 +475,14 @@ module Magic
     def maximum_hand_size
       return if permanents.any? { _1.card.no_maximum_hand_size? }
 
-      [STARTING_MAXIMUM_HAND_SIZE - opponents_maximum_hand_size_reduction, 0].max
+      fixed = permanents.filter_map { _1.card.fixed_maximum_hand_size }.min
+      base = fixed || STARTING_MAXIMUM_HAND_SIZE
+      [base - opponents_maximum_hand_size_reduction, 0].max
+    end
+
+    # "Skip your draw step" (a permanent answers `skips_draw_step?`).
+    def skips_draw_step?
+      permanents.any? { _1.card.skips_draw_step? }
     end
 
     # "Each opponent's maximum hand size is reduced by N" (Locust Miser): permanents answer
