@@ -24,12 +24,13 @@ module Magic
       # "...discard a card at random unless you pay {E}{E}." Accepting pays; declining discards.
       class PayChoice < Magic::Choice::PayEnergy
         def decline!
-          RushOfInspiration.discard_at_random(controller)
+          RushOfInspiration.discard_at_random(controller, except: actor)
         end
       end
 
-      def self.discard_at_random(player)
-        card = player.hand.cards.to_a.sample
+      # The resolving spell is still in the hand zone, but it is on the stack, so it is not a card to discard.
+      def self.discard_at_random(player, except:)
+        card = player.hand.cards.to_a.reject { _1 == except }.sample
         card&.discard!
       end
 
@@ -40,7 +41,7 @@ module Magic
         if choice.can_pay?
           game.add_choice(choice)
         else
-          self.class.discard_at_random(controller)
+          self.class.discard_at_random(controller, except: self)
         end
       end
     end
