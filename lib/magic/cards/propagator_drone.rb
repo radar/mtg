@@ -12,21 +12,38 @@ module Magic
       # "Creature tokens you control have evolve." Evolve: "Whenever a creature you control enters, if that creature
       # has greater power or toughness than this creature, put a +1/+1 counter on this creature."
       # Each token with evolve triggers on its own, so this one trigger puts a counter on every creature token that
-      # you control which the entering creature out-sizes. The Drone's own entry does not count, as it is not a token.
+      # you control which the entering creature out-sizes. Tokens already on the battlefield evolve when the Drone
+      # itself enters (it is a creature entering after they gained evolve). Qualifying tokens are recorded when the
+      # trigger fires; each is re-checked on resolution (evolve's intervening "if"), so a token created while the
+      # trigger waits on the stack gets no counter.
       class TokenEvolveTrigger < TriggeredAbility::EnterTheBattlefield
         def evolving_tokens
           entering = event.permanent
           return [] unless entering.creature? && entering.controller == controller
 
           controller.creatures.select do |creature|
-            creature.token? && creature != entering && (entering.power > creature.power || entering.toughness > creature.toughness)
+            creature.token? && creature != entering && outsized_by?(entering, creature)
           end
+        end
+
+        def outsized_by?(entering, creature)
+          entering.power > creature.power || entering.toughness > creature.toughness
         end
 
         def should_perform? = evolving_tokens.any?
 
+        def trigger!
+          @triggered_tokens = evolving_tokens
+          @triggered_tokens.any?
+        end
+
         def call
-          evolving_tokens.each { |token| add_counter("+1/+1", to: token) }
+          entering = event.permanent
+          (@triggered_tokens || evolving_tokens).each do |token|
+            next unless game.battlefield.permanents.include?(token) && outsized_by?(entering, token)
+
+            add_counter("+1/+1", to: token)
+          end
         end
       end
 

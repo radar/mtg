@@ -7,7 +7,7 @@ RSpec.describe Magic::Cards::PropagatorDrone do
 
   before { go_to_main_phase! }
 
-  let!(:drone) { ResolvePermanent("Propagator Drone", owner: p1) }
+  let(:drone) { ResolvePermanent("Propagator Drone", owner: p1) }
 
   def spawns(player = p1) = player.creatures.select { _1.name == "Eldrazi Spawn" }
 
@@ -38,6 +38,35 @@ RSpec.describe Magic::Cards::PropagatorDrone do
     expect([spawns.first.power, spawns.first.toughness]).to eq([1, 2])
   end
 
+  it "evolves tokens already on the battlefield when the Drone itself enters" do
+    helper = ResolvePermanent("Birds Of Paradise", owner: p1)
+    helper.create_eldrazi_spawn
+    game.settle!
+    expect([spawns.first.power, spawns.first.toughness]).to eq([0, 1])
+
+    ResolvePermanent("Propagator Drone", owner: p1)
+    game.settle!
+
+    expect([spawns.first.power, spawns.first.toughness]).to eq([1, 2])
+  end
+
+  it "gives no counter to a token created while the trigger is on the stack" do
+    make_spawn
+    bears = Card("Grizzly Bears", owner: p1)
+    p1.hand.add(bears)
+    p1.add_mana(green: 2)
+    p1.cast(card: bears) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
+    game.stack.resolve_top!
+    game.tick!
+    expect(game.stack.empty?).to be(false)
+
+    drone.create_eldrazi_spawn
+    game.settle!
+
+    expect(spawns.size).to eq(2)
+    expect(spawns.map { [_1.power, _1.toughness] }).to contain_exactly([1, 2], [0, 1])
+  end
+
   it "does not grow a token when the entering creature is no bigger" do
     make_spawn
     ResolvePermanent("Birds Of Paradise", owner: p1)
@@ -55,6 +84,7 @@ RSpec.describe Magic::Cards::PropagatorDrone do
   end
 
   it "does not give evolve to nontoken creatures" do
+    drone
     small = ResolvePermanent("Birds Of Paradise", owner: p1)
     ResolvePermanent("Serra Angel", owner: p1)
     game.settle!
