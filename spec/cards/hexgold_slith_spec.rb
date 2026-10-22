@@ -36,6 +36,19 @@ RSpec.describe Magic::Cards::HexgoldSlith do
     expect(slith.first_strike?).to be(true)
   end
 
+  it "loses first strike at end of turn" do
+    attack(slith)
+    game.resolve_choice!
+    game.settle!
+    expect(slith.first_strike?).to be(true)
+
+    current_turn.end!
+    current_turn.cleanup!
+    game.settle!
+
+    expect(slith.first_strike?).to be(false)
+  end
+
   it "doesn't gain first strike when you decline" do
     attack(slith)
     game.skip_choice!
