@@ -13,14 +13,12 @@ module Magic
             battlefield.not_controlled_by(controller).nonland
           end
 
-          def choice_amount = 0..1
+          def choice_amount = 1
 
           def resolve!(target:)
             actor.exile_until_leaves!(target)
             finish
           end
-
-          def decline! = finish
 
           def finish
             gain_energy 2

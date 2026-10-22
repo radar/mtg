@@ -40,9 +40,17 @@ RSpec.describe Magic::Cards::StaticPrison do
     expect(p2.creatures.map(&:name)).to include("Grizzly Bears")
   end
 
+  it "can't decline the exile when a target exists" do
+    choice = game.choices.first
+
+    expect(choice.choice_amount).to eq(1)
+    expect(choice).not_to respond_to(:decline!)
+  end
+
   it "still gives you two energy with no legal target" do
+    game.resolve_choice!(target: rival)
+    game.settle!
     p2.creatures.each(&:destroy!)
-    game.skip_choice! if game.choices.any?
     game.settle!
     p1.pay_energy!(p1.energy)
 
