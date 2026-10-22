@@ -57,6 +57,28 @@ RSpec.describe Magic::Cards::EldraziLinebreaker do
     expect(linebreaker.power + bears.power).to eq(6)
   end
 
+  it "does not offer an opponent's creature as a target" do
+    theirs = ResolvePermanent("Grizzly Bears", owner: p2)
+    begin_combat(p1)
+
+    expect(game.choices.first.choices).to contain_exactly(linebreaker, bears)
+    expect(game.choices.first.choices).not_to include(theirs)
+  end
+
+  it "wears off at end of turn" do
+    begin_combat(p1)
+    game.resolve_choice!(target: bears)
+    game.tick!
+    expect(bears.power).to eq(3)
+
+    current_turn.end!
+    current_turn.cleanup!
+    game.tick!
+
+    expect(bears.power).to eq(2)
+    expect(bears.has_keyword?(Magic::Cards::Keywords::HASTE)).to be(false)
+  end
+
   it "doesn't trigger on an opponent's turn" do
     begin_combat(p2)
 
