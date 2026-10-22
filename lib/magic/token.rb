@@ -67,6 +67,7 @@ module Magic
     def maximum_attackers_blocked = 1
     def can_activate_ability?(_) = true
     def no_maximum_hand_size? = false
+    def fixed_maximum_hand_size = nil
     def prevents_losing_at_zero_life? = false
     def opponents_maximum_hand_size_reduction = 0
 
