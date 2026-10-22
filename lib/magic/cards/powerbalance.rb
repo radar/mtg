@@ -52,7 +52,14 @@ module Magic
         def should_perform? = event.player != controller
 
         def call
-          game.choices.add(MayReveal.new(actor: actor, mana_value: spell.mana_value))
+          game.choices.add(MayReveal.new(actor: actor, mana_value: spell_mana_value))
+        end
+
+        # CR 202.3e: on the stack, each {X} in the cost counts as the chosen value of X.
+        def spell_mana_value
+          printed = spell.cost.cost
+          x_symbols = printed[:x] || 0
+          printed.except(:x).values.sum + x_symbols * (event.x_value || 0)
         end
       end
 

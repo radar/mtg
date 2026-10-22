@@ -25,6 +25,32 @@ RSpec.describe Magic::Cards::Powerbalance do
     game.settle!
   end
 
+  def opponent_casts_geyser!(x)
+    p2.add_mana(red: x + 2)
+    p2.cast(card: Card("Volcanic Geyser", owner: p2), value_for_x: x) do |action|
+      action.pay_mana(x: { red: x }, red: 2).targeting(p1)
+    end
+    game.settle!
+  end
+
+  it "counts X as its chosen value for the spell's mana value (matching)" do
+    top = top_card_for_p1("Wood Elves")
+    opponent_casts_geyser!(1)
+    game.resolve_choice!
+
+    expect(game.choices.last).to be_a(described_class::MayCast)
+    expect(top.zone).to eq(p1.library)
+  end
+
+  it "counts X as its chosen value for the spell's mana value (not matching)" do
+    top = top_card_for_p1("Wood Elves")
+    opponent_casts_geyser!(2)
+    game.resolve_choice!
+
+    expect(game.choices).to be_empty
+    expect(top.zone).to eq(p1.library)
+  end
+
   it "does nothing when you cast a spell yourself" do
     p1.add_mana(red: 1)
     p1.cast(card: Card("Lightning Bolt", owner: p1)) do |action|
@@ -60,11 +86,12 @@ RSpec.describe Magic::Cards::Powerbalance do
     end
 
     it "offers a free cast, which puts it on the stack with no mana paid" do
+      p1.add_mana(red: 2)
       expect(game.choices.last).to be_a(described_class::MayCast)
       game.resolve_choice!
 
       expect(game.stack.spells.map(&:card)).to include(top)
-      expect(p1.mana_pool.values.sum).to eq(0)
+      expect(p1.mana_pool.values.sum).to eq(2)
     end
 
     it "leaves the card on top if you decline to cast it" do
