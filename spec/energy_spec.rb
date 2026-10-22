@@ -72,4 +72,36 @@ RSpec.describe "Energy counters" do
       expect(p1.energy).to eq(1)
     end
   end
+
+  describe "Choice::PayAnyEnergy" do
+    let(:paid) { [] }
+    let(:choice_class) do
+      recorder = paid
+      Class.new(Magic::Choice::PayAnyEnergy) { define_method(:paid) { |amount| recorder << amount } }
+    end
+
+    before do
+      gain(3)
+      game.settle!
+      game.add_choice(choice_class.new(actor: artifact))
+    end
+
+    it "pays the chosen amount" do
+      game.resolve_choice!(amount: 2)
+      expect(p1.energy).to eq(1)
+      expect(paid).to eq([2])
+    end
+
+    it "pays everything by default and never more than you have" do
+      game.resolve_choice!(amount: 9)
+      expect(p1.energy).to eq(0)
+      expect(paid).to eq([3])
+    end
+
+    it "pays nothing, with an amount of 0, when declined" do
+      game.skip_choice!
+      expect(p1.energy).to eq(3)
+      expect(paid).to eq([0])
+    end
+  end
 end
