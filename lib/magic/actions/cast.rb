@@ -204,7 +204,14 @@ module Magic
       # Instants and spells with flash can be cast any time the player has priority.
       def instant_speed?
         card.instant? || card.flash? || adventure_instant? || (kicker_cost.respond_to?(:grants_flash?) && kicker_cost.grants_flash?) ||
+          static_alternative_grants_flash? ||
           static_ability_allows?(:may_cast_with_flash?) || static_ability_allows?(:grants_flash?)
+      end
+
+      # "If you cast a spell this way, you may cast it as though it had flash": the static alternative cost in use says so.
+      def static_alternative_grants_flash?
+        cost = static_alternative_cost
+        cost.respond_to?(:grants_flash?) && cost.grants_flash?
       end
 
       def target_choices
