@@ -60,6 +60,21 @@ RSpec.describe Magic::Cards::GalvanicDischarge do
     expect(bears.damage).to eq(0)
   end
 
+  context "targeting a planeswalker" do
+    let!(:walker) { ResolvePermanent("Basri Ket", owner: p2) }
+
+    it "can target it, and the damage removes loyalty" do
+      expect(Card("Galvanic Discharge", owner: p1).target_choices).to include(walker)
+      loyalty = walker.loyalty
+
+      discharge(walker)
+      game.resolve_choice!(amount: 2)
+      game.settle!
+
+      expect(walker.loyalty).to eq(loyalty - 2)
+    end
+  end
+
   it "targets only creatures and planeswalkers, not players" do
     card = Card("Galvanic Discharge", owner: p1)
     expect(card.target_choices).to include(bears)
