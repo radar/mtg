@@ -34,8 +34,9 @@ module Magic
       end
 
       # "Ulamog has annihilator X, where X is the number of +1/+1 counters on it."
+      # A separately granted instance of annihilator still triggers on its own (702.86b), hence `+ super`.
       class CounterAnnihilator < TriggeredAbility::Annihilator
-        def instance_amounts = [actor.counters.of_type(Counters::Plus1Plus1).count]
+        def instance_amounts = [actor.counters.of_type(Counters::Plus1Plus1).count] + super
       end
 
       def cast_triggers = [CastTrigger]

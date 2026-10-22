@@ -97,6 +97,45 @@ RSpec.describe Magic::Cards::UlamogTheDefiler do
       expect(p2.permanents.size).to eq(2)
     end
 
+    it "uses the X recorded when it attacked, even if the counters change while the trigger is on the stack (113.7a)" do
+      ulamog = ResolvePermanent("Ulamog The Defiler", owner: p1)
+      ulamog.add_counter(Magic::Counters::Plus1Plus1, amount: 2)
+      4.times { ResolvePermanent("Grizzly Bears", owner: p2) }
+
+      game.notify!(Magic::Events::CreatureAttacked.new(attacker: ulamog, target: p2))
+
+      # The trigger has fired (X recorded) but has not resolved yet.
+      expect(game.pending_triggers.size).to eq(1)
+      ulamog.add_counter(Magic::Counters::Plus1Plus1, amount: 3)
+      expect(ulamog.counters.of_type(Magic::Counters::Plus1Plus1).count).to eq(5)
+
+      game.settle!
+      expect(game.choices.size).to eq(1)
+      expect(game.choices.first.amount).to eq(2)
+      game.skip_choice!
+      game.settle!
+
+      expect(p2.permanents.size).to eq(2)
+    end
+
+    it "also triggers separately for a separately granted annihilator" do
+      ulamog = ResolvePermanent("Ulamog The Defiler", owner: p1)
+      ulamog.add_counter(Magic::Counters::Plus1Plus1, amount: 2)
+      ulamog.grant_keyword(Magic::Cards::Keywords::Annihilator.new(1))
+      6.times { ResolvePermanent("Grizzly Bears", owner: p2) }
+
+      attack(ulamog)
+      amounts = []
+      while (choice = game.choices.first)
+        amounts << choice.amount
+        game.skip_choice!
+        game.settle!
+      end
+
+      expect(amounts.sort).to eq([1, 2])
+      expect(p2.permanents.size).to eq(3)
+    end
+
     it "does nothing without counters" do
       ulamog = ResolvePermanent("Ulamog The Defiler", owner: p1)
       2.times { ResolvePermanent("Grizzly Bears", owner: p2) }
