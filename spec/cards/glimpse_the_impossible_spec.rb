@@ -55,6 +55,33 @@ RSpec.describe Magic::Cards::GlimpseTheImpossible do
     expect(spawns.size).to eq(2)
   end
 
+  it "uses the stack at the end step, so an exiled instant can still be cast in response" do
+    bolt = Card("Lightning Bolt", owner: p1)
+    p1.library.add(bolt)
+    cast
+    expect(bolt.zone).to be_exile
+
+    game.notify!(Magic::Events::BeginningOfEndStep.new(active_player: p1))
+    game.tick!
+    expect(game.stack.empty?).to be(false)
+    expect(top[0].zone).to be_exile
+    expect(spawns).to be_empty
+
+    p1.add_mana(red: 1)
+    action = p1.cast(card: bolt) do |a|
+      a.pay_mana(red: 1)
+      a.targeting(p2)
+    end
+    expect(action).not_to be_nil
+    game.settle!
+
+    expect(bolt.zone).to be_graveyard
+    expect(top[0].zone).to be_graveyard
+    expect(top[1].zone).to be_graveyard
+    expect(top[2].zone).to be_library
+    expect(spawns.size).to eq(2)
+  end
+
   it "makes no tokens when no cards remain exiled" do
     cast
     top.each { _1.move_to_hand! }
