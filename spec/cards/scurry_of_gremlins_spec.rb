@@ -23,6 +23,16 @@ RSpec.describe Magic::Cards::ScurryOfGremlins do
     end
   end
 
+  context "with an opposing creature on the battlefield" do
+    let!(:bears) { ResolvePermanent("Grizzly Bears", owner: p1) }
+    let!(:enemy) { ResolvePermanent("Grizzly Bears", owner: p2) }
+    let!(:scurry) { ResolvePermanent("Scurry Of Gremlins", owner: p1) }
+
+    it "doesn't count the opponent's creature for energy" do
+      expect(p1.energy).to eq(3)
+    end
+  end
+
   context "Pay {E}{E}{E}{E}" do
     let!(:bears) { ResolvePermanent("Grizzly Bears", owner: p1) }
     let!(:enemy) { ResolvePermanent("Grizzly Bears", owner: p2) }
@@ -48,6 +58,19 @@ RSpec.describe Magic::Cards::ScurryOfGremlins do
       expect(bears.has_keyword?(:haste)).to be(true)
       expect(gremlins.map(&:power)).to all(eq(2))
       expect(gremlins).to all(satisfy { _1.has_keyword?(:haste) })
+    end
+
+    it "wears off at end of turn" do
+      activate
+      expect(bears.power).to eq(3)
+
+      current_turn.end!
+      current_turn.cleanup!
+      game.settle!
+
+      expect(bears.power).to eq(2)
+      expect(bears.has_keyword?(:haste)).to be(false)
+      expect(gremlins.map(&:power)).to all(eq(1))
     end
 
     it "doesn't affect opposing creatures" do
