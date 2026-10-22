@@ -58,12 +58,30 @@ RSpec.describe Magic::Cards::IdolOfFalseGods do
       expect(plus_counters).to eq(1)
     end
 
-    it "does not trigger when an Eldrazi is exiled or bounced instead of dying" do
+    it "does not trigger when another Eldrazi is bounced instead of dying" do
       other = ResolvePermanent("Idol Of False Gods", owner: p1)
       other.return_to_hand
       game.settle!
 
       expect(plus_counters).to eq(0)
+    end
+
+    it "does not trigger when another Eldrazi is exiled instead of dying" do
+      other = ResolvePermanent("Idol Of False Gods", owner: p1)
+      other.exile!
+      game.settle!
+
+      expect(plus_counters).to eq(0)
+    end
+
+    it "does not trigger for itself dying (it is not 'another' Eldrazi)" do
+      idol.add_counter(Magic::Counters::Plus1Plus1, amount: 2)
+      idol.destroy!
+      game.settle!
+
+      expect(p1.graveyard.cards.map(&:name)).to include("Idol Of False Gods")
+      expect(game.stack.abilities).to be_empty
+      expect(plus_counters).to eq(2)
     end
 
     it "does not trigger for an opponent's Eldrazi" do
