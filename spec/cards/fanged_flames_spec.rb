@@ -50,6 +50,36 @@ RSpec.describe Magic::Cards::FangedFlames do
     expect(chandra.loyalty).to eq(1)
   end
 
+  it "exiles a planeswalker that dies from the damage" do
+    basri = ResolvePermanent("Basri Ket", owner: p2)
+    cast_at(basri)
+
+    expect(game.exile.cards).to include(basri.card)
+    expect(p2.graveyard.cards).not_to include(basri.card)
+  end
+
+  it "exiles a survivor that dies later the same turn" do
+    bear = ResolvePermanent("Ordinary Bear", owner: p2)
+    cast_at(bear)
+    bear.destroy!
+    game.settle!
+
+    expect(game.exile.cards).to include(bear.card)
+    expect(p2.graveyard.cards).not_to include(bear.card)
+  end
+
+  it "stops exiling after the turn ends" do
+    bear = ResolvePermanent("Ordinary Bear", owner: p2)
+    cast_at(bear)
+    current_turn.end!
+    current_turn.cleanup!
+    bear.destroy!
+    game.settle!
+
+    expect(p2.graveyard.cards).to include(bear.card)
+    expect(game.exile.cards).not_to include(bear.card)
+  end
+
   it "does not allow players as targets" do
     expect(flames.target_choices).not_to include(p2)
   end
