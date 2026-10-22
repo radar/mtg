@@ -19,7 +19,7 @@ module Magic
       class EldraziDiesTrigger < TriggeredAbility
         def should_perform?
           dying = event.permanent
-          dying != actor && dying.controller == controller && dying.type?("Eldrazi")
+          event.to.graveyard? && dying != actor && dying.controller == controller && dying.type?("Eldrazi")
         end
 
         def call
@@ -55,7 +55,8 @@ module Magic
       def static_abilities = [BecomesCreature, CreatureStats, GainsAnnihilator]
       def event_handlers
         {
-          Events::CreatureDied => EldraziDiesTrigger,
+          # "Dies" covers any permanent put into a graveyard from the battlefield, not just creatures (700.4).
+          Events::LeftTheBattlefield => EldraziDiesTrigger,
           Events::CreatureAttacked => TriggeredAbility::Annihilator,
         }
       end

@@ -50,6 +50,22 @@ RSpec.describe Magic::Cards::IdolOfFalseGods do
       expect(plus_counters).to eq(1)
     end
 
+    it "counts a non-creature Eldrazi (a second Idol) dying" do
+      other = ResolvePermanent("Idol Of False Gods", owner: p1)
+      other.destroy!
+      game.settle!
+
+      expect(plus_counters).to eq(1)
+    end
+
+    it "does not trigger when an Eldrazi is exiled or bounced instead of dying" do
+      other = ResolvePermanent("Idol Of False Gods", owner: p1)
+      other.return_to_hand
+      game.settle!
+
+      expect(plus_counters).to eq(0)
+    end
+
     it "does not trigger for an opponent's Eldrazi" do
       idol.create_eldrazi_spawn(controller: p2)
       game.settle!
