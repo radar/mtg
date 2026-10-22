@@ -578,11 +578,13 @@ module Magic
         if card.zone&.graveyard?
           game.battlefield.static_abilities.each { _1.cast_from_graveyard!(card, player) if _1.respond_to?(:cast_from_graveyard!) }
         end
+        origin_zone = card.zone
         game.stack.add(self)
 
         cast_event = Events::SpellCast.new(
           spell: card,
           player: player,
+          from_zone: origin_zone,
           mana_cost: mana_cost,
           x_value: value_for_x,
           flashback: flashback?,

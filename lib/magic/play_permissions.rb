@@ -12,8 +12,10 @@ module Magic
     # `any_mana`: mana of any type can be spent to cast it.
     # `pay_life`: casting it pays life equal to its mana value rather than its mana cost (Inside Information).
     # `requires_type`: only while the player controls a permanent of that type (Flameshape: "if you control a Wizard").
-    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard, :forever, :any_mana, :pay_life, :requires_type) do
-      def initialize(graveyard: false, forever: false, any_mana: false, pay_life: false, requires_type: nil, **args) = super
+    # `linked_to`: a permanent that remembers its latest exiled card in `state[:linked_exile]`; the permission only holds
+    # while that is still this card ("until you exile another card with this artifact").
+    Permission = Data.define(:card, :player, :granted_on_turn, :this_turn, :free, :graveyard, :forever, :any_mana, :pay_life, :requires_type, :linked_to) do
+      def initialize(graveyard: false, forever: false, any_mana: false, pay_life: false, requires_type: nil, linked_to: nil, **args) = super
 
       def permits?(game, card, player)
         card.equal?(self.card) && player == self.player && (graveyard ? card.zone&.graveyard? : card.zone&.exile?) &&
@@ -21,7 +23,8 @@ module Magic
       end
 
       def requirement_met?(game)
-        requires_type.nil? || game.battlefield.controlled_by(player).any? { _1.type?(requires_type) }
+        (requires_type.nil? || game.battlefield.controlled_by(player).any? { _1.type?(requires_type) }) &&
+          (linked_to.nil? || linked_to.state[:linked_exile].equal?(card))
       end
 
       def expired?(game)
@@ -51,6 +54,13 @@ module Magic
     # "For as long as it remains exiled, you may play it if you control a <type>" (Flameshape).
     def grant_while_exiled_if_controlling(card:, player:, type:)
       @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false, forever: true, requires_type: type)
+    end
+
+    # "Exile the top card of your library. You may play it until you exile another card with this artifact": remembers
+    # `card` on `permanent`, which ends the permission for whatever card it remembered before.
+    def grant_until_another_exiled_with(card:, player:, permanent:)
+      permanent.state[:linked_exile] = card
+      @permissions << Permission.new(card:, player:, granted_on_turn: @game.current_turn.number, this_turn: false, free: false, forever: true, linked_to: permanent)
     end
 
     # `free: true`: "you may cast it without paying its mana cost" (Dream Harvest).

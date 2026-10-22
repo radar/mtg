@@ -1,10 +1,11 @@
 module Magic
   module Events
     class SpellCast
-      attr_reader :spell, :player, :x_value, :targets, :mana_cost
+      attr_reader :spell, :player, :x_value, :targets, :mana_cost, :from_zone
 
-      def initialize(spell:, player:, mana_cost:, x_value: nil, flashback: false, targets: [])
+      def initialize(spell:, player:, mana_cost:, x_value: nil, flashback: false, targets: [], from_zone: nil)
         @spell = spell
+        @from_zone = from_zone
         @player = player
         @mana_cost = mana_cost
         @x_value = x_value
@@ -16,6 +17,9 @@ module Magic
       def mana_spent
         mana_cost.is_a?(Costs::Mana) ? mana_cost.mana_spent : {}
       end
+
+      # "Whenever you cast a spell from anywhere other than your hand": the zone the card was cast from.
+      def cast_from_hand? = from_zone.nil? || from_zone.hand?
 
       def flashback?
         @flashback
