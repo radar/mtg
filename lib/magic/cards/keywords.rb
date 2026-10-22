@@ -4,6 +4,8 @@ module Magic
       class Keyword
       end
 
+      # Battle cry has no handler of its own: a card that grants it supplies the attack trigger.
+      BATTLE_CRY = Class.new(Keyword)
       CANT_BE_BLOCKED = Class.new(Keyword)
       CHANGELING = Class.new(Keyword)
       DEATHTOUCH = Class.new(Keyword)
