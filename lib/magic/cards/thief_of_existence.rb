@@ -51,7 +51,9 @@ module Magic
           end
         end
 
-        def should_perform? = event.permanent == actor && actor.card.opponent_draws_on_leaving
+        # Only the permanent that resulted from the cast spell has the gained ability (CR 400.7): a copy of the card
+        # that was countered and later reanimated is a new object and does not.
+        def should_perform? = event.permanent == actor && actor.cast? && actor.card.opponent_draws_on_leaving
 
         def call
           # The gained ability belongs to this permanent only (CR 400.7).

@@ -106,6 +106,38 @@ RSpec.describe Magic::Cards::ThiefOfExistence do
     expect(p2.hand.cards.count).to eq(hand)
   end
 
+  it "does not draw when a copy that exiled something was countered and later reanimated" do
+    p1.add_mana(colorless: 2, green: 1)
+    thief_spell = p1.cast(card: thief) { _1.pay_mana(generic: { colorless: 1 }, colorless: 1, green: 1) }
+    game.stack.resolve_top!
+    game.resolve_choice!(target: signet)
+    expect(game.exile.cards.map(&:name)).to include("Arcane Signet")
+
+    cancel = Card("Cancel", owner: p2)
+    p2.hand.add(cancel)
+    p2.add_mana(blue: 3)
+    p2.cast(card: cancel) do
+      _1.pay_mana(blue: 2, generic: { blue: 1 })
+      _1.targeting(thief_spell)
+    end
+    game.stack.resolve!
+    game.settle!
+    expect(thief.zone).to be_graveyard
+
+    p1.graveyard.remove(thief)
+    Magic::Permanent.put_onto_battlefield(game:, card: thief, from_zone: p1.graveyard)
+    game.settle!
+    reanimated = p1.creatures.find { _1.name == "Thief of Existence" }
+    expect(reanimated).not_to be_nil
+    hand = p2.hand.cards.count
+    reanimated.destroy!
+    game.settle!
+    game.stack.resolve! unless game.stack.empty?
+    game.settle!
+
+    expect(p2.hand.cards.count).to eq(hand)
+  end
+
   it "does not trigger the draw when it enters without being cast" do
     permanent = ResolvePermanent("Thief of Existence", owner: p1)
     hand = p2.hand.cards.count
