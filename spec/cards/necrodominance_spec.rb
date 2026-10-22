@@ -30,6 +30,12 @@ RSpec.describe Magic::Cards::Necrodominance do
       expect(current_turn.events.find { _1.is_a?(Magic::Events::DrawStep) }).to be_nil
     end
 
+    it "doesn't skip the draw step because of a token on the battlefield" do
+      Magic::Tokens::Treasure.new(game: game, owner: p1).resolve!
+
+      expect(p1.skips_draw_step?).to be(false)
+    end
+
     it "draws normally without it" do
       hand_size = p1.hand.count
       go_to_main_phase!

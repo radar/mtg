@@ -70,6 +70,7 @@ module Magic
     def fixed_maximum_hand_size = nil
     def prevents_losing_at_zero_life? = false
     def opponents_maximum_hand_size_reduction = 0
+    def skips_draw_step? = false
 
     def zone=(zone)
       @zone = zone
