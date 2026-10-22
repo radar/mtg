@@ -33,6 +33,7 @@ module Magic
       # "When you cast this spell, ..."
       class CastTrigger < TriggeredAbility::CastThisSpell
         def call
+          actor.opponent_draws_on_leaving = false
           choice = ExileChoice.new(actor: actor)
           game.add_choice(choice) if choice.choices.any?
         end
@@ -53,6 +54,8 @@ module Magic
         def should_perform? = event.permanent == actor && actor.card.opponent_draws_on_leaving
 
         def call
+          # The gained ability belongs to this permanent only (CR 400.7).
+          actor.card.opponent_draws_on_leaving = false
           game.add_choice(OpponentChoice.new(actor: actor))
         end
       end

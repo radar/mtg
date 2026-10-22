@@ -70,6 +70,42 @@ RSpec.describe Magic::Cards::ThiefOfExistence do
     expect(p2.hand.cards.count).to eq(hand + 1)
   end
 
+  it "does not offer noncreature nonland permanents with mana value above 4, but offers mana value 4" do
+    five = ResolvePermanent("The Arkenstone", owner: p2)
+    four = ResolvePermanent("Panharmonicon", owner: p2)
+    cast_thief
+    choices = game.choices.first.choices
+    expect(five.mana_value).to eq(5)
+    expect(four.mana_value).to eq(4)
+    expect(choices).not_to include(five)
+    expect(choices).to include(four)
+  end
+
+  it "does not keep the gained ability after leaving and being recast without exiling" do
+    cast_thief
+    game.resolve_choice!(target: signet)
+    game.stack.resolve!
+    game.settle!
+    p1.creatures.find { _1.name == "Thief of Existence" }.destroy!
+    game.settle!
+    game.stack.resolve! unless game.stack.empty?
+    game.settle!
+    expect(thief.opponent_draws_on_leaving).to be(false)
+    expect(thief.zone).to eq(p1.graveyard)
+
+    thief.move_to_hand!
+    cast_thief
+    expect(game.choices).to be_empty
+    game.settle!
+    hand = p2.hand.cards.count
+    p1.creatures.find { _1.name == "Thief of Existence" }.destroy!
+    game.settle!
+    game.stack.resolve! unless game.stack.empty?
+    game.settle!
+
+    expect(p2.hand.cards.count).to eq(hand)
+  end
+
   it "does not trigger the draw when it enters without being cast" do
     permanent = ResolvePermanent("Thief of Existence", owner: p1)
     hand = p2.hand.cards.count
