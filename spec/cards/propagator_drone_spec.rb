@@ -67,6 +67,26 @@ RSpec.describe Magic::Cards::PropagatorDrone do
     expect(spawns.map { [_1.power, _1.toughness] }).to contain_exactly([1, 2], [0, 1])
   end
 
+  it "re-checks on resolution: a token that grew past the entering creature gets no counter" do
+    make_spawn
+    bears = Card("Grizzly Bears", owner: p1)
+    p1.hand.add(bears)
+    p1.add_mana(green: 2)
+    p1.cast(card: bears) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
+    game.stack.resolve_top!
+    game.tick!
+    expect(game.stack.empty?).to be(false)
+
+    spawns.first.add_counter("+1/+1", amount: 2)
+    game.settle!
+    expect([spawns.first.power, spawns.first.toughness]).to eq([2, 3])
+
+    game.stack.resolve!
+    game.settle!
+
+    expect([spawns.first.power, spawns.first.toughness]).to eq([2, 3])
+  end
+
   it "does not grow a token when the entering creature is no bigger" do
     make_spawn
     ResolvePermanent("Birds Of Paradise", owner: p1)
