@@ -580,6 +580,10 @@ module Magic
         end
         origin_zone = card.zone
         game.stack.add(self)
+        # Rule 601.2a: the card leaves the zone it was cast from and is on the stack until the spell resolves.
+        origin_zone&.remove(card)
+        game.stack_zone.add(card)
+        card.cast_from_zone = origin_zone
 
         cast_event = Events::SpellCast.new(
           spell: card,
@@ -821,7 +825,7 @@ module Magic
 
         if exiles_after_resolving?
           card.exile!
-        elsif card.zone&.graveyard? && game.emblems.any? { |emblem| emblem.owner == player && emblem.respond_to?(:exiles_after_graveyard_cast?) && emblem.exiles_after_graveyard_cast?(card) }
+        elsif card.origin_zone&.graveyard? && game.emblems.any? { |emblem| emblem.owner == player && emblem.respond_to?(:exiles_after_graveyard_cast?) && emblem.exiles_after_graveyard_cast?(card) }
           card.exile!
         elsif card.exile_with_dream_counter
           card.exile_with_dream_counter = false
@@ -831,7 +835,7 @@ module Magic
           counters = card.exile_with_time_counters
           card.exile!
           card.time_counters = counters
-        elsif card.rebound? && card.zone.hand?
+        elsif card.rebound? && card.origin_zone&.hand?
           card.exile!
         elsif card.exile_as_it_resolves?
           card.exile!

@@ -34,7 +34,7 @@ RSpec.describe Magic::Cards::SayItsName do
       game.settle!
       game.skip_choice!
 
-      expect(p1.hand.cards.count).to eq(hand_size - 1) # just the spell itself left the hand
+      expect(p1.hand.cards.count).to eq(hand_size) # the spell left the hand when it was cast
     end
   end
 

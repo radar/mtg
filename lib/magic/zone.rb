@@ -53,6 +53,10 @@ module Magic
       false
     end
 
+    def stack?
+      false
+    end
+
     def lands
       cards.lands
     end

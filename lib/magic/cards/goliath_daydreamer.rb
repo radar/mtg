@@ -14,7 +14,7 @@ module Magic
       # then exiles it (with the counter) rather than moving it to the graveyard.
       class SpellCastTrigger < TriggeredAbility::SpellCast
         def should_perform?
-          event.player == controller && (spell.instant? || spell.sorcery?) && spell.zone&.hand?
+          event.player == controller && (spell.instant? || spell.sorcery?) && spell.origin_zone&.hand?
         end
 
         def call

@@ -94,6 +94,7 @@ module Magic
       enters_tapped = false if face_down
       enters_tapped = enters_tapped_after_replacements(game:, card:, enters_tapped:, controller:)
       card_zone = card.zone unless token || copy
+      origin_zone = card.origin_zone unless token || copy
       card.begin_entering! if card.is_a?(Cards::Room)
 
       permanent = Magic::Permanent.new(game:, owner:, controller:, card:, kicked:, cast:, token:, copy:, face_down:, transformed:)
@@ -106,10 +107,10 @@ module Magic
 
       # A face-down permanent has no abilities, so none of the card's "enters with counters" apply.
       entering = permanent.face
-      permanent.entered_from_zone = card_zone
+      permanent.entered_from_zone = origin_zone
       permanent.tap! if enters_tapped
       permanent.attach_to!(attach_to) if attach_to
-      add_entering_counters(permanent:, card: entering, value_for_x:, cast_from_hand: cast && card_zone&.hand?, cast_from_graveyard: cast && card_zone&.graveyard?)
+      add_entering_counters(permanent:, card: entering, value_for_x:, cast_from_hand: cast && origin_zone&.hand?, cast_from_graveyard: cast && origin_zone&.graveyard?)
       card.extra_entering_counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) } if card.respond_to?(:extra_entering_counters)
       counters.each { |counter_type, amount| permanent.add_counter(counter_type, amount:) }
       permanent.move_zone!(from: from_zone, to: game.battlefield)
@@ -976,7 +977,7 @@ module Magic
     end
 
     def exiled_with_this_this_turn?(card)
-      exiled_cards.include?(card) && card.zone&.exile? && turns_cards_were_exiled[card] == game.current_turn.number
+      exiled_cards.include?(card) && card.origin_zone&.exile? && turns_cards_were_exiled[card] == game.current_turn.number
     end
 
     def turns_cards_were_exiled

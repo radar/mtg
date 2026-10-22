@@ -364,7 +364,17 @@ module Magic
       @spell_keywords ? [*@keywords, *@spell_keywords] : @keywords
     end
 
+    # The zone the card was cast from, while it is on the stack (`zone` is the stack then; see Zones::Stack).
+    attr_accessor :cast_from_zone
+
+    # The zone a spell was cast from, or the zone the card is in when it is not on the stack.
+    def origin_zone = zone&.stack? ? cast_from_zone : zone
+
     def zone=(zone)
+      # Casting only moves the card onto the stack: what the cast set up (controller, keywords, counters) stays.
+      return @zone = zone if zone&.stack?
+
+      @cast_from_zone = nil
       @spell_keywords = nil
       @on_adventure = false unless zone&.exile?
       @dream_counter = false unless zone&.exile?

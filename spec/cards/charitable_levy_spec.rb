@@ -115,8 +115,8 @@ RSpec.describe Magic::Cards::CharitableLevy do
       expect(p1.enchantments).not_to include(levy)
       expect(p1.graveyard.cards.map(&:name)).to include("Charitable Levy")
       expect(p1.hand.cards).to include(island)
-      # +1 for the Sol Ring (still in hand until that spell resolves, blocked by the pending search) and +1 for the draw.
-      expect(p1.hand.count).to eq(hand + 2)
+      # The Sol Ring was cast (it is on the stack, not in hand), so only the trigger's draw changes the hand.
+      expect(p1.hand.count).to eq(hand + 1)
 
       choice = game.choices.last
       expect(choice).to be_a(Magic::Choice::SearchLibrary)

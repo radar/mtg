@@ -16,7 +16,7 @@ RSpec.describe Magic::Cards::ThirstForIdentity do
   def choice = game.choices.last
 
   it "draws three cards, then asks for a discard" do
-    expect { game.stack.resolve! }.to change { p1.hand.count }.by(2)
+    expect { game.stack.resolve! }.to change { p1.hand.count }.by(3)
     expect(choice).to be_a(described_class::DiscardChoice)
   end
 

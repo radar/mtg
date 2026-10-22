@@ -8,7 +8,7 @@ module Magic
       # Create a 1/1 blue and red Otter creature token with prowess. If this spell was cast from anywhere other
       # than your hand, put a +1/+1 counter on that creature.
       def resolve!
-        from_hand = zone.nil? || zone.hand?
+        from_hand = origin_zone.nil? || origin_zone.hand?
         otter = Tokens::Otter.new(game: game, owner: controller).resolve!
         otter.add_counter("+1/+1") if otter && !from_hand
       end

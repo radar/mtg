@@ -3,7 +3,7 @@ module Magic
     extend Forwardable
     include LoggerlessMarshal
 
-    attr_reader :battlefield, :exile, :turns, :stack, :players, :emblems, :current_turn, :event_listeners, :monarch,
+    attr_reader :battlefield, :exile, :stack_zone, :turns, :stack, :players, :emblems, :current_turn, :event_listeners, :monarch,
                 :play_permissions
 
     # Cards with a `zone_replacement_effects` of their own ("If ~ would be put into a graveyard from anywhere"),
@@ -55,6 +55,7 @@ module Magic
     )
       @battlefield = battlefield
       @exile = exile
+      @stack_zone = Zones::Stack.new(owner: self)
       @stack = Stack.new(game: self)
       @effects = effects
       @player_count = 0

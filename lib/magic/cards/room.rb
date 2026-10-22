@@ -120,7 +120,7 @@ module Magic
 
       def zone=(zone)
         super
-        return if zone&.battlefield?
+        return if zone&.battlefield? || zone&.stack?
 
         @unlocked_doors = nil
         @entered_unlocked = nil
