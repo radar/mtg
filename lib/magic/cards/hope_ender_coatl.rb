@@ -15,6 +15,11 @@ module Magic
 
         def choice_amount = 1
 
+        # Mandatory: declining takes the default of the first legal spell.
+        def decline!
+          resolve!(target: choices.first)
+        end
+
         def resolve!(target:)
           choice = Magic::Choice::CounterUnlessPay.new(actor: actor, spell: target, mana: { generic: 1 })
           if choice.can_pay?

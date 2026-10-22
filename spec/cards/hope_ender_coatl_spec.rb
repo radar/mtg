@@ -85,6 +85,36 @@ RSpec.describe Magic::Cards::HopeEnderCoatl do
     end
   end
 
+  context "with two opponent spells on the stack" do
+    let(:mind_stone) { Card("Opt", owner: p2) }
+
+    before do
+      cast_sol_ring
+      p2.add_mana(blue: 1)
+      p2.cast(card: mind_stone) { _1.pay_mana(blue: 1) }
+      cast_coatl
+      game.stack.resolve! # the cast trigger
+    end
+
+    it "offers only the opponent's spells, and counters the chosen one" do
+      choice = game.choices.first
+      expect(choice.choices.map(&:card)).to contain_exactly(sol_ring, mind_stone)
+
+      game.resolve_choice!(target: choice.choices.find { _1.card == mind_stone })
+      game.settle!
+
+      expect(mind_stone.zone).to be_graveyard
+      expect(p2.permanents.map(&:name)).to include("Sol Ring")
+    end
+
+    it "still counters one spell when the choice is skipped" do
+      game.skip_choice!
+      game.settle!
+
+      expect([sol_ring, mind_stone].count { _1.zone.graveyard? }).to eq(1)
+    end
+  end
+
   it "does nothing without an opponent's spell on the stack, but still resolves" do
     cast_coatl
     game.settle!
