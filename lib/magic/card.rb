@@ -107,6 +107,12 @@ module Magic
         define_method(:begins_on_battlefield?) { true }
       end
 
+      # "You may reveal this card from your opening hand. If you do, at the beginning of your first upkeep, ...": the card
+      # defines `opening_hand_reveal_effect(game:, player:)`. See `Choice::RevealFromOpeningHand`.
+      def reveals_from_opening_hand
+        define_method(:reveals_from_opening_hand?) { true }
+      end
+
       # "Impending N--{cost}": an alternative cost (`Actions::Cast::Impending`); the permanent enters with N time
       # counters and isn't a creature while it has any, losing one at the beginning of its controller's end step.
       #
@@ -561,6 +567,7 @@ module Magic
     end
 
     def begins_on_battlefield? = false
+    def reveals_from_opening_hand? = false
 
     # "You can't cast this unless ..." (Rakdos, Lord of Riots): why +player+ can't cast this card right now, or nil.
     # `by_effect` casts skip it.

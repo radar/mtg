@@ -152,7 +152,7 @@ For a card that isn't on the stack (exiled by an effect), add `Magic::Choice::Ma
 
 ## Opening-hand step (Leylines)
 
-`begins_on_battlefield` in a card's DSL block marks "If this card is in your opening hand, you may begin the game with it on the battlefield". `Game#start!` draws the opening hands, then `offer_opening_hand_cards!` adds a `Choice::BeginOnBattlefield` (a `Choice::May`: `game.resolve_choice!` accepts, `game.skip_choice!` declines) per such card, players in turn order. No mulligans are modelled. In specs, override `p1_library` so the card is among the first seven (`LeylineOfTheVoid` spec). Also: `Player#activate_ability` now checks activation requirements before the block pays costs.
+`begins_on_battlefield` in a card's DSL block marks "If this card is in your opening hand, you may begin the game with it on the battlefield". `Game#start!` draws the opening hands, then `offer_opening_hand_cards!` adds a `Choice::BeginOnBattlefield` (a `Choice::May`: `game.resolve_choice!` accepts, `game.skip_choice!` declines) per such card, players in turn order. `reveals_from_opening_hand` (Devourer of Destiny) works the same way with `Choice::RevealFromOpeningHand`: accepting listens for the owner's first `BeginningOfUpkeep`, then calls the card's `opening_hand_reveal_effect(game:, player:)`. No mulligans are modelled. In specs, override `p1_library` so the card is among the first seven (`LeylineOfTheVoid` spec). Also: `Player#activate_ability` now checks activation requirements before the block pays costs.
 
 ## Impending (Overlords)
 

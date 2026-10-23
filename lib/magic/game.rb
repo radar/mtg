@@ -303,6 +303,7 @@ module Magic
     def offer_opening_hand_cards!
       players.each do |player|
         player.hand.cards.select(&:begins_on_battlefield?).each { |card| add_choice(Choice::BeginOnBattlefield.new(card: card)) }
+        player.hand.cards.select(&:reveals_from_opening_hand?).each { |card| add_choice(Choice::RevealFromOpeningHand.new(card: card)) }
       end
     end
 
