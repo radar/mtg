@@ -155,6 +155,19 @@ module Magic
         pay(:self_exile)
       end
 
+      def pay_self_return
+        pay(:self_return)
+      end
+
+      # "Pay X {E}": X is passed to `resolve!(x:)`.
+      def pay_energy_x(x)
+        pay(:energy_x, x)
+      end
+
+      def energy_x
+        costs.find { _1.is_a?(Costs::PayEnergyX) }&.x
+      end
+
       def pay_self_discard
         pay(:self_discard)
       end
@@ -211,6 +224,10 @@ module Magic
           Costs::ReturnCreatureType
         when :self_sacrifice
           Costs::SelfSacrifice
+        when :energy_x
+          Costs::PayEnergyX
+        when :self_return
+          Costs::SelfReturn
         when :self_exile
           Costs::SelfExile
         when :self_discard
@@ -260,7 +277,7 @@ module Magic
       end
 
       def resolve!
-        resolve_with_args(ability, target: targets.first, targets: targets, sacrificed: sacrificed, tapped: tapped)
+        resolve_with_args(ability, target: targets.first, targets: targets, sacrificed: sacrificed, tapped: tapped, x: energy_x)
       end
     end
   end

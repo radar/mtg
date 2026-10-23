@@ -60,6 +60,10 @@ module Magic
             PayLife.new(source, amount: $~[:amount].to_i)
           when /\APay (?<energy>(?:\{E\})+)\z/
             PayEnergy.new(source, amount: $~[:energy].scan("{E}").size)
+          when /\APay X {E}\z/
+            PayEnergyX.new(source)
+          when /\AReturn {this} to its owner's hand\z/
+            SelfReturn.new(source)
           when /Sacrifice {this}/
             SelfSacrifice.new(source)
           when /Exile {this}/
