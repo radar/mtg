@@ -32,6 +32,8 @@ module Magic
       INTIMIDATE = Class.new(Keyword)
       LIFELINK = Class.new(Keyword)
       MENACE = Class.new(Keyword)
+      # Mentor has no handler of its own: a card that has or grants it supplies the attack trigger (see NyxbornUnicorn).
+      MENTOR = Class.new(Keyword)
       AFTERLIFE = Class.new(Keyword)
       PERSIST = Class.new(Keyword)
       PROWESS = Class.new(Keyword)
