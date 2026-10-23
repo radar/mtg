@@ -74,5 +74,19 @@ RSpec.describe Magic::Cards::DreamtideWhale do
 
       expect(bears.counters.of_type(Magic::Counters::Plus1Plus1).count).to eq(2)
     end
+
+    it "also proliferates when an opponent casts their second spell" do
+      2.times do
+        p2.add_mana(red: 1)
+        p2.cast(card: Card("Lightning Bolt", owner: p2).tap { p2.hand.add(_1) }) do |a|
+          a.pay_mana(red: 1)
+          a.targeting(p1)
+        end
+        game.settle!
+      end
+      game.resolve_choice!(chosen: [bears])
+
+      expect(bears.counters.of_type(Magic::Counters::Plus1Plus1).count).to eq(2)
+    end
   end
 end
