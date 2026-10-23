@@ -93,8 +93,8 @@ module Magic
     # A card put onto the battlefield by an effect rather than cast (a flicker or reanimation, a token being created).
     # `face_down: true` is manifesting it (see `Game#manifest!`): a blank 2/2 creature that enters untapped.
     # `counters: { "finality" => 1 }` is "return it to the battlefield with a finality counter on it".
-    def self.put_onto_battlefield(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil, face_down: false, counters: {})
-      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: false, face_down:, counters:)
+    def self.put_onto_battlefield(game:, card:, owner: card.owner, controller: owner, from_zone: nil, enters_tapped: card.enters_tapped?, attach_to: nil, face_down: false, counters: {}, transformed: false)
+      enter(game:, card:, owner:, controller:, from_zone:, enters_tapped:, attach_to:, token: card.token?, copy: false, cast: false, face_down:, counters:, transformed:)
     end
 
     # A token that is a copy of `card`. The card itself stays where it is.
@@ -848,6 +848,14 @@ module Magic
     def exile!
       move_zone!(to: game.exile)
       card.move_zone!(to: game.exile) unless copy? || token? || card.zone&.exile?
+    end
+
+    # "Exile this, then return it to the battlefield transformed under its owner's control" (the Alchemy-style
+    # flip of Ajani, Nacatl Pariah and friends). It is a new object, so the result is a fresh permanent.
+    def exile_and_return_transformed!
+      returning = card
+      exile!
+      Permanent.put_onto_battlefield(game:, card: returning, owner:, from_zone: game.exile, transformed: true)
     end
 
     def return_to_hand

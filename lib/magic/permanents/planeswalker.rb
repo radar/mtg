@@ -4,7 +4,7 @@ module Magic
       attr_reader :loyalty
 
       def loyalty
-        @loyalty ||= card.loyalty
+        @loyalty ||= face.loyalty
       end
 
       def change_loyalty!(change)
