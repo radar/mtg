@@ -690,6 +690,12 @@ module Magic
         @gains_haste = true
       end
 
+      # "Gain control of that spell" (Invert Polarity): the spell stays on the stack, now cast by `new_player`.
+      def gain_control!(new_player)
+        @player = new_player
+        card.controller = new_player
+      end
+
       def choose_mode(mode_class, &)
         raise InvalidModes, "#{mode_class} is not a mode of #{card.name}" unless card.modes.include?(mode_class)
         if card.respond_to?(:modes_budget)
