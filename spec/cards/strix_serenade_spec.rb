@@ -23,7 +23,30 @@ RSpec.describe Magic::Cards::StrixSerenade do
     expect(bird.flying?).to eq(true)
   end
 
+  it "gives the Bird to the opponent when it counters their creature spell" do
+    go_to_main_phase_for!(p2)
+    p2.add_mana(green: 2)
+    p2.cast(card: Card("Grizzly Bears", owner: p2)) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
+
+    p1.add_mana(blue: 1)
+    p1.cast(card: Card("Strix Serenade", owner: p1)) { |a| a.pay_mana(blue: 1).targeting(game.stack.spells.first) }
+    game.stack.resolve!
+    game.settle!
+
+    expect(p2.graveyard.cards.map(&:name)).to include("Grizzly Bears")
+    expect(p2.creatures.map(&:name)).to eq(["Bird"])
+    expect(p1.creatures).to be_empty
+  end
+
   it "has no targets when the stack holds no artifact, creature or planeswalker spell" do
+    expect(Card("Strix Serenade", owner: p1).target_choices).to be_empty
+  end
+
+  it "has no targets when the stack holds only an instant" do
+    p1.add_mana(red: 1)
+    p1.cast(card: Card("Shock", owner: p1)) { |a| a.pay_mana(red: 1).targeting(p2) }
+
+    expect(game.stack.spells.size).to eq(1)
     expect(Card("Strix Serenade", owner: p1).target_choices).to be_empty
   end
 end
