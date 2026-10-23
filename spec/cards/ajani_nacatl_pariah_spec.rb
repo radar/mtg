@@ -31,6 +31,28 @@ RSpec.describe Magic::Cards::AjaniNacatlPariah do
       expect(walker.loyalty).to eq(3)
     end
 
+    it "triggers once when several Cats die together" do
+      collector = ResolvePermanent("Cat Collector", owner: p1)
+      game.settle!
+      cats.find { _1.name == "Cat Warrior" }.destroy!
+      collector.destroy!
+      game.settle!
+
+      expect(game.choices.size).to eq(1)
+      game.skip_choice!
+      game.settle!
+      expect(game.choices).to be_empty
+    end
+
+    it "does nothing if Ajani left the battlefield with the Cat" do
+      cats.find { _1.name == "Cat Warrior" }.destroy!
+      ajani.destroy!
+      game.settle!
+
+      expect(game.choices).to be_empty
+      expect(game.battlefield.controlled_by(p1).map(&:name)).not_to include("Ajani, Nacatl Avenger")
+    end
+
     it "stays a creature when the player declines" do
       cats.find { _1.name == "Cat Warrior" }.destroy!
       game.settle!
@@ -69,6 +91,20 @@ RSpec.describe Magic::Cards::AjaniNacatlPariah do
       activate(1)
       expect(cats.count).to eq(before_count + 1)
       expect(ajani.loyalty).to eq(3)
+    end
+
+    it "0 deals damage equal to your creature count when you control another red permanent" do
+      ResolvePermanent("Raging Goblin", owner: p1)
+      game.settle!
+      activate(1)
+
+      expect { game.resolve_choice!(target: p2) }.to change { p2.life }.by(-cats.count - 1)
+    end
+
+    it "0 offers no damage without another red permanent" do
+      activate(1)
+
+      expect(game.choices).to be_empty
     end
 
     it "-4 makes the opponent keep one permanent of each type" do

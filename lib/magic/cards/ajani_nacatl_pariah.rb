@@ -122,17 +122,28 @@ module Magic
       class TransformChoice < Magic::Choice::May
         def prompt = "Exile Ajani, then return him transformed?"
 
-        def resolve! = actor.exile_and_return_transformed!
+        # Ajani may have left the battlefield (or already transformed) before this resolves.
+        def resolve!
+          actor.exile_and_return_transformed! if actor.zone&.battlefield?
+        end
       end
 
       # "Whenever one or more other Cats you control die, you may exile Ajani, then return him to the battlefield
-      # transformed under his owner's control."
+      # transformed under his owner's control." Cats dying together trigger it once.
       class CatDiesTrigger < TriggeredAbility::Death
         def should_perform?
-          event.permanent != actor && event.controller == controller && event.permanent.type?("Cat")
+          event.permanent != actor && event.controller == controller && event.permanent.type?("Cat") && !already_queued?
         end
 
-        def call = game.add_choice(TransformChoice.new(actor:))
+        def call
+          game.add_choice(TransformChoice.new(actor:)) if actor.zone&.battlefield?
+        end
+
+        private
+
+        def already_queued?
+          [*game.pending_triggers, *game.stack.abilities].any? { _1.is_a?(self.class) && _1.actor == actor }
+        end
       end
 
       def etb_triggers = [ETB]
