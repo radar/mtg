@@ -22,12 +22,12 @@ module Magic
         end
       end
 
-      # Exile any number of target players' graveyards. Modelled as one target player per cast.
+      # Exile any number of target players' graveyards: `targeting` takes zero, one or both players.
       class ExileGraveyard < Mode
         def target_choices = game.players
 
-        def resolve!(target:)
-          target.graveyard.cards.to_a.each(&:exile!)
+        def resolve!(targets: [])
+          targets.each { |player| player.graveyard.cards.to_a.each(&:exile!) }
         end
       end
 
