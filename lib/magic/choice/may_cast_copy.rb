@@ -34,6 +34,7 @@ module Magic
       def prompt = "Cast a copy of #{card.name}?"
 
       def resolve!
+        CopyEffect.notify_copied!(game, spell: card, player: controller)
         return CopyEffect.resolve!(card, targets: []) unless card.respond_to?(:target_choices)
 
         choice = TargetChoice.new(actor: actor, card: card)

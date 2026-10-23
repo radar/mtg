@@ -28,7 +28,7 @@ module Magic
         storm_count = game.current_turn.spells_cast.count - 1
         return unless storm_count.positive?
 
-        Magic::CopyEffect.resolve_with_choice!(actor: self, receiver: Copy.new(source: self), targets: [target], copies: storm_count)
+        Magic::CopyEffect.resolve_with_choice!(actor: self, receiver: Copy.new(source: self), targets: [target], copies: storm_count, spell: self)
       end
     end
   end

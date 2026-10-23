@@ -12,15 +12,21 @@ module Magic
       resolver.call(**args)
     end
 
+    # Every way of copying a spell goes through here so "whenever you cast or copy" triggers (Magecraft) see each copy.
+    def self.notify_copied!(game, spell:, player:, copies: 1)
+      copies.times { game.notify!(Events::SpellCopied.new(spell: spell, player: player)) }
+    end
+
     # Resolves `copies` copies of `receiver`, offering the "may choose new
     # targets" choice when it had targets to begin with; otherwise (no
     # targets, or nothing to retarget onto) just resolves the copies directly.
-    def self.resolve_with_choice!(actor:, receiver:, targets:, copies: 1)
+    #
+    # `spell` is the spell card being copied, when the receiver is a spell (it is the receiver itself for a card). It is
+    # what `Events::SpellCopied` carries; pass it when the receiver is a stand-in object (Grapeshot's storm copies).
+    def self.resolve_with_choice!(actor:, receiver:, targets:, copies: 1, spell: (receiver if receiver.is_a?(Magic::Card)))
       copies += actor.game.battlefield.static_abilities.of_type(Abilities::Static::CopyMultiplier).sum(&:additional_copies)
 
-      if receiver.is_a?(Magic::Card)
-        copies.times { actor.game.notify!(Events::SpellCopied.new(spell: receiver, player: actor.controller)) }
-      end
+      notify_copied!(actor.game, spell: spell, player: actor.controller, copies: copies) if spell
 
       if targets.any?
         actor.game.add_choice(Magic::Choice::MayCopyTargets.new(actor: actor, receiver: receiver, original_targets: targets, copies: copies))

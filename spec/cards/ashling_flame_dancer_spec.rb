@@ -59,6 +59,34 @@ RSpec.describe Magic::Cards::AshlingFlameDancer do
     expect(game.choices.any? { _1.is_a?(Magic::Cards::AshlingFlameDancer::DiscardThenDraw) }).to be(true)
   end
 
+  def copied_events = game.current_turn.events.select { _1.is_a?(Magic::Events::SpellCopied) }
+
+  it "triggers once for each of Grapeshot's storm copies" do
+    2.times { magecraft! }
+    copied_before = copied_events.size
+
+    p1.add_mana(red: 2)
+    p1.cast(card: Card("Grapeshot", owner: p1)) { |a| a.pay_mana(generic: { red: 1 }, red: 1); a.targeting(p2) }
+    game.settle!
+    game.stack.resolve!
+    game.resolve_choice!(card: p1.hand.cards.first) if game.choices.any?
+    game.stack.resolve!
+    game.settle!
+
+    new_copies = copied_events.drop(copied_before)
+    expect(new_copies.map { _1.spell.name }).to eq(["Grapeshot"] * 2)
+  end
+
+  it "triggers when a copy of an instant is cast from outside the stack" do
+    bolt = Card("Lightning Bolt", owner: p1)
+    choice = Magic::Choice::MayCastCopy.new(actor: ashling, card: bolt)
+    game.add_choice(choice)
+    game.resolve_choice!
+    game.settle!
+
+    expect(copied_events.map(&:spell)).to eq([bolt])
+  end
+
   it "does not trigger on a creature spell" do
     p1.add_mana(green: 2)
     p1.cast(card: Card("Grizzly Bears", owner: p1)) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
