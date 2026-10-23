@@ -1,6 +1,6 @@
 module Magic
   module Cards
-    ScurryOfGremlins = Enchantment("Scurry Of Gremlins") do
+    ScurryOfGremlins = Enchantment("Scurry of Gremlins") do
       cost generic: 2, red: 1, white: 1
     end
 

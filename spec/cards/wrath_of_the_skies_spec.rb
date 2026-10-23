@@ -96,6 +96,6 @@ RSpec.describe Magic::Cards::WrathOfTheSkies do
     game.settle!
 
     expect(names).not_to include("Gremlin")
-    expect(names).to include("Grizzly Bears", "Scurry Of Gremlins")
+    expect(names).to include("Grizzly Bears", "Scurry of Gremlins")
   end
 end
