@@ -157,6 +157,11 @@ module Magic
         const_set(:REPLICATE_ENERGY, amount)
       end
 
+      # "Replicate {1}": `replicate_mana generic: 1`. Each time it is paid adds this to the spell's mana cost.
+      def replicate_mana(**cost)
+        const_set(:REPLICATE_MANA, cost)
+      end
+
       # "When this creature enters / Whenever it attacks, it connives." `connive :enters`, `connive :attacks` or
       # both: `connive :enters, :attacks`. Triggers are merged into any `etb_triggers` / `event_handlers` the
       # class defines itself.
@@ -731,6 +736,11 @@ module Magic
     # Energy paid per replicate (nil when the card has no replicate).
     def replicate_energy
       self.class.const_defined?(:REPLICATE_ENERGY, false) ? self.class::REPLICATE_ENERGY : nil
+    end
+
+    # Mana paid per replicate (nil when the replicate cost is not mana).
+    def replicate_mana
+      self.class.const_defined?(:REPLICATE_MANA, false) ? self.class::REPLICATE_MANA : nil
     end
 
     def overload_cost

@@ -145,3 +145,7 @@ Whole named mechanics spanning trigger+cost+static (Monarch, Ring tempts, Blitz,
 **Granted dredge** (The Necrobloom): a battlefield `StaticAbility` answers `dredge_amount(card, player)`; `Player#dredge!(card)` mills that many and returns the card from the graveyard to hand. The engine has no optional draw replacement, so dredge is an explicit call made instead of `draw!`, not an automatic replacement (`DakmorSalvage`'s own dredge replaces every draw).
 
 **Storm** (Amphibian Downpour): a `cast_triggers` entry (`TriggeredAbility::CastThisSpell`) counts `game.current_turn.spells_cast.count - 1` and adds one targeted `Choice` per copy. Each choice makes a token via `Permanent.token_copy(game:, owner:, card:)` and calls `attach_to!(target)`. The trigger sits on the stack, so a spec must `game.settle!` and `game.stack.resolve!` before `game.resolve_choice!`.
+
+**Copy a spell** (Flare of Duplication): target `game.stack.spells` (instant or sorcery) and call `Magic::CopyEffect.resolve_with_choice!(actor: self, receiver: target.card, targets: target.targets)`. In a spec, answer the "may" with `game.resolve_choice!`, then pick the new target with `game.resolve_choice!(target:)`.
+
+**Replicate with mana** (Consign to Memory): `replicate_mana generic: 1` in the DSL block. `action.replicate(n)` adds n times that cost to `mana_cost`, so `pay_mana` must cover it; the copy runs through `copy_for_replicate`.

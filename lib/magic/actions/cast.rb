@@ -447,6 +447,12 @@ module Magic
         @replicated = times
         self
       end
+        if card.replicate_mana
+          mana_cost.increase!(card.replicate_mana.transform_values { _1 * (times - (@replicated || 0)) })
+          @replicated = times
+          return self
+        end
+
 
       def pay_kicker(payment)
         kicker_cost.pay(player:, payment:)
@@ -638,7 +644,7 @@ module Magic
         mana_cost.finalize!(player)
         @paid_additional_costs.each { |cost| cost.finalize!(player) if cost.is_a?(Costs::PayLife) }
         paid_offspring_costs.each { |cost| cost.finalize!(player) }
-        player.pay_energy!(card.replicate_energy * @replicated) if @replicated
+        player.pay_energy!(card.replicate_energy * @replicated) if @replicated && card.replicate_energy
         gain_haste_on_resolve! if card.creature? && player.haste_mana?
         player.consume_spell_cast!
         if card.zone&.graveyard?
