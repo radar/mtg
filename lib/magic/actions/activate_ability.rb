@@ -1,6 +1,8 @@
 module Magic
   module Actions
     class ActivateAbility < Action
+      include DividedTargeting
+
       attr_reader :ability, :costs, :targets, :sacrificed, :tapped
 
       def initialize(ability:, **args)
@@ -64,8 +66,11 @@ module Magic
         ability.valid_targets?(*targets)
       end
 
-      def targeting(*targets)
+      # An ability that divides an amount among its targets (Mogg Mob) takes `distribution: { target => amount }`; see
+      # `Actions::DividedTargeting`.
+      def targeting(*targets, distribution: nil)
         raise "Invalid target specified for #{ability}: #{targets}" unless valid_targets?(*targets)
+        @distribution = divided_distribution(targets, distribution)
         @targets = targets
         apply_target_cost_reductions!
         self
@@ -295,7 +300,7 @@ module Magic
       end
 
       def resolve!
-        resolve_with_args(ability, target: targets.first, targets: targets, sacrificed: sacrificed, tapped: tapped, x: energy_x)
+        resolve_with_args(ability, target: targets.first, targets: targets, sacrificed: sacrificed, tapped: tapped, x: energy_x, distribution: @distribution)
       end
     end
   end

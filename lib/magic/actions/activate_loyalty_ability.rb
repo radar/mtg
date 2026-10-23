@@ -1,6 +1,8 @@
 module Magic
   module Actions
     class ActivateLoyaltyAbility < Action
+      include DividedTargeting
+
       attr_reader :ability, :planeswalker, :targets, :x_value
 
       def initialize(ability:, **args)
@@ -38,12 +40,7 @@ module Magic
       def targeting(*targets, distribution: nil)
         raise "Invalid target specified for #{ability}: #{targets}" if ability.respond_to?(:target_choices) && !ability.valid_targets?(*targets)
 
-        if ability.respond_to?(:divided_amount)
-          distribution ||= { targets.first => ability.divided_amount } if targets.size == 1
-          validate_distribution!(targets, distribution)
-          @distribution = distribution
-        end
-
+        @distribution = divided_distribution(targets, distribution)
         @targets = targets
         self
       end
@@ -61,17 +58,6 @@ module Magic
 
       def loyalty_change
         ability.loyalty_change == :X ? -(x_value.to_i) : ability.loyalty_change
-      end
-
-      def validate_distribution!(targets, distribution)
-        valid = distribution &&
-          distribution.keys.sort_by(&:object_id) == targets.sort_by(&:object_id) &&
-          targets.size.between?(1, ability.max_divided_targets) &&
-          distribution.values.all?(&:positive?) &&
-          distribution.values.sum == ability.divided_amount
-        return if valid
-
-        raise "#{ability.class} must divide #{ability.divided_amount} among 1 to #{ability.max_divided_targets} different targets, at least 1 each: #{distribution.inspect}"
       end
 
       def activated_this_turn?
