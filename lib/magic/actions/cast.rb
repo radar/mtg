@@ -630,6 +630,8 @@ module Magic
         mode = Mode.new(mode_class.new(game: game, card: card), source: card, controller: player)
         yield mode if block_given?
         @modes << mode
+        # Escalate: pay the cost again for each mode beyond the first, so choose the modes before paying.
+        mana_cost.increase!(card.escalate_cost) if @modes.size > 1 && card.respond_to?(:escalate_cost)
       end
 
       # Rule 700.2: the number of modes is fixed when the spell is cast. Only cards that declare

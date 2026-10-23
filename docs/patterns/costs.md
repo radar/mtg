@@ -12,6 +12,8 @@ Activation/casting costs — sacrifice, kicker, discard, exile-self, alternative
 
 **Kicker paid with a non-mana cost (e.g. "Kicker—Sacrifice a creature")**: `kicker_cost` normally returns a `Costs::Kicker < Costs::Mana`, set via the `kicker_cost(cost)` DSL macro — mana-only. For a non-mana kicker, skip that macro and override the `kicker_cost` reader in the card's class reopening to lazily build a small duck-typed cost object instead (`.pay(player:, payment:)` + `.paid?`) — e.g. `Costs::SacrificeKicker`, which sacrifices `payment` and flips a `paid?` flag. `Actions::Cast#pay_kicker`/`#resolve!` (`kicked: kicker_cost.paid?`) don't care which class it is. Spec calls it the same way as a mana kicker: `a.pay_kicker(creature_permanent)`. Example: `PrimalGrowth`.
 
+**Escalate**: define `def escalate_cost = { green: 1 }` and `def modes_to_choose = 1..3`. `Actions::Cast#choose_mode` calls `Costs::Mana#increase!` for each mode beyond the first, so the spec chooses the modes first and pays afterwards (`pay_mana(green: modes.size, generic: ...)`). Example: `CollectiveResistance`.
+
 **Entwine / "if kicked, choose both"**: model it as a mana kicker (`kicker_cost generic: 2`) plus `def modes_to_choose = kicker_cost.paid? ? 2 : 1` and `modes A, B`. The mode count is fixed as the spell is cast, so the spec calls `pay_kicker` before `choose_mode`. Example: `Gravedig` (compare `PyrrhicStrike`, which uses a blight kicker).
 
 **Kicker that widens the targets ("if kicked, instead choose target creature")**: read `kicker_cost.paid?` inside `target_choices`; `pay_kicker` must come before `targeting` in the spec. Example: `ExpelTheUnworthy`.

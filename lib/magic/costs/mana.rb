@@ -77,6 +77,16 @@ module Magic
         self
       end
 
+      # A cost increase of any colours found after the cost was built (escalate: {G} per mode beyond the first). Like
+      # `increase_generic!` it keeps the payments so far.
+      def increase!(extra)
+        extra.each do |key, amount|
+          @cost[key] = (@cost[key] || 0) + amount
+          @balance[key] = (@balance[key] || 0) + amount
+        end
+        self
+      end
+
       def zero?
         @cost.values.all?(&:zero?)
       end
