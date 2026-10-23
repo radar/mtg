@@ -31,7 +31,7 @@ module Magic
         end
 
         def resolve!
-          game.choices.add(Magic::Choice::Proliferate.new(actor: source))
+          proliferate(source)
         end
       end
 

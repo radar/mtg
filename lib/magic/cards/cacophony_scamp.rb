@@ -11,7 +11,7 @@ module Magic
       class MaySacrificeChoice < Magic::Choice::May
         def resolve!
           actor.sacrifice!
-          game.choices.add(Magic::Choice::Proliferate.new(actor: actor))
+          proliferate
         end
       end
 

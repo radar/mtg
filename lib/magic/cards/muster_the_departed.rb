@@ -27,7 +27,7 @@ module Magic
         end
 
         def call
-          Magic::Choice::Populate.add(game: game, actor: actor)
+          populate
         end
       end
 

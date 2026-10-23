@@ -24,6 +24,7 @@ module Magic
   #   counter_ability target, phase_out target, lose_game player
   #   move_card card, to: hand               # trigger_effect(:move_card_zone, from: card.zone, target: card, to: hand)
   #   copy_as_token card                     # trigger_effect(:create_token_copy, card: card)
+  #   proliferate / populate                 # queue Choice::Proliferate / Choice::Populate for the actor
   module EffectShortcuts
     def create_token(token:, **args)
       trigger_effect(:create_token, token_class: token, **args)
@@ -157,6 +158,16 @@ module Magic
     # "Create a token that's a copy of target creature": returns the tokens created.
     def copy_as_token(card, **args)
       trigger_effect(:create_token_copy, card:, **args)
+    end
+
+    # "Proliferate": queues a `Choice::Proliferate` for the actor (or `proliferate(for_actor)`).
+    def proliferate(for_actor = actor)
+      game.add_choice(Choice::Proliferate.new(actor: for_actor))
+    end
+
+    # "Populate": queues a `Choice::Populate` (nothing if the actor has no creature tokens).
+    def populate(for_actor = actor)
+      Choice::Populate.add(game:, actor: for_actor)
     end
   end
 end
