@@ -4,8 +4,9 @@ module Magic
     # spell would be put into your graveyard, exile it instead." Once the card is chosen, `FreeCast.start`
     # casts it (asking for its target first when it needs one).
     class FreeCast < Magic::Choice::Targeted
-      def self.start(actor:, card:)
-        choice = new(actor: actor, card: card)
+      # `exile_after: false` for "cast ... without paying its mana cost" with no "exile it instead" rider.
+      def self.start(actor:, card:, exile_after: true)
+        choice = new(actor: actor, card: card, exile_after: exile_after)
         if choice.pending_target?
           actor.game.add_choice(choice) if choice.choices.any?
         else
@@ -13,8 +14,9 @@ module Magic
         end
       end
 
-      def initialize(actor:, card:)
+      def initialize(actor:, card:, exile_after: true)
         @card = card
+        @exile_after = exile_after
         super(actor: actor)
       end
 
@@ -27,7 +29,7 @@ module Magic
       def resolve!(target:) = cast!(target)
 
       def cast!(target)
-        @card.exile_once!
+        @card.exile_once! if @exile_after
         action = controller.prepare_cast(card: @card, by_effect: true)
         action.mana_cost = {}
         action.targeting(target) if target
