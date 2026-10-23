@@ -26,6 +26,16 @@ RSpec.describe Magic::Cards::AmphibianDownpour do
     expect(dreadmaw.colors).to eq([:blue])
   end
 
+  it "removes the enchanted creature's abilities" do
+    expect(dreadmaw).to have_keyword(Magic::Keywords::TRAMPLE)
+
+    cast_downpour(dreadmaw)
+    game.stack.resolve!
+    game.tick!
+
+    expect(dreadmaw).not_to have_keyword(Magic::Keywords::TRAMPLE)
+  end
+
   it "has flash" do
     expect(Card("Amphibian Downpour", owner: p1)).to have_keyword(Magic::Keywords::FLASH)
   end
