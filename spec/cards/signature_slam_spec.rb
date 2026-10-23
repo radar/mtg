@@ -28,6 +28,15 @@ RSpec.describe Magic::Cards::SignatureSlam do
     expect(theirs.damage).to eq(3)
   end
 
+  it "rejects an opponent's creature as the first target" do
+    expect { slam(theirs, theirs) }.to raise_error(Magic::Actions::Cast::InvalidTarget)
+  end
+
+  it "rejects your own creature as the second target" do
+    other = ResolvePermanent("Grizzly Bears", owner: p1)
+    expect { slam(mine, other) }.to raise_error(Magic::Actions::Cast::InvalidTarget)
+  end
+
   it "has every other modified creature you control deal damage too" do
     other = ResolvePermanent("Grizzly Bears", owner: p1)
     other.add_counter("+1/+1")
