@@ -639,6 +639,7 @@ module Magic
         @paid_additional_costs.each { |cost| cost.finalize!(player) if cost.is_a?(Costs::PayLife) }
         paid_offspring_costs.each { |cost| cost.finalize!(player) }
         player.pay_energy!(card.replicate_energy * @replicated) if @replicated
+        gain_haste_on_resolve! if card.creature? && player.haste_mana?
         player.consume_spell_cast!
         if card.zone&.graveyard?
           game.battlefield.static_abilities.each { _1.cast_from_graveyard!(card, player) if _1.respond_to?(:cast_from_graveyard!) }

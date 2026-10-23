@@ -126,6 +126,8 @@ Whole named mechanics spanning trigger+cost+static (Monarch, Ring tempts, Blitz,
 
 **Conditional convoke + "discard, then exile and pick one"** (Party Thrasher): a `StaticAbility` answering `grants_convoke?(card, player)` can restrict by zone (`card.zone&.exile?`) and type. A "may discard, if you do ..." trigger queues a `Choice::May` subclass whose `resolve!(card:)` discards and then queues a second `Choice` with `resolve!(target:)` that calls `game.play_permissions.grant_until_end_of_turn`. In specs, `go_to_main_phase!` already fires `Events::FirstMainPhase`, so that choice is pending (`game.skip_choice!`) before any stack work.
 
+**Exert mana + haste** (Arena of Glory): a mana ability calls `source.cannot_untap_next_turn!` for "Exert" and `controller.grant_haste_mana!`; `Cast` then gives the next creature spell cast that turn haste (`gain_haste_on_resolve!`). The engine does not track which mana pays for what, so this is an approximation.
+
 **Improvise** (Archway of Innovation): `action.improvise(artifact)` taps an artifact to pay `{1}` (call it before `pay_mana`, like `convoke`). It needs `card.improvise?` or `player.next_spell_improvise?`, which "the next spell you cast this turn has improvise" sets with `player.grant_next_spell_improvise!` and `Player#consume_spell_cast!` clears when any spell is cast.
 
 **Modular N** (Arcbound Condor): an `AdditionalCountersForEntering` static ability returning N for `source`, plus a `TriggeredAbility::Death` whose `call` reads `actor.counters.count` (the dead permanent keeps its counters) and adds a `Choice::Targeted` over your artifact creatures. Skip the choice when no artifact creature is left.

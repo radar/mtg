@@ -163,6 +163,17 @@ module Magic
     def consume_spell_cast!
       @spell_cast_limit -= 1 if spell_cast_limited?
       @improvise_turn = nil
+      @haste_mana_turn = nil
+    end
+
+    # "If that mana is spent on a creature spell, it gains haste until end of turn" (Arena of Glory). The engine does not
+    # track which mana pays for what, so the next spell cast this turn takes the haste if it is a creature spell.
+    def grant_haste_mana!
+      @haste_mana_turn = game.current_turn.number
+    end
+
+    def haste_mana?
+      @haste_mana_turn == game.current_turn.number
     end
 
     # "The next spell you cast this turn has improvise" (Archway of Innovation): cleared when a spell is cast.
