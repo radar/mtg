@@ -298,6 +298,13 @@ module Magic
       copied_card || face
     end
 
+    # "This permanent becomes a copy of <card> until end of turn": the copy wears off in the cleanup step.
+    def become_copy_until_eot!(card)
+      self.copied_card = card
+      @copy_until_eot = true
+      apply_continuous_effects!
+    end
+
     def name = copiable_card.name
     # A token has no mana cost, so its mana value is 0.
     def cmc = copiable_card.respond_to?(:cmc) ? copiable_card.cmc : 0
@@ -960,6 +967,10 @@ module Magic
       @abilities_activated_this_turn = []
       remove_until_eot_protections!
       remove_until_eot_modifiers!
+      if @copy_until_eot
+        @copy_until_eot = false
+        self.copied_card = nil
+      end
       expire_control_change_effects!
       apply_continuous_effects!
     end
