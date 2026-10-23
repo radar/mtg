@@ -3,7 +3,7 @@ module Magic
     class TamiyoSeasonedScholar < Planeswalker
       card_name "Tamiyo, Seasoned Scholar"
       type T::Super::Legendary, T::Planeswalker, "Tamiyo"
-      color_indicator :blue
+      color_indicator :green, :blue
       loyalty 2
 
       # "+2: Until your next turn, whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end
