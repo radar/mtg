@@ -39,4 +39,31 @@ RSpec.describe Magic::Cards::InvertPolarity do
     expect(p1.creatures.map(&:name)).to eq(["Grizzly Bears"])
     expect(p2.creatures).to be_empty
   end
+
+  context "when the stolen spell has targets" do
+    let(:shock) { Card("Shock", owner: p2) }
+
+    before do
+      p2.add_mana(red: 1)
+      p2.cast(card: shock) { |a| a.pay_mana(red: 1).targeting(p1) }
+    end
+
+    it "lets the caster choose a new target after winning the flip" do
+      allow(p1).to receive(:flip_coin!).and_return(true)
+      p1.cast(card: invert_polarity) do |a|
+        a.pay_mana(blue: 2, red: 1)
+        a.targeting(game.stack.spells.find { _1.card == shock })
+      end
+      game.stack.resolve!
+      game.settle!
+
+      expect(game.choices.first).to be_a(Magic::Cards::DeflectingSwat::MayRetargetChoice)
+      game.resolve_choice!
+      game.resolve_choice!(target: p2)
+      game.stack.resolve!
+
+      expect(p2.life).to eq(18)
+      expect(p1.life).to eq(20)
+    end
+  end
 end
