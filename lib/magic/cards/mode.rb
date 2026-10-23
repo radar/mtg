@@ -5,6 +5,9 @@ module Magic
 
       attr_reader :game, :card
 
+      # The X the spell was cast with, set by Cast#choose_mode ("Target player creates X ... tokens").
+      attr_accessor :x_value
+
       # The {P} a mode of a Season costs (`points 2`); 1 by default.
       def self.points(count = nil)
         @points = count if count

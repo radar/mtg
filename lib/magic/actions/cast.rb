@@ -701,7 +701,9 @@ module Magic
         end
         raise InvalidModes, "#{card.name} allows at most #{max_modes} modes" if max_modes && @modes.size >= max_modes
 
-        mode = Mode.new(mode_class.new(game: game, card: card), source: card, controller: player)
+        mode_instance = mode_class.new(game: game, card: card)
+        mode_instance.x_value = value_for_x.to_i if mode_instance.respond_to?(:x_value=)
+        mode = Mode.new(mode_instance, source: card, controller: player)
         yield mode if block_given?
         @modes << mode
         # Escalate: pay the cost again for each mode beyond the first, so choose the modes before paying.
