@@ -25,6 +25,7 @@ module Magic
         # Declaring an attacker again just retargets it.
         return if turn.attacking?(attacker)
         return "#{attacker.name} is tapped" if attacker.tapped?
+        return "creatures can't attack this turn" if turn.attacks_prevented?
         return "#{attacker.name} can't attack" unless attacker.can_attack?
 
         return "#{attacker.name} is summoning sick" if attacker.summoning_sick?

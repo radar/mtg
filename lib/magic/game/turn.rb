@@ -5,6 +5,11 @@ module Magic
 
       attr_reader :active_player, :number, :events, :combat, :actions
 
+      # "Creatures can't attack this turn" (Orim's Chant kicked). A Turn lasts one turn, so the flag needs no reset.
+      def prevent_attacks! = @attacks_prevented = true
+
+      def attacks_prevented? = !!@attacks_prevented
+
       def_delegators :@game, :logger, :battlefield, :emblems, :players, :settle!, :add_effect
       def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :illegal_block_reason,
         :assign_combat_damage, :attacks, :attacking?, :blocking?

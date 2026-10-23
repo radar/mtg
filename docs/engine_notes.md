@@ -118,6 +118,10 @@ A card in hand or on the stack never hears its own `Events::SpellCast`, so self-
 
 A card or token answers `cant_attack_alone?` / `cant_block_alone?` (default false; `Permanent` delegates to its face unless it lost all abilities). Combat checks them against the whole declared set: `CombatPhase#validate_attackers!` raises `IllegalAttack` when the only attacker can't attack alone, and `validate_blocks!` (run on the way to combat damage) raises `IllegalBlock` when a player's only blocker can't block alone. Example: the Beast token of `TobyBeastieBefriender`.
 
+## "Creatures can't attack this turn"
+
+`game.current_turn.prevent_attacks!` sets a flag on the current `Turn` (a new `Turn` per turn, so it expires by itself). `Actions::DeclareAttacker#illegal_reason` rejects every attacker while `attacks_prevented?`. It only applies through the action path (`p1.declare_attacker(attacker:, target:)`), not the raw `current_turn.declare_attacker`. Example: kicked `OrimsChant`; its "can't cast spells" half is `player.limit_spells_this_turn!(0)`.
+
 ## Ninjutsu
 
 `ninjutsu Costs::Mana.new(...)` in a card's DSL block; `player.ninjutsu(card: card_in_hand, attacker: unblocked_attacker) { |a| a.pay_mana(...) }` runs `Actions::Ninjutsu`. It is only legal in the declare-blockers step for an unblocked attacker you control: paying the cost removes the attacker from combat and returns it to hand, and the action goes on the stack. On resolving, the card enters tapped (`put_onto_battlefield(enters_tapped: true)`) and is added to combat attacking the same player or planeswalker, without being "declared" as an attacker. `LegalActions` offers it. Example: `KaitoBaneOfNightmares`, whose "during your turn he's a 3/4 Ninja creature" is three static abilities sharing a `conditions` block, and whose emblem is a `Magic::Emblem` with a `static_abilities` buff.
