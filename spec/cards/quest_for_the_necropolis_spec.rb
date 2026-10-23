@@ -32,6 +32,21 @@ RSpec.describe Magic::Cards::QuestForTheNecropolis do
     expect(quest_counters).to eq(1)
   end
 
+  it "gets no quest counter when a land enters under an opponent's control" do
+    ResolvePermanent("Forest", owner: p2)
+    game.settle!
+
+    expect(quest_counters).to eq(0)
+  end
+
+  it "can only be activated as a sorcery" do
+    skip_to_combat!
+
+    expect do
+      reanimate!(mana: { black: 6 }, payment: { generic: { black: 5 }, black: 1 })
+    end.to raise_error(Magic::IllegalAction)
+  end
+
   it "reanimates a creature from any graveyard under your control for {5}{B}" do
     reanimate!(mana: { black: 6 }, payment: { generic: { black: 5 }, black: 1 })
 
