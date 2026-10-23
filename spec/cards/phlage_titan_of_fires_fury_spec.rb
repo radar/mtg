@@ -70,6 +70,25 @@ RSpec.describe Magic::Cards::PhlageTitanOfFiresFury do
       expect(dreadmaw.damage).to eq(3)
       expect(p1.life).to eq(23)
     end
+
+    it "deals 3 damage and gains 3 life again whenever it attacks" do
+      game.resolve_choice!(target: p2)
+      game.settle!
+      phlage = p1.creatures.find { _1.name == "Phlage, Titan of Fire's Fury" }
+      2.times { game.next_turn }
+      skip_to_combat!
+      current_turn.declare_attackers!
+      p1.declare_attacker(attacker: phlage, target: p2)
+      current_turn.attackers_declared!
+      game.tick!
+      game.settle!
+
+      game.resolve_choice!(target: p2)
+      game.settle!
+
+      expect(p2.life).to eq(20 - 3 - 3)
+      expect(p1.life).to eq(20 + 3 + 3)
+    end
   end
 
   it "cannot escape without enough cards to exile" do
