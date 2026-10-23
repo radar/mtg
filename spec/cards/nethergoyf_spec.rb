@@ -28,6 +28,14 @@ RSpec.describe Magic::Cards::Nethergoyf do
     expect([goyf.power, goyf.toughness]).to eq([3, 4])
   end
 
+  it "counts Kindred as a card type" do
+    goyf = ResolvePermanent("Nethergoyf", owner: p1)
+    bury("Grizzly Bears", "Crib Swap")
+    game.tick!
+
+    expect([goyf.power, goyf.toughness]).to eq([3, 4])
+  end
+
   it "counts a type once" do
     goyf = ResolvePermanent("Nethergoyf", owner: p1)
     bury("Grizzly Bears", "Colossal Dreadmaw")

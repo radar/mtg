@@ -8,7 +8,7 @@ module Magic
     end
 
     class Nethergoyf < Creature
-      CARD_TYPES = %w[Artifact Battle Creature Enchantment Instant Land Planeswalker Sorcery].freeze
+      CARD_TYPES = %w[Artifact Battle Creature Enchantment Instant Kindred Land Planeswalker Sorcery].freeze
 
       def self.card_types_among(cards)
         cards.flat_map { |card| CARD_TYPES.select { card.type?(_1) } }.uniq
