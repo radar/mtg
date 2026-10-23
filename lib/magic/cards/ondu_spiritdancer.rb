@@ -11,9 +11,7 @@ module Magic
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def should_perform?
           enchantment? && under_your_control? &&
-            !game.current_turn.events.any? do |event|
-              event.is_a?(Events::OnduSpiritdancerCopied) && event.actor == actor
-            end
+            !event_this_turn?(Events::OnduSpiritdancerCopied) { |event| event.actor == actor }
         end
 
         # The "once per turn" mark must happen here, not in #call: #call is deferred

@@ -10,8 +10,7 @@ module Magic
 
       # "This creature enters with a +1/+1 counter on it if a creature died this turn."
       def entering_counters
-        died = game.current_turn.events.any? { |event| event.is_a?(Events::CreatureDied) }
-        died ? { "+1/+1" => 1 } : {}
+        creature_died_this_turn? ? { "+1/+1" => 1 } : {}
       end
     end
   end

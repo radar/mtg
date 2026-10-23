@@ -3,6 +3,7 @@ module Magic
     extend Forwardable
     include BattlefieldFilters
     include EffectShortcuts
+    include TurnHistory
     attr_reader :event, :actor
 
     def_delegators :@actor, :trigger_effect

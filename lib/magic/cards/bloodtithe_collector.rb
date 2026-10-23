@@ -11,7 +11,7 @@ module Magic
     class BloodtitheCollector < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def should_perform?
-          super && (game.current_turn.events.any? { |e| e.is_a?(Events::LifeLoss) && e.player != controller })
+          super && opponent_lost_life_this_turn?
         end
 
         def call

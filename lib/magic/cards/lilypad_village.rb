@@ -24,9 +24,8 @@ module Magic
         costs "{U}, {T}"
 
         def requirements_met?
-          game.current_turn.events.any? do |event|
-            event.is_a?(Events::EnteredTheBattlefield) && event.permanent.controller == controller &&
-              LilypadVillage::TRIBES.any? { event.permanent.type?(_1) }
+          event_this_turn?(Events::EnteredTheBattlefield) do |event|
+            event.permanent.controller == controller && LilypadVillage::TRIBES.any? { event.permanent.type?(_1) }
           end
         end
 

@@ -25,13 +25,13 @@ module Magic
       SELF = {
         "~ is tapped" => "source.tapped?",
         "~ is untapped" => "source.untapped?",
-        "an opponent lost life this turn" => "game.current_turn.events.any? { |e| e.is_a?(Events::LifeLoss) && e.player != controller }",
+        "an opponent lost life this turn" => "opponent_lost_life_this_turn?",
         "~ is equipped" => 'source.attachments.any? { _1.type?("Equipment") }',
         "~ is enchanted" => 'source.attachments.any? { _1.type?("Aura") }'
       }.freeze
 
       # "you attacked this turn" (raid): one of your creatures was declared as an attacker.
-      ATTACKED_THIS_TURN = "game.current_turn.events.any? { |e| e.is_a?(Events::CreatureAttacked) && e.attacker.controller == controller }"
+      ATTACKED_THIS_TURN = "attacked_this_turn?"
 
       # "you control a creature with power 4 or greater" (ferocious).
       POWER = /\Ayou control a creature with power (?<amount>\d+|\w+) or greater\z/

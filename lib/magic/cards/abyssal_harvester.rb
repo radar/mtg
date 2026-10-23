@@ -12,7 +12,7 @@ module Magic
         costs "{T}"
 
         def target_choices
-          game.graveyard_cards.by_any_type("Creature").select { |card| game.current_turn.events.any? { |e| e.is_a?(Events::CardEnteredZone) && e.card == card && e.to.graveyard? } }
+          game.graveyard_cards.by_any_type("Creature").select { |card| event_this_turn?(Events::CardEnteredZone) { |e| e.card == card && e.to.graveyard? } }
         end
 
         def resolve!(target:)

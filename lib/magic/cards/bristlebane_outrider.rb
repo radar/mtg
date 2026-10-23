@@ -15,18 +15,9 @@ module Magic
       class EnteredThisTurnBuff < Abilities::Static::PowerAndToughnessModification
         def applicable_targets = [source]
 
-        def power_modification = another_creature_entered? ? 2 : 0
+        def power_modification = creature_entered_this_turn?(except: source) ? 2 : 0
 
         def toughness_modification = 0
-
-        private
-
-        def another_creature_entered?
-          game.current_turn.events.any? do |event|
-            event.is_a?(Events::EnteredTheBattlefield) && event.permanent.creature? &&
-              event.permanent != source && event.permanent.controller == controller
-          end
-        end
       end
 
       def static_abilities = [EnteredThisTurnBuff]

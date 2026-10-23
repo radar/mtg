@@ -1,6 +1,7 @@
 module Magic
   class StaticAbility
     extend Forwardable
+    include TurnHistory
 
     def self.applicable_targets(&block)
       define_method(:applicable_targets, block)

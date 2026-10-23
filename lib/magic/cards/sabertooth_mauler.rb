@@ -10,7 +10,7 @@ module Magic
       class EndStepTrigger < TriggeredAbility::BeginningOfEndStep
         def should_perform?
           return false unless controllers_end_step?
-          game.current_turn.events.any? { |e| e.is_a?(Events::CreatureDied) }
+          creature_died_this_turn?
         end
 
         def call

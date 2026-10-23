@@ -23,7 +23,7 @@ module Magic
       # "Morbid -- At the beginning of your end step, if a creature died this turn, populate."
       class MorbidTrigger < TriggeredAbility::BeginningOfEndStep
         def should_perform?
-          controllers_end_step? && game.current_turn.events.any? { |event| event.is_a?(Events::CreatureDied) }
+          controllers_end_step? && creature_died_this_turn?
         end
 
         def call

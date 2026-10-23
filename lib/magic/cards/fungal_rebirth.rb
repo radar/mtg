@@ -17,7 +17,7 @@ module Magic
       # turn, create two 1/1 green Saproling creature tokens."
       def resolve!(target:)
         target.move_to_hand!
-        return unless game.current_turn.events.any? { |event| event.is_a?(Events::CreatureDied) }
+        return unless creature_died_this_turn?
 
         create_token(token:SaprolingToken, amount: 2)
       end

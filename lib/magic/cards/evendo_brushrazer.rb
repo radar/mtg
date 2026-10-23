@@ -11,11 +11,7 @@ module Magic
       class ExiledCardPermission < StaticAbility
         def permits_casting_from_exile?(card)
           game.current_turn.active_player == controller &&
-            game.current_turn.events.any? do |event|
-              event.is_a?(Events::PermanentSacrificed) &&
-                event.permanent.controller == controller &&
-                !event.permanent.token?
-            end &&
+            event_this_turn?(Events::PermanentSacrificed) { |event| event.permanent.controller == controller && !event.permanent.token? } &&
             @source.exiled_cards.include?(card)
         end
       end

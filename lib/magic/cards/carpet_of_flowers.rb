@@ -8,7 +8,7 @@ module Magic
       class MainPhaseTrigger < TriggeredAbility
         def should_perform?
           event.active_player == controller &&
-            !game.current_turn.events.any? { |event| event.is_a?(Events::ManaAddedByCarpet) }
+            !event_this_turn?(Events::ManaAddedByCarpet)
         end
 
         def call

@@ -10,7 +10,7 @@ module Magic
     class GorehornRaider < Creature
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def should_perform?
-          super && (game.current_turn.events.any? { |e| e.is_a?(Events::FinalAttackersDeclared) && e.active_player == controller && e.attacks.any? })
+          super && declared_attackers_this_turn?
         end
 
         class TargetChoice < Magic::Choice::Targeted

@@ -29,7 +29,7 @@ module Magic
 
         def cast?
           card = event.permanent.card
-          game.current_turn.events.any? { |e| e.is_a?(Events::SpellCast) && e.spell.equal?(card) }
+          event_this_turn?(Events::SpellCast) { |e| e.spell.equal?(card) }
         end
 
         def call

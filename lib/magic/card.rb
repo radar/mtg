@@ -5,6 +5,7 @@ module Magic
     def_delegators :@game, :logger, :battlefield, :exile, :current_turn
 
     include BattlefieldFilters
+    include TurnHistory
 
     include Cards::Keywords
 
