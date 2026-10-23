@@ -452,6 +452,20 @@ module Magic
       CardList.new(cards)
     end
 
+    # Dredge N granted by a battlefield static ability (`dredge_amount(card, player)`, The Necrobloom): in place of a
+    # draw, mill N and return `card` from the graveyard to hand. The library must hold at least N cards (702.52b).
+    # Unlike a draw replacement effect this is something the caller does instead of `draw!`.
+    def dredge!(card)
+      amount = game.battlefield.static_abilities.filter_map do |ability|
+        ability.dredge_amount(card, self) if ability.respond_to?(:dredge_amount)
+      end.max
+      raise Magic::Error, "#{card.name} has no dredge" unless amount && card.zone == graveyard
+      raise Magic::Error, "Cannot dredge #{amount} with #{library.count} cards in library" if library.count < amount
+
+      mill(amount)
+      card.move_to_hand!(self)
+    end
+
     def scry(amount:, top:, bottom:)
       cards = library.shift(amount)
       library.unshift(*top)
