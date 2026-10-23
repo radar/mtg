@@ -18,7 +18,7 @@ module Magic
       def resolve!(targets:)
         mine, theirs = targets
         mine.bite!(theirs)
-        gain_life 3 if battlefield.controlled_by(controller).creatures.any? { _1.type?("Eldrazi") }
+        gain_life 3 if battlefield.controlled_by(controller).any? { _1.type?("Eldrazi") }
       end
     end
   end

@@ -49,6 +49,11 @@ RSpec.describe Magic::Cards::HorrificAssault do
     expect { assault(mine, theirs) }.to change { p1.life }.by(3)
   end
 
+  it "gains 3 life if you control a noncreature Eldrazi permanent" do
+    ResolvePermanent("Idol Of False Gods", owner: p1)
+    expect { assault(mine, theirs) }.to change { p1.life }.by(3)
+  end
+
   it "gains no life without an Eldrazi" do
     expect { assault(mine, theirs) }.not_to(change { p1.life })
   end
