@@ -25,6 +25,16 @@ RSpec.describe Magic::Cards::RalAndTheImplicitMaze do
       expect(mine.damage).to eq(0)
       expect(bears.zone).to be_nil
     end
+
+    it "deals 2 damage to each planeswalker an opponent controls, not your own" do
+      theirs = ResolvePermanent("Liliana, Waker Of The Dead", owner: p2)
+      mine = ResolvePermanent("Liliana, Waker Of The Dead", owner: p1)
+      ResolvePermanent("Ral And The Implicit Maze", owner: p1)
+      game.settle!
+
+      expect(theirs.loyalty).to eq(2)
+      expect(mine.loyalty).to eq(4)
+    end
   end
 
   context "chapter 2" do
@@ -72,6 +82,12 @@ RSpec.describe Magic::Cards::RalAndTheImplicitMaze do
       p1.hand.add(shock)
       p1.add_mana(red: 1)
       p1.cast(card: shock) { |a| a.pay_mana(red: 1).targeting(p2) }
+      game.settle!
+
+      expect(weird.power).to eq(3)
+
+      p1.add_mana(green: 2)
+      p1.cast(card: Card("Grizzly Bears", owner: p1)) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
       game.settle!
 
       expect(weird.power).to eq(3)
