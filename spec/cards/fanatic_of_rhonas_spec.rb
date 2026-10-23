@@ -47,6 +47,7 @@ RSpec.describe Magic::Cards::FanaticOfRhonas do
       expect(token.name).to eq("Fanatic of Rhonas")
       expect([token.power, token.toughness]).to eq([4, 4])
       expect(token.colors).to eq([:black])
+      expect(token.mana_value).to eq(0)
       expect(token.types.map(&:to_s)).to include("Zombie", "Snake", "Druid")
       expect(p1.graveyard.cards).not_to include(card)
     end

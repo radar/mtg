@@ -37,7 +37,10 @@ module Magic
     # Set by ContinuousEffects from Abilities::Static::CharacteristicSetting.
     attr_accessor :color_override, :lost_all_abilities_by_effect
 
-    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :type_grants
+    # Set for a token copy that "has no mana cost" (Eternalize, Embalm): its mana value is 0 whatever it copies.
+    attr_writer :mana_cost_removed
+
+    def_delegators :@card, :name, :colors, :colorless?, :opponents, :type_grants
     def_delegators :@game, :logger
 
     # What this permanent adds to the creature it's attached to. Each hone counter on an Equipment grants +1/+0.
@@ -320,8 +323,8 @@ module Magic
 
     def name = copiable_card.name
     # A token has no mana cost, so its mana value is 0.
-    def cmc = copiable_card.respond_to?(:cmc) ? copiable_card.cmc : 0
-    def mana_value = copiable_card.respond_to?(:mana_value) ? copiable_card.mana_value : 0
+    def cmc = @mana_cost_removed || !copiable_card.respond_to?(:cmc) ? 0 : copiable_card.cmc
+    def mana_value = @mana_cost_removed || !copiable_card.respond_to?(:mana_value) ? 0 : copiable_card.mana_value
     # A color set by continuous effects (layer 5 -- ContinuousEffects resolves any competing
     # Modifications::Color/CharacteristicSetting#set_colors by timestamp), else the card's colors.
     def colors

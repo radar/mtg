@@ -37,6 +37,7 @@ module Magic
           [*copy_as_token(source)].each do |token|
             token.modify_base_power(4, until_eot: false)
             token.modify_base_toughness(4, until_eot: false)
+            token.mana_cost_removed = true
             token.change_colors!([:black], until_eot: false)
             token.add_types(T::Creatures["Zombie"], until_eot: false)
           end
