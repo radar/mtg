@@ -28,6 +28,11 @@ module Magic
             return multi_target(*targets)
           end
 
+          # "Exile up to X target cards": a mode answering `max_targets` rejects more targets than that.
+          if mode.respond_to?(:max_targets) && targets.size > mode.max_targets
+            raise InvalidTarget, "#{mode.class} takes at most #{mode.max_targets} targets"
+          end
+
           targets.each do |target|
             raise InvalidTarget, "Invalid target for #{mode.class}: #{target}" unless can_target?(target)
           end

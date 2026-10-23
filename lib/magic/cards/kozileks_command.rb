@@ -63,8 +63,11 @@ module Magic
       class ExileFromGraveyards < Mode
         def target_choices = game.graveyard_cards.to_a
 
+        # "Exile up to X target cards from graveyards."
+        def max_targets = x_value.to_i
+
         def resolve!(targets:)
-          targets.first(x_value.to_i).each { exile_target(_1) }
+          targets.each { exile_target(_1) }
         end
       end
 
