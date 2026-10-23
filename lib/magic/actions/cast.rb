@@ -371,11 +371,13 @@ module Magic
 
       # Rule 702.119 (emerge): sacrifice a creature you control (the card's `emerge_from` type, creature by default)
       # to reduce the emerge cost (the card's `alternative_cost`) by its mana value. Like #convoke it reduces the
-      # cost itself, so cast with `cast_as(:alternative, ...)` and call it before any mana payment.
+      # cost itself, so cast with `cast_as(:alternative, ...)` and call it before any mana payment. A static ability
+      # answering `grants_emerge?(card, player)` (Herigast) grants emerge at the card's own mana cost: cast it normally.
       def emerge(creature)
-        raise "#{card.name} does not have emerge" unless card.respond_to?(:emerge_from)
+        granted = static_ability_allows?(:grants_emerge?)
+        raise "#{card.name} does not have emerge" unless granted || card.respond_to?(:emerge_from)
         raise "#{player.inspect} does not control #{creature.name}" unless creature.controller == player
-        raise "#{creature.name} is not a valid emerge sacrifice" unless creature.type?(card.emerge_from)
+        raise "#{creature.name} is not a valid emerge sacrifice" unless creature.type?(card.respond_to?(:emerge_from) ? card.emerge_from : "Creature")
 
         reduction = [creature.mana_value, mana_cost.balance[:generic].to_i].min
         mana_cost.adjusted_by(generic: -reduction) if reduction.positive?
