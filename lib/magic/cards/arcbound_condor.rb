@@ -48,7 +48,7 @@ module Magic
             super(actor: actor)
           end
 
-          def choices = battlefield.controlled_by(controller).creatures.select(&:artifact?)
+          def choices = battlefield.creatures.select(&:artifact?)
 
           def choice_amount = 1
 
@@ -58,7 +58,7 @@ module Magic
         end
 
         def call
-          amount = actor.counters.count
+          amount = actor.counters.of_type(Counters::Plus1Plus1).count
           return if amount.zero?
 
           choice = MoveCounters.new(actor: actor, amount: amount)

@@ -34,4 +34,23 @@ RSpec.describe Magic::Cards::ArcboundCondor do
 
     expect(golem.power).to eq(7)
   end
+
+  it "can move its counters to an opponent's artifact creature" do
+    theirs = ResolvePermanent("Forgotten Sentinel", owner: p2)
+    game.settle!
+    condor.destroy!
+    game.settle!
+    game.resolve_choice!(target: theirs)
+
+    expect(theirs.power).to eq(7)
+  end
+
+  it "moves only its +1/+1 counters" do
+    condor.add_counter("charge")
+    condor.destroy!
+    game.settle!
+
+    expect(golem.power).to eq(7)
+    expect(golem.counters.count).to eq(3)
+  end
 end
