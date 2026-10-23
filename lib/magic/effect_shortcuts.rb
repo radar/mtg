@@ -171,8 +171,9 @@ module Magic
     end
 
     # "It connives": the actor draws, then discards; a nonland discard puts a +1/+1 counter on the actor.
-    def connive(for_actor = actor)
-      Choice::Connive.add(game:, actor: for_actor)
+    # `amount` is X for "connives X".
+    def connive(for_actor = actor, amount: 1)
+      Choice::Connive.add(game:, actor: for_actor, amount:)
     end
   end
 end
