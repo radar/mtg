@@ -169,5 +169,10 @@ module Magic
     def populate(for_actor = actor)
       Choice::Populate.add(game:, actor: for_actor)
     end
+
+    # "It connives": the actor draws, then discards; a nonland discard puts a +1/+1 counter on the actor.
+    def connive(for_actor = actor)
+      Choice::Connive.add(game:, actor: for_actor)
+    end
   end
 end

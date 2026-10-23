@@ -79,6 +79,8 @@ Whole named mechanics spanning trigger+cost+static (Monarch, Ring tempts, Blitz,
 
 **Split second**: `keywords :split_second`. `Stack#split_second?` is true while such a spell is on the stack; `Actions::Cast#illegal_reason` and `ActivateAbility#illegal_reason` (non-mana abilities only) raise `IllegalAction` then. Triggers and mana abilities are unaffected. Example: `SiegeSmash`.
 
+**Connive**: `connive` in a triggered ability's `call` (`EffectShortcuts`, `Choice::Connive.add`). It draws immediately, then queues a mandatory discard choice; resolve with `game.resolve_choice!(card:)`. A nonland discard puts a +1/+1 counter on the actor. Example: `ScurrilousSentry`.
+
 **Replicate (energy)**: `replicate_energy 3` in the DSL block. Pay with `action.replicate(times)` while casting; `Cast` pays `cost * times` energy on finalize and `copy_for_replicate` copies the spell that many times via `CopyEffect.resolve_with_choice!` (skip the choice to keep targets, resolve it to pick new ones). Example: `ReiteratingBolt`.
 
 **Cascade**: `def cast_triggers = [TriggeredAbility::Cascade]` in the card class. It exiles from the top until a nonland card with lower mana value, casts it free via `Choice::FreeCast.start`, and bottoms the rest in random order. A hit that needs a target asks for it; skipping that choice leaves the card in exile (not yet sent to the bottom). Examples: `AnnoyedAltisaur`, `MeteoricMace`.
