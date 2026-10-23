@@ -7,21 +7,20 @@ module Magic
       loyalty 2
 
       # "+2: Until your next turn, whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end
-      # of turn." Tamiyo flags the effect with `remember_until_turn_of!`, which clears it as her controller's next
-      # upkeep begins.
+      # of turn." A delayed trigger, so it outlives Tamiyo leaving the battlefield.
       class LoyaltyAbility1 < LoyaltyAbility
         def loyalty_change = 2
         def description = "Until your next turn, whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end of turn."
 
         def resolve!
-          source.remember_until_turn_of!(:shielding, controller)
+          game.add_delayed_trigger(source: source, event_class: Events::CreatureAttacked, trigger_class: AttackTrigger, until_turn_of: controller)
         end
       end
 
       class AttackTrigger < TriggeredAbility
-        def should_perform?
-          return false unless actor.state[:shielding]
+        def controller = actor.controller
 
+        def should_perform?
           target = event.target
           target == controller || (target.is_a?(Permanent) && target.planeswalker? && target.controller == controller)
         end
@@ -72,8 +71,6 @@ module Magic
           game.add_emblem(HandSizeEmblem.new(game: game, owner: controller))
         end
       end
-
-      def event_handlers = { Events::CreatureAttacked => AttackTrigger }
 
       def loyalty_abilities = [LoyaltyAbility1, LoyaltyAbility2, LoyaltyAbility3]
     end

@@ -85,31 +85,54 @@ RSpec.describe Magic::Cards::TamiyoInquisitiveStudent do
       expect(p1.maximum_hand_size).to be_nil
     end
 
+    def attack_with(attacker, target)
+      go_to_main_phase_for!(p2)
+      current_turn.beginning_of_combat!
+      current_turn.declare_attackers!
+      p2.declare_attacker(attacker: attacker, target: target)
+      current_turn.attackers_declared!
+      game.settle!
+      game.stack.resolve!
+      game.settle!
+    end
+
     it "+2 shrinks creatures attacking its controller" do
       activate(0)
       expect(walker.loyalty).to eq(4)
       bears = ResolvePermanent("Grizzly Bears", owner: p2)
       game.next_turn
-      go_to_main_phase_for!(p2)
-      current_turn.beginning_of_combat!
-      current_turn.declare_attackers!
-      p2.declare_attacker(attacker: bears, target: p1)
-      current_turn.attackers_declared!
+      attack_with(bears, p1)
+      expect(bears.power).to eq(1)
+    end
+
+    it "+2 shrinks creatures attacking a planeswalker its controller controls" do
+      other = ResolvePermanent("Liliana, Waker Of The Dead", owner: p1)
+      activate(0)
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      game.next_turn
+      attack_with(bears, other)
+      expect(bears.power).to eq(1)
+    end
+
+    it "+2 still applies after Tamiyo leaves the battlefield" do
+      activate(0)
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      walker.destroy!
       game.settle!
-      game.stack.resolve!
-      game.settle!
+      game.next_turn
+      attack_with(bears, p1)
       expect(bears.power).to eq(1)
     end
 
     it "+2 ends when its controller's next turn begins" do
       activate(0)
-      game.next_turn
-      expect(walker.state[:shielding]).to be(true)
-
-      game.next_turn
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      2.times { game.next_turn }
       expect(current_turn.active_player).to eq(p1)
       go_to_main_phase!
-      expect(walker.state[:shielding]).to be_falsey
+      game.next_turn
+      attack_with(bears, p1)
+      expect(bears.power).to eq(2)
     end
   end
 end
