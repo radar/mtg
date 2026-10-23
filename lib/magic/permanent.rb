@@ -784,6 +784,7 @@ module Magic
     def destroy!(regenerate: true)
       return false if indestructible?
       return false if use_shield_counter!
+      return false if use_umbra_armor!
 
       if regenerate && regeneration_shield?
         regenerated!
@@ -791,6 +792,17 @@ module Magic
       end
 
       put_into_graveyard!
+      true
+    end
+
+    # Umbra armor (702.89): "If enchanted permanent would be destroyed, instead remove all damage from it and destroy
+    # this Aura." An Aura card answers `umbra_armor?(host, aura)`. Returns whether the destruction was replaced.
+    def use_umbra_armor!
+      armor = attachments.find { _1.card.respond_to?(:umbra_armor?) && _1.card.umbra_armor?(self, _1) }
+      return false unless armor
+
+      @damage = 0
+      armor.put_into_graveyard!
       true
     end
 
@@ -860,12 +872,18 @@ module Magic
     end
 
     def can_attack?
-      (lost_all_abilities? || face.can_attack?) && attachments.all?(&:can_attack?)
+      (lost_all_abilities? || face.can_attack?) && attachments.all?(&:can_attack?) && !combat_forbidden_by_attachment?
     end
 
     def can_block?(permanent)
       !prevented_from_blocking? && (lost_all_abilities? || face.can_block?(permanent)) &&
-        attachments.all? { |attachment| attachment.can_block?(permanent) }
+        attachments.all? { |attachment| attachment.can_block?(permanent) } && !combat_forbidden_by_attachment?
+    end
+
+    # An Aura whose "can't attack or block" depends on the enchanted creature (Dog Umbra) answers
+    # `forbids_enchanted_combat?(host, aura)`; Auras that always forbid it just override `can_attack?`/`can_block?`.
+    def combat_forbidden_by_attachment?
+      attachments.any? { _1.card.respond_to?(:forbids_enchanted_combat?) && _1.card.forbids_enchanted_combat?(self, _1) }
     end
 
     # What a creature's combat damage is based on: normally its power, but its toughness while
