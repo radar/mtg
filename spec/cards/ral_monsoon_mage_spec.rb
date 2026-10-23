@@ -74,6 +74,18 @@ RSpec.describe Magic::Cards::RalMonsoonMage do
       expect { p1.cast(card: blade) { |a| a.pay_mana(black: 1); a.targeting(bears) } }.not_to raise_error
     end
 
+    it "+1 lasts through the opponent's turn and ends when its controller's next turn begins" do
+      activate(0)
+      game.next_turn
+      expect(current_turn.active_player).to eq(p2)
+      expect(walker.state[:discounting]).to be(true)
+
+      game.next_turn
+      expect(current_turn.active_player).to eq(p1)
+      go_to_main_phase!
+      expect(walker.state[:discounting]).to be_falsey
+    end
+
     it "-2 deals 2 damage divided and does not draw without another blue permanent" do
       walker.change_loyalty!(1)
       hand = p1.hand.count

@@ -7,21 +7,20 @@ module Magic
       loyalty 2
 
       # "+2: Until your next turn, whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end
-      # of turn." Tamiyo remembers the turn it was activated on; in a two player game the effect covers that turn and
-      # the opponent's turn after it.
+      # of turn." Tamiyo flags the effect with `remember_until_turn_of!`, which clears it as her controller's next
+      # upkeep begins.
       class LoyaltyAbility1 < LoyaltyAbility
         def loyalty_change = 2
         def description = "Until your next turn, whenever a creature attacks you or a planeswalker you control, it gets -1/-0 until end of turn."
 
         def resolve!
-          source.state[:shield_from] = game.current_turn.number
+          source.remember_until_turn_of!(:shielding, controller)
         end
       end
 
       class AttackTrigger < TriggeredAbility
         def should_perform?
-          from = actor.state[:shield_from]
-          return false unless from && game.current_turn.number < from + 2
+          return false unless actor.state[:shielding]
 
           target = event.target
           target == controller || (target.is_a?(Permanent) && target.planeswalker? && target.controller == controller)

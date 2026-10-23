@@ -268,6 +268,13 @@ module Magic
     # Free-form per-permanent state for cards that level up or remember something (Figure of Fable).
     def state = (@state ||= {})
 
+    # Sets `state[key]` to true until `player`'s next turn begins ("until your next turn": Ral, Leyline Prodigy;
+    # Tamiyo, Seasoned Scholar). It is cleared as that player's upkeep begins, whoever else's turns come first.
+    def remember_until_turn_of!(key, player)
+      state[key] = true
+      (@state_until_turn_of ||= {})[key] = player
+    end
+
     # A Class enchantment's level (it enters at level 1).
     def level = state.fetch(:level, 1)
 
@@ -1174,6 +1181,13 @@ module Magic
     def expire_protections_until_turn_of(player)
       protections.reject! { |protection| protection.until_turn_of == player }
       modifiers.reject! { |modifier| modifier.until_turn_of == player }
+      return unless @state_until_turn_of
+
+      expired = @state_until_turn_of.select { |_key, owner| owner == player }.keys
+      expired.each do |key|
+        state.delete(key)
+        @state_until_turn_of.delete(key)
+      end
     end
 
     def remove_until_eot_protections!

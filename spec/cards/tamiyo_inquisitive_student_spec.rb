@@ -100,5 +100,16 @@ RSpec.describe Magic::Cards::TamiyoInquisitiveStudent do
       game.settle!
       expect(bears.power).to eq(1)
     end
+
+    it "+2 ends when its controller's next turn begins" do
+      activate(0)
+      game.next_turn
+      expect(walker.state[:shielding]).to be(true)
+
+      game.next_turn
+      expect(current_turn.active_player).to eq(p1)
+      go_to_main_phase!
+      expect(walker.state[:shielding]).to be_falsey
+    end
   end
 end

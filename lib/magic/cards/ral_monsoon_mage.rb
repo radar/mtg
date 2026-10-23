@@ -14,16 +14,15 @@ module Magic
         end
       end
 
-      # "+1: Until your next turn, instant and sorcery spells you cast cost {1} less to cast." Ral remembers the turn
-      # it was activated on; in a two player game the discount covers that turn and the opponent's turn after it.
+      # "+1: Until your next turn, instant and sorcery spells you cast cost {1} less to cast." Ral flags the discount
+      # with `remember_until_turn_of!`, which clears it as his controller's next upkeep begins.
       class CostReduction < Abilities::Static::ManaCostAdjustment
         def initialize(source:)
           super(source:, adjustment: { generic: -1 })
         end
 
         def applies_to?(card)
-          granted = source.state[:discount_from]
-          granted && source.game.current_turn.number < granted + 2 &&
+          source.state[:discounting] &&
             card.is_a?(Magic::Card) && (card.controller || card.owner) == source.controller &&
             (card.instant? || card.sorcery?)
         end
@@ -34,7 +33,7 @@ module Magic
         def description = "Until your next turn, instant and sorcery spells you cast cost {1} less to cast."
 
         def resolve!
-          source.state[:discount_from] = game.current_turn.number
+          source.remember_until_turn_of!(:discounting, controller)
         end
       end
 
