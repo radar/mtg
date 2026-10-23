@@ -142,6 +142,20 @@ module Magic
         const_set(:REPLICATE_ENERGY, amount)
       end
 
+      # "When this creature enters / Whenever it attacks, it connives." `connive :enters`, `connive :attacks` or
+      # both: `connive :enters, :attacks`. Triggers are merged into any `etb_triggers` / `event_handlers` the
+      # class defines itself.
+      def connive(*whens)
+        if whens.include?(:enters)
+          define_method(:etb_triggers) { [*super(), TriggeredAbility::Connive] }
+        end
+        if whens.include?(:attacks)
+          define_method(:event_handlers) do
+            super().merge({ Events::FinalAttackersDeclared => TriggeredAbility::ConniveOnAttack }) { |_, a, b| Array(a) + Array(b) }
+          end
+        end
+      end
+
       # "You may have this enter as a copy of a creature": Permanent.enter then holds off state-based
       # actions until the card's enters trigger clears `copy_choice_pending`.
       def enters_as_copy
