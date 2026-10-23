@@ -873,22 +873,23 @@ module Magic
     # Can `source` (a card, permanent or token) target this permanent when `controller` is the
     # player casting the spell or controlling the ability? Every targeting path asks this, so
     # shroud, hexproof, "hexproof from" and protection are enforced in one place.
-    def can_be_targeted_by?(source, controller: source.controller)
+    def can_be_targeted_by?(source, controller: source.controller, spell: nil)
       return true if source.nil?
       return false if shroud?
 
       opposing = opponents.include?(controller)
       return false if opposing && hexproof? && !hexproof_ignored?
       return false if opposing && source.colors.any? { hexproof_from?(_1) }
-      return false if opposing && face.respond_to?(:hexproof_from_abilities?) && face.hexproof_from_abilities? && ability_source?(source)
+      return false if opposing && face.respond_to?(:hexproof_from_abilities?) && face.hexproof_from_abilities? && !(spell.nil? ? spell_source?(source) : spell)
 
       !protected_from?(source)
     end
 
-    # A targeting source is an ability, not a spell, when it is a permanent (a triggered or activated ability's source) or
-    # an ability object itself.
-    def ability_source?(source)
-      source.is_a?(Permanent) || source.is_a?(Magic::ActivatedAbility) || source.is_a?(Magic::TriggeredAbility)
+    # Without an explicit answer from the caller, a targeting source is a spell only when it is a card on the stack (or
+    # not in any zone, as in a bare `Card(...)`). A card in a hand, graveyard or exile is the source of an ability
+    # (cycling, a graveyard ability); a permanent or an ability object is one too.
+    def spell_source?(source)
+      source.is_a?(Magic::Card) && (source.zone.nil? || source.zone.stack?)
     end
 
     # Nowhere to Run: "can be the targets of spells and abilities as though they didn't have hexproof".

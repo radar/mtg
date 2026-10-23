@@ -235,7 +235,7 @@ module Magic
         # "target creature with mana value X" (Stolen by the Fae): the card says whether a target fits the X it is cast with.
         return false if card.respond_to?(:target_fits_x?) && !card.target_fits_x?(target, value_for_x || mana_cost.x || 0)
 
-        choices.include?(target) && Targetable.targetable_by?(target, source: card, controller: player)
+        choices.include?(target) && Targetable.targetable_by?(target, source: card, controller: player, spell: true)
       end
 
       def targeting(*targets)

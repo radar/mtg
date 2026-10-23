@@ -79,5 +79,35 @@ RSpec.describe Magic::Cards::VolatileStormdrake do
 
       expect(drake.can_be_targeted_by?(shock, controller: p1)).to be(true)
     end
+
+    it "cannot be targeted by an ability of a card in a graveyard" do
+      source = Card("Grizzly Bears", owner: p1)
+      p1.graveyard.add(source)
+
+      expect(drake.can_be_targeted_by?(source, controller: p1)).to be(false)
+    end
+
+    it "cannot be targeted by an ability of a card in a hand" do
+      source = Card("Shock", owner: p1)
+      p1.hand.add(source)
+
+      expect(drake.can_be_targeted_by?(source, controller: p1)).to be(false)
+    end
+
+    it "can be targeted by a spell that is being cast, whatever zone it is cast from" do
+      go_to_main_phase!
+      shock = Card("Shock", owner: p1)
+      p1.hand.add(shock)
+      p1.add_mana(red: 1)
+
+      expect { p1.cast(card: shock) { |a| a.pay_mana(red: 1); a.targeting(drake) } }.not_to raise_error
+    end
+
+    it "can be told explicitly whether the source is a spell" do
+      source = ResolvePermanent("Grizzly Bears", owner: p1)
+
+      expect(drake.can_be_targeted_by?(source, controller: p1, spell: true)).to be(true)
+      expect(drake.can_be_targeted_by?(source, controller: p1, spell: false)).to be(false)
+    end
   end
 end

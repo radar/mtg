@@ -20,7 +20,7 @@ module Magic
 
         def can_target?(target, index = nil)
           choices = index ? target_choices[index] : target_choices
-          choices.include?(target) && Targetable.targetable_by?(target, source: @source, controller: @controller)
+          choices.include?(target) && Targetable.targetable_by?(target, source: @source, controller: @controller, spell: true)
         end
 
         def targeting(*targets)

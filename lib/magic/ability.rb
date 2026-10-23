@@ -19,7 +19,7 @@ module Magic
 
     # In the ability's choices, and not shroud/hexproof/protected against its source.
     def legal_target?(target, choices)
-      !choices.nil? && choices.include?(target) && Targetable.targetable_by?(target, source: source, controller: controller)
+      !choices.nil? && choices.include?(target) && Targetable.targetable_by?(target, source: source, controller: controller, spell: false)
     end
 
     def multi_target? = false
