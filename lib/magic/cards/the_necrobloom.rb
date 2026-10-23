@@ -36,14 +36,65 @@ module Magic
         end
       end
 
-      # "Land cards in your graveyard have dredge 2." Dredged with `Player#dredge!` in place of a draw.
+      # "Land cards in your graveyard have dredge 2."
       class LandDredge < StaticAbility
         def dredge_amount(card, player)
           2 if player == controller && card.land?
         end
       end
 
+      # Whenever you would draw, offer each dredgeable graveyard card (or the draw itself) as the answer.
+      class DredgeChoice < Magic::Choice
+        attr_reader :player, :remaining
+
+        def initialize(actor:, player:, remaining:)
+          super(actor: actor)
+          @player = player
+          @remaining = remaining
+        end
+
+        def chooser = player
+
+        def prompt = "Dredge a card from your graveyard instead of drawing, or draw normally."
+
+        def modes
+          player.dredgeable_cards.to_h { [_1, "Dredge #{_1.name} (mill #{player.dredge_amount(_1)})"] }.merge(draw: "Draw a card normally")
+        end
+
+        def resolve!(mode:)
+          mode == :draw ? player.draw! : player.dredge!(mode)
+          # The rest of the draws each get the same offer.
+          game.add_effect(Effects::DrawCards.new(source: actor, player:, number_to_draw: remaining - 1)) if remaining > 1
+        end
+      end
+
+      class DredgeInstead < Effect
+        def initialize(source:, player:, remaining:)
+          super(source:)
+          @player = player
+          @remaining = remaining
+        end
+
+        def inspect = "#<TheNecrobloom::DredgeInstead player:#{@player.name}>"
+
+        def resolve!
+          game.add_choice(DredgeChoice.new(actor: source, player: @player, remaining: @remaining))
+        end
+      end
+
+      class DredgeReplacement < ReplacementEffect
+        def applies?(effect)
+          effect.is_a?(Effects::DrawCards) && effect.player == receiver.controller && effect.number_to_draw > 0 && effect.player.dredgeable_cards.any?
+        end
+
+        def call(effect)
+          DredgeInstead.new(source: receiver, player: effect.player, remaining: effect.number_to_draw)
+        end
+      end
+
       def static_abilities = [LandDredge]
+
+      def replacement_effects = { Effects::DrawCards => DredgeReplacement }
 
       def event_handlers = { Events::Landfall => LandfallTrigger }
     end

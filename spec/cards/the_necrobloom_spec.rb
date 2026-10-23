@@ -63,5 +63,65 @@ RSpec.describe Magic::Cards::TheNecrobloom do
 
       expect { p1.dredge!(bears) }.to raise_error(Magic::Error)
     end
+
+    describe "when you would draw" do
+      def draw_a_card
+        game.add_effect(Magic::Effects::DrawCards.new(source: p1, player: p1))
+      end
+
+      it "offers the land and a normal draw" do
+        draw_a_card
+
+        expect(game.choices.last.modes.keys).to eq([forest, :draw])
+      end
+
+      it "dredges the land instead of drawing" do
+        top = p1.library.first
+        library_size = p1.library.count
+        draw_a_card
+        game.resolve_choice!(mode: forest)
+
+        expect(p1.hand.cards).to include(forest)
+        expect(p1.hand.cards).not_to include(top)
+        expect(p1.graveyard.cards).to include(top)
+        expect(p1.library.count).to eq(library_size - 2)
+      end
+
+      it "draws normally when you decline" do
+        top = p1.library.first
+        draw_a_card
+        game.resolve_choice!(mode: :draw)
+
+        expect(p1.hand.cards).to include(top)
+        expect(p1.graveyard.cards).to include(forest)
+      end
+
+      it "offers the dredge again for each further card drawn" do
+        game.add_effect(Magic::Effects::DrawCards.new(source: p1, player: p1, number_to_draw: 2))
+        game.resolve_choice!(mode: forest)
+
+        expect(game.choices.last).to be_a(described_class::DredgeChoice)
+      end
+
+      it "does not offer a dredge when the library is too small" do
+        p1.library.cards.drop(1).each { p1.library.remove(_1) }
+        draw_a_card
+
+        expect(game.choices).to be_empty
+      end
+
+      it "does not offer a dredge when no land is in the graveyard" do
+        p1.graveyard.remove(forest)
+        draw_a_card
+
+        expect(game.choices).to be_empty
+      end
+
+      it "does not apply to an opponent's draw" do
+        game.add_effect(Magic::Effects::DrawCards.new(source: p2, player: p2))
+
+        expect(game.choices).to be_empty
+      end
+    end
   end
 end
