@@ -174,6 +174,8 @@ module Magic
         types -= [T::Creature] if permanent.attached_to && copiable_card.respond_to?(:reconfigure?) && copiable_card.reconfigure?
         # Impending: "isn't a creature until the last is removed."
         types -= [T::Creature] if permanent.impending_now?
+        # Bestow: while attached it is an Aura enchantment, with none of its creature types.
+        types = [T::Enchantment, "Aura"] if permanent.bestowed_now?
         types
       end
 

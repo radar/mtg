@@ -73,8 +73,14 @@ module Magic
         auras = game.battlefield.permanents.select do |permanent|
           aura?(permanent) && !legally_enchanting?(permanent)
         end
+        # A bestowed Aura that is illegally attached stays as a creature (702.103f).
+        bestowed, auras = auras.partition(&:bestowed?)
+        bestowed.each do |permanent|
+          permanent.detach!
+          permanent.apply_continuous_effects!
+        end
         auras.each(&:put_into_graveyard!)
-        auras.any?
+        auras.any? || bestowed.any?
       end
 
       # Rule 704.5n: Equipment attached to a non-creature or to nothing becomes unattached but stays on the battlefield.

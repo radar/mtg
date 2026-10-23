@@ -116,6 +116,15 @@ module Magic
         define_method(:impending_cost) { cost }
       end
 
+      # "Bestow {cost}": an alternative cost (`Actions::Cast::Bestowed`) that makes the spell an Aura targeting a creature.
+      # See `Cards::Bestowable`.
+      #
+      #   bestow Costs::Mana.new(generic: 1, blue: 1)
+      def bestow(cost)
+        include Cards::Bestowable
+        define_method(:bestow_cost) { cost }
+      end
+
       # "Spectacle {cost}": an alternative cost, castable only if an opponent lost life this turn
       # (`Actions::Cast::Spectacle`).
       #

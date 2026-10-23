@@ -58,6 +58,8 @@ module Magic
     attr_accessor :evoked
     # Cast for its impending cost (Overlords): not a creature while it has a time counter.
     attr_accessor :impending
+    # Cast for its bestow cost and still attached: an Aura enchantment rather than a creature (`bestowed_now?`).
+    attr_accessor :bestowed
     # "You may have this enter as a copy of ...": a not-yet-copied 0/0 mustn't die to state-based
     # actions while its enters trigger is still asking (cleared once that's answered).
     attr_writer :copy_choice_pending
@@ -265,6 +267,11 @@ module Magic
 
     # Impending: a creature again once the last time counter is gone.
     def impending_now? = impending? && counters.of_type(Counters::Time).any?
+
+    def bestowed? = !!@bestowed
+
+    # Bestow: an Aura while attached; once the host is gone it is a creature again (702.103f).
+    def bestowed_now? = bestowed? && !attached_to.nil?
 
     # Modified (CR 700.9): has a counter on it, is equipped (any Equipment, whoever controls it), or is enchanted by an
     # Aura its controller controls.
