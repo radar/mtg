@@ -28,6 +28,37 @@ RSpec.describe Magic::Cards::TamiyoMeetsTheStoryCircle do
       expect(attacker.power).to eq(4)
     end
 
+    it "still applies after the Saga has left the battlefield" do
+      attacker = ResolvePermanent("Colossal Dreadmaw", owner: p2)
+      saga.destroy!
+      game.settle!
+      game.next_turn
+      go_to_main_phase!
+      skip_to_combat!
+      current_turn.declare_attackers!
+      current_turn.declare_attacker(attacker, target: p1)
+      current_turn.attackers_declared!
+      game.settle!
+
+      expect(attacker.power).to eq(4)
+    end
+
+    it "stops applying once your next turn begins" do
+      attacker = ResolvePermanent("Colossal Dreadmaw", owner: p2)
+      2.times { game.next_turn }
+      go_to_main_phase!
+      game.skip_choice! while game.choices.any?
+      game.next_turn
+      go_to_main_phase!
+      skip_to_combat!
+      current_turn.declare_attackers!
+      current_turn.declare_attacker(attacker, target: p1)
+      current_turn.attackers_declared!
+      game.settle!
+
+      expect(attacker.power).to eq(6)
+    end
+
     it "does nothing to a creature attacking someone else" do
       mine = ResolvePermanent("Colossal Dreadmaw", owner: p1)
       go_to_main_phase!

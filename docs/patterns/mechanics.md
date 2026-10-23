@@ -152,7 +152,7 @@ Whole named mechanics spanning trigger+cost+static (Monarch, Ring tempts, Blitz,
 
 **Prototype** (Frogmyr Enforcer): `prototype cost: { generic: 3, red: 1 }, power: 2, toughness: 2` in the DSL block. `Actions::Cast::Prototyped` (offered by `LegalActions`) pays the prototype cost and sets `card.prototyped`, which makes `Card#colors`, `#mana_value` and `Cards::Creature#base_power`/`#base_toughness` use the prototype values until the card leaves the stack and battlefield (`Card#zone=` resets it). Affinity is a `self_mana_cost_adjustment` (`{ generic: -> { -count } }`).
 
-**Saga chapter "until your next turn" trigger** (Tamiyo Meets the Story Circle): leave the chapter empty and add an `event_handlers` entry (`super.merge(...)`) whose `should_perform?` checks `actor.before_controllers_next_turn?`. In a spec, resolve the saga with `summoning_sick: true`: `ResolvePermanent` backdates `controlled_since_turn`, which makes the effect already over.
+**Saga chapter "until your next turn" trigger** (Tamiyo Meets the Story Circle): the chapter's `resolve!` registers `game.add_delayed_trigger(source: actor, event_class:, trigger_class:, until_turn_of: controller)`, so the effect ends when its controller's next turn begins and does not depend on the Saga staying on the battlefield.
 
 **Phyrexian black mana / "pay 2 life rather than pay {B}"** (K'rrik, Son of Yawgmoth): the card is costed with plain `black: n`; `Cast#pay_life_for_black(count)` (call before paying mana, like `convoke`) swaps `count` {B} for 2 life each. It is allowed for symbols of the card's own cost (`def phyrexian_black = 3` on the card) or while a static ability answers `may_pay_life_for_black?(card, player)`. Spells only, not abilities.
 

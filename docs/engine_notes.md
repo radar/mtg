@@ -148,7 +148,7 @@ For a card that isn't on the stack (exiled by an effect), add `Magic::Choice::Ma
 
 ## Delayed triggers (no permanent)
 
-"Until end of turn, whenever a creature you control dies, ...": `game.add_delayed_trigger(source: spell_card, event_class: Events::CreatureDied, trigger_class: MyTrigger)` registers a `Magic::DelayedTrigger` as an event listener. It builds `trigger_class.new(actor: source, event:)` for each event (so `controller` is the source's controller) and stops at the end of the turn it was made in. Use `permanent.register_turn_trigger` instead when the trigger belongs to a permanent. Example: `WaltzOfRage`.
+"Until end of turn, whenever a creature you control dies, ...": `game.add_delayed_trigger(source: spell_card, event_class: Events::CreatureDied, trigger_class: MyTrigger)` registers a `Magic::DelayedTrigger` as an event listener. It builds `trigger_class.new(actor: source, event:)` for each event (so `controller` is the source's controller) and stops at the end of the turn it was made in. Pass `until_turn_of: player` for "until your next turn": it then stops when that player's next turn begins. Use `permanent.register_turn_trigger` instead when the trigger belongs to a permanent. Example: `WaltzOfRage`.
 
 ## Opening-hand step (Leylines)
 

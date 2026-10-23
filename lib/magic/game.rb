@@ -157,8 +157,8 @@ module Magic
 
     # A trigger lasting until end of turn that belongs to no permanent ("Until end of turn, whenever a creature you control
     # dies, ..."). See `Magic::DelayedTrigger`.
-    def add_delayed_trigger(source:, event_class:, trigger_class:)
-      DelayedTrigger.new(game: self, source: source, event_class: event_class, trigger_class: trigger_class).tap { subscribe(_1) }
+    def add_delayed_trigger(source:, event_class:, trigger_class:, until_turn_of: nil)
+      DelayedTrigger.new(game: self, source: source, event_class: event_class, trigger_class: trigger_class, until_turn_of: until_turn_of).tap { subscribe(_1) }
     end
 
     def add_players(*players)

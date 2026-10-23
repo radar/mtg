@@ -6,15 +6,18 @@ module Magic
 
     class TamiyoMeetsTheStoryCircle < Saga
       # I -- Until your next turn, whenever a creature attacks you or a planeswalker you control, it gets -2/-0 until end
-      # of turn. The effect is the Saga's own trigger, live until its controller begins another turn.
+      # of turn. A delayed trigger, so it outlives the Saga leaving the battlefield or losing its abilities.
       class Chapter1 < Saga::ChapterAbility
-        def resolve! = nil
+        def resolve!
+          game.add_delayed_trigger(source: actor, event_class: Events::CreatureAttacked, trigger_class: AttackTrigger, until_turn_of: controller)
+        end
+
+        def game = actor.game
+        def controller = actor.controller
       end
 
       class AttackTrigger < TriggeredAbility
         def should_perform?
-          return false unless actor.before_controllers_next_turn?
-
           target = event.target
           target == controller || (target.is_a?(Permanent) && target.planeswalker? && target.controller == controller)
         end
@@ -68,8 +71,6 @@ module Magic
       end
 
       def chapters = [Chapter1, Chapter2, Chapter3]
-
-      def event_handlers = super.merge(Events::CreatureAttacked => AttackTrigger)
     end
   end
 end
