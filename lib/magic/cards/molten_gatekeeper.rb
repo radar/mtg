@@ -40,7 +40,7 @@ module Magic
 
           permanent.grant_haste!
           permanent.register_turn_trigger(Events::BeginningOfEndStep, ExileAtEndStep)
-          permanent.register_turn_replacement(Effects::MovePermanentZone, ReplacementEffect::ExileInsteadOfDying)
+          permanent.register_turn_replacement(Effects::MovePermanentZone, ReplacementEffect::ExileInsteadOfLeaving)
         end
       end
 

@@ -57,6 +57,15 @@ RSpec.describe Magic::Cards::MoltenGatekeeper do
       expect(card.zone).to be_exile
     end
 
+    it "exiles it instead if it would be returned to its owner's hand" do
+      gatekeeper = unearth
+      gatekeeper.return_to_hand
+      game.settle!
+
+      expect(card.zone).to be_exile
+      expect(p1.hand.cards).not_to include(card)
+    end
+
     it "can only be activated as a sorcery" do
       ability = card.graveyard_abilities.first
       current_turn.end!

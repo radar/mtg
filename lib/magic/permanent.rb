@@ -873,7 +873,8 @@ module Magic
     def return_to_hand
       move_zone!(to: owner.hand)
       # A token (or a copy) has no card of its own to put in the hand: it ceases to exist.
-      card.move_zone!(to: owner.hand) unless copy? || token?
+      # (A replacement effect may have exiled it instead.)
+      card.move_zone!(to: owner.hand) unless copy? || token? || card.zone&.exile?
     end
 
     def can_activate_ability?(ability)
