@@ -68,6 +68,51 @@ RSpec.describe "The Flare cycle" do
     end
   end
 
+  describe "Flare of Cultivation's alternative cost" do
+    let(:flare) { Card("Flare Of Cultivation", owner: p1) }
+
+    it "can be cast by sacrificing a nontoken green creature" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      action = cast_action_as(:alternative, card: flare, player: p1)
+      expect(action.can_perform?).to eq(true)
+      action.pay_cost(bears)
+      action.perform
+
+      expect(bears.zone).to be_nil
+      expect(game.stack.spells.map(&:card)).to include(flare)
+    end
+
+    it "cannot sacrifice a nongreen creature" do
+      corpse = ResolvePermanent("Walking Corpse", owner: p1)
+      action = cast_action_as(:alternative, card: flare, player: p1)
+      expect { action.pay_cost(corpse) }.to raise_error(RuntimeError, /Invalid creature/)
+    end
+  end
+
+  describe "Flare of Malice's alternative cost" do
+    let(:flare) { Card("Flare Of Malice", owner: p1) }
+
+    it "can be cast by sacrificing a nontoken black creature" do
+      corpse = ResolvePermanent("Walking Corpse", owner: p1)
+      victim = ResolvePermanent("Grizzly Bears", owner: p2)
+      action = cast_action_as(:alternative, card: flare, player: p1)
+      expect(action.can_perform?).to eq(true)
+      action.pay_cost(corpse)
+      action.perform
+      game.stack.resolve!
+      game.settle!
+
+      expect(corpse.zone).to be_nil
+      expect(victim.zone).to be_nil
+    end
+
+    it "cannot sacrifice a nonblack creature" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      action = cast_action_as(:alternative, card: flare, player: p1)
+      expect { action.pay_cost(bears) }.to raise_error(RuntimeError, /Invalid creature/)
+    end
+  end
+
   describe Magic::Cards::FlareOfMalice do
     let(:flare) { Card("Flare Of Malice", owner: p1) }
 
