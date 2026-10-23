@@ -10,8 +10,11 @@ module Magic
     class Copycrook < Creature
       enters_as_copy
 
-      # "Whenever this creature attacks, it connives." Granted to the copy too: the copy's handlers come from this card.
+      # "Whenever this creature attacks, it connives." The copy keeps it as its "except" ability; its other handlers
+      # come from the copied card.
       connive :attacks
+
+      def copy_exception_handlers = { Events::FinalAttackersDeclared => TriggeredAbility::ConniveOnAttack }
 
       # "You may have this creature enter as a copy of any creature on the battlefield, except it has 'Whenever this
       # creature attacks, it connives.'"

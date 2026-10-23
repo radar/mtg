@@ -185,6 +185,7 @@ module Magic
       # actions until the card's enters trigger clears `copy_choice_pending`.
       def enters_as_copy
         define_method(:enters_as_copy?) { true }
+        define_method(:copy_exception_handlers) { {} }
       end
 
       def offspring(cost)
@@ -733,6 +734,11 @@ module Magic
     end
 
     def enters_as_copy? = false
+
+    # Event handlers this card keeps while a permanent is a copy of something else: the "except it has ..." part of a
+    # copy effect. A card that enters as a copy keeps none unless it overrides this (Copycrook's connive).
+    def copy_exception_handlers = event_handlers
+
     # "If that spell would be put into your graveyard, exile it instead" for one cast (`exile_once!`), or
     # always for a card that overrides this (Morningtide's Light).
     def exile_once! = @exile_once = true

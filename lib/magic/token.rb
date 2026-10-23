@@ -59,6 +59,7 @@ module Magic
     def can_be_blocked?(_) = true
     def maximum_blockers = nil
     def enters_as_copy? = false
+    def copy_exception_handlers = event_handlers
     def must_be_blocked? = false
     def must_attack? = false
     def cant_attack_alone? = false

@@ -35,6 +35,36 @@ RSpec.describe Magic::Cards::Copycrook do
     expect(p1.graveyard.cards.map(&:name)).to include("Copycrook")
   end
 
+  it "keeps only the connive ability of its own card while a copy" do
+    cast_copycrook
+    game.resolve_choice!
+    game.resolve_choice!(target: bears)
+    game.settle!
+
+    crook = p1.creatures.first
+    expect(crook.copied_card).to eq(bears.copiable_card)
+    expect(crook.card.copy_exception_handlers.keys).to eq([Magic::Events::FinalAttackersDeclared])
+  end
+
+  it "connives when the copy attacks" do
+    cast_copycrook
+    game.resolve_choice!
+    game.resolve_choice!(target: bears)
+    game.settle!
+    crook = p1.creatures.first
+    crook.grant_haste!
+    game.tick!
+
+    hand_size = p1.hand.cards.count
+    skip_to_combat!
+    current_turn.declare_attackers!
+    p1.declare_attacker(attacker: crook, target: p2)
+    current_turn.attackers_declared!
+    game.settle!
+
+    expect(p1.hand.cards.count).to eq(hand_size + 1)
+  end
+
   it "connives whenever it attacks" do
     handlers = Card("Copycrook", owner: p1).event_handlers
 
