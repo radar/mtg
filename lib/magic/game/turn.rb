@@ -187,6 +187,14 @@ module Magic
         super()
       end
 
+      # "Creatures without flying can't block this turn" (Sundering Eruption): a turn-wide rule, so it covers creatures
+      # that enter later and checks flying at the moment of blocking.
+      def prevent_nonflyers_from_blocking!
+        @nonflyers_cant_block = true
+      end
+
+      def nonflyers_cant_block? = @nonflyers_cant_block == true
+
       # "Prevent all combat damage that would be dealt this turn by non-Spider creatures" (Arachnogenesis): creatures
       # without one of +creature_types+ deal no combat damage for the rest of this turn. (Stored as plain data: games are
       # copied with Marshal, which can't copy a block.)

@@ -918,7 +918,8 @@ module Magic
     end
 
     def can_block?(permanent)
-      !prevented_from_blocking? && (lost_all_abilities? || face.can_block?(permanent)) &&
+      !prevented_from_blocking? && !(game.current_turn.nonflyers_cant_block? && !flying?) &&
+        (lost_all_abilities? || face.can_block?(permanent)) &&
         attachments.all? { |attachment| attachment.can_block?(permanent) } && !combat_forbidden_by_attachment?
     end
 

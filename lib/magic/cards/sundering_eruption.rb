@@ -31,7 +31,7 @@ module Magic
         destroy(target)
         # The destroyed land is the actor, so the search runs in its controller's library.
         game.search_library(target, find: :basic_lands, to: :battlefield, tapped: true) if land_controller.library.basic_lands.any?
-        battlefield.creatures.reject(&:flying?).each(&:prevent_blocking!)
+        game.current_turn.prevent_nonflyers_from_blocking!
       end
     end
   end

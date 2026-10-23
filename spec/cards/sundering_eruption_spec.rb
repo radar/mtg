@@ -89,6 +89,17 @@ RSpec.describe Magic::Cards::SunderingEruption do
 
       expect(flyer.can_block?(attacker)).to be(true)
     end
+
+    it "also applies to creatures that enter later this turn" do
+      attacker = ResolvePermanent("Grizzly Bears", owner: p1)
+      cast_eruption(island)
+      game.skip_choice!
+      late_bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      late_flyer = ResolvePermanent("Mistral Singer", owner: p2)
+
+      expect(late_bears.can_block?(attacker)).to be(false)
+      expect(late_flyer.can_block?(attacker)).to be(true)
+    end
   end
 
   describe "played as Volcanic Fissure" do
