@@ -30,6 +30,27 @@ RSpec.describe Magic::Cards::FlareOfDuplication do
     expect(Card("Flare Of Duplication", owner: p1).alternative_cost).to be_a(Magic::Costs::SacrificeCreatureAlternativeCost)
   end
 
+  it "can be cast by sacrificing a nontoken red creature" do
+    goblin = ResolvePermanent("Raging Goblin", owner: p1)
+    cast_shock_at_p2
+    flare = Card("Flare Of Duplication", owner: p1)
+    action = cast_action_as(:alternative, card: flare, player: p1)
+    expect(action.can_perform?).to eq(true)
+    action.pay_cost(goblin)
+    action.targeting(game.stack.spells.first)
+    action.perform
+
+    expect(goblin.zone).to be_nil
+    expect(game.stack.spells.map(&:card)).to include(flare)
+  end
+
+  it "cannot sacrifice a nonred creature" do
+    bears = ResolvePermanent("Grizzly Bears", owner: p1)
+    action = cast_action_as(:alternative, card: Card("Flare Of Duplication", owner: p1), player: p1)
+
+    expect { action.pay_cost(bears) }.to raise_error(RuntimeError, /Invalid creature/)
+  end
+
   it "cannot target a creature spell" do
     p1.add_mana(green: 2)
     p1.cast(card: Card("Grizzly Bears", owner: p1)) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
