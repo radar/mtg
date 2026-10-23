@@ -44,6 +44,10 @@ RSpec.describe Magic::Cards::SpymastersVault do
       game.stack.resolve!
     end
 
+    it "can't target a creature an opponent controls" do
+      expect { activate(victim) }.to raise_error(/Invalid target/)
+    end
+
     it "connives 0 when no creature died" do
       hand_size = p1.hand.count
 
