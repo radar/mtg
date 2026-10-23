@@ -754,6 +754,10 @@ module Magic
     # cost is paid). Read by "if mana from a Treasure was spent to cast it".
     attr_accessor :treasure_mana_spent
     def treasure_mana_spent? = !!treasure_mana_spent
+    # True once mana carrying ManaRestriction::HasteForCreatureSpell was spent to cast this creature card (reset when the
+    # cost is paid). Actions::Cast reads it to give the spell haste.
+    attr_accessor :haste_mana_spent
+    def haste_mana_spent? = !!haste_mana_spent
     # Set on an instant or sorcery cast by an effect that says "if that spell would be put into your graveyard, exile
     # it instead" (Bilbo, Thief in the Night). Actions::Cast exiles the card as it resolves or is countered, then clears it.
     attr_accessor :exile_instead_of_graveyard

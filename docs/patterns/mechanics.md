@@ -130,7 +130,7 @@ Whole named mechanics spanning trigger+cost+static (Monarch, Ring tempts, Blitz,
 
 **Hexproof from abilities / exchange control** (Volatile Stormdrake): `def hexproof_from_abilities? = true` on the card; `Permanent#can_be_targeted_by?` treats a `Permanent` or ability object source as an ability (spells pass the card). Exchange control swaps `permanent.controller =` on both; capture the player before the swap, since `actor.controller` changes.
 
-**Exert mana + haste** (Arena of Glory): a mana ability calls `source.cannot_untap_next_turn!` for "Exert" and `controller.grant_haste_mana!`; `Cast` then gives the next creature spell cast that turn haste (`gain_haste_on_resolve!`). The engine does not track which mana pays for what, so this is an approximation.
+**Exert mana + haste** (Arena of Glory): a mana ability calls `source.cannot_untap_next_turn!` for "Exert" and returns `ManaRestriction::HasteForCreatureSpell.new` from `mana_restriction`. That mana rides in `restricted_mana` (spent before plain mana of the same colour); spending it on a creature card sets `haste_mana_spent`, and `Cast` then gives the spell haste (`gain_haste_on_resolve!`).
 
 **Improvise** (Archway of Innovation): `action.improvise(artifact)` taps an artifact to pay `{1}` (call it before `pay_mana`, like `convoke`). It needs `card.improvise?` or `player.next_spell_improvise?`, which "the next spell you cast this turn has improvise" sets with `player.grant_next_spell_improvise!` and `Player#consume_spell_cast!` clears when any spell is cast.
 

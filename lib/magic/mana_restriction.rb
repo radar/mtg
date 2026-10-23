@@ -118,6 +118,16 @@ module Magic
       end
     end
 
+    # Arena of Glory: "If that mana is spent on a creature spell, it gains haste until end of turn." Not a restriction
+    # (any spend is allowed); spending it on a creature spell marks the spell so it gains haste as it resolves.
+    class HasteForCreatureSpell < ManaRestriction
+      def permits?(_use) = true
+
+      def spent_on(use, _player)
+        use.haste_mana_spent = true if use.is_a?(Magic::Card) && use.creature?
+      end
+    end
+
     # "Spend this mana only to cast Elemental spells or activate abilities of Elemental sources."
     class OfType < ManaRestriction
       def initialize(type:)

@@ -20,10 +20,12 @@ module Magic
 
         def mana_produced = { red: 2 }
 
+        # The two mana carry the haste rider, so only a creature spell they are spent on gains haste.
+        def mana_restriction = ManaRestriction::HasteForCreatureSpell.new
+
         def resolve!
           super
           source.cannot_untap_next_turn!
-          controller.grant_haste_mana!
         end
       end
 

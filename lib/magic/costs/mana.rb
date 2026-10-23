@@ -128,6 +128,7 @@ module Magic
         raise CannotPay.new(cost, player) unless can_pay?(player)
 
         for_use.treasure_mana_spent = false if for_use.respond_to?(:treasure_mana_spent=)
+        for_use.haste_mana_spent = false if for_use.respond_to?(:haste_mana_spent=)
         player.pay_mana(@payments[:generic], for_use: for_use) if @payments[:generic].any?
         player.pay_mana(@payments[:x], for_use: for_use) if @payments[:x].any?
         if @any_color

@@ -33,7 +33,7 @@ RSpec.describe Magic::Cards::ArenaOfGlory do
       p1.add_mana(red: 1)
       p1.activate_ability(ability: arena.activated_abilities.last) { |a| a.pay_mana(red: 1) }
 
-      expect(p1.mana_pool[:red]).to eq(2)
+      expect(p1.restricted_mana.map(&:color)).to eq(%i[red red])
       expect(arena).to be_tapped
     end
 
@@ -59,6 +59,20 @@ RSpec.describe Magic::Cards::ArenaOfGlory do
       game.tick!
 
       expect(p1.creatures.find { _1.name == "Grizzly Bears" }).not_to be_summoning_sick
+    end
+
+    it "gives no haste to a creature spell paid for with other mana" do
+      p1.add_mana(red: 1)
+      p1.activate_ability(ability: arena.activated_abilities.last) { |a| a.pay_mana(red: 1) }
+      p1.add_mana(green: 2)
+      bears = Card("Grizzly Bears", owner: p1)
+      p1.hand.add(bears)
+
+      p1.cast(card: bears) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
+      game.stack.resolve!
+      game.tick!
+
+      expect(p1.creatures.find { _1.name == "Grizzly Bears" }).to be_summoning_sick
     end
 
     it "gives no haste without the exerted mana" do
