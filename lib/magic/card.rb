@@ -403,6 +403,11 @@ module Magic
     # The zone the card was cast from, while it is on the stack (`zone` is the stack then; see Zones::Stack).
     attr_accessor :cast_from_zone
 
+    # Whether this card was cast with escape and is still on the stack or battlefield ("unless it escaped").
+    attr_writer :escaped
+
+    def escaped? = @escaped || false
+
     # The zone a spell was cast from, or the zone the card is in when it is not on the stack.
     def origin_zone = zone&.stack? ? cast_from_zone : zone
 
@@ -411,6 +416,7 @@ module Magic
       return @zone = zone if zone&.stack?
 
       @cast_from_zone = nil
+      @escaped = false unless zone&.battlefield?
       @spell_keywords = nil
       @on_adventure = false unless zone&.exile?
       @dream_counter = false unless zone&.exile?

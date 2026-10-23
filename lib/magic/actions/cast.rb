@@ -16,6 +16,7 @@ module Magic
           normal: Cast,
           flashback: Flashback,
           harmonize: Harmonize,
+          escape: Escape,
           blitz: Blitz,
           evoked: Evoked,
           adventure: Adventure,
@@ -52,6 +53,7 @@ module Magic
 
       def flashback? = false
       def harmonize? = false
+      def escape? = false
       def evoked? = false
       def impending? = false
       def bestowed? = false
@@ -375,6 +377,22 @@ module Magic
       # answering `grants_emerge?(card, player)` (Herigast) grants emerge at the card's own mana cost: cast it normally.
       def emerge(creature)
         granted = static_ability_allows?(:grants_emerge?)
+      # Rule 702.138 (escape): exile other cards from your graveyard as part of the escape cost. The card says which sets
+      # of cards are acceptable with `escape_exile_valid?(cards)`. Cast with `cast_as(:escape, card:)` and call this
+      # in the block.
+      def escape_exile(cards)
+        raise "#{card.name} is not being cast with escape" unless escape?
+
+        cards = Array(cards)
+        raise ArgumentError, "escape can't exile #{card.name} itself" if cards.include?(card)
+        raise ArgumentError, "those cards aren't all in your graveyard" unless cards.all? { player.graveyard.cards.include?(_1) }
+        raise ArgumentError, "those cards can't pay #{card.name}'s escape cost" unless card.escape_exile_valid?(cards)
+
+        cards.each(&:exile!)
+        @escape_exiled = true
+        self
+      end
+
         raise "#{card.name} does not have emerge" unless granted || card.respond_to?(:emerge_from)
         raise "#{player.inspect} does not control #{creature.name}" unless creature.controller == player
         raise "#{creature.name} is not a valid emerge sacrifice" unless creature.type?(card.respond_to?(:emerge_from) ? card.emerge_from : "Creature")
