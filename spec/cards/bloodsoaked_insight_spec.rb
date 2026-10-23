@@ -65,6 +65,35 @@ RSpec.describe Magic::Cards::BloodsoakedInsight do
     expect(p1.creatures.map(&:name)).to include("Grizzly Bears")
   end
 
+  it "lets you play the exiled cards during your next turn" do
+    cast_insight!
+    2.times { game.next_turn }
+    go_to_main_phase!
+    p1.add_mana(red: 2)
+    p1.cast(card: bears) { |action| action.pay_mana(generic: { red: 1 }, red: 1) }
+    game.stack.resolve!
+    game.settle!
+
+    expect(p1.creatures.map(&:name)).to include("Grizzly Bears")
+  end
+
+  it "stops letting you play the exiled cards after the end of your next turn" do
+    cast_insight!
+    4.times { game.next_turn }
+    go_to_main_phase!
+    p1.add_mana(green: 2)
+
+    expect { p1.cast(card: bears) { |action| action.pay_mana(generic: { green: 1 }, green: 1) } }.to raise_error(Magic::IllegalAction)
+  end
+
+  it "lets you play an exiled land" do
+    forest = Card("Forest", owner: p2).tap { p2.library.add(_1) }
+    cast_insight!
+    p1.play_land(land: forest)
+
+    expect(p1.lands.map(&:card)).to include(forest)
+  end
+
   describe "played as Sanguine Morass" do
     let(:morass) { p1.permanents.by_name("Sanguine Morass").first }
 
