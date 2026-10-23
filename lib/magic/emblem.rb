@@ -17,6 +17,9 @@ module Magic
     def controller = owner
     def static_abilities = []
 
+    # "You have no maximum hand size" (Tamiyo, Seasoned Scholar's emblem).
+    def no_maximum_hand_size? = false
+
     def permits_casting_from_graveyard?(card) = false
     def exiles_after_graveyard_cast?(card) = false
   end

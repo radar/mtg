@@ -526,6 +526,7 @@ module Magic
     # Rule 402.2: seven, unless a permanent says "You have no maximum hand size" (nil then).
     def maximum_hand_size
       return if permanents.any? { _1.card.no_maximum_hand_size? }
+      return if game.emblems.any? { _1.owner == self && _1.no_maximum_hand_size? }
 
       fixed = permanents.filter_map { _1.card.fixed_maximum_hand_size }.min
       base = fixed || STARTING_MAXIMUM_HAND_SIZE
