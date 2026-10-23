@@ -1126,7 +1126,9 @@ module Magic
       perform_trigger!(TriggeredAbility::ImpendingCounterRemoval, event) if impending? && event.is_a?(Events::BeginningOfEndStep)
       return if lost_all_abilities?
 
-      Array(face.event_handlers[event.class]).each do |handler_class|
+      # A copy keeps its own card's handlers (the "except it has ..." abilities) and gains the copied card's.
+      handler_classes = [face, copied_card].compact.uniq.flat_map { |source| Array(source.event_handlers[event.class]) }.uniq
+      handler_classes.each do |handler_class|
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
         perform_trigger!(handler_class, event)
       end
