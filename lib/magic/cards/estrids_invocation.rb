@@ -58,7 +58,8 @@ module Magic
 
       def etb_triggers = [EntersTrigger]
 
-      def event_handlers
+      # Only the copy has the blink ability; uncopied, this is a vanilla enchantment.
+      def copy_exception_handlers
         { Events::BeginningOfUpkeep => UpkeepTrigger }
       end
     end

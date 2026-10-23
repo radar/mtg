@@ -42,10 +42,12 @@ RSpec.describe Magic::Cards::EstridsInvocation do
     expect(p1.enchantments.map(&:name)).to eq(["Estrid's Invocation"])
   end
 
-  it "offers to blink itself at the beginning of your upkeep" do
-    ResolvePermanent("Estrid's Invocation", owner: p1)
+  it "gives the copy a blink ability at the beginning of your upkeep" do
+    ResolvePermanent("Monstrous Vortex", owner: p1)
+    cast_invocation
+    game.resolve_choice!
+    game.resolve_choice!(target: p1.enchantments.first)
     game.settle!
-    game.skip_choice! while game.choices.any?
     2.times { game.next_turn }
     go_to_main_phase!
     game.settle!
@@ -55,5 +57,14 @@ RSpec.describe Magic::Cards::EstridsInvocation do
     game.settle!
 
     expect(p1.enchantments.map(&:name)).to include("Estrid's Invocation")
+  end
+
+  it "has no blink ability when it did not copy anything" do
+    cast_invocation
+    2.times { game.next_turn }
+    go_to_main_phase!
+    game.settle!
+
+    expect(game.choices).to be_empty
   end
 end
