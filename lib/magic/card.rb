@@ -789,6 +789,11 @@ module Magic
       false
     end
 
+    # "Hexproof from activated and triggered abilities" (Volatile Stormdrake): opponents' abilities can't target it.
+    def hexproof_from_abilities?
+      false
+    end
+
     def prowess_trigger
       -> (permanent, event) do
         Cards::KeywordHandlers::Prowess.trigger(permanent: permanent, event: event)

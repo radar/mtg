@@ -857,8 +857,15 @@ module Magic
       opposing = opponents.include?(controller)
       return false if opposing && hexproof? && !hexproof_ignored?
       return false if opposing && source.colors.any? { hexproof_from?(_1) }
+      return false if opposing && face.respond_to?(:hexproof_from_abilities?) && face.hexproof_from_abilities? && ability_source?(source)
 
       !protected_from?(source)
+    end
+
+    # A targeting source is an ability, not a spell, when it is a permanent (a triggered or activated ability's source) or
+    # an ability object itself.
+    def ability_source?(source)
+      source.is_a?(Permanent) || source.is_a?(Magic::ActivatedAbility) || source.is_a?(Magic::TriggeredAbility)
     end
 
     # Nowhere to Run: "can be the targets of spells and abilities as though they didn't have hexproof".
