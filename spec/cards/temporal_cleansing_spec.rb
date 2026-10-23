@@ -36,6 +36,23 @@ RSpec.describe Magic::Cards::TemporalCleansing do
     expect(p2.library.to_a.last).to eq(stone.card)
   end
 
+  it "asks the permanent's owner, not the caster, to choose" do
+    stone = ResolvePermanent("Mind Stone", owner: p2)
+    cast_on(stone)
+
+    expect(game.choices.last.chooser).to eq(p2)
+  end
+
+  it "removes the permanent from the battlefield" do
+    stone = ResolvePermanent("Mind Stone", owner: p2)
+    cast_on(stone)
+    game.resolve_choice!(position: :bottom)
+    game.settle!
+
+    expect(stone.zone).to be_nil
+    expect(p2.library.to_a.last).to eq(stone.card)
+  end
+
   it "can't target a land" do
     forest = ResolvePermanent("Forest", owner: p2)
 
