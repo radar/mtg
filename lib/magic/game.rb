@@ -386,6 +386,8 @@ module Magic
       begin
         loop do
           battlefield.map(&:apply_continuous_effects!)
+          # Ascend is a static ability: the blessing is gained the moment a player controls ten permanents.
+          players.each(&:citys_blessing?)
           sba_changed = StateBasedActions.new(game: self).perform!
 
           if stack.pending_choices?

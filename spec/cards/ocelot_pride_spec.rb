@@ -41,4 +41,15 @@ RSpec.describe Magic::Cards::OcelotPride do
 
     expect(cats.size).to eq(2)
   end
+
+  it "keeps the city's blessing gained earlier in the turn after permanents leave" do
+    forests = Array.new(9) { ResolvePermanent("Forest", owner: p1) }
+    game.settle!
+    forests.each(&:destroy!)
+    game.settle!
+    p1.gain_life(1)
+    end_turn!
+
+    expect(cats.size).to eq(2)
+  end
 end

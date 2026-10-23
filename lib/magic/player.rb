@@ -516,7 +516,7 @@ module Magic
     end
 
     # Ascend: once a player controls ten or more permanents they have the city's blessing for the rest of the game.
-    # Checked whenever a card with ascend asks.
+    # Latched at every state-based-action check, and on demand.
     def citys_blessing?
       @citys_blessing ||= permanents.count >= 10
     end
