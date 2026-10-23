@@ -53,6 +53,10 @@ module Magic
       @game = game
     end
 
+    # A token has no mana cost, so its mana value is 0 unless the card that creates it defines one (Spellgorger Weird).
+    def mana_value = 0
+    def cmc = mana_value
+
     def entering_counters = {}
     def can_attack? = !keywords.include?(Keywords::DEFENDER)
     def can_block?(_) = true

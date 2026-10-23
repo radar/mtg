@@ -65,6 +65,7 @@ RSpec.describe Magic::Cards::RalAndTheImplicitMaze do
       weird = game.battlefield.by_name("Spellgorger Weird").first
       expect(weird).not_to be_nil
       expect(weird.power).to eq(2)
+      expect(weird.mana_value).to eq(3)
 
       go_to_main_phase!
       shock = Card("Shock", owner: p1)

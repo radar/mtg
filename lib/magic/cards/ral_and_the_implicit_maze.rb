@@ -52,6 +52,9 @@ module Magic
         toughness 2
         colors :red
 
+        # "It's a {2}{R} 2/2 Weird creature..."
+        def mana_value = 3
+
         def event_handlers
           { Events::SpellCast => SpellgorgerWeirdToken::SpellCastTrigger }
         end
