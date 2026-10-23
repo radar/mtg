@@ -21,8 +21,11 @@ module Magic
           cost.auto_pay(player: chooser)
           cost.finalize!(chooser)
         end
-        actor.transform!
+        transform!
       end
+
+      # Subclasses override this for "exile it, then return it transformed" (`exile_and_return_transformed!`).
+      def transform! = actor.transform!
     end
   end
 end
