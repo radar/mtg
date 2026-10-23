@@ -64,6 +64,32 @@ RSpec.describe Magic::Cards::TheHungerTideRises do
       expect(p1.graveyard.cards).not_to include(small)
     end
 
+    it "puts a creature found in the library onto the battlefield and shuffles" do
+      from_library = Card("Grizzly Bears", owner: p1)
+      p1.library.add(from_library)
+      game.resolve_choice!(sacrifices: insects)
+      game.settle!
+
+      choice = game.choices.last
+      expect(choice.choices).to contain_exactly(small, from_library)
+      expect(p1.library).to receive(:shuffle!)
+      game.resolve_choice!(target: from_library)
+      game.settle!
+
+      expect(p1.creatures.map(&:name)).to include("Grizzly Bears")
+      expect(p1.library.cards).not_to include(from_library)
+      expect(p1.graveyard.cards).to include(small)
+    end
+
+    it "does not shuffle when the creature comes from the graveyard" do
+      game.resolve_choice!(sacrifices: insects)
+      game.settle!
+
+      expect(p1.library).not_to receive(:shuffle!)
+      game.resolve_choice!(target: small)
+      game.settle!
+    end
+
     it "finds nothing if no creatures are sacrificed" do
       game.skip_choice!
       game.settle!
