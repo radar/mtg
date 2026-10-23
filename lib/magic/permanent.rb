@@ -855,7 +855,9 @@ module Magic
     def exile_and_return_transformed!
       returning = card
       exile!
-      Permanent.put_onto_battlefield(game:, card: returning, owner:, from_zone: game.exile, transformed: true)
+      Permanent.put_onto_battlefield(game:, card: returning, owner:, from_zone: game.exile, transformed: true).tap do |permanent|
+        permanent.loyalty if permanent.planeswalker? # fixes the starting loyalty now, while "this turn" counts still hold
+      end
     end
 
     def return_to_hand
