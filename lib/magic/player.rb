@@ -469,6 +469,12 @@ module Magic
       game.battlefield.permanents.controlled_by(self)
     end
 
+    # Ascend: once a player controls ten or more permanents they have the city's blessing for the rest of the game.
+    # Checked whenever a card with ascend asks.
+    def citys_blessing?
+      @citys_blessing ||= permanents.count >= 10
+    end
+
     STARTING_MAXIMUM_HAND_SIZE = 7
 
     # Rule 402.2: seven, unless a permanent says "You have no maximum hand size" (nil then).
