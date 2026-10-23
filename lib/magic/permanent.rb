@@ -37,11 +37,21 @@ module Magic
     # Set by ContinuousEffects from Abilities::Static::CharacteristicSetting.
     attr_accessor :color_override, :lost_all_abilities_by_effect
 
-    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :toughness_modification, :type_grants
+    def_delegators :@card, :name, :cmc, :mana_value, :colors, :colorless?, :opponents, :type_grants
     def_delegators :@game, :logger
 
     # What this permanent adds to the creature it's attached to. Each hone counter on an Equipment grants +1/+0.
-    def power_modification = @card.power_modification + counters.of_type(Counters::Hone).count
+    def power_modification = @card.power_modification + counters.of_type(Counters::Hone).count + counter_scaled_modification
+
+    def toughness_modification = @card.toughness_modification + counter_scaled_modification
+
+    # "Enchanted creature gets +1/+1 for each +1/+1 counter on this Aura": a card answering `enchanted_bonus_per_plus_one_counter`
+    # gives that much per +1/+1 counter on this permanent.
+    def counter_scaled_modification
+      return 0 unless @card.respond_to?(:enchanted_bonus_per_plus_one_counter)
+
+      @card.enchanted_bonus_per_plus_one_counter * counters.of_type(Counters::Plus1Plus1).count
+    end
 
     class Protections < SimpleDelegator
       def player
