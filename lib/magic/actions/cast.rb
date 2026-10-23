@@ -387,12 +387,6 @@ module Magic
         self
       end
 
-      # Rule 702.119 (emerge): sacrifice a creature you control (the card's `emerge_from` type, creature by default)
-      # to reduce the emerge cost (the card's `alternative_cost`) by its mana value. Like #convoke it reduces the
-      # cost itself, so cast with `cast_as(:alternative, ...)` and call it before any mana payment. A static ability
-      # answering `grants_emerge?(card, player)` (Herigast) grants emerge at the card's own mana cost: cast it normally.
-      def emerge(creature)
-        granted = static_ability_allows?(:grants_emerge?)
       # Rule 702.138 (escape): exile other cards from your graveyard as part of the escape cost. The card says which sets
       # of cards are acceptable with `escape_exile_valid?(cards)`. Cast with `cast_as(:escape, card:)` and call this
       # in the block.
@@ -409,6 +403,12 @@ module Magic
         self
       end
 
+      # Rule 702.119 (emerge): sacrifice a creature you control (the card's `emerge_from` type, creature by default)
+      # to reduce the emerge cost (the card's `alternative_cost`) by its mana value. Like #convoke it reduces the
+      # cost itself, so cast with `cast_as(:alternative, ...)` and call it before any mana payment. A static ability
+      # answering `grants_emerge?(card, player)` (Herigast) grants emerge at the card's own mana cost: cast it normally.
+      def emerge(creature)
+        granted = static_ability_allows?(:grants_emerge?)
         raise "#{card.name} does not have emerge" unless granted || card.respond_to?(:emerge_from)
         raise "#{player.inspect} does not control #{creature.name}" unless creature.controller == player
         raise "#{creature.name} is not a valid emerge sacrifice" unless creature.type?(card.respond_to?(:emerge_from) ? card.emerge_from : "Creature")
@@ -442,18 +442,18 @@ module Magic
       # Rule 702.56 (replicate): pay the replicate cost +times+ times; when the spell is cast, it is copied that many
       # times (the copies may choose new targets). The energy is paid when the cast is finalized.
       def replicate(times = 1)
-        raise "#{card.name} does not have replicate" unless card.replicate_energy
-        raise "#{player.inspect} cannot pay for replicate #{times} time(s)" if player.energy < card.replicate_energy * times
-
-        @replicated = times
-        self
-      end
         if card.replicate_mana
           mana_cost.increase!(card.replicate_mana.transform_values { _1 * (times - (@replicated || 0)) })
           @replicated = times
           return self
         end
 
+        raise "#{card.name} does not have replicate" unless card.replicate_energy
+        raise "#{player.inspect} cannot pay for replicate #{times} time(s)" if player.energy < card.replicate_energy * times
+
+        @replicated = times
+        self
+      end
 
       def pay_kicker(payment)
         kicker_cost.pay(player:, payment:)
