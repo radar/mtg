@@ -766,6 +766,7 @@ module Magic
     # `regenerate: false` is "it can't be regenerated" (Rapid Hybridization): a regeneration shield is not used.
     def destroy!(regenerate: true)
       return false if indestructible?
+      return false if use_shield_counter!
 
       if regenerate && regeneration_shield?
         regenerated!
@@ -773,6 +774,15 @@ module Magic
       end
 
       put_into_graveyard!
+      true
+    end
+
+    # A shield counter: "If it would be dealt damage or destroyed, remove a shield counter from it instead."
+    # Returns whether one was removed (and so the damage or destruction is prevented).
+    def use_shield_counter!
+      return false if @counters.of_type(Counters::Shield).none?
+
+      @counters.remove_first(Counters::Shield)
       true
     end
 

@@ -52,7 +52,9 @@ module Magic
     # Rule 702.80 (wither): damage a source with wither deals to a creature is dealt as -1/-1 counters.
     # Everything else about the damage (lifelink, events, prevention) is unchanged.
     def deal_damage_to_target!(target, damage)
-      if target.creature? && source.respond_to?(:wither?) && source.wither?
+      if target.respond_to?(:use_shield_counter!) && damage.positive? && target.use_shield_counter!
+        nil
+      elsif target.creature? && source.respond_to?(:wither?) && source.wither?
         target.add_counter(Counters::Minus1Minus1, amount: damage) if damage.positive?
       else
         target.take_damage(damage)
