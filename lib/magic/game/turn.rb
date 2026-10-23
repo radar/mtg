@@ -161,6 +161,16 @@ module Magic
         event :cleanup do
           transition end: :cleanup
         end
+
+        # An additional beginning phase (Shadow of the Second Sun) runs untap, upkeep and draw again after the
+        # postcombat main phase, then the turn continues with its end step.
+        event :additional_beginning_phase do
+          transition second_main: :untap
+        end
+
+        after_transition on: :additional_beginning_phase do |turn|
+          turn.begin_additional_beginning_phase!
+        end
       end
 
       def initialize(number: 1, game: Magic::Game.new, active_player: Magic::Player.new)
@@ -170,6 +180,8 @@ module Magic
         @actions = []
         @events = EventLog.new
         @additional_combats = 0
+        @additional_beginning_phases = 0
+        @in_additional_beginning_phase = false
         @combat = CombatPhase.new(game: game)
         @combat_damage_exceptions = nil
         super()
@@ -253,7 +265,11 @@ module Magic
       # player has passed with an empty stack.
       def advance_step!
         event = NEXT_STEP_EVENTS.fetch(step.to_sym) { raise "No next step after #{step}" }
-        if event == :attackers_declared!
+        if step.to_sym == :second_main && additional_beginning_phase_pending?
+          additional_beginning_phase
+        elsif step.to_sym == :draw && in_additional_beginning_phase?
+          self.end
+        elsif event == :attackers_declared!
           combat.validate_attackers!(active_player)
           combat.attackers_declared? ? attackers_declared! : end_of_combat
         else
@@ -271,6 +287,23 @@ module Magic
 
       def consume_additional_combat!
         @additional_combats -= 1
+      end
+
+      def queue_additional_beginning_phase!
+        @additional_beginning_phases += 1
+      end
+
+      def additional_beginning_phase_pending?
+        @additional_beginning_phases.positive?
+      end
+
+      def in_additional_beginning_phase?
+        @in_additional_beginning_phase
+      end
+
+      def begin_additional_beginning_phase!
+        @additional_beginning_phases -= 1
+        @in_additional_beginning_phase = true
       end
 
       def take_action(action)
