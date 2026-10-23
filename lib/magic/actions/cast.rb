@@ -387,6 +387,16 @@ module Magic
         self
       end
 
+      # Rule 702.56 (replicate): pay the replicate cost +times+ times; when the spell is cast, it is copied that many
+      # times (the copies may choose new targets). The energy is paid when the cast is finalized.
+      def replicate(times = 1)
+        raise "#{card.name} does not have replicate" unless card.replicate_energy
+        raise "#{player.inspect} cannot pay for replicate #{times} time(s)" if player.energy < card.replicate_energy * times
+
+        @replicated = times
+        self
+      end
+
       def pay_kicker(payment)
         kicker_cost.pay(player:, payment:)
         self
@@ -577,6 +587,7 @@ module Magic
         mana_cost.finalize!(player)
         @paid_additional_costs.each { |cost| cost.finalize!(player) if cost.is_a?(Costs::PayLife) }
         paid_offspring_costs.each { |cost| cost.finalize!(player) }
+        player.pay_energy!(card.replicate_energy * @replicated) if @replicated
         player.consume_spell_cast!
         if card.zone&.graveyard?
           game.battlefield.static_abilities.each { _1.cast_from_graveyard!(card, player) if _1.respond_to?(:cast_from_graveyard!) }
@@ -603,6 +614,7 @@ module Magic
         queue_cast_triggers(cast_event)
 
         copy_for_conspire if @conspired
+        copy_for_replicate if @replicated
       end
 
       # Every permanent this spell targets (including through its modes) became a target.
@@ -756,6 +768,10 @@ module Magic
         else
           Magic::CopyEffect.resolve_with_choice!(actor: card, receiver: card, targets:, copies: 1)
         end
+      end
+
+      def copy_for_replicate
+        Magic::CopyEffect.resolve_with_choice!(actor: card, receiver: card, targets:, copies: @replicated)
       end
 
       private

@@ -135,6 +135,12 @@ module Magic
         const_set(:OVERLOAD_COST, cost)
       end
 
+      # "Replicate—Pay {E}{E}{E}": `replicate_energy 3`. Cast with `action.replicate(times)` to copy the spell that
+      # many times (`Actions::Cast#replicate`).
+      def replicate_energy(amount)
+        const_set(:REPLICATE_ENERGY, amount)
+      end
+
       # "You may have this enter as a copy of a creature": Permanent.enter then holds off state-based
       # actions until the card's enters trigger clears `copy_choice_pending`.
       def enters_as_copy
@@ -683,6 +689,11 @@ module Magic
 
     def evoke_cost
       self.class.const_defined?(:EVOKE_COST, false) ? Costs::Mana.new(self.class::EVOKE_COST.dup) : nil
+    end
+
+    # Energy paid per replicate (nil when the card has no replicate).
+    def replicate_energy
+      self.class.const_defined?(:REPLICATE_ENERGY, false) ? self.class::REPLICATE_ENERGY : nil
     end
 
     def overload_cost
