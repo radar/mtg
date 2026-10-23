@@ -1,6 +1,6 @@
 module Magic
   module Cards
-    ExpelTheUnworthy = Sorcery("Expel The Unworthy") do
+    ExpelTheUnworthy = Sorcery("Expel the Unworthy") do
       cost generic: 1, white: 1
       kicker_cost generic: 2, white: 1
     end
