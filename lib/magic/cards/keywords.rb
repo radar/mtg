@@ -32,6 +32,7 @@ module Magic
       INTIMIDATE = Class.new(Keyword)
       LIFELINK = Class.new(Keyword)
       MENACE = Class.new(Keyword)
+      AFTERLIFE = Class.new(Keyword)
       PERSIST = Class.new(Keyword)
       PROWESS = Class.new(Keyword)
       REACH = Class.new(Keyword)

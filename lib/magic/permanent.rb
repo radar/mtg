@@ -1092,7 +1092,7 @@ module Magic
       case event
       when Events::EnteredTheBattlefield then face.etb_triggers + (evoked? ? [TriggeredAbility::EvokeSacrifice] : [])
       when Events::LeftTheBattlefield     then face.ltb_triggers
-      when Events::CreatureDied           then face.death_triggers + (has_keyword?(Keywords::PERSIST) ? [TriggeredAbility::Persist] : [])
+      when Events::CreatureDied           then face.death_triggers + (has_keyword?(Keywords::PERSIST) ? [TriggeredAbility::Persist] : []) + (has_keyword?(Keywords::AFTERLIFE) ? [TriggeredAbility::Afterlife] : [])
       else []
       end
     end
