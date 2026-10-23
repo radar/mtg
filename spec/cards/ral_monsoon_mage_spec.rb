@@ -89,18 +89,33 @@ RSpec.describe Magic::Cards::RalMonsoonMage do
     it "-2 deals 2 damage divided and does not draw without another blue permanent" do
       walker.change_loyalty!(1)
       hand = p1.hand.count
-      activate(1)
-      game.resolve_choice!(distribution: { p2 => 1, p1 => 1 })
+      activate(1) { _1.targeting(p2, p1, distribution: { p2 => 1, p1 => 1 }) }
       expect(p2.life).to eq(19)
+      expect(p1.life).to eq(19)
       expect(p1.hand.count).to eq(hand)
+    end
+
+    it "-2 puts both points on a single target by default" do
+      walker.change_loyalty!(1)
+      activate(1) { _1.targeting(p2) }
+      expect(p2.life).to eq(18)
+    end
+
+    it "-2 needs a division that adds up to 2 among one or two targets" do
+      walker.change_loyalty!(1)
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      ability = walker.loyalty_abilities[1]
+
+      expect { p1.activate_loyalty_ability(ability: ability) { _1.targeting(p2, bears) } }.to raise_error(/must divide 2/)
+      expect { p1.activate_loyalty_ability(ability: ability) { _1.targeting(p2, bears, distribution: { p2 => 2, bears => 1 }) } }.to raise_error(/must divide 2/)
+      expect { p1.activate_loyalty_ability(ability: ability) { _1.targeting(p2, bears, p1, distribution: { p2 => 1, bears => 1, p1 => 1 }) } }.to raise_error(/must divide 2/)
     end
 
     it "-2 draws when another blue permanent is controlled" do
       walker.change_loyalty!(1)
       ResolvePermanent("Dreamtide Whale", owner: p1)
       hand = p1.hand.count
-      activate(1)
-      game.resolve_choice!(distribution: { p2 => 2 })
+      activate(1) { _1.targeting(p2, distribution: { p2 => 2 }) }
       expect(p2.life).to eq(18)
       expect(p1.hand.count).to eq(hand + 1)
     end

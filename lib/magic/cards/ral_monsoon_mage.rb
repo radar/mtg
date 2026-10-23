@@ -38,34 +38,29 @@ module Magic
       end
 
       # "-2: Ral deals 2 damage divided as you choose among one or two targets. Draw a card if you control a blue
-      # permanent other than Ral." The division is answered when the ability resolves, like Mogg Mob.
-      class DivideDamageChoice < Magic::Choice
-        def choices = game.any_target.select { _1.can_be_targeted_by?(actor) }
-
-        # Mandatory: skipping puts both points on the first legal target.
-        def decline!
-          resolve!(distribution: { choices.first => 2 })
-        end
-
-        def resolve!(distribution:)
-          unless distribution.values.sum == 2 && distribution.values.all?(&:positive?)
-            raise ArgumentError, "Ral must divide exactly 2 damage, at least 1 to each target"
-          end
-          raise ArgumentError, "illegal target" unless distribution.keys.all? { choices.include?(_1) }
-
-          distribution.each { |target, damage| deal_damage(damage, to: target) }
-          return unless game.battlefield.controlled_by(controller).any? { _1 != actor && _1.colors.include?(:blue) }
-
-          controller.draw!
-        end
-      end
-
+      # permanent other than Ral." Targets and the division are chosen on activation, as with any divided damage:
+      # `a.targeting(p2, bears, distribution: { p2 => 1, bears => 1 })`; one target takes both points. See
+      # `Actions::ActivateLoyaltyAbility#targeting`.
       class LoyaltyAbility2 < LoyaltyAbility
         def loyalty_change = -2
         def description = "Ral deals 2 damage divided as you choose among one or two targets. Draw a card if you control a blue permanent other than Ral."
 
-        def resolve!
-          game.choices.add(DivideDamageChoice.new(actor: source))
+        def target_choices = game.any_target
+
+        def divided_amount = 2
+
+        def max_divided_targets = 2
+
+        # A target that left the battlefield is skipped; the rest still take their damage.
+        def resolve!(distribution:)
+          distribution.each do |target, damage|
+            next if target.is_a?(Permanent) && target.zone.nil?
+
+            deal_damage(damage, to: target)
+          end
+          return unless game.battlefield.controlled_by(controller).any? { _1 != source && _1.colors.include?(:blue) }
+
+          controller.draw!
         end
       end
 
