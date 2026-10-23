@@ -37,6 +37,16 @@ RSpec.describe Magic::Cards::GristVoraciousLarva do
       expect(game.battlefield.controlled_by(p1).map(&:name)).not_to include("Grist, Voracious Larva")
     end
 
+    it "also triggers for a creature cast from your graveyard" do
+      game.play_permissions.grant_until_end_of_turn(card: bears, player: p1, from_graveyard: true)
+      p1.add_mana(green: 3)
+      p1.cast(card: bears) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
+      game.stack.resolve!
+      game.settle!
+
+      expect(game.choices.last).to be_a(Magic::Cards::GristVoraciousLarva::PayChoice)
+    end
+
     it "does nothing when the player declines" do
       p1.add_mana(green: 1)
       reanimate(bears)
@@ -77,6 +87,22 @@ RSpec.describe Magic::Cards::GristVoraciousLarva do
       expect(insects.count).to eq(1)
       expect(p1.graveyard.cards.count).to eq(2)
       expect(walker.loyalty).to eq(4)
+    end
+
+    it "+1 puts a deathtouch counter on the Insect when a black card is milled" do
+      p1.library.items.clear
+      2.times { p1.library.add(Card("Walking Corpse", owner: p1)) }
+      activate(0)
+
+      expect(insects.first.counters.of_type(Magic::Counters::Deathtouch).count).to eq(1)
+    end
+
+    it "+1 puts no deathtouch counter on the Insect when no black card is milled" do
+      p1.library.items.clear
+      2.times { p1.library.add(Card("Forest", owner: p1)) }
+      activate(0)
+
+      expect(insects.first.counters.of_type(Magic::Counters::Deathtouch).count).to eq(0)
     end
 
     it "-2 destroys target artifact or enchantment" do
