@@ -29,6 +29,26 @@ RSpec.describe Magic::Cards::DeemInferior do
     expect(p2.library.cards.last).to eq(bears.card)
   end
 
+  it "lets the target's owner, not the caster, choose the position" do
+    p1.add_mana(blue: 3)
+    p1.cast(card: Card("Deem Inferior", owner: p1)) { |a| a.pay_mana(generic: { blue: 2 }, blue: 1).targeting(bears) }
+    game.stack.resolve!
+
+    expect(game.choices.first.chooser).to eq(p2)
+  end
+
+  it "makes the target leave the battlefield" do
+    p1.add_mana(blue: 3)
+    p1.cast(card: Card("Deem Inferior", owner: p1)) { |a| a.pay_mana(generic: { blue: 2 }, blue: 1).targeting(bears) }
+    game.stack.resolve!
+    game.resolve_choice!(position: :bottom)
+
+    left = game.current_turn.events.find do |e|
+      e.is_a?(Magic::Events::LeftTheBattlefield) && e.permanent == bears
+    end
+    expect(left).not_to be_nil
+  end
+
   it "costs {1} less for each card drawn this turn" do
     p1.draw!
     game.settle!

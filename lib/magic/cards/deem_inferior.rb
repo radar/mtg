@@ -21,16 +21,19 @@ module Magic
           @target = target
         end
 
+        def chooser = target.owner
+
         def choices = %i[second bottom]
 
         def resolve!(position:)
           raise ArgumentError, "choose :second or :bottom" unless choices.include?(position)
 
-          owner = target.card.owner
-          game.unsubscribe(target)
-          game.battlefield.remove(target)
-          target.card.zone = owner.library
-          owner.library.add(target.card, position == :second ? [1, owner.library.count].min : owner.library.count)
+          library = target.owner.library
+          # Leaving the battlefield for real, so leaves-the-battlefield triggers see it go.
+          target.move_zone!(to: library)
+          return if target.copy? || target.token?
+
+          move_card(target.card, to: library, placement: position == :second ? [1, library.count].min : library.count)
         end
       end
 
