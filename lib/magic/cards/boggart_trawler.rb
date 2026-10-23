@@ -26,10 +26,12 @@ module Magic
 
     class BoggartTrawler < Creature
       # "Exile target player's graveyard."
-      class ExileGraveyardChoice < Magic::Choice
+      class ExileGraveyardChoice < Magic::Choice::Targeted
         def prompt = "Exile target player's graveyard."
 
         def choices = game.players
+
+        def choice_amount = 1
 
         def resolve!(target:)
           target.graveyard.cards.to_a.each(&:exile!)

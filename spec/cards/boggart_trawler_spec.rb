@@ -52,6 +52,20 @@ RSpec.describe Magic::Cards::BoggartTrawler do
     end
   end
 
+  describe "targeting a player with hexproof" do
+    let!(:theirs) { Card("Forest", owner: p2).tap { p2.graveyard.add(_1) } }
+
+    it "cannot exile that player's graveyard" do
+      p2.gain_hexproof_until_end_of_turn!
+      p1.add_mana(black: 3)
+      p1.cast(card: trawler) { _1.pay_mana(generic: { black: 2 }, black: 1) }
+      game.stack.resolve!
+      game.settle!
+
+      expect(theirs.zone).to be_graveyard
+    end
+  end
+
   describe "played as Boggart Bog" do
     let(:bog) { p1.permanents.by_name("Boggart Bog").first }
 
