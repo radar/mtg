@@ -129,6 +129,12 @@ module Magic
         const_set(:EVOKE_COST, cost)
       end
 
+      # "Overload {cost}": cast with `player.cast_as(:overloaded, card:)`; `resolve!(overloaded:)` then affects each
+      # object instead of a target (`Actions::Cast::Overloaded`).
+      def overload(**cost)
+        const_set(:OVERLOAD_COST, cost)
+      end
+
       # "You may have this enter as a copy of a creature": Permanent.enter then holds off state-based
       # actions until the card's enters trigger clears `copy_choice_pending`.
       def enters_as_copy
@@ -677,6 +683,10 @@ module Magic
 
     def evoke_cost
       self.class.const_defined?(:EVOKE_COST, false) ? Costs::Mana.new(self.class::EVOKE_COST.dup) : nil
+    end
+
+    def overload_cost
+      self.class.const_defined?(:OVERLOAD_COST, false) ? Costs::Mana.new(self.class::OVERLOAD_COST.dup) : nil
     end
 
     def blitz_cost

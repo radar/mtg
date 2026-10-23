@@ -23,6 +23,7 @@ module Magic
           door: Door,
           impending: Impending,
           spectacle: Spectacle,
+          overloaded: Overloaded,
         }.fetch(mode) { raise ArgumentError, "unknown way to cast a spell: #{mode.inspect}" }
       end
 
@@ -52,6 +53,7 @@ module Magic
       def harmonize? = false
       def evoked? = false
       def impending? = false
+      def overloaded? = false
       def adventure? = false
 
       def inspect
@@ -722,6 +724,7 @@ module Magic
             mana_spent: mana_cost.is_a?(Costs::Mana) ? mana_cost.mana_spent : {},
             evoked: evoked?,
             impending: impending?,
+            overloaded: overloaded?,
             flashback: flashback?,
             value_for_x: value_for_x || (mana_cost.x && mana_cost.x / card.x_multiplier),
             controller: player,
