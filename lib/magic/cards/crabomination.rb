@@ -34,17 +34,29 @@ module Magic
           end
         end
 
-        def call
-          opponent = game.opponents(controller).first
-          exiled = [
-            opponent.library.cards.first,
-            opponent.graveyard.cards.to_a.sample,
-            opponent.hand.cards.to_a.sample
-          ].compact
-          exiled.each(&:exile!)
+        # "target opponent"
+        class OpponentChoice < Magic::Choice::Targeted
+          def prompt = "Choose target opponent."
 
-          choice = CastChoice.new(actor: actor, exiled: exiled)
-          game.add_choice(choice) if choice.choices.any?
+          def choices = game.opponents(controller)
+
+          def choice_amount = 1
+
+          def resolve!(target:)
+            exiled = [
+              target.library.cards.first,
+              target.graveyard.cards.to_a.sample,
+              target.hand.cards.to_a.sample
+            ].compact
+            exiled.each(&:exile!)
+
+            choice = CastChoice.new(actor: actor, exiled: exiled)
+            game.add_choice(choice) if choice.choices.any?
+          end
+        end
+
+        def call
+          game.add_choice(OpponentChoice.new(actor: actor))
         end
       end
 

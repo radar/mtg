@@ -48,6 +48,16 @@ RSpec.describe Magic::Cards::Crabomination do
     end
   end
 
+  it "cannot exile cards from an opponent with hexproof" do
+    top = Card("Grizzly Bears", owner: p2).tap { p2.library.add(_1) }
+    p2.gain_hexproof_until_end_of_turn!
+    ResolvePermanent("Crabomination", owner: p1)
+    game.settle!
+
+    expect(game.exile.cards).to be_empty
+    expect(p2.library.cards.first).to eq(top)
+  end
+
   describe "emerge from artifact" do
     let!(:artifact) { ResolvePermanent("Sol Ring", owner: p1) }
 
