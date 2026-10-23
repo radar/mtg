@@ -37,7 +37,7 @@ module Magic
 
         def resolve!(choices:)
           cards = choices.to_a
-          cards.each(&:move_to_graveyard!)
+          cards.each(&:discard!)
           (cards.count * 2).times { create_token(token: Tokens::Clue) }
         end
 

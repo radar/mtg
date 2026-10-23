@@ -59,6 +59,20 @@ RSpec.describe Magic::Cards::TamiyoMeetsTheStoryCircle do
       expect(attacker.power).to eq(6)
     end
 
+    it "gives -2/-0 to a creature attacking a planeswalker you control" do
+      walker = ResolvePermanent("Basri Ket", owner: p1)
+      attacker = ResolvePermanent("Colossal Dreadmaw", owner: p2)
+      game.next_turn
+      go_to_main_phase!
+      skip_to_combat!
+      current_turn.declare_attackers!
+      current_turn.declare_attacker(attacker, target: walker)
+      current_turn.attackers_declared!
+      game.settle!
+
+      expect(attacker.power).to eq(4)
+    end
+
     it "does nothing to a creature attacking someone else" do
       mine = ResolvePermanent("Colossal Dreadmaw", owner: p1)
       go_to_main_phase!
@@ -83,6 +97,15 @@ RSpec.describe Magic::Cards::TamiyoMeetsTheStoryCircle do
 
       expect(p1.graveyard.cards).to include(*hand)
       expect(clues.count).to eq(4)
+    end
+
+    it "discards through Card#discard!, so madness cards are exiled instead" do
+      madness = Card("Emrakul, The World Anew", owner: p1)
+      p1.hand.add(madness)
+      game.resolve_choice!(choices: [madness])
+
+      expect(p1.graveyard.cards).not_to include(madness)
+      expect(game.exile.cards).to include(madness)
     end
 
     it "investigates not at all when discarding nothing" do
