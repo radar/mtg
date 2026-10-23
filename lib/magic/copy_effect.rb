@@ -18,6 +18,10 @@ module Magic
     def self.resolve_with_choice!(actor:, receiver:, targets:, copies: 1)
       copies += actor.game.battlefield.static_abilities.of_type(Abilities::Static::CopyMultiplier).sum(&:additional_copies)
 
+      if receiver.is_a?(Magic::Card)
+        copies.times { actor.game.notify!(Events::SpellCopied.new(spell: receiver, player: actor.controller)) }
+      end
+
       if targets.any?
         actor.game.add_choice(Magic::Choice::MayCopyTargets.new(actor: actor, receiver: receiver, original_targets: targets, copies: copies))
       else
