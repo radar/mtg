@@ -27,6 +27,28 @@ RSpec.describe Magic::Cards::UginsLabyrinth do
     end
   end
 
+  context "with a colored card with mana value 7 or more and a colorless card with lower mana value in hand" do
+    it "offers neither card to imprint" do
+      p1.hand.add(Card("Blasphemous Act", owner: p1))
+      p1.hand.add(Card("Sol Ring", owner: p1))
+      ResolvePermanent("Ugin's Labyrinth", owner: p1)
+      game.settle!
+
+      expect(game.choices).to be_empty
+      expect(land.exiled_cards).to be_empty
+    end
+
+    it "offers only the card that is colorless with mana value 7 or more" do
+      p1.hand.add(Card("Blasphemous Act", owner: p1))
+      p1.hand.add(Card("Sol Ring", owner: p1))
+      p1.hand.add(titan)
+      ResolvePermanent("Ugin's Labyrinth", owner: p1)
+      game.settle!
+
+      expect(game.choices.last.choices).to contain_exactly(titan)
+    end
+  end
+
   context "with a colorless card with mana value 7 or more in hand" do
     before do
       p1.hand.add(titan)
