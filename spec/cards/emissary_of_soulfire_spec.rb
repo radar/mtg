@@ -35,6 +35,20 @@ RSpec.describe Magic::Cards::EmissaryOfSoulfire do
     expect { add_exalted(bears) }.to raise_error(/can't pay 2/)
   end
 
+  it "only offers creatures you control as targets" do
+    opposing = ResolvePermanent("Grizzly Bears", owner: p2)
+    targets = emissary.activated_abilities.first.target_choices.to_a
+
+    expect(targets).to include(bears)
+    expect(targets).not_to include(opposing)
+  end
+
+  it "can only be activated as a sorcery" do
+    skip_to_combat!
+
+    expect { add_exalted(bears) }.to raise_error(Magic::IllegalAction)
+  end
+
   def attack_with(*attackers)
     skip_to_combat!
     current_turn.declare_attackers!
