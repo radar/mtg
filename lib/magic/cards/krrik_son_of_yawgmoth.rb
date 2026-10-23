@@ -12,7 +12,8 @@ module Magic
       # The three {B/P} symbols in its own cost: `Cast#pay_life_for_black(n)` pays n of them with 2 life each.
       def phyrexian_black = 3
 
-      # "For each {B} in a cost, you may pay 2 life rather than pay that mana." Spells only: see `Cast#pay_life_for_black`.
+      # "For each {B} in a cost, you may pay 2 life rather than pay that mana." Spells use `Cast#pay_life_for_black`, activated abilities
+      # `ActivateAbility#pay_life_for_black`.
       class PayLifeForBlack < StaticAbility
         def may_pay_life_for_black?(_card, player) = player == controller
       end

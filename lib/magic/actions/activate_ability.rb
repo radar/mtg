@@ -103,6 +103,24 @@ module Magic
         self
       end
 
+      # K'rrik's "for each {B} in a cost, you may pay 2 life rather than pay that mana", for an activation cost: pays
+      # `count` of the ability's {B} with 2 life each. Like #convoke it reduces the mana cost, so call it before paying mana.
+      # A battlefield static ability answers `may_pay_life_for_black?(source, player)`.
+      def pay_life_for_black(count = 1)
+        source = ability.source
+        unless game.battlefield.static_abilities.any? { _1.respond_to?(:may_pay_life_for_black?) && _1.may_pay_life_for_black?(source, player) }
+          raise "#{source.name}'s ability has no {B} that #{player.inspect} may pay with life"
+        end
+
+        mana = costs.find { _1.is_a?(Costs::Mana) }
+        raise "#{source.name}'s ability has only #{mana&.balance&.[](:black).to_i} {B} left" if mana&.balance&.[](:black).to_i < count
+        raise "#{player.inspect} cannot pay #{count * 2} life" if player.life < count * 2
+
+        mana.adjusted_by(black: -count)
+        player.lose_life(count * 2)
+        self
+      end
+
       # "For each mana in this ability's activation cost, you may tap an untapped creature you control rather than
       # pay that mana" (Heirloom Epic): taps `creature` to pay {1} of the generic cost. Call it before paying mana.
       def convoke(creature)

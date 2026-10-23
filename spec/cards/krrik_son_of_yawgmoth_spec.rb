@@ -53,6 +53,48 @@ RSpec.describe Magic::Cards::KrrikSonOfYawgmoth do
       expect(p1.life).to eq(18)
     end
 
+    context "with an activated ability that costs {B}" do
+      let!(:vault) { ResolvePermanent("Spymaster's Vault", owner: p1) }
+      let!(:bears) { ResolvePermanent("Grizzly Bears", owner: p1) }
+
+      before { vault.untap! }
+
+      it "lets the {B} be paid with 2 life" do
+        p1.activate_ability(ability: vault.activated_abilities.last) do |a|
+          a.pay_life_for_black(1)
+          a.targeting(bears)
+        end
+
+        expect(p1.life).to eq(18)
+        expect(vault).to be_tapped
+        expect(game.stack).not_to be_empty
+      end
+
+      it "still lets the {B} be paid with mana" do
+        p1.add_mana(black: 1)
+        p1.activate_ability(ability: vault.activated_abilities.last) do |a|
+          a.pay_mana(black: 1)
+          a.targeting(bears)
+        end
+
+        expect(p1.life).to eq(20)
+      end
+
+      it "does not let an opponent's ability use it" do
+        opposing_vault = ResolvePermanent("Spymaster's Vault", owner: p2)
+        opposing_bears = ResolvePermanent("Grizzly Bears", owner: p2)
+        opposing_vault.untap!
+
+        expect {
+          p2.activate_ability(ability: opposing_vault.activated_abilities.last) do |a|
+            a.pay_life_for_black(1)
+            a.targeting(opposing_bears)
+          end
+        }.to raise_error(/may pay with life/)
+        expect(p2.life).to eq(20)
+      end
+    end
+
     it "gets a +1/+1 counter whenever its controller casts a black spell" do
       p1.add_mana(black: 2)
       p1.cast(card: Card("Doom Blade", owner: p1)) do |a|
