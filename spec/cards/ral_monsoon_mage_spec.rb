@@ -46,6 +46,17 @@ RSpec.describe Magic::Cards::RalMonsoonMage do
     end
   end
 
+  context "when casting an instant on an opponent's turn" do
+    it "does not flip a coin or deal damage" do
+      go_to_main_phase_for!(p2)
+      expect(p1).not_to receive(:flip_coin!)
+      cast_shock
+      game.settle!
+      expect(p1.life).to eq(20)
+      expect(game.choices).to be_empty
+    end
+  end
+
   context "as a planeswalker" do
     let!(:walker) do
       ral.exile_and_return_transformed!
@@ -126,6 +137,20 @@ RSpec.describe Magic::Cards::RalMonsoonMage do
       count = p1.library.count
       activate(2)
       expect(p1.library.count).to eq(count - 8)
+    end
+
+    it "-8 lets you cast exiled instants and sorceries free, but not other cards" do
+      walker.change_loyalty!(6)
+      6.times { p1.library.add(Card("Island", owner: p1)) }
+      shock = Card("Shock", owner: p1)
+      bears = Card("Grizzly Bears", owner: p1)
+      p1.library.add(shock)
+      p1.library.add(bears)
+      activate(2)
+
+      expect(game.exile.cards).to include(shock, bears)
+      expect(game.play_permissions.permits?(shock, p1)).to be(true)
+      expect(game.play_permissions.permits?(bears, p1)).to be(false)
     end
   end
 end
