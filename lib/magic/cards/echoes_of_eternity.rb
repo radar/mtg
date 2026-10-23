@@ -7,10 +7,15 @@ module Magic
 
     class EchoesOfEternity < Enchantment
       # "If a triggered ability of a colorless spell you control or another colorless permanent you control triggers, that
-      # ability triggers an additional time." Only permanents are consulted by `Permanent#perform_trigger!`.
+      # ability triggers an additional time." Permanents are consulted by `Permanent#perform_trigger!`, a spell's own
+      # `cast_triggers` by `Actions::Cast`.
       class TriggersAdditionalTime < Abilities::Static::TriggeredAbilityDoubler
         def doubles_trigger_for?(permanent, _event)
           permanent != source && permanent.controller == controller && permanent.colorless?
+        end
+
+        def doubles_spell_trigger_for?(spell, _event)
+          spell.controller == controller && spell.colorless?
         end
       end
 

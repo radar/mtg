@@ -865,11 +865,18 @@ module Magic
       def queue_cast_triggers(cast_event)
         return if adventure?
 
-        card.cast_triggers.each do |trigger_class|
-          ability = trigger_class.new(actor: card, event: cast_event)
-          next unless ability.trigger!
+        doublers = game.battlefield.static_abilities
+          .of_type(Abilities::Static::TriggeredAbilityDoubler)
+          .select { _1.doubles_spell_trigger_for?(card, cast_event) }
+        doublers.each { game.notify!(Events::TriggerDoubled.new(source: _1.source, permanent: card)) }
 
-          game.queue_triggers? ? game.queue_trigger!(ability) : ability.call
+        card.cast_triggers.each do |trigger_class|
+          (1 + doublers.size).times do
+            ability = trigger_class.new(actor: card, event: cast_event)
+            next unless ability.trigger!
+
+            game.queue_triggers? ? game.queue_trigger!(ability) : ability.call
+          end
         end
       end
 

@@ -50,6 +50,30 @@ RSpec.describe Magic::Cards::EchoesOfEternity do
     expect(p1.creatures.count { _1.name == "Solemn Simulacrum" }).to eq(2)
   end
 
+  context "a colorless spell's own cast trigger" do
+    def cast_ulamog!(player)
+      player.add_mana(colorless: 10)
+      player.cast(card: Card("Ulamog The Defiler", owner: player)) { |a| a.pay_mana(generic: { colorless: 10 }) }
+      game.settle!
+      10.times do
+        game.skip_choice! if game.choices.any?
+        game.stack.resolve! unless game.stack.empty?
+        game.settle!
+      end
+    end
+
+    it "happens an additional time" do
+      expect { cast_ulamog!(p1) }.to change { p2.library.count }.from(7).to(1)
+    end
+
+    it "happens once without Echoes of Eternity" do
+      echoes.destroy!
+      game.settle!
+
+      expect { cast_ulamog!(p1) }.to change { p2.library.count }.from(7).to(3)
+    end
+  end
+
   it "does not copy a coloured spell" do
     p1.add_mana(red: 1)
     p1.cast(card: Card("Shock", owner: p1)) { |a| a.pay_mana(red: 1); a.targeting(p2) }
