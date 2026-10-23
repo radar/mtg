@@ -9,7 +9,7 @@ module Magic
       # "Morbid -- At the beginning of each end step, if a creature died this turn, put a soul counter on this artifact."
       class EndStepTrigger < TriggeredAbility
         def should_perform?
-          game.current_turn.events.any? { _1.is_a?(Events::CreatureDied) }
+          creature_died_this_turn?
         end
 
         def call

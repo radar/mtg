@@ -297,7 +297,7 @@ RSpec.describe Magic::CardParser::Rules::Trigger do
     source = parse("At the beginning of your end step, if another creature entered the battlefield under your control this turn, draw a card.")
       .class_source("EndStepIfCreatureEnteredTrigger")
     expect(source).to include("class EndStepIfCreatureEnteredTrigger < TriggeredAbility::BeginningOfEndStep",
-                              "controllers_end_step? && game.current_turn.events.any?", "draw_card")
+                              "controllers_end_step? && creature_entered_this_turn?(except: actor)", "draw_card")
   end
 
   it "parses an each-end-step trigger conditional on you having put a counter on a creature" do

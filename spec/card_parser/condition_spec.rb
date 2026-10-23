@@ -30,8 +30,8 @@ RSpec.describe Magic::CardParser::Condition do
   end
 
   it "checks what happened this turn" do
-    expect(described_class.parse("you attacked this turn")).to include("Events::CreatureAttacked", "e.attacker.controller == controller")
-    expect(described_class.parse("an opponent lost life this turn")).to include("Events::LifeLoss", "e.player != controller")
+    expect(described_class.parse("you attacked this turn")).to eq("attacked_this_turn?")
+    expect(described_class.parse("an opponent lost life this turn")).to eq("opponent_lost_life_this_turn?")
   end
 
   it "checks typed cards in the graveyard and counters on the permanent" do

@@ -11,7 +11,7 @@ module Magic
     class DreadedBatCloud < Creature
       # "This spell costs {3} less to cast if a creature died this turn."
       def self_mana_cost_adjustment
-        { generic: -> { game.current_turn.events.any? { _1.is_a?(Events::CreatureDied) } ? -3 : 0 } }
+        { generic: -> { creature_died_this_turn? ? -3 : 0 } }
       end
     end
   end

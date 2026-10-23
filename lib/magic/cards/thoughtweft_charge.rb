@@ -12,14 +12,6 @@ module Magic
         pump(target, 3, 3)
         draw_card if creature_entered_this_turn?
       end
-
-      private
-
-      def creature_entered_this_turn?
-        game.current_turn.events.any? do |event|
-          event.is_a?(Events::EnteredTheBattlefield) && event.permanent.creature? && event.permanent.controller == controller
-        end
-      end
     end
   end
 end

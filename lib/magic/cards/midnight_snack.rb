@@ -21,7 +21,7 @@ module Magic
 
       class EndStepTrigger < TriggeredAbility::BeginningOfEndStep
         def should_perform?
-          controllers_end_step? && (game.current_turn.events.any? { |e| e.is_a?(Events::CreatureAttacked) && e.attacker.controller == controller })
+          controllers_end_step? && attacked_this_turn?
         end
 
         def call

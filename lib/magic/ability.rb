@@ -2,6 +2,7 @@ module Magic
   class Ability
     include BattlefieldFilters
     include EffectShortcuts
+    include TurnHistory
 
     attr_reader :source
 

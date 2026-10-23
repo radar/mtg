@@ -13,9 +13,7 @@ module Magic
       def may_cast_from_graveyard?
         return false unless zone&.graveyard?
 
-        game.current_turn.events.any? do |event|
-          event.is_a?(Events::CreatureDied) && !event.permanent.type?("Zombie")
-        end
+        creature_died_this_turn?(except_type: "Zombie")
       end
 
       # "If you do, this creature enters with a +1/+1 counter on it."

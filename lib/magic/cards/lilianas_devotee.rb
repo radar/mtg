@@ -34,7 +34,7 @@ module Magic
       # "At the beginning of your end step, if a creature died this turn, ..."
       class EndStepTrigger < TriggeredAbility::BeginningOfEndStep
         def should_perform?
-          controllers_end_step? && game.current_turn.events.any? { |e| e.is_a?(Events::CreatureDied) }
+          controllers_end_step? && creature_died_this_turn?
         end
 
         def call

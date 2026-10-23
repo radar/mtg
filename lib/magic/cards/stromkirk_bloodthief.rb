@@ -10,7 +10,7 @@ module Magic
     class StromkirkBloodthief < Creature
       class EndStepTrigger < TriggeredAbility::BeginningOfEndStep
         def should_perform?
-          controllers_end_step? && (game.current_turn.events.any? { |e| e.is_a?(Events::LifeLoss) && e.player != controller })
+          controllers_end_step? && opponent_lost_life_this_turn?
         end
 
         class TargetChoice < Magic::Choice::Targeted

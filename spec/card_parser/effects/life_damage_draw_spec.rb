@@ -38,7 +38,7 @@ RSpec.describe Magic::CardParser::Effect, "(batch 3)" do
   it "parses discard-unless-a-condition" do
     effect = described_class.parse("Then discard a card unless you attacked this turn.")
     expect(effect).to be_a(e.const_get(:DiscardUnlessCondition))
-    expect(effect.resolve_call).to start_with("unless game.current_turn.events.any?")
+    expect(effect.resolve_call).to start_with("unless attacked_this_turn?")
     expect(described_class.parse("Discard a card unless you have no cards in hand.")).to be_a(e.const_get(:DiscardUnlessCondition))
     expect(described_class.parse("Discard a card unless you flip a coin.")).to be_nil
   end
@@ -163,7 +163,7 @@ end
 
 RSpec.describe Magic::CardParser::Condition do
   it "reads 'you attacked this turn'" do
-    expect(described_class.parse("you attacked this turn")).to include("Events::CreatureAttacked")
+    expect(described_class.parse("you attacked this turn")).to eq("attacked_this_turn?")
   end
 
   it "reads 'it/~ has a <type> counter on it' as one or more" do

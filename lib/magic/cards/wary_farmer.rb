@@ -10,7 +10,7 @@ module Magic
     class WaryFarmer < Creature
       class EndStepIfCreatureEnteredTrigger < TriggeredAbility::BeginningOfEndStep
         def should_perform?
-          controllers_end_step? && game.current_turn.events.any? { |e| e.is_a?(Events::EnteredTheBattlefield) && e.permanent.creature? && e.permanent != actor && e.permanent.controller == controller }
+          controllers_end_step? && creature_entered_this_turn?(except: actor)
         end
 
         def call

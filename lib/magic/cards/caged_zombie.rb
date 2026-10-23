@@ -13,7 +13,7 @@ module Magic
         costs "{1}{B}, {T}"
 
         def requirements_met?
-          game.current_turn.events.any? { |event| event.is_a?(Events::CreatureDied) }
+          creature_died_this_turn?
         end
 
         def resolve!

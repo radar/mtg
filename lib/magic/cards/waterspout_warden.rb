@@ -12,13 +12,7 @@ module Magic
       # turn, this creature gains flying until end of turn.
       class AttacksTrigger < TriggeredAbility
         def should_perform?
-          event.attacks.any? { _1.attacker == actor } && entered_this_turn?
-        end
-
-        def entered_this_turn?
-          game.current_turn.events.any? do |entered|
-            entered.is_a?(Events::EnteredTheBattlefield) && entered.permanent != actor && entered.permanent.creature? && entered.permanent.controller == controller
-          end
+          event.attacks.any? { _1.attacker == actor } && creature_entered_this_turn?(except: actor)
         end
 
         def call

@@ -7,7 +7,7 @@ module Magic
     class LastingTarfire < Enchantment
       class EachEndStepIfCounterPutTrigger < TriggeredAbility::BeginningOfEndStep
         def should_perform?
-          game.current_turn.events.any? { |e| e.is_a?(Events::CounterAddedToPermanent) && e.permanent.creature? && e.source&.controller == controller }
+          event_this_turn?(Events::CounterAddedToPermanent) { |e| e.permanent.creature? && e.source&.controller == controller }
         end
 
         def call
