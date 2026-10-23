@@ -13,6 +13,7 @@ module Magic
       when "energy" then Energy
       when "blessing" then Blessing
       when "stun" then Stun
+      when "exalted" then Exalted
       when "hatchling" then Hatchling
       when "time" then Time
       when "quest" then Quest

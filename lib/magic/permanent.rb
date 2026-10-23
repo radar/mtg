@@ -1128,6 +1128,7 @@ module Magic
 
       # A copy keeps its own card's handlers (the "except it has ..." abilities) and gains the copied card's.
       handler_classes = [face, copied_card].compact.uniq.flat_map { |source| Array(source.event_handlers[event.class]) }.uniq
+      handler_classes += [Counters::Exalted::Trigger] if event.is_a?(Events::FinalAttackersDeclared) && counters.of_type(Counters::Exalted).any?
       handler_classes.each do |handler_class|
         logger.debug "EVENT HANDLER: #{self} handling #{event}"
         perform_trigger!(handler_class, event)
