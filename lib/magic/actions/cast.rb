@@ -181,6 +181,7 @@ module Magic
 
         unless @by_effect
           return "#{card.name} is a land, and lands are played, not cast" if card.land? && !adventure?
+          return "#{card.name} can't be cast while a spell with split second is on the stack" if game.stack.split_second?
           return "#{card.name} is already on the stack" if already_on_stack?
           return "#{card.name} is not in a zone it can be cast from" unless castable_from_current_zone?
           return cost_mode_illegal_reason if cost_mode_illegal_reason

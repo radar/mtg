@@ -73,6 +73,11 @@ module Magic
       @stack.select { |item| item.is_a?(Magic::Actions::Cast) }
     end
 
+    # Split second (rule 702.61): players can't cast spells or activate non-mana abilities meanwhile.
+    def split_second?
+      spells.any? { |spell| spell.card.keywords.include?(Cards::Keywords::SPLIT_SECOND) }
+    end
+
     def abilities
       @stack.select { |item| item.is_a?(Magic::Actions::ActivateAbility) || item.is_a?(TriggeredAbility) }
     end

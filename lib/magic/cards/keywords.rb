@@ -38,6 +38,8 @@ module Magic
       SHADOW = Class.new(Keyword)
       SHROUD = Class.new(Keyword)
       SKULK = Class.new(Keyword)
+      # Split second: while a spell with it is on the stack, nobody can cast spells or activate non-mana abilities.
+      SPLIT_SECOND = Class.new(Keyword)
       TRAMPLE = Class.new(Keyword)
       VIGILANCE = Class.new(Keyword)
       WITHER = Class.new(Keyword)

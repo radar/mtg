@@ -27,6 +27,7 @@ module Magic
 
       def illegal_reason
         source = ability.source
+        return "#{source.name}'s ability can't be activated while a spell with split second is on the stack" if !ability.is_a?(Magic::ManaAbility) && game.stack.split_second?
         return "#{player.inspect} does not control #{source.name}" if source.respond_to?(:controller) && source.controller != player
         return "#{source.name}'s ability cannot be activated" if source.respond_to?(:can_activate_ability?) && !source.can_activate_ability?(ability)
         return "#{source.name}'s ability can only be activated once each turn" if ability.activation_limit_reached?
