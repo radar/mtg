@@ -208,8 +208,17 @@ module Magic
       @cant_gain_life = true
     end
 
+    # "Until end of turn, your life total can't change" (Flare of Fortitude): no life is gained or lost this turn.
+    def freeze_life_total_until_eot!
+      @life_frozen_turn = game.current_turn.number
+    end
+
+    def life_total_frozen?
+      @life_frozen_turn == game.current_turn.number
+    end
+
     def can_gain_life?
-      return false if @cant_gain_life
+      return false if @cant_gain_life || life_total_frozen?
 
       game.battlefield.static_abilities.none? { |ability| ability.respond_to?(:prevents_life_gain?) && ability.prevents_life_gain?(self) }
     end
@@ -231,6 +240,8 @@ module Magic
     end
 
     def lose_life(loss)
+      return if life_total_frozen?
+
       @life -= loss
 
       game.notify!(

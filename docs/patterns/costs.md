@@ -95,4 +95,6 @@ Activation/casting costs — sacrifice, kicker, discard, exile-self, alternative
 
 **Exalted counters**: `add_counter "exalted", to: creature` uses `Counters::Exalted`. `Permanent#dispatch_event_handlers` adds `Counters::Exalted::Trigger` on `FinalAttackersDeclared` for any permanent holding one; the trigger gives the lone attacker +N/+N, N being that permanent's exalted counters. Example: `EmissaryOfSoulfire` (`costs "Pay {E}{E}"`).
 
+**"Your life total can't change" this turn**: `controller.freeze_life_total_until_eot!` makes `Player#gain_life` and `lose_life` no-ops until the turn number changes (`life_total_frozen?`). Example: `FlareOfFortitude`.
+
 **Eldrazi Spawn / Scion tokens**: `create_eldrazi_spawn` (0/1) and `create_eldrazi_scion` (1/1) shortcuts (an optional amount: `create_eldrazi_spawn 2`), wrapping `create_token token: Tokens::EldraziSpawn` / `Tokens::EldraziScion`. Both are colorless Eldrazi creature tokens with a mana ability (`costs "Sacrifice {this}"`, `choices :colorless`), so `token.activated_abilities.first` is activated with no payment. Match them for "Eldrazi you control" via `type?(T::Creatures["Eldrazi"])`. Spec: `spec/devoid_colorless_mana_spec.rb`.
