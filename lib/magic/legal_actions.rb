@@ -38,6 +38,7 @@ module Magic
 
         candidates = [keep(Actions::Cast.new(game: game, player: player, card: card))]
         candidates << keep(Actions::Cast::Impending.new(game: game, player: player, card: card)) if card.respond_to?(:impending_cost)
+        candidates << keep(Actions::Cast::Prototyped.new(game: game, player: player, card: card)) if card.prototype_cost
         candidates << keep(Actions::Cast::Bestowed.new(game: game, player: player, card: card)) if card.respond_to?(:bestow_cost)
         candidates << keep(Actions::Cast::Spectacle.new(game: game, player: player, card: card)) if card.respond_to?(:spectacle_cost)
         candidates << keep(Actions::Cast::Overloaded.new(game: game, player: player, card: card)) if card.overload_cost

@@ -23,6 +23,7 @@ module Magic
           alternative: Alternative,
           door: Door,
           impending: Impending,
+          prototyped: Prototyped,
           bestowed: Bestowed,
           spectacle: Spectacle,
           overloaded: Overloaded,

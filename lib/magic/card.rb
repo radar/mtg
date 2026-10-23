@@ -162,6 +162,11 @@ module Magic
         const_set(:REPLICATE_MANA, cost)
       end
 
+      # "Prototype {3}{R} — 2/2": `prototype cost: { generic: 3, red: 1 }, power: 2, toughness: 2`.
+      def prototype(cost:, power:, toughness:)
+        const_set(:PROTOTYPE, { cost: cost, power: power, toughness: toughness })
+      end
+
       # "When this creature enters / Whenever it attacks, it connives." `connive :enters`, `connive :attacks` or
       # both: `connive :enters, :attacks`. Triggers are merged into any `etb_triggers` / `event_handlers` the
       # class defines itself.
@@ -348,13 +353,25 @@ module Magic
 
     # A back face has the mana value of its front face (rule 711.4c).
     def mana_value
-      front_face ? front_face.mana_value : cost.mana_value
+      return front_face.mana_value if front_face
+
+      prototyped ? prototype_cost.mana_value : cost.mana_value
     end
     alias_method :cmc, :mana_value
     alias_method :converted_mana_cost, :mana_value
 
     def colors
-      devoid? ? [] : cost.colors
+      return [] if devoid?
+
+      prototyped ? prototype_cost.colors : cost.colors
+    end
+
+    # Rule 718: set while a prototyped card is a spell or permanent; it then has the prototype's cost, colour and
+    # power/toughness. Reset when the card leaves the stack and battlefield (`#zone=`).
+    attr_accessor :prototyped
+
+    def prototype_cost
+      self.class.const_defined?(:PROTOTYPE, false) ? Costs::Mana.new(self.class::PROTOTYPE[:cost].dup) : nil
     end
 
     def back_face
@@ -427,6 +444,7 @@ module Magic
       return @zone = zone if zone&.stack?
 
       @cast_from_zone = nil
+      @prototyped = false unless zone&.battlefield?
       @escaped = false unless zone&.battlefield?
       @spell_keywords = nil
       @on_adventure = false unless zone&.exile?

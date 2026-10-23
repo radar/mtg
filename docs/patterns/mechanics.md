@@ -149,3 +149,5 @@ Whole named mechanics spanning trigger+cost+static (Monarch, Ring tempts, Blitz,
 **Copy a spell** (Flare of Duplication): target `game.stack.spells` (instant or sorcery) and call `Magic::CopyEffect.resolve_with_choice!(actor: self, receiver: target.card, targets: target.targets)`. In a spec, answer the "may" with `game.resolve_choice!`, then pick the new target with `game.resolve_choice!(target:)`.
 
 **Replicate with mana** (Consign to Memory): `replicate_mana generic: 1` in the DSL block. `action.replicate(n)` adds n times that cost to `mana_cost`, so `pay_mana` must cover it; the copy runs through `copy_for_replicate`.
+
+**Prototype** (Frogmyr Enforcer): `prototype cost: { generic: 3, red: 1 }, power: 2, toughness: 2` in the DSL block. `Actions::Cast::Prototyped` (offered by `LegalActions`) pays the prototype cost and sets `card.prototyped`, which makes `Card#colors`, `#mana_value` and `Cards::Creature#base_power`/`#base_toughness` use the prototype values until the card leaves the stack and battlefield (`Card#zone=` resets it). Affinity is a `self_mana_cost_adjustment` (`{ generic: -> { -count } }`).
