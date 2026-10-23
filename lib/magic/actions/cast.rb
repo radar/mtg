@@ -369,6 +369,20 @@ module Magic
         self
       end
 
+      # Rule 702.119 (emerge): sacrifice a creature you control (the card's `emerge_from` type, creature by default)
+      # to reduce the emerge cost (the card's `alternative_cost`) by its mana value. Like #convoke it reduces the
+      # cost itself, so cast with `cast_as(:alternative, ...)` and call it before any mana payment.
+      def emerge(creature)
+        raise "#{card.name} does not have emerge" unless card.respond_to?(:emerge_from)
+        raise "#{player.inspect} does not control #{creature.name}" unless creature.controller == player
+        raise "#{creature.name} is not a valid emerge sacrifice" unless creature.type?(card.emerge_from)
+
+        reduction = [creature.mana_value, mana_cost.balance[:generic].to_i].min
+        mana_cost.adjusted_by(generic: -reduction) if reduction.positive?
+        creature.sacrifice!
+        self
+      end
+
       # Rule 702.78 (conspire): as you cast it, tap two untapped creatures you control that share a
       # color with it; when you do, copy it. A card has conspire itself or is granted it by a
       # static ability that defines `grants_conspire?(card, player)` (Raiding Schemes).
