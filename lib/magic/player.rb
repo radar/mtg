@@ -162,6 +162,16 @@ module Magic
 
     def consume_spell_cast!
       @spell_cast_limit -= 1 if spell_cast_limited?
+      @improvise_turn = nil
+    end
+
+    # "The next spell you cast this turn has improvise" (Archway of Innovation): cleared when a spell is cast.
+    def grant_next_spell_improvise!
+      @improvise_turn = game.current_turn.number
+    end
+
+    def next_spell_improvise?
+      @improvise_turn == game.current_turn.number
     end
 
     def prepare_declare_attacker(attacker:, target: nil, **args)

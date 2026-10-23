@@ -357,6 +357,21 @@ module Magic
         self
       end
 
+      # Rule 702.126: tap an untapped artifact you control to pay for {1} of this spell's cost. The spell needs improvise of
+      # its own (`card.improvise?`) or from Archway of Innovation (`player.next_spell_improvise?`). Like #convoke it reduces
+      # the cost itself, so call it before any mana payment.
+      def improvise(artifact)
+        raise "#{card.name} does not have improvise" unless card.improvise? || player.next_spell_improvise?
+        raise "#{artifact.name} is not an artifact" unless artifact.artifact?
+        raise "#{artifact.name} is tapped" if artifact.tapped?
+        raise "#{player.inspect} does not control #{artifact.name}" unless artifact.controller == player
+        raise "#{card.name}'s cost has no generic mana left to improvise" unless mana_cost.balance[:generic].to_i.positive?
+
+        mana_cost.adjusted_by(generic: -1)
+        artifact.tap!
+        self
+      end
+
       # Rule 702.180 (harmonize): tap an untapped creature you control to reduce the harmonize cost
       # by an amount of generic mana equal to its power (no more than the generic mana left).
       # Like #convoke it reduces the cost itself, so call it before any mana payment.

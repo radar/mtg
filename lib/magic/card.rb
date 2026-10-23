@@ -785,6 +785,10 @@ module Magic
       false
     end
 
+    def improvise?
+      false
+    end
+
     def prowess_trigger
       -> (permanent, event) do
         Cards::KeywordHandlers::Prowess.trigger(permanent: permanent, event: event)
