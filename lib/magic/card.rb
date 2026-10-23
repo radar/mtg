@@ -517,8 +517,13 @@ module Magic
       permanent
     end
 
+    # A discarded card with madness (`madness_cost`) is exiled and its owner may cast it for that cost
+    # (`Choice::Madness`).
     def discard!
-      move_zone!(to: zone.owner.graveyard)
+      return move_zone!(to: zone.owner.graveyard) unless respond_to?(:madness_cost) && zone&.hand?
+
+      move_zone!(to: exile)
+      game.choices.add(Choice::Madness.new(actor: self, card: self))
     end
 
     def exile!

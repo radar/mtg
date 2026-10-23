@@ -1,0 +1,70 @@
+# frozen_string_literal: true
+
+require "spec_helper"
+
+RSpec.describe Magic::Cards::EmrakulTheWorldAnew do
+  include_context "two player game"
+
+  before { go_to_main_phase! }
+
+  it "is a 12/12 flyer" do
+    emrakul = ResolvePermanent("Emrakul, The World Anew", owner: p1)
+    expect([emrakul.power, emrakul.toughness]).to eq([12, 12])
+    expect(emrakul).to be_flying
+  end
+
+  it "steals the target player's creatures when cast" do
+    bears = ResolvePermanent("Grizzly Bears", owner: p2)
+    card = Card("Emrakul, The World Anew", owner: p1)
+    p1.hand.add(card)
+    p1.add_mana(colorless: 12)
+    p1.cast(card: card) { |a| a.pay_mana(generic: { colorless: 12 }) }
+    game.settle!
+    game.resolve_choice!(target: p2)
+    game.settle!
+
+    expect(bears.controller).to eq(p1)
+  end
+
+  it "is protected from spells" do
+    emrakul = ResolvePermanent("Emrakul, The World Anew", owner: p1)
+    spell = Card("Doom Blade", owner: p2)
+    p2.hand.add(spell)
+    p2.add_mana(black: 2)
+    expect do
+      p2.cast(card: spell) { |a| a.pay_mana(generic: { black: 1 }, black: 1); a.targeting(emrakul) }
+    end.to raise_error(Magic::Actions::Cast::InvalidTarget)
+  end
+
+  it "sacrifices your creatures when it leaves the battlefield" do
+    emrakul = ResolvePermanent("Emrakul, The World Anew", owner: p1)
+    bears = ResolvePermanent("Grizzly Bears", owner: p1)
+    other = ResolvePermanent("Grizzly Bears", owner: p2)
+    emrakul.destroy!
+    game.settle!
+
+    expect(game.battlefield.creatures.select { _1.controller == p1 }).to be_empty
+    expect(other.zone).to be_battlefield
+    expect(bears.zone).to be_nil
+  end
+
+  context "madness" do
+    let(:card) { Card("Emrakul, The World Anew", owner: p1) }
+    before { p1.hand.add(card) }
+
+    it "goes to the graveyard when the madness cast is declined" do
+      card.discard!
+      expect(card.zone).to be_exile
+      game.skip_choice!
+      expect(card.zone).to be_graveyard
+    end
+
+    it "is cast for six colorless when discarded" do
+      p1.add_mana(colorless: 6)
+      card.discard!
+      game.resolve_choice!
+      game.settle!
+      expect(card.zone).to be_battlefield.or be_stack
+    end
+  end
+end

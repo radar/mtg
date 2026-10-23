@@ -213,6 +213,12 @@ module Magic
       @prepared = false
       @timestamp = timestamp
       @controlled_since_turn = game.current_turn&.number
+      @entered_turn = @controlled_since_turn
+    end
+
+    # True for a permanent that was cast as a spell during the current turn (Emrakul, the World Anew's protection).
+    def cast_this_turn?
+      cast? && @entered_turn == game.current_turn&.number
     end
 
     def kicked?
