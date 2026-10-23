@@ -642,6 +642,7 @@ module Magic
         if pays_nothing_instead?
           game.battlefield.static_abilities.each { _1.paid_nothing_for_spell!(card, player) if _1.respond_to?(:paid_nothing_for_spell!) }
         end
+        player.lose_life(@black_life * 2) if @black_life.to_i.positive?
         mana_cost.finalize!(player)
         @paid_additional_costs.each { |cost| cost.finalize!(player) if cost.is_a?(Costs::PayLife) }
         paid_offspring_costs.each { |cost| cost.finalize!(player) }
@@ -688,6 +689,20 @@ module Magic
       # permanent this spell resolves into gets haste.
       def gain_haste_on_resolve!
         @gains_haste = true
+      end
+
+      # Phyrexian mana and K'rrik's "for each {B} in a cost, you may pay 2 life rather than pay that mana": pays `count` of the
+      # spell's {B} with 2 life each. Like #convoke it reduces the cost itself, so call it before any mana payment. Allowed when
+      # the card has Phyrexian black symbols of its own (`phyrexian_black`) or a static ability answers `may_pay_life_for_black?`.
+      def pay_life_for_black(count = 1)
+        own = card.respond_to?(:phyrexian_black) ? card.phyrexian_black : 0
+        raise "#{card.name} has no {B} to pay with life" unless count <= own || static_ability_allows?(:may_pay_life_for_black?)
+        raise "#{card.name}'s cost has only #{mana_cost.balance[:black].to_i} {B} left" if mana_cost.balance[:black].to_i < count
+        raise "#{player.inspect} cannot pay #{count * 2} life" if player.life < (@black_life.to_i + count) * 2
+
+        mana_cost.adjusted_by(black: -count)
+        @black_life = @black_life.to_i + count
+        self
       end
 
       # "Gain control of that spell" (Invert Polarity): the spell stays on the stack, now cast by `new_player`.
