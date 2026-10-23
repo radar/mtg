@@ -29,6 +29,30 @@ RSpec.describe Magic::Cards::ConsignToMemory do
     expect(consign.target_choices).to be_empty
   end
 
+  it "counters a triggered ability" do
+    ResolvePermanent("Skyscanner", owner: p2, settle: false)
+    game.check_state_based_actions!
+    trigger = game.stack.abilities.grep(Magic::TriggeredAbility).first
+    expect(trigger).not_to be_nil
+    expect(consign.target_choices).to include(trigger)
+
+    p1.add_mana(blue: 1)
+    p1.cast(card: consign) { |a| a.pay_mana(blue: 1).targeting(trigger) }
+    game.stack.resolve!
+
+    expect(game.stack.abilities).to be_empty
+    expect(p2.hand.cards.count).to eq(7)
+  end
+
+  it "cannot target an activated ability" do
+    igneous_cur = ResolvePermanent("Igneous Cur", owner: p2)
+    p2.add_mana(red: 2)
+    p2.activate_ability(ability: igneous_cur.activated_abilities.first) { _1.pay_mana(generic: { red: 1 }, red: 1) }
+
+    expect(game.stack.abilities).not_to be_empty
+    expect(consign.target_choices).to be_empty
+  end
+
   it "costs {1} more for each replicate" do
     p1.add_mana(red: 2)
     p1.cast(card: Card("Rakdos Signet", owner: p1)) { |a| a.pay_mana(generic: { red: 2 }) }

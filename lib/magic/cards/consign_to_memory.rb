@@ -9,7 +9,7 @@ module Magic
       def single_target? = true
 
       def target_choices
-        game.stack.abilities + game.stack.spells.select { _1.card != self && _1.card.colorless? }
+        game.stack.abilities.grep(Magic::TriggeredAbility) + game.stack.spells.select { _1.card != self && _1.card.colorless? }
       end
 
       # "Counter target triggered ability or colorless spell."

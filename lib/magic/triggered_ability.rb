@@ -137,5 +137,10 @@ module Magic
     def resolve!
       call
     end
+
+    # Countered on the stack (Consign to Memory, Sublime Epiphany): already removed from the stack, so only announce it.
+    def countered!
+      game.notify!(Events::AbilityCountered.new(ability: self, player: controller))
+    end
   end
 end
