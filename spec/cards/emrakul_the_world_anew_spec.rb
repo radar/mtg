@@ -36,6 +36,34 @@ RSpec.describe Magic::Cards::EmrakulTheWorldAnew do
     end.to raise_error(Magic::Actions::Cast::InvalidTarget)
   end
 
+  it "is protected from a spell on the stack but not from a card in a graveyard" do
+    emrakul = ResolvePermanent("Emrakul, The World Anew", owner: p1)
+    spell = Card("Doom Blade", owner: p2)
+    p2.hand.add(spell)
+    p2.add_mana(black: 2)
+    p2.cast(card: spell) { |a| a.pay_mana(generic: { black: 1 }, black: 1); a.targeting(ResolvePermanent("Grizzly Bears", owner: p1)) }
+    expect(spell.zone).to be_stack
+    expect(emrakul.protected_from?(spell)).to be(true)
+
+    in_graveyard = Card("Doom Blade", owner: p2)
+    p2.graveyard.add(in_graveyard)
+    expect(emrakul.protected_from?(in_graveyard)).to be(false)
+  end
+
+  it "is protected from a permanent cast this turn" do
+    emrakul = ResolvePermanent("Emrakul, The World Anew", owner: p1)
+    p2.add_mana(green: 2)
+    go_to_main_phase_for!(p2)
+    p2.add_mana(green: 2)
+    p2.cast(card: Card("Grizzly Bears", owner: p2)) { |a| a.pay_mana(generic: { green: 1 }, green: 1) }
+    game.stack.resolve!
+    bears = p2.creatures.find { _1.name == "Grizzly Bears" }
+    expect(emrakul.protected_from?(bears)).to be(true)
+
+    game.next_turn
+    expect(emrakul.protected_from?(bears)).to be(false)
+  end
+
   it "sacrifices your creatures when it leaves the battlefield" do
     emrakul = ResolvePermanent("Emrakul, The World Anew", owner: p1)
     bears = ResolvePermanent("Grizzly Bears", owner: p1)

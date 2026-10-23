@@ -548,8 +548,8 @@ module Magic
       dispatch_lifecycle_triggers(event)
     end
 
-    def protected_from?(card)
-      @protections.any? { |protection| protection.protected_from?(card) }
+    def protected_from?(card, spell: nil)
+      @protections.any? { |protection| protection.protected_from?(card, spell: spell) }
     end
 
     # "Target creature gets -2/-0 until your next turn."
@@ -882,7 +882,7 @@ module Magic
       return false if opposing && source.colors.any? { hexproof_from?(_1) }
       return false if opposing && face.respond_to?(:hexproof_from_abilities?) && face.hexproof_from_abilities? && !(spell.nil? ? spell_source?(source) : spell)
 
-      !protected_from?(source)
+      !protected_from?(source, spell: spell)
     end
 
     # Without an explicit answer from the caller, a targeting source is a spell only when it is a card on the stack (or

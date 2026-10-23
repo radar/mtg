@@ -10,8 +10,12 @@ module Magic
 
     class EmrakulTheWorldAnew < Creature
       # "Protection from spells and from permanents that were cast this turn."
-      # A card that is not a permanent is a spell (or being cast as one: it leaves the hand only once cast).
-      protections [Protection.new(condition: ->(card) { card.is_a?(Magic::Card) || (card.respond_to?(:cast_this_turn?) && card.cast_this_turn?) })]
+      # `Protection.from_spells` covers only a card that is a spell (on the stack, or being cast), not the card behind a
+      # graveyard ability. The second protection covers a permanent that was cast this turn.
+      protections [
+        Protection.from_spells,
+        Protection.new(condition: ->(card) { card.respond_to?(:cast_this_turn?) && card.cast_this_turn? })
+      ]
 
       # "Madness--Pay six {C}."
       def madness_cost = { colorless: 6 }
