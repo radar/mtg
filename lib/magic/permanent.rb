@@ -730,7 +730,7 @@ module Magic
     end
 
     def remove_from_exile(card)
-      @exiled_cards -= [card]
+      @exiled_cards = Magic::CardList.new(@exiled_cards.to_a - [card])
       game.exile.remove(card)
     end
 
