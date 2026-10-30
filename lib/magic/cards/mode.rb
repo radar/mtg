@@ -13,6 +13,11 @@ module Magic
         card.controller
       end
 
+      # Effects a mode triggers name their source (in logs and events): the card the mode belongs to.
+      def name
+        card.name
+      end
+
       def source
         card
       end
