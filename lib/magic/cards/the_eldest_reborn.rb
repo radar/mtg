@@ -7,6 +7,9 @@ module Magic
     class TheEldestReborn < Saga
       class Chapter1 < Saga::ChapterAbility
         class SacrificeChoice < Magic::Choice::Targeted
+          # The opponent who sacrifices makes this choice, not the saga's controller.
+          attr_reader :player
+
           def initialize(actor:, player:)
             @player = player
             super(actor: actor)
