@@ -19,6 +19,8 @@ module Magic
             SelfTap.new(source)
           when /\A(?:\{[^}]+\})+\z/
             Mana.new(Costs::Parsers::Mana.parse(cost))
+          when /\ASacrifice (?<amount>ten) nonland permanents\z/
+            SacrificeNonlandPermanents.new(source, amount: 10)
           when /Sacrifice a creature with defender/
             Sacrifice.new(source, source.controller.creatures.select(&:defender?))
           when /Sacrifice another creature/

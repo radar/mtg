@@ -73,7 +73,7 @@ module Magic
             cost = card.adventure_cost
           elsif @alternative
             cost = card.alternative_cost
-          elsif free_from_exile?
+          elsif free_from_exile? || pays_life_instead?
             cost = Costs::Mana.new({})
           else
             cost = card.cost
@@ -112,8 +112,21 @@ module Magic
         card.kicker_cost
       end
 
+      # "You may pay life equal to a spell's mana value rather than pay its mana cost" (Bolas's Citadel), for a spell
+      # cast from the top of the library. Static abilities answer `pays_life_for?(card, player)`.
+      def pays_life_instead?
+        return false unless card.zone&.library? && !@flashback && !@harmonize && !@blitz && !@evoked && !@adventure && !@alternative
+
+        static_ability_allows?(:pays_life_for?)
+      end
+
+      def life_payment
+        pays_life_instead? ? card.mana_value : 0
+      end
+
       def can_perform?
         return false if already_on_stack?
+        return false if player.life < life_payment
         return false unless castable_from_current_zone?
         return false unless modes_satisfiable?
         return true if mana_cost.zero?
@@ -134,6 +147,8 @@ module Magic
             return "#{card.name} can only be cast at sorcery speed, but #{reason}"
           end
         end
+
+        return "#{player.inspect} cannot pay #{life_payment} life for #{card.name}" if player.life < life_payment
 
         "#{player.inspect} cannot cast any more spells this turn" if player.spell_cast_limit_reached?
       end
@@ -392,6 +407,7 @@ module Magic
         # Casting a card you don't own (from an opponent's exile) makes you its controller.
         card.controller = player
 
+        player.lose_life(life_payment) if pays_life_instead?
         mana_cost.finalize!(player)
         paid_offspring_costs.each { |cost| cost.finalize!(player) }
         player.consume_spell_cast!
