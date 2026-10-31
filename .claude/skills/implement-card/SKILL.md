@@ -168,6 +168,17 @@ bundle exec rspec                                        # full suite before com
 Don't consider the card done on a green new spec alone; a shared static-ability or
 event-handler change can silently break an unrelated card.
 
+**Done means all of these are true** (pass/fail, no judgment calls):
+- Every Oracle line has its own `it` that asserts the real outcome, including the
+  negative case the wording implies ("other", "you control", "up to", "may").
+- The new spec is green, and the full suite shows no new failures.
+- No card name appears in a shared layer (`lib/magic` outside `cards/`).
+
+**Attempt cap:** at most 3 edit-and-rerun rounds on one failing spec. If it is still
+red after round 3, stop. Do not stub, loosen the assertion or special-case the card to
+get green. Leave no partial commit and report `FAILED: <last error line>` (or
+`BLOCKED: <mechanic>` when the engine lacks something).
+
 ## 6. Note anything new in docs/patterns/
 
 If you used or discovered a pattern not already documented, add a bullet to the

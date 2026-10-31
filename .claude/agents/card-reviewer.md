@@ -19,3 +19,8 @@ Input: card name, commit SHA, path to `tmp/sets/<code>/cards.md`.
 
 Output, one line per Oracle line: `<n>. <ok|MISSING|WRONG|UNTESTED>: <line text> -- <evidence file:line, fix>`.
 Final line: `VERDICT: PASS` or `VERDICT: FAIL`. PASS only if every line is `ok`.
+
+Pass/fail rules (binary, no "mostly ok"):
+- Any `MISSING`, `WRONG` or `UNTESTED` line, a red spec, or any item flagged in step 6 means `VERDICT: FAIL`.
+- Report only defects you can point to with file:line. Do not fail a card for style or for behavior the Oracle text does not require.
+- On a re-review of a fix commit, check the earlier findings first, then re-check the whole card. Do not raise new nitpicks that the first review missed unless they are real Oracle mismatches.
