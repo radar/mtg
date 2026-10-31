@@ -13,6 +13,13 @@ module Magic
       colors :black
     end
 
+    OrcArmyToken = Token.create "Orc Army" do
+      creature_type "Orc Army"
+      power 0
+      toughness 0
+      colors :black
+    end
+
     def self.call(source:, controller:, amount:, subtype: "Goblin")
       army = controller.creatures.by_type("Army").first
       army ||= create_army(source: source, controller: controller, subtype: subtype)
@@ -24,7 +31,7 @@ module Magic
     end
 
     def self.create_army(source:, controller:, subtype:)
-      token_class = GoblinArmyToken
+      token_class = subtype == "Orc" ? OrcArmyToken : GoblinArmyToken
       created = source.create_token(token: token_class, controller: controller)
       Array(created).flatten.first
     end
