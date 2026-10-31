@@ -96,8 +96,12 @@ RSpec.describe Magic::Cards::ShagratLootBearer do
 
   it "does not trigger when another creature attacks" do
     bears = ResolvePermanent("Grizzly Bears", owner: p1)
-    equipment
+    ram = equipment
+    germ = ram.attached_to # Cranial Ram's living weapon attaches it to its Germ
+    expect(germ).not_to be_nil
     attack_with(bears)
+    expect(game.choices).to be_empty
+    expect(ram.attached_to).to eq(germ)
     expect(armies).to be_empty
   end
 end
