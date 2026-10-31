@@ -48,6 +48,17 @@ RSpec.describe Magic::Cards::MeriadocBrandybuck do
     expect(foods).to be_empty
   end
 
+  it "does not trigger when a Halfling attacks a planeswalker" do
+    walker = ResolvePermanent("Jaya Ballard", owner: p2)
+    skip_to_combat!
+    current_turn.declare_attackers!
+    p1.declare_attacker(attacker: halfling, target: walker)
+    current_turn.attackers_declared!
+    game.settle!
+
+    expect(foods).to be_empty
+  end
+
   it "does not trigger when an opponent's Halfling attacks you" do
     go_to_main_phase_for!(p2)
     ResolvePermanent("Belladonna Took", owner: p2)
