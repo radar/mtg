@@ -44,6 +44,8 @@ module Magic
             ReturnCreatureType.new(source, $~[:type])
           when /\ASacrifice a Treasure\z/
             Sacrifice.new(source, source.controller.permanents.select { _1.type?("Treasure") })
+          when /\ASacrifice a Food\z/
+            Sacrifice.new(source, source.controller.permanents.select { _1.type?("Food") })
           when /\ASacrifice a Room\z/
             Sacrifice.new(source, source.controller.rooms)
           when /\ASacrifice another (?<type>[A-Z][\w-]*)\z/
