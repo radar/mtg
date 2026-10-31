@@ -6,4 +6,5 @@ Engine notes gathered while implementing The Lord of the Rings: Tales of Middle-
 - Resetting once-per-turn state in a spec needs two full turn cycles.
 - `Permanent#controller=` is the gain-control path.
 - Mode specs need two candidates (a lone legal target auto-resolves).
+- "Up to N target X": `number_of_targets` is exact, so use `multi_target? = true` with `target_choices` returning N lists (zero to N targets accepted, N+1 raises `Cast::InvalidTarget`) and `resolve!(targets: [])` (example: `SecondBreakfast`).
 - Food: "enters or leaves the battlefield" is two triggers, `etb_triggers` plus `ltb_triggers`, each calling `create_token(token: Tokens::Food)`; the token goes to the trigger's controller even when the source has left (example: `BrandywineFarmer`). Count Food with `permanents.select { _1.type?("Food") }`.
