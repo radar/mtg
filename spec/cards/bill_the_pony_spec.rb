@@ -62,10 +62,13 @@ RSpec.describe Magic::Cards::BillThePony do
     it "does nothing to creatures that were not targeted" do
       game.settle!
       activate(foods.first, bill)
-      bears.modify_power(0)
+      bears.modify_toughness(2)
+      game.tick!
+      expect([bears.power, bears.toughness]).to eq([2, 4])
 
       attack_unblocked!(bears)
 
+      # Deals its power (2), not its toughness (4).
       expect(p2.life).to eq(18)
     end
 
