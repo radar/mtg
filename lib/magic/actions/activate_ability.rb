@@ -13,7 +13,8 @@ module Magic
         @value_for_x = value_for_x
         x_cost = @costs.find { |cost| cost.is_a?(Costs::Mana) && cost.cost.key?(:x) }
         if x_cost
-          x_cost.x = value_for_x.to_i
+          # {X}{X} (parsed as x: 2) asks twice X in all; `value_for_x` stays X for the effect.
+          x_cost.x = value_for_x.to_i * x_cost.cost[:x]
           x_cost.x_must_be_affordable = true
         end
         # So restricted mana ("spend only on abilities of Elemental sources") counts wherever
