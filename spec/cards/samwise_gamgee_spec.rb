@@ -100,6 +100,24 @@ RSpec.describe Magic::Cards::SamwiseGamgee do
       expect(ability.target_choices).to eq([elanor])
     end
 
+    it "does not offer a historic card in an opponent's graveyard as a target" do
+      elanor = graveyard_card("Elanor Gardner")
+      theirs = Card("Springleaf Drum", owner: p2)
+      p2.graveyard.add(theirs)
+
+      expect(ability.target_choices).to eq([elanor])
+      expect(ability.target_choices).not_to include(theirs)
+    end
+
+    it "cannot be paid with Foods you do not control" do
+      make_foods(2)
+      Magic::Tokens::Food.new(game: game, owner: p2).resolve!
+
+      expect(foods(p1).count).to eq(2)
+      expect(foods(p2).count).to eq(1)
+      expect(ability.costs.first.can_pay?(p1)).to be(false)
+    end
+
     it "cannot be paid with fewer than three Foods" do
       make_foods(2)
 
