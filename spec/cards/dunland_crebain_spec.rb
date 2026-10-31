@@ -30,6 +30,22 @@ RSpec.describe Magic::Cards::DunlandCrebain do
     expect(armies.first.power).to eq(4)
   end
 
+  it "does not use an Army an opponent controls" do
+    Magic::Amass.call(source: ResolvePermanent("Ordinary Bear", owner: p2), controller: p2, amount: 1)
+    game.settle!
+    opponent_armies = p2.creatures.select { _1.type?("Army") }
+    expect(opponent_armies.count).to eq(1)
+    expect(opponent_armies.first.power).to eq(1)
+
+    ResolvePermanent("Dunland Crebain", owner: p1)
+
+    expect(armies.count).to eq(1)
+    expect(armies.first.type?("Orc")).to eq(true)
+    expect([armies.first.power, armies.first.toughness]).to eq([2, 2])
+    expect(opponent_armies.first.power).to eq(1)
+    expect(opponent_armies.first.type?("Orc")).to eq(false)
+  end
+
   it "makes an existing Goblin Army also an Orc" do
     Magic::Amass.call(source: ResolvePermanent("Ordinary Bear", owner: p1), controller: p1, amount: 1)
     game.settle!
