@@ -10,6 +10,11 @@ module Magic
 
       def attacks_prevented? = !!@attacks_prevented
 
+      # "Damage can't be prevented this turn." A Turn lasts one turn, so the flag needs no reset.
+      def damage_cant_be_prevented! = @damage_cant_be_prevented = true
+
+      def damage_cant_be_prevented? = !!@damage_cant_be_prevented
+
       def_delegators :@game, :logger, :battlefield, :emblems, :players, :settle!, :add_effect
       def_delegators :@combat, :declare_attacker, :declare_blocker, :choose_attacker_target, :can_block?, :illegal_block_reason,
         :assign_combat_damage, :attacks, :attacking?, :blocking?
