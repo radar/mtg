@@ -22,7 +22,11 @@ module Magic
           deal_damage(@army.power, to: target)
         end
 
-        def decline! = nil
+        # The target is mandatory, so skipping still picks a legal target.
+        def decline!
+          target = choices.first
+          resolve!(target: target) if target
+        end
       end
 
       # "Amass Orcs 2. When you do, ..."

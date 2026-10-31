@@ -66,11 +66,12 @@ RSpec.describe Magic::Cards::ForayOfOrcs do
       expect(game.choices.last.choices).not_to include(hexproof)
     end
 
-    it "declining does nothing" do
+    it "still deals damage to a legal creature when the choice is skipped (target is mandatory)" do
       cast_foray
       game.skip_choice!
-      expect(bears.damage).to eq(0)
-      expect(ogre.damage).to eq(0)
+      game.settle!
+      expect(game.choices).to be_empty
+      expect([bears.damage, ogre.damage].sort).to eq([0, 2])
     end
   end
 
