@@ -932,7 +932,16 @@ module Magic
     # What a creature's combat damage is based on: normally its power, but its toughness while
     # something says so (Bark of Doran).
     def combat_damage_amount
-      attachments.any? { _1.card.assigns_toughness_damage?(self) } ? toughness : power
+      assigns_toughness_damage? ? toughness : power
+    end
+
+    # "Until end of turn, target creature assigns combat damage equal to its toughness rather than its power."
+    def assign_toughness_damage_this_turn!
+      @toughness_damage_until_eot = true
+    end
+
+    def assigns_toughness_damage?
+      !!@toughness_damage_until_eot || attachments.any? { _1.card.assigns_toughness_damage?(self) }
     end
 
     # "Target creature can't be blocked this turn."
@@ -994,6 +1003,7 @@ module Magic
       @modes_chosen_this_turn = []
       @triggered_once_keys_this_turn = []
       @abilities_activated_this_turn = []
+      @toughness_damage_until_eot = false
       remove_until_eot_protections!
       remove_until_eot_modifiers!
       if @copy_until_eot
