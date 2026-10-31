@@ -2,7 +2,13 @@
 # PreToolUse hook (matcher: Bash). Blocks commands that CLAUDE.md bans.
 # Exit 2 + stderr message = call blocked, message goes back to the model.
 
-cmd=$(jq -r '.tool_input.command // ""')
+# Match only against the command skeleton: drop heredoc bodies and quoted
+# strings first, so words inside commit messages or rg patterns do not trip it.
+cmd=$(jq -r '
+  (.tool_input.command // "")
+  | gsub("<<-?[ \\t]*[\u0027\"]?(?<d>[A-Za-z_]+)[\u0027\"]?[\\s\\S]*?\\n[ \\t]*\\k<d>"; "")
+  | gsub("\u0027[^\u0027]*\u0027|\"[^\"]*\""; "\"\"")
+')
 
 # A command word: at start of line, or after ; & | ( or a newline.
 pos='(^|[;&|(]|\n)[[:space:]]*'
