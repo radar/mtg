@@ -23,7 +23,8 @@ RSpec.describe Magic::Cards::GaladrielGiftGiver do
 
     it "can put a +1/+1 counter on another creature, including an opponent's" do
       ResolvePermanent("Galadriel, Gift-Giver", owner: p1)
-      game.resolve_choice!(mode: :counter, target: theirs)
+      game.resolve_choice!(mode: :counter)
+      game.resolve_choice!(target: theirs)
       game.tick!
 
       expect(theirs.power).to eq(3)
@@ -32,8 +33,21 @@ RSpec.describe Magic::Cards::GaladrielGiftGiver do
 
     it "cannot put the counter on Galadriel herself" do
       galadriel = ResolvePermanent("Galadriel, Gift-Giver", owner: p1)
+      game.resolve_choice!(mode: :counter)
 
-      expect { game.resolve_choice!(mode: :counter, target: galadriel) }.to raise_error(ArgumentError, /not another creature/)
+      targets = game.choices.first.choices
+      expect(targets).to contain_exactly(bears, theirs)
+      expect(targets).not_to include(galadriel)
+    end
+
+    it "cannot target an opponent's hexproof creature" do
+      hexproof = ResolvePermanent("Gigantic Big Bear", owner: p2)
+      ResolvePermanent("Galadriel, Gift-Giver", owner: p1)
+      game.resolve_choice!(mode: :counter)
+
+      targets = game.choices.first.choices
+      expect(targets).to contain_exactly(bears, theirs)
+      expect(targets).not_to include(hexproof)
     end
 
     it "can create a Food token" do
@@ -83,10 +97,13 @@ RSpec.describe Magic::Cards::GaladrielGiftGiver do
 
     it "can put a counter on another creature" do
       bears = ResolvePermanent("Grizzly Bears", owner: p1)
+      theirs = ResolvePermanent("Grizzly Bears", owner: p2)
       attack_with(galadriel)
-      game.resolve_choice!(mode: :counter, target: bears)
+      game.resolve_choice!(mode: :counter)
+      game.resolve_choice!(target: bears)
       game.tick!
 
+      expect(theirs.power).to eq(2)
       expect(bears.power).to eq(3)
     end
 
