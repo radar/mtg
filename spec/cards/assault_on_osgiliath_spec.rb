@@ -81,6 +81,25 @@ RSpec.describe Magic::Cards::AssaultOnOsgiliath do
     expect(goblin).to be_double_strike
   end
 
+  it "does not settle mid-resolution: a trigger from the Army entering is still on the stack afterwards" do
+    ResolvePermanent("Soul Warden", owner: p1)
+    card = Card("Assault On Osgiliath", owner: p1)
+    p1.hand.add(card)
+    p1.add_mana(red: 5)
+    p1.cast(card:, value_for_x: 2) { |a| a.pay_mana(x: { red: 2 }, red: 3) }
+    life = p1.life
+    game.stack.resolve_top!
+
+    expect(armies.size).to eq(1)
+    expect(counters(armies.first)).to eq(2)
+    waiting = game.pending_triggers + game.stack.abilities
+    expect(waiting.map { |i| i.class.name }).to include(/CreatureEnteredTrigger/)
+    expect(p1.life).to eq(life)
+
+    game.settle!
+    expect(p1.life).to eq(life + 1)
+  end
+
   it "is a sorcery that cannot be cast outside your main phase" do
     skip_to_combat!
     card = Card("Assault On Osgiliath", owner: p1)
