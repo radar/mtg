@@ -31,7 +31,11 @@ module Magic
           give_keyword(target, :haste)
         end
 
-        def decline! = nil
+        # The target is mandatory (CR 603.3d), so skipping still picks a legal target.
+        def decline!
+          target = choices.first
+          resolve!(target: target) if target
+        end
 
         private
 

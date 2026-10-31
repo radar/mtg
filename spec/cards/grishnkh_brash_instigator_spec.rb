@@ -68,6 +68,7 @@ RSpec.describe Magic::Cards::GrishnkhBrashInstigator do
       game.settle!
       expect(p2.creatures).to include(bears)
       expect(p1.creatures).not_to include(bears)
+      expect(bears).not_to be_haste
     end
 
     it "uses the Army's power after counters when an Army already exists" do
@@ -79,11 +80,15 @@ RSpec.describe Magic::Cards::GrishnkhBrashInstigator do
       expect(game.choices.last.choices).to contain_exactly(bears, bears2)
     end
 
-    it "declining does nothing" do
+    it "still steals a legal creature when the choice is skipped (target is mandatory)" do
       enter_grishnakh
       game.skip_choice!
-      expect(p2.creatures).to include(bears, bears2)
+      game.settle!
       expect(game.choices).to be_empty
+      stolen = [bears, bears2].select { p1.creatures.include?(_1) }
+      expect(stolen.size).to eq(1)
+      expect(p2.creatures).to include(giant, legend)
+      expect(p1.creatures).not_to include(giant, legend)
     end
 
     it "does not offer a hexproof creature" do
