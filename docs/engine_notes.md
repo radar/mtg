@@ -47,6 +47,7 @@ spec patterns.
 - A loyalty ability that costs more than the planeswalker has needs `planeswalker.change_loyalty!(n)` first. Two copies of a legendary planeswalker trigger a pending legend-rule choice that blocks all stack resolution.
 - **DSL-block leak**: a `class Foo` written inside a `Creature("Name") do ... end` block lands in `Magic::Cards::Foo`, and a bare `ActivatedAbility` in *any* other card then resolves to whichever leaked `Magic::Cards::ActivatedAbility` loaded last. It showed up as a spec that passed alone and failed in the full suite (`Speaker of the Heavens`, fixed). Put nested classes in a class reopening.
 - **Token triggers**: a `Token.create` block can define `event_handlers` (tokens dispatch them like cards), but constants in that block resolve in the *enclosing card's* scope, not the token's. Define the trigger in a `class GoblinShamanToken` reopening and reference it as `GoblinShamanToken::AttacksTrigger` (bare `AttacksTrigger` raises `NameError`). Example: `FableOfTheMirrorBreaker`.
+- **`{X}` in an activated ability's cost**: `ActivateAbility.new(value_for_x:)` sets `Costs::Mana#x` (default 0) for a mana cost with an `:x` key and flags it `x_must_be_affordable`, so `can_pay?` counts X as generic (spells don't, their X is still the printed placeholder while legality is probed). X is paid via `pay_mana(x: {...})` and reaches `resolve!(x:)` / `resolve!(value_for_x:)`. Pattern: `docs/patterns/ltr_notes.md`.
 
 ## Engine hooks added for arena (cards and UI)
 

@@ -3,11 +3,19 @@ module Magic
     class ActivateAbility < Action
       include DividedTargeting
 
-      attr_reader :ability, :costs, :targets, :sacrificed, :tapped
+      attr_reader :ability, :costs, :targets, :sacrificed, :tapped, :value_for_x
 
-      def initialize(ability:, **args)
+      # `value_for_x:` chooses X for an ability with {X} in its mana cost ("{X}, {T}: ..."); X defaults to 0. It is
+      # paid like a spell's X (`pay_mana(x: { green: 2 }, ...)`) and handed to `resolve!(x:)` / `resolve!(value_for_x:)`.
+      def initialize(ability:, value_for_x: nil, **args)
         @ability = ability
         @costs = @ability.costs
+        @value_for_x = value_for_x
+        x_cost = @costs.find { |cost| cost.is_a?(Costs::Mana) && cost.cost.key?(:x) }
+        if x_cost
+          x_cost.x = value_for_x.to_i
+          x_cost.x_must_be_affordable = true
+        end
         # So restricted mana ("spend only on abilities of Elemental sources") counts wherever
         # these costs are checked or paid: `legal_actions`, `#pay`, or `GameRunner`.
         @costs.each { |cost| cost.for_use = AbilityUse.new(source: @ability.source, mana_cost: cost) if cost.is_a?(Costs::Mana) }
@@ -300,7 +308,7 @@ module Magic
       end
 
       def resolve!
-        resolve_with_args(ability, target: targets.first, targets: targets, sacrificed: sacrificed, tapped: tapped, x: energy_x, distribution: @distribution)
+        resolve_with_args(ability, target: targets.first, targets: targets, sacrificed: sacrificed, tapped: tapped, x: energy_x || value_for_x, value_for_x: value_for_x, distribution: @distribution)
       end
     end
   end

@@ -23,6 +23,9 @@ module Magic
       # What this mana is being spent on (the spell's card, or an ability's source), so
       # restricted mana ("spend only to cast an Elf spell") that permits it counts too.
       attr_accessor :for_use
+      # Set for an activated ability's {X} (X is chosen before `can_pay?` is asked), so `can_pay?` counts X as
+      # generic mana. Spells leave it off: their X may still be the printed placeholder when legality is probed.
+      attr_accessor :x_must_be_affordable
 
       def initialize(cost)
         if cost.is_a?(String)
@@ -191,7 +194,8 @@ module Magic
           return false if remaining.positive?
         end
 
-        generic_mana_payable = cost[:generic].nil? || pool.values.sum >= cost[:generic]
+        generic_needed = (cost[:generic] || 0) + (x_must_be_affordable ? (cost[:x] || 0) : 0)
+        generic_mana_payable = generic_needed.zero? || pool.values.sum >= generic_needed
 
         generic_mana_payable && (pool.values.all? { |v| v.zero? || v.positive? })
       end

@@ -17,7 +17,9 @@ module Magic
             .flatten
             .group_by(&:itself)
             .map do |key, values|
-              if key =~ /\d+/
+              if key == "X"
+                [:x, values.count]
+              elsif key =~ /\d+/
                 [:generic, key.to_i]
               elsif key.include?("/")
                 colors = key.split("/").map { |symbol| symbols.fetch(symbol) }.sort
