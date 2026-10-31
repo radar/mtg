@@ -61,6 +61,37 @@ RSpec.describe Magic::Cards::FallOfCairAndros do
     end
   end
 
+  describe "a creature with a shield counter" do
+    def shields(creature) = creature.counters.of_type(Magic::Counters::Shield).count
+
+    it "prevents noncombat damage, so there is no excess and no amass" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      bears.add_counter("shield")
+
+      bolt(bears)
+
+      expect(shields(bears)).to eq(0)
+      expect(bears.damage).to eq(0)
+      expect(armies).to be_empty
+    end
+
+    it "prevents noncombat wither damage too, so there is no excess and no amass" do
+      bears = ResolvePermanent("Grizzly Bears", owner: p2)
+      bears.add_counter("shield")
+      source = ResolvePermanent("Spinerock Tyrant", owner: p1)
+      expect(source).to be_wither
+
+      game.add_effect(Magic::Effects::DealDamage.new(source: source, target: bears, damage: 3))
+      game.settle!
+      game.stack.resolve!
+      game.settle!
+
+      expect(shields(bears)).to eq(0)
+      expect(bears.counters.of_type(Magic::Counters::Minus1Minus1).count).to eq(0)
+      expect(armies).to be_empty
+    end
+  end
+
   it "does not trigger for your own creatures" do
     bolt(ResolvePermanent("Grizzly Bears", owner: p1))
 
