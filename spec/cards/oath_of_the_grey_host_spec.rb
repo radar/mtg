@@ -71,6 +71,7 @@ RSpec.describe Magic::Cards::OathOfTheGreyHost do
       expect(spirits(p1)).to all(be_tapped)
       expect(spirits(p1)).to all(have_attributes(power: 1, toughness: 1))
       expect(spirits(p1)).to all(have_keyword(:flying))
+      expect(spirits(p1).map(&:colors)).to all(eq([:white]))
       expect(spirits(p2).count).to eq(0)
     end
 
