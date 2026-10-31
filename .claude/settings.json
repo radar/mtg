@@ -1,0 +1,33 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bundle exec rspec)",
+      "Bash(bundle exec rspec *)",
+      "Bash(bundle exec rake find_card*)",
+      "Bash(bundle exec rake search_cards*)",
+      "Bash(bundle exec rake -T)",
+      "Bash(bundle exec ruby script/parser_gaps.rb *)",
+      "Bash(bundle exec ruby script/coverage.rb *)",
+      "Bash(ruby script/coverage.rb *)",
+      "Bash(bundle exec rake coverage*)",
+      "Bash(ls:*)",
+      "Bash(rg:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(cat:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-banned-bash.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
