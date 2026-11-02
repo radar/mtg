@@ -135,6 +135,15 @@ RSpec.describe Magic::Cards::FiresOfMountDoom do
       expect([p1.life, p2.life]).to eq([18, 15])
     end
 
+    it "still deals the damage when Fires has left the battlefield" do
+      activate
+      fires.destroy!
+      game.settle!
+      p1.play_land(land: top)
+      game.settle!
+      expect([p1.life, p2.life]).to eq([18, 18])
+    end
+
     it "deals no damage when the card is not played" do
       activate
       expect([p1.life, p2.life]).to eq([20, 20])

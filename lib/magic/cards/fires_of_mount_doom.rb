@@ -41,16 +41,30 @@ module Magic
 
           top.exile!
           game.play_permissions.grant_until_end_of_turn(card: top, player: controller)
-          (source.state[:played_cards] ||= []) << top
+          watcher = PlayedWatcher.new(top, false)
+          [Events::SpellCast, Events::EnteredTheBattlefield].each do |event_class|
+            game.add_delayed_trigger(source: source, event_class: event_class, trigger_class: watcher)
+          end
         end
       end
 
-      # "When you play a card this way, Fires of Mount Doom deals 2 damage to each player."
+      # "When you play a card this way, Fires of Mount Doom deals 2 damage to each player." A delayed triggered ability
+      # (CR 603.7a) made when the exile ability resolves, so it outlives Fires. The watcher stands in for the trigger
+      # class and remembers the exiled card; it fires once (a cast spell also enters the battlefield).
       class PlayedTrigger < TriggeredAbility
+        def initialize(event:, actor:, watcher:)
+          super(event: event, actor: actor)
+          @watcher = watcher
+        end
+
         def should_perform?
+          return false if @watcher.fired
+
           card = event.is_a?(Events::SpellCast) ? event.spell : event.permanent.card
           player = event.is_a?(Events::SpellCast) ? event.player : event.permanent.controller
-          player == controller && actor.state.fetch(:played_cards, []).delete(card)
+          return false unless card == @watcher.card && player == controller
+
+          @watcher.fired = true
         end
 
         def call
@@ -58,15 +72,13 @@ module Magic
         end
       end
 
+      PlayedWatcher = Struct.new(:card, :fired) do
+        def new(actor:, event:) = PlayedTrigger.new(actor: actor, event: event, watcher: self)
+      end
+
       def etb_triggers = [EntersTrigger]
 
       def activated_abilities = [ExileAbility]
-
-      def event_handlers
-        super.merge(Events::SpellCast => PlayedTrigger, Events::EnteredTheBattlefield => PlayedTrigger) do |_, old, new|
-          [*old, *new]
-        end
-      end
     end
   end
 end
