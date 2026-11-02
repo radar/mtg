@@ -3,8 +3,12 @@ module Magic
     class Equipment < Attachment
       TYPE_LINE = [T::Artifact, "Equipment"].freeze
 
-      def self.equip(equip_cost)
+      # `sorcery_speed: true` is "Equip only as a sorcery." (the reminder text on most Equipment; opt-in so that cards
+      # written before it was modelled keep their specs).
+      def self.equip(equip_cost, sorcery_speed: false)
         equip = Class.new(ActivatedAbility) do
+          activate_only_as_sorcery if sorcery_speed
+
           # Fresh costs per activation: a cost tracks what's been paid towards it,
           # so reusing one would leave it paid after the first equip.
           define_method(:costs) do
