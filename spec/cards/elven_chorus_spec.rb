@@ -10,7 +10,9 @@ RSpec.describe Magic::Cards::ElvenChorus do
 
   it "is a 4-mana enchantment" do
     expect(chorus.type?("Enchantment")).to be(true)
-    expect(chorus.card.cost.to_s).to include("3")
+    expect(chorus.card.cost.generic).to eq(3)
+    expect(chorus.card.cost.cost[:green]).to eq(1)
+    expect(chorus.card.cost.mana_value).to eq(4)
   end
 
   it "lets only its controller look at the top card" do
@@ -44,9 +46,14 @@ RSpec.describe Magic::Cards::ElvenChorus do
     p1.add_mana(generic: 1, green: 1)
     expect(p1.prepare_cast(card: creature).can_perform?).to be(false)
 
+  end
+
+  it "does not allow casting the opponent's top creature, even on their own turn" do
+    go_to_main_phase_for!(p2)
     theirs = Card("Grizzly Bears", owner: p2)
     p2.library.add(theirs, 0)
     p2.add_mana(generic: 1, green: 1)
+    expect(game.current_turn.active_player).to eq(p2)
     expect(p2.prepare_cast(card: theirs).can_perform?).to be(false)
   end
 
