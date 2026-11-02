@@ -9,11 +9,13 @@ module Magic
 
     class SaradocMasterOfBuckland < Creature
       # "Whenever Saradoc or another nontoken creature you control with power 2 or less enters, create a 1/1 white
-      # Halfling creature token." Saradoc has power 2, so his own entry matches.
+      # Halfling creature token." The nontoken/power filter only qualifies "another creature"; Saradoc's own entry
+      # always triggers.
       class EntersTrigger < TriggeredAbility::EnterTheBattlefield
         def should_perform?
           permanent = event.permanent
-          permanent.creature? && !permanent.token? && under_your_control? && permanent.power <= 2
+          under_your_control? &&
+            (permanent == actor || (permanent.creature? && !permanent.token? && permanent.power <= 2))
         end
 
         def call

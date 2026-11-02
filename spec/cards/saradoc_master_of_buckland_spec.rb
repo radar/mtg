@@ -24,6 +24,14 @@ RSpec.describe Magic::Cards::SaradocMasterOfBuckland do
       expect([halfling_tokens.first.power, halfling_tokens.first.toughness]).to eq([1, 1])
     end
 
+    it "still makes a token when Saradoc enters with power above 2" do
+      ResolvePermanent("Glorious Anthem", owner: p1)
+      saradoc = ResolvePermanent("Saradoc Master Of Buckland", owner: p1)
+
+      expect(saradoc.power).to eq(3)
+      expect(halfling_tokens.count).to eq(1)
+    end
+
     context "with Saradoc in play" do
       let!(:saradoc) { ResolvePermanent("Saradoc Master Of Buckland", owner: p1) }
 
