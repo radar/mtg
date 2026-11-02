@@ -42,6 +42,8 @@ RSpec.describe Magic::Cards::QuarrelsEnd do
     expect(p1.library.count).to eq(library - 2)
     expect(soldiers(p1).count).to eq(1)
     expect(soldiers(p1).first.type?("Human")).to be(true)
+    expect([soldiers(p1).first.power, soldiers(p1).first.toughness]).to eq([1, 1])
+    expect(soldiers(p1).first.colors).to eq([:white])
     expect(soldiers(p2)).to be_empty
     expect(spell.zone).to be_graveyard
   end
