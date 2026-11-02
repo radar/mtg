@@ -15,13 +15,18 @@ module Magic
 
         def choice_amount = 1
 
+        # CR 610.3c: if Shirriff already left the battlefield, the exile never happens.
         def resolve!(target:)
+          return unless game.battlefield.include?(actor)
+
           actor.exiled_cards << target.card
           exile_target(target)
         end
 
         # The reflexive target is mandatory (CR 603.3d): declining picks a legal creature.
         def decline!
+          return unless game.battlefield.include?(actor)
+
           target = choices.first
           resolve!(target: target) if target
         end
@@ -33,6 +38,8 @@ module Magic
 
         def resolve!(sacrifice: nil)
           super
+          return unless game.battlefield.include?(actor)
+
           exile_choice = ExileChoice.new(actor: actor)
           game.add_choice(exile_choice) if exile_choice.choices.any?
         end

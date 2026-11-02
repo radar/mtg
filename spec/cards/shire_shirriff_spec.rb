@@ -100,6 +100,21 @@ RSpec.describe Magic::Cards::ShireShirriff do
     expect(p2.creatures.count).to eq(1)
   end
 
+  it "exiles nothing if the Shirriff left the battlefield before the trigger resolved" do
+    token = make_token
+    s = ResolvePermanent("Shire Shirriff", owner: p1)
+    s.destroy!
+    game.settle!
+
+    game.resolve_choice!(sacrifice: token)
+    game.resolve_choice!(target: enemy_bears) if game.choices.any?
+    game.settle!
+
+    expect(p1.permanents).not_to include(token)
+    expect(p2.creatures).to contain_exactly(enemy_bears, enemy_ox)
+    expect(game.exile.cards).to be_empty
+  end
+
   it "returns the exiled creature when the Shirriff leaves the battlefield" do
     token = make_token
     s = ResolvePermanent("Shire Shirriff", owner: p1)
