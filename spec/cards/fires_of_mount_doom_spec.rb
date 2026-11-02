@@ -135,6 +135,22 @@ RSpec.describe Magic::Cards::FiresOfMountDoom do
       expect([p1.life, p2.life]).to eq([18, 15])
     end
 
+    it "deals 2 damage to each player exactly once when you cast a permanent that way" do
+      goblin = Card("Raging Goblin", owner: p1)
+      p1.library.add(goblin)
+      activate
+      expect(goblin.zone).to eq(game.exile)
+      p1.add_mana(red: 1)
+      action = cast_action(card: goblin, player: p1)
+      action.pay_mana(red: 1)
+      game.take_action(action)
+      game.settle!
+      game.stack.resolve!
+      game.settle!
+      expect(p1.creatures.map(&:name)).to include("Raging Goblin")
+      expect([p1.life, p2.life]).to eq([18, 18])
+    end
+
     it "still deals the damage when Fires has left the battlefield" do
       activate
       fires.destroy!
