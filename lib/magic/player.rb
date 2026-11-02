@@ -305,6 +305,17 @@ module Magic
       game.turns.none? { |turn| turn.active_player == self && turn.number > @damage_prevented_since_turn && turn.number <= game.current_turn.number }
     end
 
+    # "You gain protection from everything until your next turn": can't be targeted, damage to you is prevented.
+    def gain_protection_from_everything_until_next_turn!
+      @protected_from_everything_since_turn = game.current_turn.number
+    end
+
+    def protected_from_everything?
+      return false unless @protected_from_everything_since_turn
+
+      game.turns.none? { |turn| turn.active_player == self && turn.number > @protected_from_everything_since_turn && turn.number <= game.current_turn.number }
+    end
+
     def can_be_targeted_by?(source, controller: source&.controller, spell: nil)
       return true if source.nil?
       return false if hexproof? && controller != self
@@ -650,6 +661,8 @@ module Magic
     end
 
     def protected_from?(card)
+      return true if protected_from_everything?
+
       permanents.flat_map { |card| card.protections.player }.any? { |protection| protection.protected_from?(card) }
     end
 
