@@ -4,7 +4,7 @@ module Magic
       legendary_artifact
       cost generic: 3
       keywords :flash, :indestructible
-      equip [Costs::Mana.new(generic: 3)]
+      equip [Costs::Mana.new(generic: 3)], sorcery_speed: true
     end
 
     class MithrilCoat < Equipment

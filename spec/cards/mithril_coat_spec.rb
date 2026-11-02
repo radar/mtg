@@ -99,6 +99,18 @@ RSpec.describe Magic::Cards::MithrilCoat do
       expect(ability.costs.first.cost[:generic]).to eq(3)
     end
 
+    it "can only be equipped at sorcery speed" do
+      go_to_main_phase_for!(p2)
+      p1.add_mana(colorless: 3)
+
+      expect do
+        p1.activate_ability(ability: coat.activated_abilities.first) do |a|
+          a.pay_mana(generic: { colorless: 3 })
+          a.targeting(bears)
+        end
+      end.to raise_error(Magic::IllegalAction, /requirements to activate/)
+    end
+
     it "grants indestructible, which stops destruction" do
       expect(bears).not_to have_keyword(:indestructible)
       equip(coat, bears)
