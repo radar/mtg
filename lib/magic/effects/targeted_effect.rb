@@ -17,6 +17,7 @@ module Magic
 
         return true if target.respond_to?(:prevents_damage?) && target.prevents_damage?
         return true if damage_prevented_by_static_ability?
+        return true if damage_prevented_to_target_by_static_ability?
         return false unless target.respond_to?(:protected_from?)
 
         origin = source.respond_to?(:colors) ? source : (source.source if source.respond_to?(:source))
@@ -30,6 +31,14 @@ module Magic
         return false if origin.nil? || !respond_to?(:game) || game.nil?
 
         game.battlefield.static_abilities.any? { _1.respond_to?(:prevents_damage_from?) && _1.prevents_damage_from?(origin) }
+      end
+
+      # A battlefield static ability may answer `prevents_damage_to?(target)` ("Prevent all damage that would be dealt
+      # to this creature").
+      def damage_prevented_to_target_by_static_ability?
+        return false unless respond_to?(:game) && game
+
+        game.battlefield.static_abilities.any? { _1.respond_to?(:prevents_damage_to?) && _1.prevents_damage_to?(target) }
       end
     end
   end
