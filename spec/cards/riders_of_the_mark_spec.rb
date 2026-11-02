@@ -101,11 +101,13 @@ RSpec.describe Magic::Cards::RidersOfTheMark do
 
     it "creates no tokens if it left the battlefield before the trigger resolved" do
       attack_with(riders)
+      game.notify!(Magic::Events::BeginningOfEndStep.new(active_player: p1))
       riders.destroy!
       game.settle!
-      end_step
 
       expect(soldiers(p1)).to be_empty
+      expect(p1.graveyard.cards).to include(riders.card)
+      expect(p1.hand.cards).not_to include(riders.card)
     end
   end
 end
