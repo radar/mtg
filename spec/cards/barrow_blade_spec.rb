@@ -91,6 +91,20 @@ RSpec.describe Magic::Cards::BarrowBlade do
       expect(jazal).to have_keyword(:first_strike)
     end
 
+    it "does not restore abilities the blocker had already lost indefinitely" do
+      jazal.lose_all_abilities!
+      p1_attacks_with(bears, jazal)
+      game.settle!
+      game.tick!
+
+      current_turn.end!
+      current_turn.cleanup!
+      game.tick!
+
+      expect(jazal.lost_all_abilities?).to be true
+      expect(jazal).not_to have_keyword(:first_strike)
+    end
+
     it "does not affect the equipped creature itself" do
       p1_attacks_with(bears, jazal)
       game.settle!

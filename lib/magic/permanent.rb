@@ -788,9 +788,10 @@ module Magic
     end
 
     # "It loses all abilities until end of turn": restored by `cleanup!`.
+    # Tracked in its own flag so it never ends an indefinite `lose_all_abilities!` (CR 611.2).
     def lose_all_abilities_until_eot!
       @lost_abilities_until_eot = true
-      lose_all_abilities!
+      apply_continuous_effects!
     end
 
     # The end of a "loses all abilities until ..." effect.
@@ -800,7 +801,7 @@ module Magic
     end
 
     def lost_all_abilities?
-      !!(@lost_all_abilities || lost_all_abilities_by_effect)
+      !!(@lost_all_abilities || @lost_abilities_until_eot || lost_all_abilities_by_effect)
     end
 
     def alive?
@@ -1010,10 +1011,7 @@ module Magic
       @triggered_once_keys_this_turn = []
       @abilities_activated_this_turn = []
       @toughness_damage_until_eot = false
-      if @lost_abilities_until_eot
-        @lost_abilities_until_eot = false
-        @lost_all_abilities = false
-      end
+      @lost_abilities_until_eot = false
       remove_until_eot_protections!
       remove_until_eot_modifiers!
       if @copy_until_eot
