@@ -10,6 +10,14 @@ cmd=$(jq -r '
   | gsub("\u0027[^\u0027]*\u0027|\"[^\"]*\""; "\"\"")
 ')
 
+# Redirects that are fine: fd duplication (2>&1), /dev/null, and writes under tmp/. Whatever redirect is left
+# writes somewhere else, and is blocked below.
+redirects=$(jq -Rrs '
+  gsub("[0-9]?>&[0-9-]+"; "")
+  | gsub("&?[0-9]?>>?[ \\t]*/dev/null"; "")
+  | gsub("[0-9]?>[>|]?[ \\t]*tmp/[^ \\t;&|)]*"; "")
+' <<<"$cmd")
+
 # A command word: at start of line, or after ; & | ( or a newline.
 pos='(^|[;&|(]|\n)[[:space:]]*'
 
@@ -28,6 +36,10 @@ fi
 
 if [[ $cmd =~ ${pos}cat[[:space:]]*\>  ]]; then
   block "No heredoc or redirect file writes (cat > f). Use the Write tool."
+fi
+
+if [[ $redirects == *">"* ]]; then
+  block "No redirect file writes outside tmp/ (echo x > f, cat in > out, ...). Use the Write tool, or redirect into tmp/ with >|."
 fi
 
 if [[ $cmd =~ ${pos}find([[:space:]]|$) ]]; then
