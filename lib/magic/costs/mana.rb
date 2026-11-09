@@ -34,6 +34,7 @@ module Magic
           @cost = cost == 0 ? {} : cost
         end
         @balance = @cost.dup
+        @x_symbols = @cost[:x]
 
         @payments = Hash.new(0)
         @payments[:generic] = Hash.new(0)
@@ -162,6 +163,12 @@ module Magic
 
       def x
         cost[:x]
+      end
+
+      # Chooses X: owes `value` for each {X} symbol the cost was built with ({X}{X} owes 2 * value). Always works from
+      # the printed symbol count, so choosing again (or reusing this cost object) never compounds.
+      def choose_x!(value)
+        self.x = value.to_i * (@x_symbols || 1)
       end
 
       def paid?

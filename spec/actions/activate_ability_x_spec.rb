@@ -49,6 +49,19 @@ RSpec.describe Magic::Actions::ActivateAbility, "with {X} in the cost" do
     expect(seen).to be_empty
   end
 
+  it "does not compound X when an ability instance's cost object is reused" do
+    mana = Magic::Costs::Mana.new("{X}{G}")
+    reusing = Class.new(Magic::ActivatedAbility) do
+      define_method(:costs) { @costs ||= [mana] }
+      def resolve!(**) = nil
+    end.new(source: source)
+
+    p1.prepare_activate_ability(ability: reusing, value_for_x: 3)
+    p1.prepare_activate_ability(ability: reusing, value_for_x: 2)
+
+    expect(mana.x).to eq(2)
+  end
+
   it "can be activated with a larger X only when the mana is there" do
     p1.add_mana(green: 3)
 
