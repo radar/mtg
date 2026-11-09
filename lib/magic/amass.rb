@@ -6,18 +6,16 @@ module Magic
   #
   # Returns the Army that got the counters (nil if it couldn't be found).
   module Amass
-    GoblinArmyToken = Token.create "Goblin Army" do
-      creature_type "Goblin Army"
-      power 0
-      toughness 0
-      colors :black
-    end
+    @army_tokens = {}
 
-    OrcArmyToken = Token.create "Orc Army" do
-      creature_type "Orc Army"
-      power 0
-      toughness 0
-      colors :black
+    # One 0/0 black "<Type> Army" token class per creature type, built on first use.
+    def self.army_token(subtype)
+      @army_tokens[subtype] ||= Token.create "#{subtype} Army" do
+        creature_type "#{subtype} Army"
+        power 0
+        toughness 0
+        colors :black
+      end
     end
 
     def self.call(source:, controller:, amount:, subtype: "Goblin")
@@ -31,8 +29,7 @@ module Magic
     end
 
     def self.create_army(source:, controller:, subtype:)
-      token_class = subtype == "Orc" ? OrcArmyToken : GoblinArmyToken
-      created = source.create_token(token: token_class, controller: controller)
+      created = source.create_token(token: army_token(subtype), controller: controller)
       Array(created).flatten.first
     end
   end
