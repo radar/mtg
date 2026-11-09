@@ -18,6 +18,14 @@ RSpec.describe Magic::Cards::MindlessConscription do
     expect(armies.first.types).to include("Zombie")
   end
 
+  it "creates a Zombie Army token, not a Goblin Army" do
+    ResolvePermanent("Mindless Conscription", owner: p1)
+    game.settle!
+
+    expect(armies.first.name).to eq("Zombie Army")
+    expect(armies.first.types).not_to include("Goblin")
+  end
+
   it "amasses again when you draw your third card in a turn" do
     ResolvePermanent("Mindless Conscription", owner: p1)
     game.settle!

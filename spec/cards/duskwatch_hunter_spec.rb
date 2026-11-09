@@ -21,7 +21,7 @@ RSpec.describe Magic::Cards::DuskwatchHunter do
 
   it "can't be blocked by tokens but can be blocked by nontoken creatures" do
     game.resolve_choice!(target: hunter)
-    token = Magic::Amass::GoblinArmyToken.new(game: game, owner: p2, base_power: 2, base_toughness: 2).resolve!
+    token = Magic::Amass.army_token("Goblin").new(game: game, owner: p2, base_power: 2, base_toughness: 2).resolve!
     expect(token.token?).to eq(true)
     expect(hunter.can_be_blocked?(token)).to eq(false)
     expect(hunter.can_be_blocked?(bears)).to eq(true)
